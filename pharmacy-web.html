@@ -342,7 +342,7 @@ function openDetail(id){
   var r=rows.find(function(x){return x.id===id}); cur=clone(r);
   var ndrug=(cur.drugs&&cur.drugs.length)||0;
   document.getElementById('mTitle').textContent=cur.nut;
-  document.getElementById('mSub').textContent='부족 영양소 ID '+(cur.nid||'-')+' · 관련 약물 '+ndrug+'개';
+  document.getElementById('mSub').textContent='관련 약물 '+ndrug+'개';
   document.getElementById('basicH').innerHTML='기본 정보';
   document.getElementById('infoH').innerHTML='관련 약물 <span style="font-weight:600;color:var(--muted);font-size:11px">이 부족 영양소와 연결된 약물 (조회 전용)</span>';
   document.getElementById('mBasic').innerHTML=
