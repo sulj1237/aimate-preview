@@ -180,7 +180,7 @@
       <div class="tbl">
         <table>
           <thead><tr>
-            <th>부족 영양소</th><th>관련 카테고리</th><th>추천 효능군</th>
+            <th>부족 영양소</th><th>관련 카테고리</th>
             <th class="c">관련 약물 수</th><th>굿팜 추천 상품</th><th>우리약국 추천 상품</th>
             <th class="c">노출 상태</th><th>최종 수정</th>
           </tr></thead>
@@ -245,7 +245,6 @@ var rows = [
   { id:1, nut:"비타민 B12", nid:"NUT-B12", cat:"비타민 B군, 종합비타민", eff:"대사케어", on:true,
     mod:"2026-06-20", modBy:"admin",
     drugs:[ {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12 흡수가 저하되어 부족해질 위험"},
-            {code:"A10BA02R", comp:"메트포르민", form:"서방정(TR)", reason:"메트포르민 서방정도 동일 기전으로 B12 흡수가 저하될 수 있어 부족 위험"},
             {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12 유리가 감소해 흡수 저하"},
             {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 부족 위험"} ],
     prods:[ {nm:"○○ 비타민B 컴플렉스", bc:"8801111000022", kind:"건기식", on:true, def:true} ],
@@ -321,7 +320,7 @@ function renderList(){
     var modtxt = r.mod==='-' ? '<span style="color:#9aa4af">-</span>' : r.mod;
     b.insertAdjacentHTML('beforeend',
       '<tr class="click" onclick="openDetail('+r.id+')"><td class="nut">'+r.nut+'</td>'+
-      '<td>'+(r.cat||'-')+'</td><td>'+(r.eff||'-')+'</td>'+
+      '<td>'+(r.cat||'-')+'</td>'+
       '<td class="c">'+ndrug+'</td>'+
       '<td style="white-space:normal">'+gpTxt+'</td><td style="white-space:normal">'+stTxt+'</td>'+
       '<td class="c"><span class="onoff '+(r.on?'on':'off')+'">'+(r.on?'ON':'OFF')+'</span></td>'+
@@ -348,7 +347,6 @@ function openDetail(id){
   document.getElementById('mBasic').innerHTML=
     '<div class="kv"><div class="k">부족 영양소</div><div class="v">'+cur.nut+'</div></div>'+
     '<div class="kv"><div class="k">관련 카테고리</div><div class="v">'+(cur.cat||'-')+'</div></div>'+
-    '<div class="kv"><div class="k">추천 효능군</div><div class="v">'+(cur.eff||'-')+'</div></div>'+
     '<div class="kv"><div class="k">관련 약물 수</div><div class="v">'+ndrug+'개</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
   document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs)+
@@ -359,14 +357,14 @@ function openDetail(id){
   renderProds();
   document.getElementById('detailBg').classList.add('open');
 }
-// 관련 약물(조회 전용) — 성분코드·성분명·제형·부족해지는 이유
+// 관련 약물(조회 전용) — 성분코드·성분명·부족해지는 이유
 function relDrugsHtml(drugs){
   if(!drugs || !drugs.length) return '<div class="readbox">연결된 약물 데이터가 없습니다.</div>';
   return '<div class="tbl" style="overflow:auto"><table><thead><tr>'+
-    '<th>성분코드</th><th>성분명</th><th>제형</th><th>부족해지는 이유</th></tr></thead><tbody>'+
+    '<th>성분코드</th><th>성분명</th><th>부족해지는 이유</th></tr></thead><tbody>'+
     drugs.map(function(d){
       return '<tr><td style="white-space:nowrap;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8a9099">'+d.code+'</td>'+
-        '<td style="white-space:nowrap">'+d.comp+'</td><td style="white-space:nowrap">'+(d.form||'-')+'</td>'+
+        '<td style="white-space:nowrap">'+d.comp+'</td>'+
         '<td style="white-space:normal;min-width:200px">'+(d.reason||'-')+'</td></tr>';
     }).join('')+'</tbody></table></div>';
 }

@@ -105,6 +105,13 @@
   .celltx{width:100%;min-width:170px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11.5px;font-family:inherit;line-height:1.5;resize:vertical;min-height:48px;color:var(--ink);outline:none;background:#fff}
   .celltx:focus{border-color:var(--teal)}
   .edch{font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:5px;padding:1px 6px;margin-left:5px}
+  /* 추천 관리 상세 = 페이지 */
+  .dpage-head{display:flex;align-items:center;gap:14px;padding-bottom:15px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .dpage-head .dt{font-size:18px;font-weight:800}
+  .dpage-head .ds{font-size:12px;color:var(--muted);margin-top:2px}
+  .dpage-foot{display:flex;gap:8px;margin-left:auto}
+  .dpage-foot .btn{min-width:78px}
+  .dpage-body .block{max-width:860px}
   .mlist{border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .mli{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #eef1f4;font-size:12px}
   .mli:last-child{border:none}
@@ -172,8 +179,8 @@
         </div>
         <div class="tbl"><table>
           <thead><tr>
-            <th>부족 영양소</th><th>관련 카테고리</th><th>추천 효능군</th>
-            <th class="num">관련 약물 수</th><th class="num">굿팜 추천 상품 수</th><th class="num">약국 설정 수</th>
+            <th>부족 영양소</th><th>관련 카테고리</th>
+            <th class="num">관련 약물 수</th>
             <th class="c">노출</th><th>최종 수정일</th>
           </tr></thead>
           <tbody id="masterBody"></tbody>
@@ -207,78 +214,68 @@
         <div class="bar">
           <span class="total">전체 <b id="iTotal">0</b> 건</span>
           <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
-          <select class="sel" id="iForm" onchange="renderIngredients()"><option value="">제형 전체</option></select>
           <select class="sel" id="iNut" onchange="renderIngredients()"><option value="">연결 부족 영양소 전체</option></select>
           <span class="spacer"></span>
         </div>
         <div class="tbl"><table>
           <thead><tr>
-            <th>성분코드</th><th>성분명</th><th>제형</th><th class="num">연결 부족 영양소 수</th>
-            <th>연결 부족 영양소</th><th class="c">상태</th><th>최종 수정일</th><th>수정자</th>
+            <th>성분코드</th><th>성분명</th><th class="num">연결 부족 영양소 수</th><th>최종 수정일</th>
           </tr></thead>
           <tbody id="ingrBody"></tbody>
         </table></div>
-        <div class="note">성분명·제형은 <b>성분코드 기준 공통 정보</b>입니다. 수정하면 이 성분과 연결된 모든 부족 영양소 항목·AI mate 화면에 공통 반영됩니다. 부족해지는 이유·근거는 <b>(성분코드 × 부족 영양소)</b> 조합 정보라 여기서 수정하지 않습니다(추천 관리에서 관리).</div>
+        <div class="note">성분명은 <b>성분코드 기준 공통 정보</b>입니다. 수정하면 이 성분과 연결된 모든 부족 영양소 항목·AI mate 화면에 공통 반영됩니다. 성분코드는 제형 구분 없이 하나로 묶어 관리합니다. 부족해지는 이유·근거는 <b>(성분코드 × 부족 영양소)</b> 조합 정보로 성분 상세에서 조합별로 수정합니다.</div>
+      </div>
+
+      <!-- 추천 관리 상세 (모달 아닌 페이지) -->
+      <div id="recoDetail" class="hidden">
+        <div class="dpage-head">
+          <button class="btn" onclick="closeMaster()">← 목록</button>
+          <div style="flex:1;min-width:0"><div class="dt" id="mmTitle">—</div><div class="ds" id="mmSub">—</div></div>
+          <div class="dpage-foot" id="mmFoot"></div>
+        </div>
+        <div class="dpage-body">
+          <div class="block">
+            <div class="block-h">AI mate 노출</div>
+            <div class="exprow">
+              <div style="flex:1">
+                <div style="font-weight:700">AI mate·약사웹 추천에 노출</div>
+                <div style="font-size:11.5px;color:var(--muted);margin-top:2px">OFF로 두면 이 부족 영양소는 AI mate·약사웹에 노출되지 않습니다. <b>삭제는 노출 OFF 상태에서만 가능합니다.</b></div>
+              </div>
+              <div class="tg" id="fExpose" onclick="toggleTg()"></div>
+            </div>
+          </div>
+          <div class="block">
+            <div class="block-h">기본 정보</div>
+            <div class="kvs">
+              <div class="kv"><div class="k">부족 영양소</div><div class="v"><input class="fw" id="fNut" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+              <div class="kv"><div class="k">관련 약물 수</div><div class="v"><input class="fw" id="fRelCount" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+              <div class="kv"><div class="k">관련 카테고리</div><div class="v"><input class="fw" id="fCat" placeholder="쉼표(,)로 구분 · 예: 비타민 B군, 종합비타민"></div></div>
+            </div>
+            <div class="roinfo"><b>부족 영양소명은 고정</b>입니다. 이 화면에서는 관련 카테고리·굿팜 추천 상품·노출을 수정합니다. 성분명·부족해지는 이유·근거는 「AI mate 성분 관리」에서 관리합니다(아래 관련 약물 목록의 성분명 클릭 시 이동).</div>
+          </div>
+          <div class="block">
+            <div class="block-h">굿팜 추천 상품 <span style="font-weight:600;color:var(--muted);font-size:11px">부족 영양소별 기본값 · 약국 미설정 시 AI mate 노출 · 최대 2개</span></div>
+            <div id="mDefProds"></div>
+            <div id="mDefAdd" style="margin-top:8px">
+              <input class="fw" id="fDefSearch" placeholder="상품명 또는 바코드로 검색해 굿팜 추천 상품 추가" oninput="searchDef()" autocomplete="off">
+              <div id="fDefRes" style="display:none;border:1px solid #e3e6ea;border-radius:8px;margin-top:4px;max-height:150px;overflow:auto;background:#fff"></div>
+            </div>
+          </div>
+          <div class="block">
+            <div class="block-h">관련 약물 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">이 부족 영양소와 연결된 약물 (조회 전용) · 수정은 AI mate 성분 관리에서</span></div>
+            <div id="mRelDrugs"></div>
+            <div class="roinfo" style="margin-top:8px">부족해지는 <b>이유·근거(참고문헌)</b>는 <b>(성분코드 × 부족 영양소)</b> 조합 정보입니다. 같은 성분이라도 부족 영양소가 다르면 내용이 다릅니다. 수정은 <b>성분명을 클릭</b>해 「AI mate 성분 관리」에서 합니다.</div>
+          </div>
+          <div class="block" id="mmMatchBlock">
+            <div class="block-h">수정 이력 <span style="font-weight:600;color:var(--muted);font-size:11px">이 부족 영양소를 수정한 이력 (조회 전용)</span></div>
+            <div id="mmMatch"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 등록/수정 가운데 모달 -->
-<div class="modal-bg" id="mModal" onclick="if(event.target===this)closeMaster()">
-  <div class="modal">
-    <div class="m-head">
-      <div><div class="dt" id="mmTitle">—</div><div class="ds" id="mmSub">—</div></div>
-      <button class="x" onclick="closeMaster()">✕</button>
-    </div>
-    <div class="m-body">
-      <div class="block">
-        <div class="block-h">기본 정보</div>
-        <div class="kvs">
-          <div class="kv"><div class="k">부족 영양소</div><div class="v"><input class="fw" id="fNut" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
-          <div class="kv"><div class="k">관련 약물 수</div><div class="v"><input class="fw" id="fRelCount" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
-        </div>
-        <div class="roinfo"><b>부족 영양소명은 원칙상 수정할 수 없습니다.</b> 이 화면에서는 관련 카테고리·추천 효능군·굿팜 추천 상품·노출을 수정합니다. <b>성분명·제형과 부족해지는 이유·근거는 이 화면에서 수정하지 않고 「AI mate 성분 관리」에서 관리합니다</b>(아래 관련 약물 목록의 성분명을 클릭하면 이동).</div>
-      </div>
-      <div class="block">
-        <div class="block-h">굿팜 추천 상품 <span style="font-weight:600;color:var(--muted);font-size:11px">부족 영양소별 기본값 · 약국 미설정 시 AI mate 노출 · 최대 2개</span></div>
-        <div id="mDefProds"></div>
-        <div id="mDefAdd" style="margin-top:8px">
-          <input class="fw" id="fDefSearch" placeholder="상품명 또는 바코드로 검색해 굿팜 추천 상품 추가" oninput="searchDef()" autocomplete="off">
-          <div id="fDefRes" style="display:none;border:1px solid #e3e6ea;border-radius:8px;margin-top:4px;max-height:150px;overflow:auto;background:#fff"></div>
-        </div>
-      </div>
-      <div class="block">
-        <div class="block-h">관련 카테고리 <span style="font-weight:600;color:var(--muted);font-size:11px">쉼표(,)로 구분해 여러 개 입력 (예: 비타민 B군, 종합비타민)</span></div>
-        <input class="fw" id="fCat" placeholder="예: 비타민 B군, 종합비타민">
-      </div>
-      <div class="block">
-        <div class="block-h">추천 효능군 <span style="font-weight:600;color:var(--muted);font-size:11px">쉼표(,)로 구분 (예: 대사케어, 면역케어) · DIND 12개 효능군 기준</span></div>
-        <input class="fw" id="fEff" placeholder="예: 항산화&염증케어, 면역케어">
-      </div>
-      <div class="block">
-        <div class="block-h">AI mate 노출</div>
-        <div class="exprow">
-          <div style="flex:1">
-            <div style="font-weight:700">AI mate·약사웹 추천에 노출</div>
-            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">OFF로 두면 이 부족 영양소는 AI mate·약사웹에 노출되지 않습니다.</div>
-          </div>
-          <div class="tg" id="fExpose" onclick="toggleTg()"></div>
-        </div>
-      </div>
-      <div class="block">
-        <div class="block-h">관련 약물 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">이 부족 영양소와 연결된 약물 (조회 전용) · 수정은 AI mate 성분 관리에서</span></div>
-        <div id="mRelDrugs"></div>
-        <div class="roinfo" style="margin-top:8px">부족해지는 <b>이유·근거(참고문헌)</b>는 <b>(성분코드 × 부족 영양소)</b> 조합 정보입니다. 같은 성분이라도 부족 영양소가 다르면 내용이 다릅니다(오메프라졸→B12 vs 오메프라졸→칼슘은 서로 독립). 수정은 <b>성분명을 클릭</b>해 「AI mate 성분 관리」에서 조합별로 합니다.</div>
-      </div>
-      <div class="block" id="mmMatchBlock">
-        <div class="block-h">수정 이력 <span style="font-weight:600;color:var(--muted);font-size:11px">슈퍼어드민이 이 부족 영양소를 수정한 이력 (조회 전용)</span></div>
-        <div id="mmMatch"></div>
-      </div>
-    </div>
-    <div class="m-foot" id="mmFoot"></div>
-  </div>
-</div>
 <!-- 성분 정보 상세 모달 (AI mate 성분 관리) -->
 <div class="modal-bg" id="iModal" onclick="if(event.target===this)closeIngredient()">
   <div class="modal">
@@ -292,18 +289,21 @@
         <div class="kvs">
           <div class="kv"><div class="k">성분코드</div><div class="v"><input class="fw" id="fICode" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
           <div class="kv"><div class="k">성분명 *</div><div class="v"><input class="fw" id="fIComp" placeholder="성분명"></div></div>
-          <div class="kv"><div class="k">제형 *</div><div class="v"><input class="fw" id="fIForm" placeholder="예: 정제(TB)"></div></div>
           <div class="kv"><div class="k">연결 부족 영양소 수</div><div class="v"><input class="fw" id="fILink" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
         </div>
-        <div class="roinfo"><b>성분코드는 고정</b>이며 <b>성분명·제형</b>만 수정할 수 있습니다. 성분명·제형 수정 시 이 성분과 연결된 <b>모든 부족 영양소 항목·AI mate 화면에 공통 반영</b>됩니다. <b>부족해지는 이유·근거</b>는 아래 연결 부족 영양소 목록에서 <b>(성분코드 × 부족 영양소) 조합별로</b> 수정합니다(공통 반영 아님 — 조합마다 독립).</div>
+        <div class="roinfo"><b>성분코드는 고정</b>이며 <b>성분명</b>만 수정할 수 있습니다(성분코드는 제형 구분 없이 하나로 관리). 성분명 수정 시 이 성분과 연결된 <b>모든 부족 영양소 항목·AI mate 화면에 공통 반영</b>됩니다. <b>부족해지는 이유·근거</b>는 아래 연결 부족 영양소 목록에서 <b>(성분코드 × 부족 영양소) 조합별로</b> 수정합니다(공통 반영 아님 — 조합마다 독립).</div>
       </div>
       <div class="block">
-        <div class="block-h">연결 부족 영양소 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">부족해지는 이유·근거는 조합별 수정 · 영양소명·카테고리·효능군은 조회</span></div>
+        <div class="block-h">연결 부족 영양소 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">이유·근거는 조합별 수정 · 부족 영양소 추가/삭제 가능</span></div>
         <div id="iLinks"></div>
-        <div class="roinfo" style="margin-top:8px">부족해지는 이유·근거는 <b>(이 성분 × 각 부족 영양소)</b> 조합 정보입니다. 한 행을 고쳐도 다른 부족 영양소의 같은 성분 행에는 반영되지 않습니다(예: 오메프라졸→B12 ≠ 오메프라졸→칼슘). 공통 반영되는 값은 <b>성분명·제형</b>뿐입니다.</div>
+        <div id="iLinkAdd" style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          <select class="sel" id="fLinkNut" style="flex:1"></select>
+          <button class="btn" onclick="addLink()">＋ 부족 영양소 연결 추가</button>
+        </div>
+        <div class="roinfo" style="margin-top:8px">부족해지는 이유·근거는 <b>(이 성분 × 각 부족 영양소)</b> 조합 정보입니다. 한 행을 고쳐도 다른 부족 영양소의 같은 성분 행에는 반영되지 않습니다(예: 오메프라졸→B12 ≠ 오메프라졸→칼슘). <b>연결 추가/삭제</b>는 해당 부족 영양소의 관련 약물 목록에 이 성분을 넣거나 뺍니다.</div>
       </div>
       <div class="block">
-        <div class="block-h">수정 이력 <span style="font-weight:600;color:var(--muted);font-size:11px">성분명·제형 수정 이력 (조회 전용)</span></div>
+        <div class="block-h">수정 이력 <span style="font-weight:600;color:var(--muted);font-size:11px">성분명·이유/근거·연결 추가·삭제 이력 (조회 전용)</span></div>
         <div id="iHist"></div>
       </div>
     </div>
@@ -316,7 +316,7 @@
   <div class="modal" style="max-width:440px">
     <div class="m-head"><div><div class="dt">성분 정보 저장</div></div><button class="x" onclick="closeIConfirm()">✕</button></div>
     <div class="m-body">
-      <div style="font-size:13px;line-height:1.65"><b>성분명/제형 수정 시</b> 이 성분과 연결된 <b>모든 부족 영양소 항목</b> 및 <b>AI mate 화면</b>에 공통 반영됩니다.</div>
+      <div style="font-size:13px;line-height:1.65"><b>성분명 수정 시</b> 이 성분과 연결된 <b>모든 부족 영양소 항목</b> 및 <b>AI mate 화면</b>에 공통 반영됩니다.</div>
       <div class="block-h" style="margin:16px 0 8px">영향 범위</div>
       <div class="kvs">
         <div class="kv"><div class="k">연결 부족 영양소</div><div class="v" id="icNut">-</div></div>
@@ -324,6 +324,16 @@
       </div>
     </div>
     <div class="m-foot"><button class="btn" onclick="closeIConfirm()">취소</button><button class="btn primary" onclick="applyIngredient()">저장</button></div>
+  </div>
+</div>
+<!-- 삭제 불가 경고 모달 (노출 ON일 때) -->
+<div class="modal-bg" id="delWarn" onclick="if(event.target===this)closeDelWarn()" style="z-index:78">
+  <div class="modal" style="max-width:420px">
+    <div class="m-head"><div><div class="dt">삭제할 수 없습니다</div></div><button class="x" onclick="closeDelWarn()">✕</button></div>
+    <div class="m-body">
+      <div style="font-size:13px;line-height:1.7"><b>노출 ON 상태에서는 삭제할 수 없습니다.</b><br>삭제하려면 먼저 <b>AI mate 노출</b>을 OFF로 변경해 주세요.</div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeDelWarn()">닫기</button><button class="btn primary" onclick="offAndClose()">노출 OFF로 변경</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -336,7 +346,6 @@ var master = [
    defs:[{nm:"○○ 비타민B 컴플렉스",bc:"8801111000022"},{nm:"△△ 비타민B12 1000mcg",bc:"8809001112223"}], store:128, on:true, mod:"2026-06-20",
    drugs:[
      {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12-내인자 복합체 흡수가 저하되어 부족해질 위험", ref:"1) Metformin-associated vitamin B12 deficiency, Diabetes Care"},
-     {code:"A10BA02R", comp:"메트포르민", form:"서방정(TR)", reason:"메트포르민 서방정도 동일 기전으로 B12 흡수가 저하될 수 있어 부족 위험", ref:"1) Metformin and B12 status, Diabetes Care"},
      {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12의 유리가 감소해 흡수가 저하", ref:"1) Acid suppression and B12 malabsorption, review"},
      {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 장기 복용 시 부족 위험", ref:"1) PPI use and vitamin B12, JAMA"}
    ]},
@@ -385,7 +394,7 @@ var stats = [
 var adminHist = {
   "NUT-B12":[
     {at:"2026-06-20 10:12", field:"굿팜 추천 상품", before:"○○ 비타민B 컴플렉스", after:"○○ 비타민B 컴플렉스, △△ 비타민B12 1000mcg", by:"관리자 김OO"},
-    {at:"2026-06-05 14:30", field:"추천 효능군", before:"(없음)", after:"대사케어", by:"관리자 박OO"}
+    {at:"2026-06-05 14:30", field:"관련 카테고리", before:"비타민 B군", after:"비타민 B군, 종합비타민", by:"관리자 박OO"}
   ],
   "NUT-COQ10":[
     {at:"2026-06-24 09:40", field:"노출", before:"OFF", after:"ON", by:"관리자 김OO"},
@@ -393,6 +402,9 @@ var adminHist = {
   ],
   "NUT-CA":[
     {at:"2026-06-22 15:20", field:"굿팜 추천 상품", before:"○○ 칼슘 마그네슘 D", after:"○○ 칼슘 마그네슘 D, ○○ 칼슘 플러스", by:"관리자 박OO"}
+  ],
+  "NUT-VD":[
+    {at:"2026-06-12 16:40", field:"노출", before:"ON", after:"OFF", by:"관리자 박OO"}
   ]
 };
 // MVP: 성분 검색·직접 입력·신규 등록·업로드 제외 — 보유 Master 데이터 기반 조회·수정만. 성분명/성분코드는 고정값(읽기 전용).
@@ -451,15 +463,11 @@ function srcBadge(s){ return s==='store'?'<span class="stt ok">약국 설정</sp
 
 function renderMaster(){
   document.getElementById('masterBody').innerHTML = master.map(function(m,idx){
-    var nd=(m.defs&&m.defs.length)||0;
     var ndrug=(m.drugs&&m.drugs.length)||0;
     return '<tr class="click" onclick="openMaster('+idx+')">'+
       '<td class="nut">'+m.nut+'</td>'+
       '<td>'+(m.cat||'-')+'</td>'+
-      '<td>'+(m.eff||'-')+'</td>'+
       '<td class="num">'+ndrug+'</td>'+
-      '<td class="num">'+(nd?nd+'개':'<span style="color:#9aa4af">미설정</span>')+'</td>'+
-      '<td class="num">'+(m.store||0)+'</td>'+
       '<td class="c"><span class="stt '+(m.on?'ok':'hide')+'">'+(m.on?'ON':'OFF')+'</span></td>'+
       '<td>'+m.mod+'</td></tr>';
   }).join('');
@@ -470,12 +478,11 @@ function renderRelDrugs(drugs){
   var c=document.getElementById('mRelDrugs');
   if(!drugs || !drugs.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
   c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
-    '<th>성분코드</th><th>성분명</th><th>제형</th><th>부족해지는 이유</th><th>근거/참고문헌</th></tr></thead><tbody>'+
+    '<th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거/참고문헌</th></tr></thead><tbody>'+
     drugs.map(function(d){
       return '<tr>'+
         '<td class="mono" style="white-space:nowrap;color:#8a9099">'+d.code+'</td>'+
         '<td style="white-space:nowrap"><a onclick="openIngredientByCode(\''+d.code+'\')" style="color:var(--teal-d);font-weight:700;cursor:pointer;text-decoration:underline" title="AI mate 성분 관리에서 수정">'+d.comp+'</a></td>'+
-        '<td style="white-space:nowrap">'+(d.form||'-')+'</td>'+
         '<td style="white-space:normal;min-width:210px">'+(d.reason||'-')+'</td>'+
         '<td style="white-space:normal;min-width:160px;color:#8a9099">'+(d.ref||'-')+'</td></tr>';
     }).join('')+'</tbody></table></div>';
@@ -496,7 +503,6 @@ function openMaster(idx){
   document.getElementById('fNut').value = m.nut||'';
   document.getElementById('fRelCount').value = ndrug+'개';
   document.getElementById('fCat').value = m.cat && m.cat!=='-' ? m.cat : '';
-  document.getElementById('fEff').value = m.eff && m.eff!=='-' ? m.eff : '';
   renderRelDrugs(idx<0 ? [] : (m.drugs||[]));
   document.getElementById('mmMatchBlock').style.display = idx<0 ? 'none' : '';
   renderMatchHist(idx<0 ? '' : m.nid);
@@ -504,7 +510,9 @@ function openMaster(idx){
   document.getElementById('mmFoot').innerHTML = idx<0
     ? '<button class="btn" onclick="closeMaster()">취소</button><button class="btn primary" onclick="saveMaster()">등록</button>'
     : '<button class="btn danger" onclick="deleteMaster('+idx+')">삭제</button><button class="btn primary" onclick="saveMaster()">저장</button>';
-  document.getElementById('mModal').classList.add('open');
+  document.getElementById('pageReco').classList.add('hidden');
+  document.getElementById('recoDetail').classList.remove('hidden');
+  if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
 function syncTg(){ document.getElementById('fExpose').classList.toggle('on', curOn); }
 function toggleTg(){ curOn=!curOn; syncTg(); }
@@ -512,23 +520,38 @@ function saveMaster(){
   var nut=document.getElementById('fNut').value.trim();
   if(!nut){ toast('부족 영양소명이 필요합니다.'); return; }
   var rec = curIdx<0 ? {store:0, drugs:[], nid:''} : master[curIdx];
-  rec.nut=nut;
-  rec.cat=document.getElementById('fCat').value.trim();
-  rec.eff=document.getElementById('fEff').value.trim();
-  rec.defs=curDefs.map(function(x){return {nm:x.nm,bc:x.bc}});
-  rec.on=curOn; rec.mod='2026-07-14';
+  var newCat=document.getElementById('fCat').value.trim();
+  var newDefs=curDefs.map(function(x){return {nm:x.nm,bc:x.bc}});
+  // 수정 이력 — 변경된 항목만 케이스별로 기록(관련 카테고리 / 굿팜 추천 상품 / 노출)
+  if(curIdx>=0){
+    var hist=[];
+    if((rec.cat||'')!==newCat) hist.push({field:'관련 카테고리', before:rec.cat||'(없음)', after:newCat||'(없음)'});
+    var oldNames=(rec.defs||[]).map(function(p){return p.nm;}).join(', ');
+    var newNames=newDefs.map(function(p){return p.nm;}).join(', ');
+    if(oldNames!==newNames) hist.push({field:'굿팜 추천 상품', before:oldNames||'(없음)', after:newNames||'(없음)'});
+    if(!!rec.on!==!!curOn) hist.push({field:'노출', before:rec.on?'ON':'OFF', after:curOn?'ON':'OFF'});
+    if(hist.length){ if(!adminHist[rec.nid]) adminHist[rec.nid]=[]; hist.forEach(function(h){ adminHist[rec.nid].unshift({at:'2026-07-14 10:00', field:h.field, before:h.before, after:h.after, by:'관리자 김OO'}); }); }
+  }
+  rec.nut=nut; rec.cat=newCat; rec.defs=newDefs; rec.on=curOn; rec.mod='2026-07-14';
   if(curIdx<0) master.unshift(rec);
   renderMaster(); closeMaster(); toast(curIdx<0?'부족 영양소 추천을 등록했습니다.':'저장했습니다.');
 }
 function deleteMaster(idx){
+  // 삭제는 노출 OFF 상태에서만 가능 — ON이면 경고 모달
+  if(curOn){ document.getElementById('delWarn').classList.add('open'); return; }
   var m=master[idx];
   var msg = (m && m.store>0)
-    ? '⚠ 이 부족 영양소에 우리약국 추천 상품을 등록한 약국 '+m.store+'곳이 있습니다.\n삭제하면 해당 약국 설정도 AI mate·약사웹에 노출되지 않습니다.\n\n삭제 대신 「노출 OFF」를 권장합니다. 그래도 삭제할까요?'
+    ? '⚠ 이 부족 영양소에 우리약국 추천 상품을 등록한 약국 '+m.store+'곳이 있습니다.\n삭제하면 해당 약국 설정도 AI mate·약사웹에 노출되지 않습니다.\n\n그래도 삭제할까요?'
     : '이 부족 영양소를 삭제할까요? AI mate·약사웹 추천에서 제외됩니다.';
   if(!confirm(msg)) return;
   master.splice(idx,1); renderMaster(); closeMaster(); toast('삭제했습니다.');
 }
-function closeMaster(){ document.getElementById('mModal').classList.remove('open'); }
+function closeMaster(){
+  document.getElementById('recoDetail').classList.add('hidden');
+  document.getElementById('pageReco').classList.remove('hidden');
+}
+function closeDelWarn(){ document.getElementById('delWarn').classList.remove('open'); }
+function offAndClose(){ curOn=false; syncTg(); closeDelWarn(); toast('노출을 OFF로 변경했습니다. 이제 삭제할 수 있습니다.'); }
 function renderStats(){
   document.getElementById('statBody').innerHTML = stats.map(function(s){
     return '<tr><td class="nut">'+s.nut+'</td><td class="num">'+s.comps+'</td><td class="num">'+s.rx.toLocaleString()+'</td>'+
@@ -557,7 +580,6 @@ function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt);
 // 성분 마스터 — 성분명·제형은 성분코드 기준 공통값(단일 소스). status: 사용/검토/제외
 var ingredients = [
   {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", status:"사용", mod:"2026-06-20", modBy:"관리자 김OO"},
-  {code:"A10BA02R", comp:"메트포르민", form:"서방정(TR)", status:"사용", mod:"2026-06-20", modBy:"관리자 김OO"},
   {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", status:"사용", mod:"2026-06-18", modBy:"관리자 박OO"},
   {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", status:"사용", mod:"2026-06-22", modBy:"관리자 박OO"},
   {code:"C10AA05", comp:"아토르바스타틴", form:"정제(TB)", status:"사용", mod:"2026-06-24", modBy:"관리자 김OO"},
@@ -568,11 +590,16 @@ var ingredients = [
 ];
 var ingHist = {
   "A02BC01":[
-    {at:"2026-06-22 15:20", by:"관리자 박OO", field:"제형", before:"경질캡슐(CH)", after:"장용캡슐(CE)"},
+    {at:"2026-06-22 15:20", by:"관리자 박OO", field:"부족해지는 이유 · 칼슘", before:"위산 감소로 칼슘 흡수 저하", after:"위산 감소로 칼슘의 이온화·흡수가 저하되어 부족 위험"},
+    {at:"2026-06-10 11:00", by:"관리자 박OO", field:"부족 영양소 연결 추가", before:"-", after:"마그네슘"},
     {at:"2026-06-01 09:10", by:"관리자 박OO", field:"성분명", before:"오메프라졸염", after:"오메프라졸"}
   ],
   "C10AA05":[
-    {at:"2026-06-24 09:40", by:"관리자 김OO", field:"성분명", before:"아토르바스타틴칼슘", after:"아토르바스타틴"}
+    {at:"2026-06-24 09:40", by:"관리자 김OO", field:"성분명", before:"아토르바스타틴칼슘", after:"아토르바스타틴"},
+    {at:"2026-06-20 13:25", by:"관리자 김OO", field:"근거/참고문헌 · 코엔자임Q10", before:"(없음)", after:"1) Statin therapy and CoQ10 depletion, Am J Cardiol"}
+  ],
+  "R03AC02":[
+    {at:"2026-05-30 10:05", by:"관리자 김OO", field:"부족 영양소 연결 삭제", before:"나트륨", after:"-"}
   ]
 };
 function ingStt(s){ return s==='사용'?'<span class="stt ok">사용</span>':s==='검토'?'<span class="stt need">검토</span>':'<span class="stt hide">제외</span>'; }
@@ -586,6 +613,7 @@ function ingredientLinks(code){
 }
 function showPage(p){
   var reco = p!=='ingr';
+  document.getElementById('recoDetail').classList.add('hidden');
   document.getElementById('pageReco').classList.toggle('hidden', !reco);
   document.getElementById('pageIngr').classList.toggle('hidden', reco);
   document.getElementById('navReco').classList.toggle('on', reco);
@@ -593,68 +621,81 @@ function showPage(p){
   document.getElementById('pgTitle').textContent = reco ? 'AI mate 추천 관리' : 'AI mate 성분 관리';
   document.getElementById('pgFilter').textContent = reco
     ? '부족 영양소 기준 추천 상품 Master · 굿팜 기본 추천 상품(최대 2)·노출 관리 · 관련 약물/근거는 참고 정보'
-    : '성분코드 기준 공통 정보(성분명·제형) 관리 · 수정 시 연결된 모든 부족 영양소·AI mate 화면에 공통 반영';
+    : '성분코드 기준 공통 정보(성분명) 관리 · 수정 시 연결된 모든 부족 영양소·AI mate 화면에 공통 반영';
   if(!reco) renderIngredients();
 }
 function fillIngFilters(){
-  var forms=[], nuts=[];
-  ingredients.forEach(function(g){ if(forms.indexOf(g.form)<0) forms.push(g.form); });
+  var nuts=[];
   master.forEach(function(m){ if(nuts.indexOf(m.nut)<0) nuts.push(m.nut); });
-  document.getElementById('iForm').innerHTML='<option value="">제형 전체</option>'+forms.map(function(f){return '<option>'+f+'</option>';}).join('');
   document.getElementById('iNut').innerHTML='<option value="">연결 부족 영양소 전체</option>'+nuts.map(function(n){return '<option>'+n+'</option>';}).join('');
 }
 function renderIngredients(){
   var q=(document.getElementById('iSearch').value||'').trim().toLowerCase();
-  var ff=document.getElementById('iForm').value, nf=document.getElementById('iNut').value;
+  var nf=document.getElementById('iNut').value;
   var list=ingredients.filter(function(g){
     var links=ingredientLinks(g.code);
     if(q && g.code.toLowerCase().indexOf(q)<0 && g.comp.toLowerCase().indexOf(q)<0) return false;
-    if(ff && g.form!==ff) return false;
     if(nf && !links.some(function(l){return l.nut===nf;})) return false;
     return true;
   });
   document.getElementById('ingrBody').innerHTML = list.map(function(g){
     var links=ingredientLinks(g.code);
-    var nutTxt = links.length ? links.map(function(l){return l.nut;}).join(', ') : '<span style="color:#9aa4af">-</span>';
     return '<tr class="click" onclick="openIngredient(\''+g.code+'\')">'+
-      '<td class="mono">'+g.code+'</td><td>'+g.comp+'</td><td>'+g.form+'</td>'+
-      '<td class="num">'+links.length+'</td>'+
-      '<td style="white-space:normal">'+nutTxt+'</td>'+
-      '<td class="c">'+ingStt(g.status)+'</td><td>'+g.mod+'</td><td>'+(g.modBy||'-')+'</td></tr>';
+      '<td class="mono">'+g.code+'</td><td>'+g.comp+'</td>'+
+      '<td class="num">'+links.length+'</td><td>'+g.mod+'</td></tr>';
   }).join('');
   document.getElementById('iTotal').textContent = list.length.toLocaleString();
 }
 var curIng=null;
-var curLinks=[];   // 연결 부족 영양소 편집용 사본 ((성분×영양소) 이유·근거만 수정)
+var curLinks=[];       // 연결 부족 영양소 편집용 사본
+var curLinksOrig=[];   // 열었을 때 원본(수정 이력 비교용)
 function openIngredient(code){
   var g=ingredients.find(function(x){return x.code===code;}); if(!g){ toast('성분 정보를 찾을 수 없습니다.'); return; }
   curIng=g;
   var links=ingredientLinks(code);
-  curLinks = links.map(function(l){ return {nid:l.nid, nut:l.nut, cat:l.cat, eff:l.eff, reason:l.reason, ref:l.ref}; });
+  curLinks = links.map(function(l){ return {nid:l.nid, nut:l.nut, cat:l.cat, reason:l.reason, ref:l.ref}; });
+  curLinksOrig = links.map(function(l){ return {nid:l.nid, nut:l.nut, reason:l.reason, ref:l.ref}; });
   document.getElementById('imSub').textContent = g.comp+' · '+g.code;
   document.getElementById('fICode').value=g.code;
   document.getElementById('fIComp').value=g.comp;
-  document.getElementById('fIForm').value=g.form;
-  document.getElementById('fILink').value=links.length+'개';
-  renderILinks(); renderIngHist(code);
+  renderILinks(); refreshLinkAdd(); renderIngHist(code);
   document.getElementById('iModal').classList.add('open');
 }
 // 추천 관리 관련 약물 목록의 성분명 클릭 → 성분 상세 모달
 function openIngredientByCode(code){ openIngredient(code); }
-// 연결 부족 영양소 목록 — 영양소명·카테고리·효능군은 조회, 부족해지는 이유·근거는 조합별 수정
+// 연결 부족 영양소 목록 — 이유·근거는 조합별 수정, 부족 영양소 추가/삭제 가능
 function renderILinks(){
   var c=document.getElementById('iLinks');
-  if(!curLinks || !curLinks.length){ c.innerHTML='<div class="readbox">연결된 부족 영양소가 없습니다.</div>'; return; }
+  document.getElementById('fILink').value=curLinks.length+'개';
+  if(!curLinks.length){ c.innerHTML='<div class="readbox">연결된 부족 영양소가 없습니다. 아래에서 추가하세요.</div>'; return; }
   c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
-    '<th>부족 영양소명</th><th>관련 카테고리</th><th>추천 효능군</th>'+
-    '<th>부족해지는 이유 <span class="edch">수정</span></th><th>근거/참고문헌 <span class="edch">수정</span></th></tr></thead><tbody>'+
+    '<th>부족 영양소명</th><th>관련 카테고리</th>'+
+    '<th>부족해지는 이유 <span class="edch">수정</span></th><th>근거/참고문헌 <span class="edch">수정</span></th><th class="c">삭제</th></tr></thead><tbody>'+
     curLinks.map(function(l,i){
       return '<tr><td class="nut" style="white-space:nowrap">'+l.nut+'</td>'+
-        '<td style="white-space:nowrap">'+(l.cat||'-')+'</td><td style="white-space:nowrap">'+(l.eff||'-')+'</td>'+
-        '<td style="min-width:220px"><textarea class="celltx" oninput="curLinks['+i+'].reason=this.value" placeholder="부족해지는 이유">'+(l.reason||'')+'</textarea></td>'+
-        '<td style="min-width:170px"><textarea class="celltx" oninput="curLinks['+i+'].ref=this.value" placeholder="근거/참고문헌">'+(l.ref||'')+'</textarea></td></tr>';
+        '<td style="white-space:nowrap">'+(l.cat||'-')+'</td>'+
+        '<td style="min-width:210px"><textarea class="celltx" oninput="curLinks['+i+'].reason=this.value" placeholder="부족해지는 이유">'+(l.reason||'')+'</textarea></td>'+
+        '<td style="min-width:160px"><textarea class="celltx" oninput="curLinks['+i+'].ref=this.value" placeholder="근거/참고문헌">'+(l.ref||'')+'</textarea></td>'+
+        '<td class="c"><button class="btn sm danger" onclick="delLink('+i+')">삭제</button></td></tr>';
     }).join('')+'</tbody></table></div>';
 }
+// 연결 추가 드롭다운 — 아직 연결되지 않은 부족 영양소만
+function refreshLinkAdd(){
+  var sel=document.getElementById('fLinkNut');
+  var avail=master.filter(function(m){ return !curLinks.some(function(l){return l.nid===m.nid;}); });
+  sel.innerHTML = avail.length
+    ? avail.map(function(m){return '<option value="'+m.nid+'">'+m.nut+'</option>';}).join('')
+    : '<option value="">연결 가능한 부족 영양소 없음</option>';
+  document.getElementById('iLinkAdd').style.display = avail.length ? 'flex' : 'none';
+}
+function addLink(){
+  var nid=document.getElementById('fLinkNut').value; if(!nid) return;
+  var m=master.find(function(x){return x.nid===nid;}); if(!m) return;
+  if(curLinks.some(function(l){return l.nid===nid;})) return;
+  curLinks.push({nid:m.nid, nut:m.nut, cat:m.cat, reason:'', ref:''});
+  renderILinks(); refreshLinkAdd();
+}
+function delLink(i){ curLinks.splice(i,1); renderILinks(); refreshLinkAdd(); }
 function renderIngHist(code){
   var c=document.getElementById('iHist'); var list=ingHist[code]||[];
   if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }
@@ -669,11 +710,10 @@ function renderIngHist(code){
 function closeIngredient(){ document.getElementById('iModal').classList.remove('open'); }
 function askSaveIngredient(){
   if(!curIng) return;
-  var comp=document.getElementById('fIComp').value.trim(), form=document.getElementById('fIForm').value.trim();
-  if(!comp || !form){ toast('성분명·제형을 입력해 주세요.'); return; }
-  // 성분명·제형(공용값)이 바뀐 경우에만 공통 반영 확인 모달. 이유·근거만 바뀌면 바로 저장.
-  var compChanged = (comp!==curIng.comp)||(form!==curIng.form);
-  if(!compChanged){ applyIngredient(); return; }
+  var comp=document.getElementById('fIComp').value.trim();
+  if(!comp){ toast('성분명을 입력해 주세요.'); return; }
+  // 성분명(공용값)이 바뀐 경우에만 공통 반영 확인 모달. 그 외(이유·근거·연결)만 바뀌면 바로 저장.
+  if(comp===curIng.comp){ applyIngredient(); return; }
   var links=ingredientLinks(curIng.code);
   var expo=links.filter(function(l){return l.on;}).length;
   var storeSum=links.reduce(function(a,l){return a+(l.store||0);},0);
@@ -684,23 +724,36 @@ function askSaveIngredient(){
 function closeIConfirm(){ document.getElementById('iConfirm').classList.remove('open'); }
 function applyIngredient(){
   if(!curIng) return;
-  var comp=document.getElementById('fIComp').value.trim(), form=document.getElementById('fIForm').value.trim();
-  var changed=[];
-  if(comp!==curIng.comp) changed.push({field:'성분명', before:curIng.comp, after:comp});
-  if(form!==curIng.form) changed.push({field:'제형', before:curIng.form, after:form});
-  // 성분명·제형(공용값) — 연결된 모든 부족 영양소의 관련 약물에 공통 전파
-  curIng.comp=comp; curIng.form=form;
-  master.forEach(function(m){ (m.drugs||[]).forEach(function(d){ if(d.code===curIng.code){ d.comp=comp; d.form=form; } }); });
-  // 부족해지는 이유·근거 — (성분 × 각 부족 영양소) 조합별로만 반영
-  curLinks.forEach(function(l){ var m=master.find(function(x){return x.nid===l.nid;}); if(!m)return;
-    (m.drugs||[]).forEach(function(d){ if(d.code===curIng.code){ d.reason=l.reason; d.ref=l.ref; } }); });
-  if(changed.length){ curIng.mod='2026-07-14'; curIng.modBy='관리자 김OO';
+  var comp=document.getElementById('fIComp').value.trim();
+  var hist=[];
+  // 1) 성분명(공용값) — 변경 시 연결된 모든 관련 약물에 전파
+  if(comp!==curIng.comp) hist.push({field:'성분명', before:curIng.comp, after:comp});
+  curIng.comp=comp;
+  master.forEach(function(m){ (m.drugs||[]).forEach(function(d){ if(d.code===curIng.code){ d.comp=comp; } }); });
+  // 2) 연결 reconcile — 삭제 / 추가 / 이유·근거 수정
+  var curByNid={}; curLinks.forEach(function(l){ curByNid[l.nid]=l; });
+  var origByNid={}; curLinksOrig.forEach(function(o){ origByNid[o.nid]=o; });
+  curLinksOrig.forEach(function(o){ if(!curByNid[o.nid]){
+    var m=master.find(function(x){return x.nid===o.nid;});
+    if(m){ var di=(m.drugs||[]).findIndex(function(d){return d.code===curIng.code;}); if(di>=0) m.drugs.splice(di,1); }
+    hist.push({field:'부족 영양소 연결 삭제', before:o.nut, after:'-'});
+  }});
+  curLinks.forEach(function(l){
+    var m=master.find(function(x){return x.nid===l.nid;}); if(!m) return;
+    var d=(m.drugs||[]).find(function(x){return x.code===curIng.code;});
+    if(!d){ m.drugs.push({code:curIng.code, comp:curIng.comp, form:'', reason:l.reason||'', ref:l.ref||''});
+      hist.push({field:'부족 영양소 연결 추가', before:'-', after:l.nut}); }
+    else { var o=origByNid[l.nid];
+      if(o && (o.reason||'')!==(l.reason||'')) hist.push({field:'부족해지는 이유 · '+l.nut, before:o.reason||'(없음)', after:l.reason||'(없음)'});
+      if(o && (o.ref||'')!==(l.ref||'')) hist.push({field:'근거/참고문헌 · '+l.nut, before:o.ref||'(없음)', after:l.ref||'(없음)'});
+      d.reason=l.reason; d.ref=l.ref; d.comp=curIng.comp; }
+  });
+  // 3) 수정 이력 기록
+  if(hist.length){ curIng.mod='2026-07-14'; curIng.modBy='관리자 김OO';
     if(!ingHist[curIng.code]) ingHist[curIng.code]=[];
-    changed.forEach(function(ch){ ingHist[curIng.code].unshift({at:'2026-07-14 10:00', by:'관리자 김OO', field:ch.field, before:ch.before, after:ch.after}); }); }
+    hist.forEach(function(h){ ingHist[curIng.code].unshift({at:'2026-07-14 10:00', by:'관리자 김OO', field:h.field, before:h.before, after:h.after}); }); }
   closeIConfirm(); closeIngredient(); renderIngredients();
-  toast(changed.length
-    ? '성분 정보를 저장했습니다. 성분명·제형은 연결된 모든 부족 영양소·AI mate에 공통 반영됩니다.'
-    : '부족해지는 이유·근거를 저장했습니다. (해당 성분×영양소 조합에만 반영)');
+  toast(hist.length ? '성분 정보를 저장했습니다. (성분명은 전 화면 공통 · 이유/근거·연결은 조합별 반영)' : '변경 사항이 없습니다.');
 }
 
 renderMaster(); renderStats(); fillIngFilters(); renderIngredients();
