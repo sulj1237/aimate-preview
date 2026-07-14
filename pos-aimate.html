@@ -309,54 +309,48 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// 데이터 매핑: 약물 기준으로 노출하되, 추천 상품은 약물에 직접 매핑된 게 아니라
-//   해당 약물과 연결된 '부족 영양소'의 추천 상품을 부족 영양소 Master에서 조회해 노출한다.
-//   nut=부족 위험 영양소, cat=관련 카테고리(영양소 Master), prods=추천 상품(영양소 Master),
-//   info/ref=부족해지는 이유·근거(약물×영양소 세부 데이터에서 조회)
-// 추천 상품은 출처별로 분리: gp=굿팜(영양소 Master 기본) 최대 2 · store=우리약국(약국 등록) 최대 3
-var recos = [
-  { nut:"코엔자임Q10", cat:"항산화 작용",
-    gp:[{nm:"○○ 코엔자임Q10 100mg"},{nm:"△△ 코큐텐 이지 200mg"}],
-    store:[{nm:"□□ 코엔자임Q10 이지"}],
-    info:"스타틴 계열은 체내 코엔자임Q10 생성을 줄일 수 있어 부족해질 위험이 있습니다.",
-    ref:"1) Statin therapy and CoQ10 depletion, Am J Cardiol" },
-  // 우리약국 미등록 + 굿팜 있음 → 우측에 등록 CTA 노출(정책5)
-  { nut:"비타민 B12", cat:"비타민 B군, 종합비타민",
-    gp:[{nm:"○○ 비타민B 컴플렉스"}],
-    store:[],
-    info:"위산분비억제제(H2 차단제)를 장기 복용하면 비타민 B12 흡수가 저하되어 부족해질 위험이 있습니다.",
-    ref:"1) Acid suppression and vitamin B12 malabsorption, review" },
-  // 우리약국 미등록 + 굿팜 있음 → 등록 CTA(정책5)
-  { nut:"철분(Fe)", cat:"철분제",
-    gp:[{nm:"○○ 훼로바-유 서방정"}],
-    store:[],
-    info:"위산이 줄면 철분의 이온화가 방해되어 흡수가 떨어지고 부족해질 위험이 있습니다.",
-    ref:"1) Gastric acidity and iron absorption, review" },
+// 데이터 매핑(2층):
+//  ① 부족 영양소 Master(nutMaster) — 부족 영양소 ID 기준. 추천 상품(gp/store)·관련 카테고리는 영양소 종속.
+//  ② 약물×영양소 근거(drugs[].depl) — '부족해지는 근거(info)·참고문헌(ref)'는 (처방 약물 × 해당 영양소) 조합에서 가져온다.
+// → 화면 흐름: "이 약물 때문에 → 이 영양소가 부족 → 그래서 이 상품 추천". 같은 영양소라도 약물이 다르면 근거 문구가 다르다.
+var nutMaster = {
+  "NUT-COQ10":{ nut:"코엔자임Q10", cat:"항산화 작용",
+    gp:[{nm:"○○ 코엔자임Q10 100mg"},{nm:"△△ 코큐텐 이지 200mg"}], store:[{nm:"□□ 코엔자임Q10 이지"}] },
+  // 우리약국 미등록 + 굿팜 있음 → 우측에 등록 CTA(정책5)
+  "NUT-B12":{ nut:"비타민 B12", cat:"비타민 B군, 종합비타민",
+    gp:[{nm:"○○ 비타민B 컴플렉스"}], store:[] },
+  "NUT-FE":{ nut:"철분(Fe)", cat:"철분제",
+    gp:[{nm:"○○ 훼로바-유 서방정"}], store:[] },
   // 추천 상품 전무 → 우측 '추천 상품이 없습니다'(정책4)
-  { nut:"칼슘(Ca)", cat:"칼슘 및 미네랄제품",
-    gp:[],
-    store:[],
-    info:"위산 감소로 칼슘 흡수가 저하되어 장기 복용 시 부족해질 위험이 있습니다.",
-    ref:"" },
-  // 4번째 성분(더보기 안에 노출) · 우리약국+굿팜 모두 있음
-  { nut:"마그네슘(Mg)", cat:"마그네슘 및 미네랄제품",
-    gp:[{nm:"○○ 마그네슘 비스글리시네이트"}],
-    store:[{nm:"□□ 마그네슘 350"}],
-    info:"위산분비억제제 장기 복용은 저마그네슘혈증(마그네슘 부족) 위험을 높일 수 있습니다.",
-    ref:"1) PPIs and hypomagnesemia, FDA safety communication" }
-];
-// 처방 약물 + 약물별 관련 추천(rec = recos 인덱스). rec 없으면 추천 없음.
+  "NUT-CA":{ nut:"칼슘(Ca)", cat:"칼슘 및 미네랄제품",
+    gp:[], store:[] },
+  // 우리약국+굿팜 모두 있음
+  "NUT-MG":{ nut:"마그네슘(Mg)", cat:"마그네슘 및 미네랄제품",
+    gp:[{nm:"○○ 마그네슘 비스글리시네이트"}], store:[{nm:"□□ 마그네슘 350"}] }
+};
+// 약물×영양소 근거를 영양소 Master 상품과 합쳐 렌더용 객체로 만든다.
+function reco(x){
+  var m=nutMaster[x.nid]||{nut:'(미지정)',cat:'-',gp:[],store:[]};
+  return { nut:m.nut, cat:m.cat, gp:m.gp, store:m.store, info:x.info, ref:x.ref };
+}
+// 처방 약물 + 약물이 고갈시키는 부족 영양소(depl). 각 depl은 {nid, info, ref}:
+//   nid=부족 영양소 ID(→ nutMaster에서 추천 상품 조회), info/ref=이 약물×영양소의 부족해지는 근거·참고문헌.
 var drugs = [
   { name:"세비카정5/20밀리그램", img:"💊", pill:true, comp:"amlodipine besylate (as amlodipine) 5mg, 올메사르탄메독소밀 20mg", eff:"혈압강하제", dose:"1정<br/>하루 1회",
-    warn:"· 증상이 없어도 투여를 중단하지 말고 정해진 용법·용량을 지켜주세요.", rec:[] },
+    warn:"· 증상이 없어도 투여를 중단하지 말고 정해진 용법·용량을 지켜주세요.", depl:[] },
   { name:"리피논정20밀리그램", img:"💊", pill:true, comp:"atorvastatin calcium (as atorvastatin) 20mg", eff:"고지혈증약", dose:"0.5정<br/>하루 1회",
-    warn:"· 투여 후 때때로 근육통이 나타날 수 있어요<br/><b>· 증상이 심할 경우 전문가와 상의하세요.</b>", rec:[0] },
+    warn:"· 투여 후 때때로 근육통이 나타날 수 있어요<br/><b>· 증상이 심할 경우 전문가와 상의하세요.</b>",
+    depl:[ {nid:"NUT-COQ10", info:"스타틴 계열은 체내 코엔자임Q10 생성을 줄일 수 있어 부족해질 위험이 있습니다.", ref:"1) Statin therapy and CoQ10 depletion, Am J Cardiol"} ] },
   { name:"카비드추어블정", img:"💊", pill:true, comp:"calcium carbonate (as calcium) 0.5g, 콜레칼시페롤 400I.U", eff:"칼슘보급제", dose:"1정<br/>하루 1회",
-    warn:"· 입안에서 녹이거나 씹어서 복용하세요.", rec:[] },
+    warn:"· 입안에서 녹이거나 씹어서 복용하세요.", depl:[] },
   { name:"유로박솜캡슐", img:"💊", pill:true, comp:"standardized lyophilized bacterial lysates of E.coli 60mg (as lyophilized bacterial lysates) 6mg", eff:"자격요법제", dose:"1캡슐<br/>하루 1회",
-    warn:"· 1일 1회 아침 공복(식사 전)에 복용하세요.", rec:[] },
+    warn:"· 1일 1회 아침 공복(식사 전)에 복용하세요.", depl:[] },
   { name:"동아가스터정20밀리그램", img:"💊", pill:true, comp:"파모티딘 20mg", eff:"위산과다증약", dose:"1정<br/>하루 2회",
-    warn:"· 간질환 환자나 신장질환 환자의 경우 전문가에게 미리 알리세요.", rec:[1,2,3,4] }
+    warn:"· 간질환 환자나 신장질환 환자의 경우 전문가에게 미리 알리세요.",
+    depl:[ {nid:"NUT-B12", info:"위산분비억제제(H2 차단제)를 장기 복용하면 비타민 B12 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Acid suppression and vitamin B12 malabsorption, review"},
+           {nid:"NUT-FE", info:"위산이 줄면 철분의 이온화가 방해되어 흡수가 떨어지고 부족해질 위험이 있습니다.", ref:"1) Gastric acidity and iron absorption, review"},
+           {nid:"NUT-CA", info:"위산 감소로 칼슘 흡수가 저하되어 장기 복용 시 부족해질 위험이 있습니다.", ref:""},
+           {nid:"NUT-MG", info:"위산분비억제제 장기 복용은 저마그네슘혈증(마그네슘 부족) 위험을 높일 수 있습니다.", ref:"1) PPIs and hypomagnesemia, FDA safety communication"} ] }
 ];
 var selIdx = -1;        // 시안 B: 선택 약물
 var variant = 'A';      // 'A'(약물별 인라인) | 'B'(하단 상세 패널)
@@ -390,9 +384,9 @@ function clean(s){ return s.replace(/<br\/?>/g,' ').replace(/<\/?b>/g,''); }
 function renderDrugCards(){
   var c=document.getElementById('drugCards');
   c.innerHTML=drugs.map(function(d){
-    var hasRec=d.rec.length>0;
+    var hasRec=d.depl.length>0;
     var body = hasRec
-      ? d.rec.map(function(ri){ return '<div class="ablk">'+cardInner(recos[ri])+'</div>'; }).join('')
+      ? d.depl.map(function(x){ return '<div class="ablk">'+cardInner(reco(x))+'</div>'; }).join('')
       : '<div class="norec-b">추천 상품이 없습니다</div>';
     return '<div class="dcard'+(hasRec?'':' off')+'">'+
       '<div class="dcard-h">'+
@@ -461,9 +455,9 @@ function renderTableD(){
       '<td class="c"><span class="img'+(d.pill?' pill':'')+'">'+d.img+'</span></td>'+
       '<td class="comp">'+d.comp+'</td><td class="c">'+d.eff+'</td>'+
       '<td class="dose">'+d.dose+'</td><td class="warn">'+d.warn+'</td></tr>');
-    if(d.rec.length){
-      var items=d.rec.map(function(ri,i){ return dmItem(recos[ri], i>=DM_MAX); }).join('');
-      var extra=d.rec.length-DM_MAX;
+    if(d.depl.length){
+      var items=d.depl.map(function(x,i){ return dmItem(reco(x), i>=DM_MAX); }).join('');
+      var extra=d.depl.length-DM_MAX;
       var more = extra>0
         ? '<button class="dm-more" data-open="0" onclick="toggleMore('+di+','+extra+')">＋ '+extra+'개 더보기</button>'
         : '';
