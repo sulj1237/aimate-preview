@@ -230,7 +230,7 @@
         <input class="inp search" id="searchInp" placeholder="바코드 또는 상품명 입력" oninput="renderRes()" />
         <button class="btn primary sm">검색</button>
       </div>
-      <div class="hint" style="margin:8px 2px 0">POS 미사용 약국도 등록 가능하도록, 약국 로컬 데이터가 아닌 <b>서버 마스터 상품 데이터</b>에서 검색해 추가합니다.</div>
+      <div class="hint" style="margin:8px 2px 0">약국 로컬이 아닌 <b>서버 마스터 상품</b>에서 검색합니다.</div>
       <div class="res" id="searchRes"></div>
     </div>
   </div>
@@ -343,14 +343,13 @@ function openDetail(id){
   document.getElementById('mTitle').textContent=cur.nut;
   document.getElementById('mSub').textContent='관련 약물 '+ndrug+'개';
   document.getElementById('basicH').innerHTML='기본 정보';
-  document.getElementById('infoH').innerHTML='관련 약물 <span style="font-weight:600;color:var(--muted);font-size:11px">이 부족 영양소와 연결된 약물 (조회 전용)</span>';
+  document.getElementById('infoH').innerHTML='관련 약물';
   document.getElementById('mBasic').innerHTML=
     '<div class="kv"><div class="k">부족 영양소</div><div class="v">'+cur.nut+'</div></div>'+
     '<div class="kv"><div class="k">관련 카테고리</div><div class="v">'+(cur.cat||'-')+'</div></div>'+
     '<div class="kv"><div class="k">관련 약물 수</div><div class="v">'+ndrug+'개</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
-  document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs)+
-    '<div class="hint">부족해지는 <b>이유·근거</b>는 <b>(성분코드 × 부족 영양소)</b> 단위 데이터로, 같은 성분이라도 부족 영양소가 다르면 내용이 다릅니다. 이 화면에서는 <b>조회만</b> 가능하며 수정은 슈퍼어드민(굿팜)에서 관리합니다.</div>';
+  document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs);
   document.getElementById('mFoot').innerHTML=
     '<button class="btn" onclick="closeDetail()">취소</button>'+
     '<button class="btn primary" onclick="saveDetail()">저장</button>';
@@ -413,7 +412,7 @@ function renderProds(){
         return '<div class="pitem">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div><button class="btn sm danger" onclick="delP('+gi+')">삭제</button></div>'; }).join('')
     : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다. 서버 마스터 상품에서 검색해 추가하세요.</div>';
   c.innerHTML =
-    '<div class="pg-h">굿팜 추천 상품 <span class="info" tabindex="0">ⓘ<span class="tip-pop">이 상품은 <b>슈퍼어드민이 등록한 기본 추천 상품</b>입니다. 약국에서는 수정·삭제할 수 없으며, 아래 <b>우리약국 추천 상품</b>만 등록·정렬·삭제할 수 있습니다.</span></span></div>'+gpHtml+
+    '<div class="pg-h">굿팜 추천 상품 <span class="info" tabindex="0">ⓘ<span class="tip-pop">슈퍼어드민 등록 상품 · 약국 수정 불가</span></span></div>'+gpHtml+
     '<div class="pg-h store">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml;
   var atMax=store.length>=MAX_PRODS;
   document.getElementById('mHint').innerHTML = atMax
