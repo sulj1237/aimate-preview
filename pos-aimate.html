@@ -155,30 +155,30 @@
   .dcard-b{padding:10px 14px}
   .dcard-b .ablk + .ablk{border-top:1px dashed #dfeae7;margin-top:8px;padding-top:8px}
   .norec-b{font-size:11.5px;color:#9aa4a0;font-weight:600}
-  /* 시안 D: 약물 row 하단 '드럭머거 & 추천제품' 인라인 영역(표와 연결된 compact sub-row) */
+  /* 시안 D: 약물 하단 추천 영역 — 화이트·최소 구분선(민트/좌측라인 제거) */
   .dtbl tr.drow{cursor:default}
-  .dmrow>td{padding:0;border:1px solid var(--line);border-top:none;background:#f4faf9}
-  .dminline{padding:7px 12px 8px;border-left:3px solid var(--teal)}
-  .dminline.off{padding:5px 12px}
-  .dminline .ablk + .ablk{border-top:1px dashed #dfeae7;margin-top:6px;padding-top:6px}
-  /* 시안 D: 부족 성분 row 내부 좌우 2열 (좌=근거 / 우=상품 액션) — 우측 여백↓·세로 스크롤↓ */
-  .dm-item{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:flex-start}
-  .dm-item + .dm-item{border-top:1px dashed #dfeae7;margin-top:8px;padding-top:9px}
+  .dmrow>td{padding:0;border:1px solid var(--line);border-top:none;background:#fff}
+  .dminline{padding:8px 14px 12px}
+  /* 부족 영양소 블록: 좌(근거) / 우(우리약국·굿팜 2열 비교) */
+  .dm-item{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:flex-start;padding:11px 0}
+  .dm-item + .dm-item{border-top:1px solid #eef1f0}
   .dm-item.more-hidden{display:none}
-  .dm-left{flex:1 1 56%;min-width:240px}      /* 좌 55~60% */
-  .dm-right{flex:1 1 38%;min-width:200px}     /* 우 40~45% (좁으면 아래로 wrap) */
+  .dm-left{flex:1 1 290px;min-width:230px}
+  .dm-right{flex:2 1 340px;min-width:250px;display:flex;gap:16px}
+  .dm-col{flex:1;min-width:0}
   .dm-nut{font-size:12.5px;color:#28323a}
   .dm-nut b{font-weight:800}
   .dm-basis{font-size:11.5px;color:#55606a;line-height:1.55;margin-top:4px}
   .dm-bk{font-weight:800;color:#8a9a96;font-size:10.5px;margin-right:3px}
-  .dm-pg{display:flex;flex-direction:column;gap:4px}
-  .dm-pg + .dm-pg{margin-top:7px}
-  .dm-pgl{font-size:10px;font-weight:800;color:#8a9a96;letter-spacing:.2px}
-  .dm-pg.store .dm-pgl{color:var(--teal-d)}   /* 우리약국만 상대적 강조 */
-  .dm-chips{display:flex;flex-wrap:wrap;gap:4px}
-  .dm-chips .pchip{margin:0}
-  .dm-none{font-size:11px;color:#9aa4a0;font-weight:600}
-  .dm-more{margin-top:9px;font-size:11px;font-weight:700;color:var(--teal-d);background:none;border:none;cursor:pointer;padding:2px 0}
+  .dm-cl{font-size:10px;font-weight:800;letter-spacing:.2px;margin-bottom:5px;color:#8a9a96}
+  .dm-col.store .dm-cl{color:var(--teal-d)}   /* 우리약국 우선 강조 */
+  .dm-plist{display:flex;flex-direction:column;gap:5px}
+  /* 상품 카드: 줄바꿈 허용·최대 2줄·초과 시 말줄임(hover=전체명 tooltip) */
+  .pcard{font-size:12px;line-height:1.35;border-radius:7px;padding:6px 9px;background:#f1f3f5;color:#5c6671;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
+  .pcard.store{background:var(--teal-soft);color:var(--teal-d);font-weight:700;border:1px solid var(--teal-line)}
+  .dm-cta{font-size:11px;font-weight:700;color:var(--teal-d);background:none;border:1px dashed var(--teal-line);border-radius:7px;padding:6px 9px;cursor:pointer;text-align:left;width:100%;font-family:inherit}
+  .dm-more{margin-top:10px;font-size:11.5px;font-weight:700;color:var(--teal-d);background:none;border:none;cursor:pointer;padding:2px 0;font-family:inherit}
   .dm-more:hover{text-decoration:underline}
   /* 관련 카테고리 배지 — 색 최소화(중립 그레이) */
   .catb{display:inline-block;font-size:10px;font-weight:700;color:#6b7680;background:#eef1f0;border:1px solid #e2e7e5;border-radius:5px;padding:1px 7px;margin-left:7px;vertical-align:middle}
@@ -321,12 +321,21 @@ var nutMaster = {
     gp:[{nm:"○○ 비타민B 컴플렉스"}], store:[] },
   "NUT-FE":{ nut:"철분(Fe)", cat:"철분제",
     gp:[{nm:"○○ 훼로바-유 서방정"}], store:[] },
-  // 추천 상품 전무 → 우측 '추천 상품이 없습니다'(정책4)
+  // 추천 상품 전무(우리약국·굿팜 모두 없음) → 블록 자체 비노출(정책)
   "NUT-CA":{ nut:"칼슘(Ca)", cat:"칼슘 및 미네랄제품",
     gp:[], store:[] },
-  // 우리약국+굿팜 모두 있음
+  // 우리약국만 있음(굿팜 없음) — 케이스 2
   "NUT-MG":{ nut:"마그네슘(Mg)", cat:"마그네슘 및 미네랄제품",
-    gp:[{nm:"○○ 마그네슘 비스글리시네이트"}], store:[{nm:"□□ 마그네슘 350"}] }
+    gp:[], store:[{nm:"□□ 마그네슘 비스글리시네이트 350mg 90정"}] },
+  // 케이스 4(부족 영양소 10개 이상) 데모용 영양소 — 각 굿팜 1개
+  "NUT-FOL":{ nut:"엽산", cat:"비타민 B군, 종합비타민", gp:[{nm:"○○ 엽산 400mcg"}], store:[] },
+  "NUT-ZN":{ nut:"아연(Zn)", cat:"미네랄", gp:[{nm:"○○ 아연 15mg"}], store:[] },
+  "NUT-VD":{ nut:"비타민 D", cat:"비타민 D", gp:[{nm:"○○ 비타민D 2000IU"}], store:[] },
+  "NUT-VA":{ nut:"비타민 A", cat:"비타민 A", gp:[{nm:"○○ 비타민A 5000IU"}], store:[] },
+  "NUT-VE":{ nut:"비타민 E", cat:"비타민 E", gp:[{nm:"○○ 비타민E 400IU"}], store:[] },
+  "NUT-VK":{ nut:"비타민 K", cat:"비타민 K", gp:[{nm:"○○ 비타민K2 MK-7"}], store:[] },
+  "NUT-VB6":{ nut:"비타민 B6", cat:"비타민 B군", gp:[{nm:"○○ 비타민B6 피리독신"}], store:[] },
+  "NUT-SE":{ nut:"셀레늄(Se)", cat:"미네랄", gp:[{nm:"○○ 셀레늄 200mcg"}], store:[] }
 };
 // 약물×영양소 근거를 영양소 Master 상품과 합쳐 렌더용 객체로 만든다.
 function reco(x){
@@ -352,7 +361,21 @@ var drugs = [
     depl:[ {nid:"NUT-B12", info:"위산분비억제제(H2 차단제)를 장기 복용하면 비타민 B12 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Acid suppression and vitamin B12 malabsorption, review"},
            {nid:"NUT-FE", info:"위산이 줄면 철분의 이온화가 방해되어 흡수가 떨어지고 부족해질 위험이 있습니다.", ref:"1) Gastric acidity and iron absorption, review"},
            {nid:"NUT-CA", info:"위산 감소로 칼슘 흡수가 저하되어 장기 복용 시 부족해질 위험이 있습니다.", ref:""},
-           {nid:"NUT-MG", info:"위산분비억제제 장기 복용은 저마그네슘혈증(마그네슘 부족) 위험을 높일 수 있습니다.", ref:"1) PPIs and hypomagnesemia, FDA safety communication"} ] }
+           {nid:"NUT-MG", info:"위산분비억제제 장기 복용은 저마그네슘혈증(마그네슘 부족) 위험을 높일 수 있습니다.", ref:"1) PPIs and hypomagnesemia, FDA safety communication"} ] },
+  // 케이스 4: 부족 영양소 10개 이상 → 상위 3개 + '+N개 더보기'
+  { name:"콜레스티라민현탁용산", img:"💊", pill:false, comp:"cholestyramine resin 4g", eff:"이상지질혈증약(담즙산 결합)", dose:"1포<br/>하루 2회",
+    warn:"· 다른 약과 최소 1시간 이상 간격을 두고 복용하세요.",
+    depl:[ {nid:"NUT-VD", info:"담즙산 결합제는 지용성 비타민(D)의 흡수를 방해해 부족해질 위험이 있습니다.", ref:"1) Bile acid sequestrants and fat-soluble vitamins"},
+           {nid:"NUT-VA", info:"지용성 비타민 A의 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Bile acid sequestrants and vitamin A"},
+           {nid:"NUT-VE", info:"지용성 비타민 E의 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Bile acid sequestrants and vitamin E"},
+           {nid:"NUT-VK", info:"지용성 비타민 K의 흡수가 저하되어 출혈 경향·부족 위험이 있습니다.", ref:"1) Bile acid sequestrants and vitamin K"},
+           {nid:"NUT-FOL", info:"엽산 흡수가 저하되어 장기 복용 시 부족해질 위험이 있습니다.", ref:"1) Cholestyramine and folate"},
+           {nid:"NUT-B12", info:"비타민 B12 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Bile acid sequestrants and B12"},
+           {nid:"NUT-FE", info:"철분 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Cholestyramine and iron"},
+           {nid:"NUT-ZN", info:"아연 흡수가 저하되어 부족해질 위험이 있습니다.", ref:"1) Cholestyramine and zinc"},
+           {nid:"NUT-MG", info:"마그네슘 흡수가 저하될 수 있습니다.", ref:"1) Cholestyramine and magnesium"},
+           {nid:"NUT-VB6", info:"비타민 B6 흡수가 저하될 수 있습니다.", ref:"1) Cholestyramine and B6"},
+           {nid:"NUT-SE", info:"셀레늄 흡수가 저하될 수 있습니다.", ref:"1) Cholestyramine and selenium"} ] }
 ];
 var selIdx = -1;        // 시안 B: 선택 약물
 var variant = 'A';      // 'A'(약물별 인라인) | 'B'(하단 상세 패널)
@@ -416,22 +439,23 @@ function setVariant(v){
   if(v==='C') renderDrugCards();
   if(v==='D') renderTableD();
 }
-// 시안 D 우측(상품 액션): 우리약국 → 굿팜. 둘 다 없으면 '추천 상품이 없습니다'(정책4),
-//   우리약국 없고 굿팜 있으면 우리약국 슬롯에 등록 CTA(정책5).
+// 상품 카드 목록(긴 이름=2줄+말줄임, hover=전체명 tooltip)
+function prodCards(list, cls){
+  return '<div class="dm-plist">'+list.map(function(p){
+    return '<div class="pcard '+cls+'" title="'+(p.nm||'').replace(/"/g,'&quot;')+'">'+p.nm+'</div>';
+  }).join('')+'</div>';
+}
+function dmCol(label, inner, cls){ return '<div class="dm-col'+(cls?' '+cls:'')+'"><div class="dm-cl">'+label+'</div>'+inner+'</div>'; }
+// 시안 D 우측: 우리약국(우선 강조) | 굿팜(보조) 2열. 우리약국 없으면 등록 CTA, 굿팜은 있을 때만.
 function dmRight(r){
   var store=(r.store||[]).slice(0,3), gp=(r.gp||[]).slice(0,2);
-  if(!store.length && !gp.length)
-    return '<div class="dm-right"><div class="dm-none">추천 상품이 없습니다</div></div>';
-  var storeInner = store.length
-    ? '<div class="dm-chips">'+store.map(function(p){return '<span class="pchip store">'+p.nm+'</span>';}).join('')+'</div>'
-    : '<button class="cta-reg" onclick="openSetting()">＋ 우리약국 추천 상품 등록하러 가기</button>';
-  var out = '<div class="dm-pg store"><div class="dm-pgl">우리약국 추천 상품</div>'+storeInner+'</div>';
-  if(gp.length)
-    out += '<div class="dm-pg"><div class="dm-pgl">굿팜 추천 상품</div>'+
-      '<div class="dm-chips">'+gp.map(function(p){return '<span class="pchip gp">'+p.nm+'</span>';}).join('')+'</div></div>';
+  var storeInner = store.length ? prodCards(store,'store')
+    : '<button class="dm-cta" onclick="openSetting()">＋ 우리약국 추천 등록</button>';
+  var out = dmCol('우리약국 추천 상품', storeInner, 'store');
+  if(gp.length) out += dmCol('굿팜 추천 상품', prodCards(gp,'gp'));
   return '<div class="dm-right">'+out+'</div>';
 }
-// 시안 D 부족성분 1개 = 좌우 2열 item. 좌=성분명[카테고리]·부족해지는 근거(ⓘ), 우=상품 액션.
+// 시안 D 부족영양소 1개 = 좌우 2열. 좌=영양소명[카테고리]·근거(ⓘ), 우=우리약국|굿팜.
 function dmItem(r, hidden){
   var ref = r.ref ? ' <span class="info" tabindex="0">ⓘ<span class="tip-pop">'+r.ref+'</span></span>' : '';
   var left = '<div class="dm-left">'+
@@ -458,7 +482,9 @@ function renderTableD(){
       '<td class="c"><span class="img'+(d.pill?' pill':'')+'">'+d.img+'</span></td>'+
       '<td class="comp">'+d.comp+'</td><td class="c">'+d.eff+'</td>'+
       '<td class="dose">'+d.dose+'</td><td class="warn">'+d.warn+'</td></tr>');
-    var dep=activeDepl(d);
+    // 노출 정책: 우리약국 또는 굿팜 추천 상품이 하나라도 있는 부족 영양소만 노출.
+    //   둘 다 없으면 그 영양소 블록은 물론 '추천 상품이 없습니다'도 노출하지 않는다(행 자체 생략).
+    var dep=activeDepl(d).filter(function(x){ var m=nutMaster[x.nid]; return m && (((m.store||[]).length)||((m.gp||[]).length)); });
     if(dep.length){
       var items=dep.map(function(x,i){ return dmItem(reco(x), i>=DM_MAX); }).join('');
       var extra=dep.length-DM_MAX;
@@ -467,9 +493,6 @@ function renderTableD(){
         : '';
       b.insertAdjacentHTML('beforeend',
         '<tr class="dmrow"><td colspan="6"><div class="dminline" data-di="'+di+'">'+items+more+'</div></td></tr>');
-    } else {
-      b.insertAdjacentHTML('beforeend',
-        '<tr class="dmrow"><td colspan="6"><div class="dminline off"><span class="norec-i">추천 상품이 없습니다</span></div></td></tr>');
     }
   });
 }
