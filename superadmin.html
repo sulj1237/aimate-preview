@@ -137,7 +137,8 @@
       <div class="sub">
         <a>마스터 상품 관리</a>
         <a>약국 등록 상품 관리</a>
-        <a class="on">AI mate 추천 관리</a>
+        <a id="navReco" class="on" onclick="showPage('reco')">AI mate 추천 관리</a>
+        <a id="navIngr" onclick="showPage('ingr')">AI mate 성분 관리</a>
       </div>
       <a class="grp">모바일 약국 관리 <span class="cv">▾</span></a>
       <a class="grp">포인트/쿠폰 관리 <span class="cv">▾</span></a>
@@ -151,9 +152,10 @@
 
   <!-- 메인 -->
   <div class="main">
-    <div class="top"><div class="pg">AI mate 추천 관리</div></div>
-    <div class="filterbar">부족 영양소 기준 추천 상품 Master · 굿팜 기본 추천 상품(최대 2)·노출 관리 · 관련 약물/근거는 참고 정보</div>
+    <div class="top"><div class="pg" id="pgTitle">AI mate 추천 관리</div></div>
+    <div class="filterbar" id="pgFilter">부족 영양소 기준 추천 상품 Master · 굿팜 기본 추천 상품(최대 2)·노출 관리 · 관련 약물/근거는 참고 정보</div>
     <div class="wrap">
+      <div id="pageReco">
       <div class="tabs">
         <div class="tab on">추천 Master 목록</div>
         <!-- 부족 영양소별 통계 탭: 아직 미제공(가림). 추후 활성화 -->
@@ -198,6 +200,26 @@
       </div>
 
       <!-- 약국별 매칭 현황: 별도 탭 없이 Master 레코드 클릭 시 상세 모달의 '약국별 제출 이력'으로 표시 -->
+      </div><!-- /pageReco -->
+
+      <!-- AI mate 성분 관리 (성분코드 기준 공통 정보) -->
+      <div id="pageIngr" class="hidden">
+        <div class="bar">
+          <span class="total">전체 <b id="iTotal">0</b> 건</span>
+          <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
+          <select class="sel" id="iForm" onchange="renderIngredients()"><option value="">제형 전체</option></select>
+          <select class="sel" id="iNut" onchange="renderIngredients()"><option value="">연결 부족 영양소 전체</option></select>
+          <span class="spacer"></span>
+        </div>
+        <div class="tbl"><table>
+          <thead><tr>
+            <th>성분코드</th><th>성분명</th><th>제형</th><th class="num">연결 부족 영양소 수</th>
+            <th>연결 부족 영양소</th><th class="c">상태</th><th>최종 수정일</th><th>수정자</th>
+          </tr></thead>
+          <tbody id="ingrBody"></tbody>
+        </table></div>
+        <div class="note">성분명·제형은 <b>성분코드 기준 공통 정보</b>입니다. 수정하면 이 성분과 연결된 모든 부족 영양소 항목·AI mate 화면에 공통 반영됩니다. 부족해지는 이유·근거는 <b>(성분코드 × 부족 영양소)</b> 조합 정보라 여기서 수정하지 않습니다(추천 관리에서 관리).</div>
+      </div>
     </div>
   </div>
 </div>
@@ -256,6 +278,52 @@
       </div>
     </div>
     <div class="m-foot" id="mmFoot"></div>
+  </div>
+</div>
+<!-- 성분 정보 상세 모달 (AI mate 성분 관리) -->
+<div class="modal-bg" id="iModal" onclick="if(event.target===this)closeIngredient()">
+  <div class="modal">
+    <div class="m-head">
+      <div><div class="dt" id="imTitle">성분 정보 상세</div><div class="ds" id="imSub">—</div></div>
+      <button class="x" onclick="closeIngredient()">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="block">
+        <div class="block-h">기본 정보</div>
+        <div class="kvs">
+          <div class="kv"><div class="k">성분코드</div><div class="v"><input class="fw" id="fICode" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+          <div class="kv"><div class="k">성분명 *</div><div class="v"><input class="fw" id="fIComp" placeholder="성분명"></div></div>
+          <div class="kv"><div class="k">제형 *</div><div class="v"><input class="fw" id="fIForm" placeholder="예: 정제(TB)"></div></div>
+          <div class="kv"><div class="k">연결 부족 영양소 수</div><div class="v"><input class="fw" id="fILink" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+        </div>
+        <div class="roinfo"><b>성분코드는 고정</b>이며 <b>성분명·제형</b>만 수정할 수 있습니다. 수정 시 이 성분과 연결된 <b>모든 부족 영양소 항목·AI mate 화면에 공통 반영</b>됩니다. 부족해지는 이유·근거는 (성분코드 × 부족 영양소) 조합 정보로 여기서 수정하지 않습니다(추천 관리에서 행 단위 관리).</div>
+      </div>
+      <div class="block">
+        <div class="block-h">연결 부족 영양소 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">이 성분이 고갈시키는 부족 영양소 (조회 전용)</span></div>
+        <div id="iLinks"></div>
+      </div>
+      <div class="block">
+        <div class="block-h">수정 이력 <span style="font-weight:600;color:var(--muted);font-size:11px">성분명·제형 수정 이력 (조회 전용)</span></div>
+        <div id="iHist"></div>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeIngredient()">취소</button><button class="btn primary" onclick="askSaveIngredient()">저장</button></div>
+  </div>
+</div>
+
+<!-- 성분 저장 확인 모달 -->
+<div class="modal-bg" id="iConfirm" onclick="if(event.target===this)closeIConfirm()" style="z-index:75">
+  <div class="modal" style="max-width:440px">
+    <div class="m-head"><div><div class="dt">성분 정보 저장</div></div><button class="x" onclick="closeIConfirm()">✕</button></div>
+    <div class="m-body">
+      <div style="font-size:13px;line-height:1.65"><b>성분명/제형 수정 시</b> 이 성분과 연결된 <b>모든 부족 영양소 항목</b> 및 <b>AI mate 화면</b>에 공통 반영됩니다.</div>
+      <div class="block-h" style="margin:16px 0 8px">영향 범위</div>
+      <div class="kvs">
+        <div class="kv"><div class="k">연결 부족 영양소</div><div class="v" id="icNut">-</div></div>
+        <div class="kv"><div class="k">관련 노출 대상</div><div class="v" id="icExp">-</div></div>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeIConfirm()">취소</button><button class="btn primary" onclick="applyIngredient()">저장</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -409,7 +477,7 @@ function renderRelDrugs(){
     curDrugs.map(function(d,i){
       return '<tr>'+
         '<td class="mono" style="white-space:nowrap;color:#8a9099">'+d.code+'</td>'+
-        '<td style="white-space:nowrap">'+d.comp+'</td>'+
+        '<td style="white-space:nowrap"><a onclick="openIngredientByCode(\''+d.code+'\')" style="color:var(--teal-d);font-weight:700;cursor:pointer;text-decoration:underline" title="AI mate 성분 관리에서 성분명·제형 수정">'+d.comp+'</a></td>'+
         '<td style="white-space:nowrap">'+(d.form||'-')+'</td>'+
         '<td style="min-width:230px"><textarea class="celltx" oninput="curDrugs['+i+'].reason=this.value" placeholder="부족해지는 이유">'+(d.reason||'')+'</textarea></td>'+
         '<td style="min-width:180px"><textarea class="celltx" oninput="curDrugs['+i+'].ref=this.value" placeholder="근거/참고문헌">'+(d.ref||'')+'</textarea></td>'+
@@ -491,7 +559,145 @@ function renderMatchHist(code){
 }
 var te=document.getElementById('toast'),tt;
 function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt); tt=setTimeout(function(){te.classList.remove('show')},2000); }
-renderMaster(); renderStats();
+
+/* ===== AI mate 성분 관리 (성분코드 기준 공통 정보) ===== */
+// 성분 마스터 — 성분명·제형은 성분코드 기준 공통값(단일 소스). status: 사용/검토/제외
+var ingredients = [
+  {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", status:"사용", mod:"2026-06-20", modBy:"관리자 김OO"},
+  {code:"A10BA02R", comp:"메트포르민", form:"서방정(TR)", status:"사용", mod:"2026-06-20", modBy:"관리자 김OO"},
+  {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", status:"사용", mod:"2026-06-18", modBy:"관리자 박OO"},
+  {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", status:"사용", mod:"2026-06-22", modBy:"관리자 박OO"},
+  {code:"C10AA05", comp:"아토르바스타틴", form:"정제(TB)", status:"사용", mod:"2026-06-24", modBy:"관리자 김OO"},
+  {code:"C07AB04", comp:"아세부톨롤", form:"경질캡슐(CH)", status:"사용", mod:"2026-06-15", modBy:"관리자 김OO"},
+  {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", status:"사용", mod:"2026-06-12", modBy:"관리자 박OO"},
+  {code:"L04AX03", comp:"메토트렉세이트", form:"정제(TB)", status:"검토", mod:"2026-06-10", modBy:"관리자 박OO"},
+  {code:"R03AC02", comp:"살부타몰", form:"흡입제(SI)", status:"제외", mod:"2026-05-30", modBy:"관리자 김OO"}
+];
+var ingHist = {
+  "A02BC01":[
+    {at:"2026-06-22 15:20", by:"관리자 박OO", field:"제형", before:"경질캡슐(CH)", after:"장용캡슐(CE)"},
+    {at:"2026-06-01 09:10", by:"관리자 박OO", field:"성분명", before:"오메프라졸염", after:"오메프라졸"}
+  ],
+  "C10AA05":[
+    {at:"2026-06-24 09:40", by:"관리자 김OO", field:"성분명", before:"아토르바스타틴칼슘", after:"아토르바스타틴"}
+  ]
+};
+function ingStt(s){ return s==='사용'?'<span class="stt ok">사용</span>':s==='검토'?'<span class="stt need">검토</span>':'<span class="stt hide">제외</span>'; }
+// 성분코드 → 연결된 부족 영양소(master의 drugs에서 code 매칭)
+function ingredientLinks(code){
+  var out=[];
+  master.forEach(function(m){ (m.drugs||[]).forEach(function(d){
+    if(d.code===code) out.push({nid:m.nid, nut:m.nut, cat:m.cat, eff:m.eff, reason:d.reason, ref:d.ref, on:m.on, store:m.store||0});
+  }); });
+  return out;
+}
+function showPage(p){
+  var reco = p!=='ingr';
+  document.getElementById('pageReco').classList.toggle('hidden', !reco);
+  document.getElementById('pageIngr').classList.toggle('hidden', reco);
+  document.getElementById('navReco').classList.toggle('on', reco);
+  document.getElementById('navIngr').classList.toggle('on', !reco);
+  document.getElementById('pgTitle').textContent = reco ? 'AI mate 추천 관리' : 'AI mate 성분 관리';
+  document.getElementById('pgFilter').textContent = reco
+    ? '부족 영양소 기준 추천 상품 Master · 굿팜 기본 추천 상품(최대 2)·노출 관리 · 관련 약물/근거는 참고 정보'
+    : '성분코드 기준 공통 정보(성분명·제형) 관리 · 수정 시 연결된 모든 부족 영양소·AI mate 화면에 공통 반영';
+  if(!reco) renderIngredients();
+}
+function fillIngFilters(){
+  var forms=[], nuts=[];
+  ingredients.forEach(function(g){ if(forms.indexOf(g.form)<0) forms.push(g.form); });
+  master.forEach(function(m){ if(nuts.indexOf(m.nut)<0) nuts.push(m.nut); });
+  document.getElementById('iForm').innerHTML='<option value="">제형 전체</option>'+forms.map(function(f){return '<option>'+f+'</option>';}).join('');
+  document.getElementById('iNut').innerHTML='<option value="">연결 부족 영양소 전체</option>'+nuts.map(function(n){return '<option>'+n+'</option>';}).join('');
+}
+function renderIngredients(){
+  var q=(document.getElementById('iSearch').value||'').trim().toLowerCase();
+  var ff=document.getElementById('iForm').value, nf=document.getElementById('iNut').value;
+  var list=ingredients.filter(function(g){
+    var links=ingredientLinks(g.code);
+    if(q && g.code.toLowerCase().indexOf(q)<0 && g.comp.toLowerCase().indexOf(q)<0) return false;
+    if(ff && g.form!==ff) return false;
+    if(nf && !links.some(function(l){return l.nut===nf;})) return false;
+    return true;
+  });
+  document.getElementById('ingrBody').innerHTML = list.map(function(g){
+    var links=ingredientLinks(g.code);
+    var nutTxt = links.length ? links.map(function(l){return l.nut;}).join(', ') : '<span style="color:#9aa4af">-</span>';
+    return '<tr class="click" onclick="openIngredient(\''+g.code+'\')">'+
+      '<td class="mono">'+g.code+'</td><td>'+g.comp+'</td><td>'+g.form+'</td>'+
+      '<td class="num">'+links.length+'</td>'+
+      '<td style="white-space:normal">'+nutTxt+'</td>'+
+      '<td class="c">'+ingStt(g.status)+'</td><td>'+g.mod+'</td><td>'+(g.modBy||'-')+'</td></tr>';
+  }).join('');
+  document.getElementById('iTotal').textContent = list.length.toLocaleString();
+}
+var curIng=null;
+function openIngredient(code){
+  var g=ingredients.find(function(x){return x.code===code;}); if(!g){ toast('성분 정보를 찾을 수 없습니다.'); return; }
+  curIng=g;
+  var links=ingredientLinks(code);
+  document.getElementById('imSub').textContent = g.comp+' · '+g.code;
+  document.getElementById('fICode').value=g.code;
+  document.getElementById('fIComp').value=g.comp;
+  document.getElementById('fIForm').value=g.form;
+  document.getElementById('fILink').value=links.length+'개';
+  renderILinks(links); renderIngHist(code);
+  document.getElementById('iModal').classList.add('open');
+}
+// 추천 관리 관련 약물 목록의 성분명 클릭 → 성분 상세 모달
+function openIngredientByCode(code){ openIngredient(code); }
+function renderILinks(links){
+  var c=document.getElementById('iLinks');
+  if(!links.length){ c.innerHTML='<div class="readbox">연결된 부족 영양소가 없습니다.</div>'; return; }
+  c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
+    '<th>부족 영양소 ID</th><th>부족 영양소명</th><th>관련 카테고리</th><th>추천 효능군</th><th>부족해지는 이유</th><th>근거/참고문헌</th></tr></thead><tbody>'+
+    links.map(function(l){
+      return '<tr><td class="mono" style="white-space:nowrap;color:#8a9099">'+l.nid+'</td>'+
+        '<td class="nut" style="white-space:nowrap">'+l.nut+'</td>'+
+        '<td style="white-space:nowrap">'+(l.cat||'-')+'</td><td style="white-space:nowrap">'+(l.eff||'-')+'</td>'+
+        '<td style="white-space:normal;min-width:200px">'+(l.reason||'-')+'</td>'+
+        '<td style="white-space:normal;min-width:150px;color:#8a9099">'+(l.ref||'-')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function renderIngHist(code){
+  var c=document.getElementById('iHist'); var list=ingHist[code]||[];
+  if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }
+  c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
+    '<th>수정일시</th><th>수정자</th><th>수정 항목</th><th>변경 전</th><th>변경 후</th></tr></thead><tbody>'+
+    list.map(function(x){
+      return '<tr><td style="white-space:nowrap">'+x.at+'</td><td style="white-space:nowrap">'+x.by+'</td><td>'+x.field+'</td>'+
+        '<td style="color:#98a2ad;text-decoration:line-through">'+x.before+'</td>'+
+        '<td style="color:#0ea58b;font-weight:700">'+x.after+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function closeIngredient(){ document.getElementById('iModal').classList.remove('open'); }
+function askSaveIngredient(){
+  if(!curIng) return;
+  var comp=document.getElementById('fIComp').value.trim(), form=document.getElementById('fIForm').value.trim();
+  if(!comp || !form){ toast('성분명·제형을 입력해 주세요.'); return; }
+  var links=ingredientLinks(curIng.code);
+  var expo=links.filter(function(l){return l.on;}).length;
+  var storeSum=links.reduce(function(a,l){return a+(l.store||0);},0);
+  document.getElementById('icNut').innerHTML='<b>'+links.length+'</b>개';
+  document.getElementById('icExp').innerHTML='노출 ON <b>'+expo+'</b>개 · 약국 설정 <b>'+storeSum+'</b>곳';
+  document.getElementById('iConfirm').classList.add('open');
+}
+function closeIConfirm(){ document.getElementById('iConfirm').classList.remove('open'); }
+function applyIngredient(){
+  if(!curIng) return;
+  var comp=document.getElementById('fIComp').value.trim(), form=document.getElementById('fIForm').value.trim();
+  var changed=[];
+  if(comp!==curIng.comp) changed.push({field:'성분명', before:curIng.comp, after:comp});
+  if(form!==curIng.form) changed.push({field:'제형', before:curIng.form, after:form});
+  curIng.comp=comp; curIng.form=form; curIng.mod='2026-07-14'; curIng.modBy='관리자 김OO';
+  // 공통 반영: 연결된 모든 부족 영양소의 관련 약물(drugs)에 성분명·제형 전파
+  master.forEach(function(m){ (m.drugs||[]).forEach(function(d){ if(d.code===curIng.code){ d.comp=comp; d.form=form; } }); });
+  if(changed.length){ if(!ingHist[curIng.code]) ingHist[curIng.code]=[]; changed.forEach(function(ch){ ingHist[curIng.code].unshift({at:'2026-07-14 10:00', by:'관리자 김OO', field:ch.field, before:ch.before, after:ch.after}); }); }
+  closeIConfirm(); closeIngredient(); renderIngredients();
+  toast('성분 정보를 저장했습니다. 연결된 모든 부족 영양소·AI mate 화면에 공통 반영됩니다.');
+}
+
+renderMaster(); renderStats(); fillIngFilters(); renderIngredients();
 </script>
 </body>
 </html>
