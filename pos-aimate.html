@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>굿팜 AI MATE · 처방 상세 분석 — 영양소 상담 추천</title>
+<style>
+  :root{
+    --teal:#16b8a3; --teal-d:#0e9e8c; --teal-soft:#e6f7f4; --teal-line:#bfe8e1;
+    --ink:#28303a; --muted:#7b8794; --faint:#9aa4af; --line:#e6e9ee; --bg:#f1f3f6;
+    --amber:#c98a12; --blue:#2a6fc0; --danger:#d8453a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#dfe3e8;font-size:13.5px;line-height:1.55;padding:14px}
+  .win{max-width:1020px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 14px 46px -18px rgba(0,0,0,.34)}
+  .titlebar{height:46px;display:flex;align-items:center;gap:9px;padding:0 16px;border-bottom:1px solid var(--line)}
+  .tb-logo{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#15c0a8,#0e9e8c);position:relative}
+  .tb-logo::after{content:"";position:absolute;inset:5px 6px auto 5px;height:4px;border-radius:3px;background:#fff;opacity:.85}
+  .tb-title{font-size:15px;font-weight:800}
+  .tb-x{margin-left:auto;color:#aab2bb;font-size:18px;cursor:pointer}
+  /* 상단 탭 */
+  .tabs{display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 16px}
+  .tab{padding:15px 18px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.on{color:var(--teal-d);border-bottom-color:var(--teal)}
+  .tabs .set{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:6px 12px;cursor:pointer}
+
+  .body{padding:22px 26px 28px}
+  .h2{font-size:19px;font-weight:800;margin:0 0 4px}
+  .lead{font-size:13px;color:var(--muted);margin:0 0 14px}
+  .rule{height:2px;background:var(--teal);opacity:.85;margin:0 0 18px;border-radius:2px}
+
+  .langrow{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-bottom:18px;flex-wrap:wrap}
+  .lang{border:1px solid var(--teal-line);background:#fff;color:var(--teal-d);font-weight:700;font-size:13px;
+    border-radius:8px;padding:9px 18px;cursor:pointer;font-family:inherit}
+  .lang.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .lang.drop{color:var(--muted);border-color:var(--line)}
+  .lang.print{background:var(--teal);border-color:var(--teal);color:#fff}
+
+  /* 표 헤더 행 (제목 + 설정 CTA) */
+  .sec-row{display:flex;align-items:center;gap:12px;margin:6px 0 12px}
+  .sec-h{font-size:16px;font-weight:800;margin:0}
+  .cta{margin-left:auto;background:var(--teal);color:#fff;border:none;font-family:inherit;font-weight:800;font-size:12.5px;
+    border-radius:9px;padding:10px 15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .cta:hover{background:var(--teal-d)}
+  /* 시안 A/B 토글 */
+  .vtoggle{display:inline-flex;gap:5px}
+  .vbtn{font-size:12px;font-weight:800;border:1px solid var(--teal-line);background:#fff;color:var(--teal-d);
+    border-radius:8px;padding:7px 12px;cursor:pointer;font-family:inherit}
+  .vbtn.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  /* 시안 A: 약물 row에 종속된 하위 추천 영역(sub-row) — 배경·좌측 라인으로 하위 정보임을 표현 */
+  .arow>td{padding:0;border:1px solid var(--line);border-top:none;background:#f4faf9}
+  .ainline{padding:9px 14px 11px;border-left:3px solid var(--teal)}
+  .a-label{font-size:10.5px;font-weight:800;color:#7c9a94;margin-bottom:7px}
+  .ablk + .ablk{border-top:1px dashed #dfeae7;margin-top:8px;padding-top:8px}
+  .nut-line{font-size:12px;color:#3a424c;margin-bottom:5px}
+  .nut-line .nk{font-size:10px;font-weight:800;color:#5f8078;background:#e9f5f2;border-radius:5px;padding:2px 7px;margin-right:6px}
+  .nut-line b{font-weight:800;font-size:12.5px}
+  /* 출처별 그룹 — 우리약국(민트 강조) / 굿팜(회색 낮은 위계) */
+  .pg{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+  .pg-l{font-size:11px;font-weight:800;color:var(--muted);width:96px;flex:none}
+  .pg.store .pg-l{color:var(--teal-d)}
+  .pchips{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+  .pchip{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;border-radius:7px;padding:3px 9px;line-height:1.3}
+  .pchip.gp{background:#f2f4f4;border:1px solid #e6ebea;color:#6a736f;font-weight:600}
+  .pchip.store{background:var(--teal-soft);border:1px solid var(--teal-line);color:var(--teal-d);font-weight:800}
+  .cta-reg{font-size:11px;font-weight:800;color:var(--teal-d);background:#fff;border:1px solid var(--teal-line);
+    border-radius:8px;padding:5px 11px;cursor:pointer;font-family:inherit}
+  .cta-reg:hover{background:var(--teal-soft)}
+  /* 관련 카테고리·부족해지는 근거·참고문헌 — 정돈된 텍스트 라인 */
+  .irow{display:flex;gap:9px;font-size:12px;line-height:1.5;margin-top:4px;align-items:baseline}
+  .irow .ik{flex:none;width:82px;font-size:11px;font-weight:700;color:#8a9a96}
+  .irow .iv{flex:1;color:#333b42;min-width:0}
+  .ref-line{font-size:10.5px;color:#a6aeb6;margin-top:4px}
+  .tip-a{font-size:10.5px;font-weight:700;color:#9aa4a0;white-space:nowrap}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .ptbl th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:center;padding:11px 10px;border:1px solid var(--line)}
+  .ptbl td{padding:11px 12px;border:1px solid var(--line);vertical-align:top;color:#3a424c}
+  .ptbl .drug{font-weight:700;text-align:center}
+  .ptbl .img{width:64px;height:46px;border-radius:8px;background:#eef1f4;display:inline-flex;align-items:center;justify-content:center;color:#b8c0c9;font-size:18px}
+  .ptbl .img.pill{background:linear-gradient(135deg,#bcdcff,#dfeeff)}
+  .ptbl .comp{color:var(--blue)}
+  .ptbl .dose{text-align:center;white-space:nowrap}
+  .ptbl .warn b{color:var(--danger)}
+  .ptbl td.c{text-align:center}
+  .ptbl tr.drow{cursor:pointer}
+  .ptbl tr.drow:hover td{background:#f4fbf9}
+  .ptbl tr.drow.sel td{background:#e6f7f4}
+  .ptbl tr.drow.norec{cursor:default}
+  .ptbl tr.drow.norec:hover td{background:transparent}
+  /* 추천 Tip 배지 (덜 강조) */
+  .tip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px;cursor:pointer;
+    border:1px solid #dcece8;background:#f7fbfa;color:#4d857a;white-space:nowrap}
+  .tip:hover{background:#eef7f4}
+  .tip.sel{background:#eaf6f3;border-color:#c3e2db;color:#357568}
+  .tip.none{border-color:var(--line);background:#f6f8fa;color:var(--faint);cursor:default;font-weight:600}
+
+  /* 추천 상세 패널 (시안 B) — 덜 강조 */
+  .rpanel{margin-top:16px;border:1px solid #e7ecea;border-radius:12px;overflow:hidden;background:#fcfefe}
+  .rp-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#f6faf9;padding:11px 16px;border-bottom:1px solid #eaf0ee}
+  .rp-head .rt{font-size:13px;font-weight:800;color:#4a6b64}
+  .rp-head .sd{font-size:12px;color:#5a6560}
+  .rp-head .sd b{font-weight:800;color:#3a5852}
+  .rp-head .cnt{font-size:10.5px;font-weight:700;color:#6a8b83;background:#fff;border:1px solid #e4ece9;border-radius:999px;padding:2px 8px}
+  .rp-guide{width:100%;font-size:11px;color:#93a09b;line-height:1.5}
+  .rp-body{padding:13px 16px;display:grid;gap:9px}
+  .rcard{border:1px solid #eef2f1;border-radius:9px;padding:12px 14px;background:#fff}
+  .rc-nuth{font-size:12.5px;font-weight:800;color:#3a424c;margin-bottom:7px;display:flex;align-items:center;gap:7px}
+  .rc-nuth .dot{width:6px;height:6px;border-radius:50%;background:#9dd6cb;flex:none}
+  .rc-row{display:flex;gap:10px;font-size:12px;padding:3px 0}
+  .rc-k{width:100px;flex:none;color:var(--muted);font-weight:600}
+  .rc-v{flex:1;color:#4a525c;min-width:0}
+  .rc-v .pn{font-weight:700}
+  .rc-v .num{color:#b0b8c0;font-weight:700;margin-right:5px}
+  /* 추천 상품 강조 — 칩 형태 */
+  .rc-row.prod .rc-k{color:var(--teal-d);font-weight:800}
+  .rc-v.prods{display:flex;flex-wrap:wrap;gap:6px}
+  .prodchip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:var(--teal-d);
+    background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:8px;padding:4px 10px;line-height:1.3}
+  .prodchip .pi{font-size:10px;font-weight:800;color:#fff;background:var(--teal);border-radius:50%;width:15px;height:15px;
+    display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .ainline .prodchip{font-size:12px;padding:4px 10px}
+  .rc-v.reason{color:#566}
+  .rc-ref{margin-top:6px;font-size:10.5px;color:#a6aeb6;line-height:1.5}
+  .rc-ref b{color:#b8c0c8;font-weight:700}
+  .rc-rel{margin-top:7px;font-size:11px;color:#6a727a;background:#fbfcfc;border:1px dashed #e6eae8;border-radius:7px;padding:6px 10px}
+  .rc-rel b{color:#96a0a8;font-weight:700}
+  .rc-miss{font-size:11.5px;color:#9a8a5e;background:#fbf6ea;border:1px dashed #ecdcbe;border-radius:7px;padding:7px 10px;margin-top:2px}
+  .rp-empty{padding:20px;text-align:center;color:var(--faint);font-size:12.5px}
+  /* 처방 약물 카드 리스트 */
+  .dcards{display:grid;gap:10px}
+  .dcard{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+  .dcard.off{background:#fbfcfc}
+  .dcard.off .dcard-b{padding:8px 14px}
+  .dcard-h{display:flex;gap:11px;padding:10px 14px;border-bottom:1px solid #eef2f0;background:#fbfdfc}
+  .dcard.off .dcard-h{border-bottom:none}
+  .dimg{width:50px;height:38px;flex:none;border-radius:8px;background:#eef1f4;display:inline-flex;align-items:center;justify-content:center;color:#b8c0c9;font-size:18px}
+  .dimg.pill{background:linear-gradient(135deg,#bcdcff,#dfeeff)}
+  .dinfo{flex:1;min-width:0}
+  .dtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .dnm{font-size:14px;font-weight:800;color:var(--ink)}
+  .deff{font-size:11px;font-weight:700;color:var(--teal-d);background:var(--teal-soft);border-radius:5px;padding:2px 8px}
+  .badge{margin-left:auto;font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 10px;white-space:nowrap}
+  .badge.rec{color:var(--teal-d);background:var(--teal-soft);border:1px solid var(--teal-line)}
+  .badge.none{color:#8b8b97;background:#f0eef2;border:1px solid #e6e3ea}
+  .dcomp{font-size:11.5px;color:#5a6560;margin-top:3px;word-break:break-word}
+  /* 복용법 = 라벨+텍스트 · 주의 = 주황 태그 (배지 최소화) */
+  .dmeta{margin-top:7px;display:grid;gap:3px}
+  .mrow{display:flex;gap:8px;font-size:12.5px;line-height:1.5;align-items:baseline}
+  .mrow .mk{flex:none;min-width:52px;font-size:11px;font-weight:800;color:#8a9a96}
+  .mrow .mv{flex:1;color:#333b42;min-width:0;font-weight:600}
+  .mrow.warn .mk{min-width:0;color:#c0693c;background:#fbf0e7;border-radius:5px;padding:2px 8px;font-size:10.5px}
+  .mrow.warn .mv{color:#6f4e3a;font-weight:500}
+  .dcard-b{padding:10px 14px}
+  .dcard-b .ablk + .ablk{border-top:1px dashed #dfeae7;margin-top:8px;padding-top:8px}
+  .norec-b{font-size:11.5px;color:#9aa4a0;font-weight:600}
+  /* 시안 D: 약물 row 하단 '드럭머거 & 추천제품' 인라인 영역(표와 연결된 compact sub-row) */
+  .dtbl tr.drow{cursor:default}
+  .dmrow>td{padding:0;border:1px solid var(--line);border-top:none;background:#f4faf9}
+  .dminline{padding:7px 12px 8px;border-left:3px solid var(--teal)}
+  .dminline.off{padding:5px 12px}
+  .dminline .ablk + .ablk{border-top:1px dashed #dfeae7;margin-top:6px;padding-top:6px}
+  /* 시안 D: 부족 성분 row 내부 좌우 2열 (좌=근거 / 우=상품 액션) — 우측 여백↓·세로 스크롤↓ */
+  .dm-item{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:flex-start}
+  .dm-item + .dm-item{border-top:1px dashed #dfeae7;margin-top:8px;padding-top:9px}
+  .dm-item.more-hidden{display:none}
+  .dm-left{flex:1 1 56%;min-width:240px}      /* 좌 55~60% */
+  .dm-right{flex:1 1 38%;min-width:200px}     /* 우 40~45% (좁으면 아래로 wrap) */
+  .dm-nut{font-size:12.5px;color:#28323a}
+  .dm-nut b{font-weight:800}
+  .dm-basis{font-size:11.5px;color:#55606a;line-height:1.55;margin-top:4px}
+  .dm-bk{font-weight:800;color:#8a9a96;font-size:10.5px;margin-right:3px}
+  .dm-pg{display:flex;flex-direction:column;gap:4px}
+  .dm-pg + .dm-pg{margin-top:7px}
+  .dm-pgl{font-size:10px;font-weight:800;color:#8a9a96;letter-spacing:.2px}
+  .dm-pg.store .dm-pgl{color:var(--teal-d)}   /* 우리약국만 상대적 강조 */
+  .dm-chips{display:flex;flex-wrap:wrap;gap:4px}
+  .dm-chips .pchip{margin:0}
+  .dm-none{font-size:11px;color:#9aa4a0;font-weight:600}
+  .dm-more{margin-top:9px;font-size:11px;font-weight:700;color:var(--teal-d);background:none;border:none;cursor:pointer;padding:2px 0}
+  .dm-more:hover{text-decoration:underline}
+  /* 관련 카테고리 배지 — 색 최소화(중립 그레이) */
+  .catb{display:inline-block;font-size:10px;font-weight:700;color:#6b7680;background:#eef1f0;border:1px solid #e2e7e5;border-radius:5px;padding:1px 7px;margin-left:7px;vertical-align:middle}
+  .info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#dbe2e5;color:#5a6771;font-size:9px;font-weight:800;cursor:help;vertical-align:middle;margin-left:2px}
+  .info .tip-pop{display:none;position:absolute;right:0;top:140%;z-index:30;width:250px;max-width:60vw;background:#28303a;color:#fff;font-size:11px;font-weight:500;line-height:1.5;border-radius:8px;padding:9px 11px;box-shadow:0 12px 28px -10px rgba(0,0,0,.45);white-space:normal}
+  .info:hover .tip-pop,.info:focus .tip-pop{display:block}
+  .norec-i{font-size:11.5px;color:#9aa4a0;font-weight:600}
+  /* 상태별 표시 예시(케이스) */
+  .rcases{margin-top:16px;border:1px solid #eef1f0;border-radius:12px;padding:14px 16px;background:#fcfdfd}
+  .rcases .rc-h{font-size:12px;font-weight:800;color:#6a7a75}
+  .rcases .rc-sub{font-size:11px;color:#9aa4a0;margin:2px 0 12px}
+  .rcases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .ct{font-size:11px;font-weight:800;color:#3a5852;background:#eef7f4;border-radius:6px;padding:3px 9px;display:inline-block;margin-bottom:6px}
+  .ct.warn{color:#9a7b3e;background:#fbf4e6}
+  .ct.off{color:#8b8b97;background:#f0eef2}
+  @media(max-width:760px){.rcases-grid{grid-template-columns:1fr}}
+
+  /* 고객정보 및 구매정보 */
+  .subh{font-size:13px;font-weight:800;color:#3a424c;margin:0 0 7px}
+  .cust{font-size:13px;color:#3a424c}
+  .crow b{color:#5c6671;font-weight:700}
+  .special{border:1px solid var(--line);border-radius:9px;padding:11px 14px;font-size:12.5px;color:#3a424c;background:#fbfcfd}
+  .buytbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:2px}
+  .buytbl th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:center;padding:10px;border:1px solid var(--line)}
+  .buytbl td{padding:10px 12px;border:1px solid var(--line);color:#3a424c}
+  .buytbl td.c{text-align:center}
+  .buytbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .buytbl td.dt{text-align:center;font-weight:700;vertical-align:middle}
+  .buytbl tr.sum td{background:#f7f9fb;font-weight:800;text-align:center}
+  .buytbl tr.sum td.num{text-align:right}
+  /* 기간별 처방 추이 (효능군 타임라인) */
+  .chart{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:#fff}
+  .chart-h{font-size:15px;font-weight:800;margin-bottom:12px}
+  .crowc{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+  .clbl{width:220px;flex:none;font-size:10.5px;color:#7b8794;font-weight:700;line-height:1.35}
+  .clbl>span{display:block;color:#9aa4af;font-weight:500}
+  .cbar{position:relative;flex:1;height:14px;background:#f4f6f8;border-radius:7px}
+  .cbar .seg{position:absolute;top:0;height:14px;background:#f4a2a0;border-radius:7px;opacity:.9}
+  /* TOP 버튼 */
+  .topbtn{position:fixed;right:24px;bottom:26px;width:46px;height:46px;border-radius:50%;background:var(--teal);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:800;line-height:1;
+    box-shadow:0 8px 20px -8px rgba(0,0,0,.4);cursor:pointer;z-index:50}
+  /* 하단 탭 */
+  .btabs{display:flex;gap:0;margin-top:26px;border-bottom:1px solid var(--line)}
+  .btab{flex:1;text-align:center;padding:13px 8px;font-size:13px;font-weight:700;color:var(--faint);
+    border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;margin-right:6px;background:#fafbfc;cursor:pointer}
+  .btab.on{color:var(--teal-d);background:#fff;border-color:var(--teal-line);box-shadow:inset 0 3px 0 var(--teal)}
+  .btab:last-child{margin-right:0}
+  .bbody{border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;padding:18px;color:var(--muted);font-size:13px;min-height:70px}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#28303a;color:#fff;font-size:13px;padding:11px 18px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="titlebar">
+    <span class="tb-logo"></span><span class="tb-title">굿팜 AI MATE</span>
+    <span class="tb-x">✕</span>
+  </div>
+  <div class="body">
+    <!-- ① 고객정보 및 구매정보 -->
+    <h2 class="h2">고객정보 및 구매정보</h2>
+    <div class="rule"></div>
+    <div class="cust">
+      <div class="subh">고객정보</div>
+      <div class="crow"><b>성명:</b> 김*선 &nbsp;&nbsp; <b>연령(성별):</b> 80세 (여) &nbsp;&nbsp; <b>최근 처방일:</b> 2024.10.01 &nbsp;&nbsp; <b>약력관리 이력:</b> 2023.02.01 ~ 2025.05.13</div>
+      <div class="subh" style="margin-top:16px">특이사항</div>
+      <div class="special">+글리(24.06.11동의사인받음)</div>
+    </div>
+    <h3 class="sec-h" style="margin-top:18px">상품 구매 이력</h3>
+    <table class="buytbl">
+      <thead><tr><th style="width:110px">일자</th><th style="width:56px">NO</th><th>상품명</th><th style="width:80px">수량</th><th style="width:120px">판매금액</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2" class="dt">24.02.20</td><td class="c">1</td><td>가그린제로750ml</td><td class="c">2</td><td class="num">13,000</td></tr>
+        <tr class="sum"><td colspan="2">합계</td><td class="c">2</td><td class="num">13,000</td></tr>
+        <tr><td rowspan="3" class="dt">23.02.01</td><td class="c">1</td><td>우산3000</td><td class="c">1</td><td class="num">3,000</td></tr>
+        <tr><td class="c">2</td><td>팜페인 파워연질캡슐(나프록센)</td><td class="c">1</td><td class="num">4,000</td></tr>
+        <tr class="sum"><td colspan="2">합계</td><td class="c">2</td><td class="num">7,000</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ② AI 약력관리 분석 -->
+    <h2 class="h2" style="margin-top:30px">AI 약력관리 분석</h2>
+    <div class="rule"></div>
+    <p class="lead">환자의 약력 데이터를 기반으로 고객 맞춤형 복용약물 분석 자료를 생성해드립니다</p>
+    <h3 class="sec-h" style="margin-top:16px">기간별 처방 추이</h3>
+    <p class="lead" style="margin-top:-4px">· 지난 처방 내역을 바탕으로 한 약물 복용 이력 분석입니다.</p>
+    <div class="chart">
+      <div class="chart-h">효능군</div>
+      <div class="crowc"><div class="clbl">혈압약 <span>세비카정5/20밀리그램</span></div><div class="cbar"><span class="seg" style="left:52%;width:44%"></span></div></div>
+      <div class="crowc"><div class="clbl"><span>세비카에이치씨티정5/20/12.5밀리그램</span></div><div class="cbar"><span class="seg" style="left:8%;width:15%"></span><span class="seg" style="left:27%;width:11%"></span><span class="seg" style="left:43%;width:9%"></span></div></div>
+      <div class="crowc"><div class="clbl">고지혈증약 <span>리피논정20밀리그램</span></div><div class="cbar"><span class="seg" style="left:40%;width:52%"></span></div></div>
+      <div class="crowc"><div class="clbl">위산과다증약 <span>동아가스터정20밀리그램</span></div><div class="cbar"><span class="seg" style="left:60%;width:32%"></span></div></div>
+    </div>
+
+    <!-- ③ 처방 약물 정보표 (+ 우리가 작업한 추천 부분) -->
+    <div class="sec-row" style="margin-top:30px">
+      <h3 class="sec-h">처방 약물 정보</h3>
+      <span class="vtoggle">
+        <button class="vbtn on" id="vC" onclick="setVariant('C')">시안 C · 약물 카드</button>
+        <button class="vbtn" id="vD" onclick="setVariant('D')">시안 D · 표 + 드럭머거</button>
+      </span>
+      <button class="cta" onclick="openSetting()">⚙ 추천 상품 설정</button>
+    </div>
+    <p class="lead">각 처방 약물과 함께 복용하면 좋을 추천 상품입니다. (우리약국 추천을 우선 안내)</p>
+    <div class="rule"></div>
+    <div class="langrow">
+      <button class="lang on" onclick="pickLang(this)">한국어</button>
+      <button class="lang" onclick="pickLang(this)">영어</button>
+      <button class="lang" onclick="pickLang(this)">중국어</button>
+      <button class="lang" onclick="pickLang(this)">일본어</button>
+      <button class="lang drop">언어 설정 ▾</button>
+      <button class="lang print">인쇄 ⬇</button>
+    </div>
+    <!-- ▼ 시안 C · 처방 약물 카드 리스트 (각 약물 = 카드, 본문에 추천 상품) -->
+    <div class="dcards" id="drugCards"></div>
+
+    <!-- ▼ 시안 D · 처방 약물표 + 드럭머거 & 추천제품 (부족 성분명 기준 2열) -->
+    <div id="viewD" style="display:none">
+      <table class="ptbl dtbl">
+        <thead><tr><th>약물명</th><th>이미지</th><th>성분명</th><th>효능</th><th>복용법</th><th>주의사항</th></tr></thead>
+        <tbody id="drugBodyD"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="topbtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">⌃<span>TOP</span></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// 데이터 매핑: 약물 기준으로 노출하되, 추천 상품은 약물에 직접 매핑된 게 아니라
+//   해당 약물과 연결된 '부족 영양소'의 추천 상품을 부족 영양소 Master에서 조회해 노출한다.
+//   nut=부족 위험 영양소, cat=관련 카테고리(영양소 Master), prods=추천 상품(영양소 Master),
+//   info/ref=부족해지는 이유·근거(약물×영양소 세부 데이터에서 조회)
+// 추천 상품은 출처별로 분리: gp=굿팜(영양소 Master 기본) 최대 2 · store=우리약국(약국 등록) 최대 3
+var recos = [
+  { nut:"코엔자임Q10", cat:"항산화 작용",
+    gp:[{nm:"○○ 코엔자임Q10 100mg"},{nm:"△△ 코큐텐 이지 200mg"}],
+    store:[{nm:"□□ 코엔자임Q10 이지"}],
+    info:"스타틴 계열은 체내 코엔자임Q10 생성을 줄일 수 있어 부족해질 위험이 있습니다.",
+    ref:"1) Statin therapy and CoQ10 depletion, Am J Cardiol" },
+  // 우리약국 미등록 + 굿팜 있음 → 우측에 등록 CTA 노출(정책5)
+  { nut:"비타민 B12", cat:"비타민 B군, 종합비타민",
+    gp:[{nm:"○○ 비타민B 컴플렉스"}],
+    store:[],
+    info:"위산분비억제제(H2 차단제)를 장기 복용하면 비타민 B12 흡수가 저하되어 부족해질 위험이 있습니다.",
+    ref:"1) Acid suppression and vitamin B12 malabsorption, review" },
+  // 우리약국 미등록 + 굿팜 있음 → 등록 CTA(정책5)
+  { nut:"철분(Fe)", cat:"철분제",
+    gp:[{nm:"○○ 훼로바-유 서방정"}],
+    store:[],
+    info:"위산이 줄면 철분의 이온화가 방해되어 흡수가 떨어지고 부족해질 위험이 있습니다.",
+    ref:"1) Gastric acidity and iron absorption, review" },
+  // 추천 상품 전무 → 우측 '추천 상품이 없습니다'(정책4)
+  { nut:"칼슘(Ca)", cat:"칼슘 및 미네랄제품",
+    gp:[],
+    store:[],
+    info:"위산 감소로 칼슘 흡수가 저하되어 장기 복용 시 부족해질 위험이 있습니다.",
+    ref:"" },
+  // 4번째 성분(더보기 안에 노출) · 우리약국+굿팜 모두 있음
+  { nut:"마그네슘(Mg)", cat:"마그네슘 및 미네랄제품",
+    gp:[{nm:"○○ 마그네슘 비스글리시네이트"}],
+    store:[{nm:"□□ 마그네슘 350"}],
+    info:"위산분비억제제 장기 복용은 저마그네슘혈증(마그네슘 부족) 위험을 높일 수 있습니다.",
+    ref:"1) PPIs and hypomagnesemia, FDA safety communication" }
+];
+// 처방 약물 + 약물별 관련 추천(rec = recos 인덱스). rec 없으면 추천 없음.
+var drugs = [
+  { name:"세비카정5/20밀리그램", img:"💊", pill:true, comp:"amlodipine besylate (as amlodipine) 5mg, 올메사르탄메독소밀 20mg", eff:"혈압강하제", dose:"1정<br/>하루 1회",
+    warn:"· 증상이 없어도 투여를 중단하지 말고 정해진 용법·용량을 지켜주세요.", rec:[] },
+  { name:"리피논정20밀리그램", img:"💊", pill:true, comp:"atorvastatin calcium (as atorvastatin) 20mg", eff:"고지혈증약", dose:"0.5정<br/>하루 1회",
+    warn:"· 투여 후 때때로 근육통이 나타날 수 있어요<br/><b>· 증상이 심할 경우 전문가와 상의하세요.</b>", rec:[0] },
+  { name:"카비드추어블정", img:"💊", pill:true, comp:"calcium carbonate (as calcium) 0.5g, 콜레칼시페롤 400I.U", eff:"칼슘보급제", dose:"1정<br/>하루 1회",
+    warn:"· 입안에서 녹이거나 씹어서 복용하세요.", rec:[] },
+  { name:"유로박솜캡슐", img:"💊", pill:true, comp:"standardized lyophilized bacterial lysates of E.coli 60mg (as lyophilized bacterial lysates) 6mg", eff:"자격요법제", dose:"1캡슐<br/>하루 1회",
+    warn:"· 1일 1회 아침 공복(식사 전)에 복용하세요.", rec:[] },
+  { name:"동아가스터정20밀리그램", img:"💊", pill:true, comp:"파모티딘 20mg", eff:"위산과다증약", dose:"1정<br/>하루 2회",
+    warn:"· 간질환 환자나 신장질환 환자의 경우 전문가에게 미리 알리세요.", rec:[1,2,3,4] }
+];
+var selIdx = -1;        // 시안 B: 선택 약물
+var variant = 'A';      // 'A'(약물별 인라인) | 'B'(하단 상세 패널)
+
+// 추천 상품 출처별 그룹.
+//  · 우리약국(최대 3): 항상 노출 — 상품 있으면 chips, 없으면 등록 CTA
+//  · 굿팜(최대 2): 상품이 있을 때만 노출(없으면 섹션 자체 숨김 → 우리약국만 노출)
+function prodGroups(r){
+  var gp=(r.gp||[]).slice(0,2), store=(r.store||[]).slice(0,3);
+  var storeHtml = store.length
+    ? '<div class="pchips">'+store.map(function(p){return '<span class="pchip store">'+p.nm+'</span>';}).join('')+'</div>'
+    : '<button class="cta-reg" onclick="openSetting()">＋ 우리약국 추천 상품 등록하러 가기</button>';
+  var out = '<div class="pg store"><div class="pg-l">우리약국 추천 상품</div>'+storeHtml+'</div>';
+  if(gp.length){
+    out += '<div class="pg"><div class="pg-l">굿팜 추천 상품</div>'+
+      '<div class="pchips">'+gp.map(function(p){return '<span class="pchip gp">'+p.nm+'</span>';}).join('')+'</div></div>';
+  }
+  return out;
+}
+// 영양소 블록. 순서: 부족 위험 영양소 → 굿팜 → 우리약국 → 관련 카테고리·부족해지는 근거 → 참고문헌
+function cardInner(r){
+  return '<div class="nut-line"><span class="nk">부족 위험 영양소</span><b>'+r.nut+'</b></div>'+
+    prodGroups(r)+
+    '<div class="irow"><span class="ik">관련 카테고리</span><span class="iv">'+r.cat+'</span></div>'+
+    '<div class="irow"><span class="ik">부족해지는 근거</span><span class="iv">'+r.info+'</span></div>'+
+    (r.ref?'<div class="ref-line">근거(참고문헌) · '+r.ref+'</div>':'');
+}
+// 카드 리스트: 각 처방 약물 = 카드 1개 (헤더=약물정보+추천 상태 배지, 본문=추천 영역)
+function statusBadge(has){ return has ? '<span class="badge rec">추천 상품 있음</span>' : '<span class="badge none">추천 없음</span>'; }
+function clean(s){ return s.replace(/<br\/?>/g,' ').replace(/<\/?b>/g,''); }
+function renderDrugCards(){
+  var c=document.getElementById('drugCards');
+  c.innerHTML=drugs.map(function(d){
+    var hasRec=d.rec.length>0;
+    var body = hasRec
+      ? d.rec.map(function(ri){ return '<div class="ablk">'+cardInner(recos[ri])+'</div>'; }).join('')
+      : '<div class="norec-b">추천 상품이 없습니다</div>';
+    return '<div class="dcard'+(hasRec?'':' off')+'">'+
+      '<div class="dcard-h">'+
+        '<span class="dimg'+(d.pill?' pill':'')+'">'+d.img+'</span>'+
+        '<div class="dinfo">'+
+          '<div class="dtop"><b class="dnm">'+d.name+'</b><span class="deff">'+d.eff+'</span></div>'+
+          '<div class="dcomp">'+d.comp+'</div>'+
+          '<div class="dmeta">'+
+            '<div class="mrow"><span class="mk">복용법</span><span class="mv">'+clean(d.dose)+'</span></div>'+
+            '<div class="mrow warn"><span class="mk">주의사항</span><span class="mv">'+clean(d.warn)+'</span></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="dcard-b">'+body+'</div>'+
+    '</div>';
+  }).join('');
+}
+// ── 시안 C / 시안 D 토글 ──
+function setVariant(v){
+  document.getElementById('vC').classList.toggle('on', v==='C');
+  document.getElementById('vD').classList.toggle('on', v==='D');
+  document.getElementById('drugCards').style.display = v==='C' ? '' : 'none';
+  document.getElementById('viewD').style.display = v==='D' ? '' : 'none';
+  if(v==='C') renderDrugCards();
+  if(v==='D') renderTableD();
+}
+// 시안 D 우측(상품 액션): 우리약국 → 굿팜. 둘 다 없으면 '추천 상품이 없습니다'(정책4),
+//   우리약국 없고 굿팜 있으면 우리약국 슬롯에 등록 CTA(정책5).
+function dmRight(r){
+  var store=(r.store||[]).slice(0,3), gp=(r.gp||[]).slice(0,2);
+  if(!store.length && !gp.length)
+    return '<div class="dm-right"><div class="dm-none">추천 상품이 없습니다</div></div>';
+  var storeInner = store.length
+    ? '<div class="dm-chips">'+store.map(function(p){return '<span class="pchip store">'+p.nm+'</span>';}).join('')+'</div>'
+    : '<button class="cta-reg" onclick="openSetting()">＋ 우리약국 추천 상품 등록하러 가기</button>';
+  var out = '<div class="dm-pg store"><div class="dm-pgl">우리약국 추천 상품</div>'+storeInner+'</div>';
+  if(gp.length)
+    out += '<div class="dm-pg"><div class="dm-pgl">굿팜 추천 상품</div>'+
+      '<div class="dm-chips">'+gp.map(function(p){return '<span class="pchip gp">'+p.nm+'</span>';}).join('')+'</div></div>';
+  return '<div class="dm-right">'+out+'</div>';
+}
+// 시안 D 부족성분 1개 = 좌우 2열 item. 좌=성분명[카테고리]·부족해지는 근거(ⓘ), 우=상품 액션.
+function dmItem(r, hidden){
+  var ref = r.ref ? ' <span class="info" tabindex="0">ⓘ<span class="tip-pop">'+r.ref+'</span></span>' : '';
+  var left = '<div class="dm-left">'+
+    '<div class="dm-nut"><b>'+r.nut+'</b><span class="catb">'+r.cat+'</span></div>'+
+    '<div class="dm-basis"><span class="dm-bk">부족해지는 근거</span>'+r.info+ref+'</div>'+
+  '</div>';
+  return '<div class="dm-item'+(hidden?' dm-extra more-hidden':'')+'">'+left+dmRight(r)+'</div>';
+}
+// 상위 3개까지 기본 노출, 4개 이상이면 '+ N개 더보기'로 접어둠(정책1·2)
+function toggleMore(di, n){
+  var box=document.querySelector('.dminline[data-di="'+di+'"]'); if(!box)return;
+  var btn=box.querySelector('.dm-more'); var open=btn.getAttribute('data-open')==='1';
+  box.querySelectorAll('.dm-extra').forEach(function(el){ el.classList.toggle('more-hidden', open); });
+  btn.setAttribute('data-open', open?'0':'1');
+  btn.textContent = open ? ('＋ '+n+'개 더보기') : '접기';
+}
+// 시안 D: 최신 처방 약물표 + 각 약물 row 하단에 '드럭머거 & 추천제품' 인라인 영역
+var DM_MAX = 3;
+function renderTableD(){
+  var b=document.getElementById('drugBodyD'); b.innerHTML='';
+  drugs.forEach(function(d, di){
+    b.insertAdjacentHTML('beforeend',
+      '<tr class="drow norec"><td class="drug">'+d.name+'</td>'+
+      '<td class="c"><span class="img'+(d.pill?' pill':'')+'">'+d.img+'</span></td>'+
+      '<td class="comp">'+d.comp+'</td><td class="c">'+d.eff+'</td>'+
+      '<td class="dose">'+d.dose+'</td><td class="warn">'+d.warn+'</td></tr>');
+    if(d.rec.length){
+      var items=d.rec.map(function(ri,i){ return dmItem(recos[ri], i>=DM_MAX); }).join('');
+      var extra=d.rec.length-DM_MAX;
+      var more = extra>0
+        ? '<button class="dm-more" data-open="0" onclick="toggleMore('+di+','+extra+')">＋ '+extra+'개 더보기</button>'
+        : '';
+      b.insertAdjacentHTML('beforeend',
+        '<tr class="dmrow"><td colspan="6"><div class="dminline" data-di="'+di+'">'+items+more+'</div></td></tr>');
+    } else {
+      b.insertAdjacentHTML('beforeend',
+        '<tr class="dmrow"><td colspan="6"><div class="dminline off"><span class="norec-i">추천 상품이 없습니다</span></div></td></tr>');
+    }
+  });
+}
+function pickLang(el){ document.querySelectorAll('.lang').forEach(function(b){ if(b.classList.contains('on'))b.classList.remove('on'); }); if(!el.classList.contains('drop')&&!el.classList.contains('print'))el.classList.add('on'); }
+function openSetting(){
+  toast('약사웹 추천 상품 설정을 새 창으로 엽니다 (약국ID·부족 위험 영양소ID 전달)');
+  window.open('./pharmacy-web.html','_blank');
+}
+var te=document.getElementById('toast'),tt;
+function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt); tt=setTimeout(function(){te.classList.remove('show')},2200); }
+setVariant('D');
+</script>
+</body>
+</html>

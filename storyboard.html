@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI mate 영양소 상담 추천 · 화면설계서(스토리보드)</title>
+<style>
+  :root{
+    --teal:#16b8a3; --teal-d:#0e9e8c; --teal-soft:#e6f7f4; --teal-line:#bfe8e1;
+    --ink:#28303a; --muted:#7b8794; --faint:#9aa4af; --line:#e6e9ee; --bg:#f1f3f6;
+    --amber:#c98a12; --blue:#2a6fc0; --danger:#d8453a; --hl:#fff3d6; --hlb:#e8b84b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#eef1f4;font-size:13px;line-height:1.55;padding:16px}
+  .doc{max-width:1280px;margin:0 auto}
+  .doc-head{margin-bottom:14px}
+  .doc-head h1{font-size:20px;font-weight:800;margin:0 0 4px}
+  .doc-head p{font-size:12.5px;color:var(--muted);margin:0}
+  /* 플랫폼 탭 */
+  .ptabs{display:flex;gap:8px;margin:16px 0 18px;flex-wrap:wrap}
+  .ptab{padding:11px 18px;border:1px solid var(--line);background:#fff;border-radius:10px;font-weight:800;font-size:13.5px;color:var(--muted);cursor:pointer}
+  .ptab .pn{font-size:11px;color:var(--faint);margin-right:6px}
+  .ptab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .ptab.on .pn{color:#cdeee8}
+  .platform[hidden]{display:none}
+  .hint-bar{font-size:12px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 13px;margin-bottom:16px}
+  .hint-bar b{color:var(--teal-d)}
+
+  /* 스크린 카드 */
+  .screen{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px;box-shadow:0 6px 20px -14px rgba(0,0,0,.2)}
+  .sc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sc-head .sid{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:7px;padding:4px 10px}
+  .sc-head .nm{font-size:15px;font-weight:800}
+  .sc-head .pf{margin-left:auto;font-size:11.5px;color:var(--faint);font-weight:700}
+  .sc-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+  @media(max-width:900px){.sc-grid{grid-template-columns:1fr}}
+
+  /* 목업 공통 — 번호 배지가 잘리지 않도록 테두리 제거 + overflow 보이게 + 좌측 여백 크게 */
+  .mock{border:none;background:transparent;position:relative;overflow:visible;
+    padding:4px;margin:16px 0 4px 26px}
+  .hot{position:relative;cursor:pointer;transition:box-shadow .12s,background .12s}
+  .hot .num{position:absolute;z-index:5;top:-7px;left:-13px;width:21px;height:21px;border-radius:50%;
+    background:var(--teal);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px -1px rgba(0,0,0,.35);border:2px solid #fff}
+  .hot.active{box-shadow:0 0 0 3px var(--hlb), 0 0 0 6px var(--hl);background:var(--hl);border-radius:6px;z-index:2}
+  .hot.active .num{background:var(--amber)}
+
+  /* 디스크립션 */
+  .desc{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  .desc .dh{font-size:12px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+  .desc li{display:flex;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;cursor:pointer;background:#fff;transition:background .12s,border-color .12s}
+  .desc li:hover{border-color:var(--teal-line)}
+  .desc li .di{flex:none;width:22px;height:22px;border-radius:50%;background:var(--teal-soft);color:var(--teal-d);font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .desc li .dt{font-size:12.5px;color:#3a424c}.desc li .dt b{color:var(--ink)}
+  .desc li.active{background:var(--hl);border-color:var(--hlb)}
+  .desc li.active .di{background:var(--amber);color:#fff}
+  .desc .asis-note{display:block;font-size:10.5px;font-weight:600;color:var(--faint);text-transform:none;letter-spacing:0;margin-top:4px}
+  /* as-is(기존 화면) 영역 — 흐리게 표시, 번호 없음 */
+  .asis{opacity:.62;filter:saturate(.85)}
+  .asis-tag{font-size:9px;font-weight:700;color:var(--faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px}
+
+  /* ── 목업 부품 ── */
+  .win{font-size:12px}
+  .win .bar{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--line);background:#fafbfc}
+  .win .dotm{width:13px;height:13px;border-radius:5px 5px 5px 2px;background:var(--teal)}
+  .win .wt{font-weight:800;font-size:13px}
+  .win .x{margin-left:auto;color:#b8c0c9}
+  .tabrow{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 12px}
+  .tabrow .t{padding:11px 13px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent}
+  .tabrow .t.on{color:var(--teal-d);border-bottom-color:var(--teal)}
+  .pad{padding:13px}
+  .htitle{font-size:14px;font-weight:800;margin:0 0 6px}
+  .sub{font-size:11px;color:var(--muted);margin:0 0 10px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
+  .chip{font-size:11px;font-weight:700;border:1px solid var(--teal-line);color:var(--teal-d);border-radius:7px;padding:5px 11px;background:#fff}
+  .chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  table.m{width:100%;border-collapse:collapse;font-size:11px}
+  table.m th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:7px 8px;border:1px solid var(--line)}
+  table.m td{padding:7px 8px;border:1px solid var(--line);color:#3a424c}
+  .reco-box{border:1.5px solid var(--teal-line);border-radius:10px;overflow:visible;margin-top:6px}
+  .reco-top{display:flex;align-items:flex-start;gap:8px;background:var(--teal-soft);padding:10px 12px;border-bottom:1px solid var(--teal-line)}
+  .reco-top .rt{flex:1}.reco-top .rtt{font-weight:800;color:#0c7a6c;font-size:12.5px}
+  .reco-top .rg{font-size:10.5px;color:#4f6f69;margin-top:3px}
+  .cta-b{background:var(--teal);color:#fff;border-radius:7px;font-size:11px;font-weight:800;padding:7px 10px;white-space:nowrap}
+  .setb{font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px}
+  .setb.base{background:#eef2f6;color:#5c6671}.setb.store{background:#e6f7f4;color:var(--teal-d)}
+  .btabs{display:flex;gap:5px;margin-top:10px}
+  .btabs .b{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:var(--faint);border:1px solid var(--line);border-radius:7px 7px 0 0;padding:8px 4px;background:#fafbfc}
+  .btabs .b.on{color:var(--teal-d);background:#fff;box-shadow:inset 0 2px 0 var(--teal)}
+
+  /* 사이드 셸 */
+  .shell{display:flex;min-height:300px}
+  .side{width:120px;flex:none;border-right:1px solid var(--line);background:#fafbfc;padding:10px 8px}
+  .side .br{font-weight:800;font-size:12px;color:var(--teal);padding:2px 4px 8px}
+  .side .ni{font-size:11px;color:#5c6671;padding:6px 7px;border-radius:6px;font-weight:600}
+  .side .ni.on{background:var(--teal-soft);color:var(--teal-d);font-weight:800}
+  .scol{flex:1;min-width:0}
+  .stop{display:flex;align-items:center;padding:10px 13px;border-bottom:1px solid var(--line);font-weight:800;font-size:13px}
+  .stop .me{margin-left:auto;font-size:10px;color:var(--faint);font-weight:600}
+  .srow{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .inp{height:26px;border:1px solid var(--line);border-radius:6px;font-size:10.5px;color:var(--muted);padding:0 8px;display:flex;align-items:center;background:#fff}
+  .inp.w{flex:1;min-width:80px}
+  .bn{height:26px;border-radius:6px;font-size:10.5px;font-weight:700;padding:0 11px;display:flex;align-items:center;background:var(--teal);color:#fff}
+  .bn.g{background:#fff;border:1px solid var(--line);color:#5c6671}
+  .onoff{font-size:9.5px;font-weight:800;border-radius:5px;padding:2px 7px}.onoff.on{background:#e7f6ee;color:#16a34a}.onoff.off{background:#f0eef2;color:#8b8b97}
+  .stt{font-size:9.5px;font-weight:800;border-radius:999px;padding:2px 8px}
+  .stt.ok{background:#e7f6ee;color:#16a34a}.stt.need{background:#fbf1dd;color:var(--amber)}.stt.exp{background:#f3eef9;color:#6f5fae}.stt.hide{background:#eef0f2;color:#8b8b97}
+  /* 드로어 목업 */
+  .drw{border:1px solid var(--line);border-radius:10px;overflow:visible}
+  .drw-h{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:800;font-size:12.5px;background:#fafbfc}
+  .blk{padding:10px 12px;border-bottom:1px solid var(--line)}
+  .blk:last-child{border:none}
+  .blk .bh{font-size:11px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .ro{font-size:9px;font-weight:700;color:var(--faint);background:#f4f6f8;border-radius:4px;padding:1px 6px}
+  .kvm{font-size:10.5px;color:#566;line-height:1.7}
+  .pitem{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:10.5px;margin-bottom:6px}
+  .pitem .nm{flex:1;font-weight:700}
+  .tg{width:30px;height:17px;border-radius:999px;background:var(--teal);position:relative;flex:none}
+  .tg::after{content:"";position:absolute;top:2px;left:15px;width:13px;height:13px;border-radius:50%;background:#fff}
+  .footb{display:flex;gap:6px;padding:10px 12px}
+  .footb .bn{flex:1;justify-content:center}
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="doc-head">
+    <h1>AI mate 영양소 상담 추천 · 화면설계서 (스토리보드)</h1>
+    <p>플랫폼별 화면 — 화면번호 + 컴포넌트 번호 + 디스크립션. 화면의 <b>번호(컴포넌트)</b>나 우측 <b>디스크립션</b>에 마우스를 올리면 짝이 하이라이트되고, 클릭하면 고정됩니다.</p>
+  </div>
+
+  <div class="ptabs">
+    <div class="ptab on" data-p="client" onclick="pickP(this)"><span class="pn">P1</span>클라이언트 · POS AI mate</div>
+    <div class="ptab" data-p="pharm" onclick="pickP(this)"><span class="pn">P2</span>약국 어드민 · 약사웹</div>
+    <div class="ptab" data-p="super" onclick="pickP(this)"><span class="pn">P3</span>슈퍼어드민 · 추천 관리</div>
+  </div>
+  <div class="hint-bar">💡 컴포넌트 번호(①②③…) 또는 디스크립션 항목에 <b>hover</b> = 미리보기 하이라이트 · <b>click</b> = 고정(다시 클릭 해제). 화면별로 독립 동작합니다.</div>
+
+  <!-- ════════ P1 클라이언트 ════════ -->
+  <div class="platform" data-p="client">
+    <section class="screen" data-sid="AIM-C-01">
+      <div class="sc-head"><span class="sid">AIM-C-01</span><span class="nm">처방 상세 분석 · 영양소 상담 추천 영역</span><span class="pf">클라이언트 POS · AI mate</span></div>
+      <div class="sc-grid">
+        <!-- 목업 (추천 영역만 번호 표기 · 그 외 기존 화면 as-is) -->
+        <div class="mock win">
+          <div class="bar"><span class="dotm"></span><span class="wt">굿팜 AI MATE</span><span class="x">✕</span></div>
+          <div class="asis">
+            <div class="tabrow"><span class="t">고객 종합 분석</span><span class="t on">처방 상세 분석</span></div>
+          </div>
+          <div class="pad">
+            <div class="asis"><div class="htitle">AI 처방전 분석</div><div class="sub">유형별 복약안내서를 생성해드립니다. <span class="asis-tag">기존 화면 · as-is</span></div></div>
+            <div class="asis" style="margin:8px 0"><div class="chips"><span class="chip on">한국어</span><span class="chip">영어</span><span class="chip">중국어</span><span class="chip">인쇄 ⬇</span></div></div>
+            <div class="asis" style="display:flex;align-items:center;gap:8px">
+              <div class="htitle" style="font-size:13px">처방 약물 정보표</div>
+              <div class="hot" data-n="1" style="margin-left:auto"><span class="num" style="top:-10px;right:-10px;left:auto">1</span><span class="cta-b">⚙ 추천 상품 설정</span></div>
+            </div>
+            <div class="hot" data-n="2" style="margin-top:6px"><span class="num">2</span>
+              <table class="m"><thead><tr><th>약물명</th><th>성분명</th><th>효능</th><th>복용법</th><th>추천 Tip</th></tr></thead>
+              <tbody>
+                <tr class="hot" data-n="3" style="display:table-row"><td><span class="num" style="left:-2px;top:2px">3</span>뮤테란과립</td><td>아세틸시스테인</td><td>가래제거약</td><td>하루 3회</td><td><span class="cta-b" style="background:#16b8a3">💡 추천 Tip 2건</span></td></tr>
+                <tr><td>시네츄라시럽</td><td>coptis…</td><td>기침가래약</td><td>하루 3회</td><td><span class="bn g" style="border-color:#bfe8e1;color:#0e9e8c">💡 추천 Tip 1건</span></td></tr>
+                <tr><td>어린이용타스펜정</td><td>acetaminophen</td><td>해열진통제</td><td>하루 3회</td><td><span class="bn" style="color:#9aa4af">추천 없음</span></td></tr>
+              </tbody></table>
+            </div>
+            <div class="hot reco-box" data-n="4" style="position:relative;margin-top:12px;padding:0;border:1px solid #bfe8e1;border-radius:10px;overflow:hidden">
+              <span class="num" style="left:-2px;top:-2px">4</span>
+              <div style="background:#e6f7f4;padding:8px 12px;font-size:11px;font-weight:800;color:#0c7a6c">추천 상품 상세 · 선택 약물 <b>뮤테란과립</b> · 2개 영양소</div>
+              <div style="padding:10px 12px">
+                <div style="border:1px solid #e6e9ee;border-radius:8px;padding:9px 11px;margin-bottom:7px;font-size:11px">
+                  <b>● 비타민 B12</b><br>관련 카테고리 · 비타민 B군, 종합비타민<br>추천 상품 · ①○○ 비타민B 컴플렉스, ②△△ 비타민B12<br>부족해지는 근거 · 메트포르민 장기 복용 시 B12 흡수 저하<br><span style="color:#9aa4af">근거(참고문헌) · 1) Metformin & B12, Diabetes Care</span><br><span style="color:#566">관련 약물 · 시네츄라시럽</span></div>
+                <div style="border:1px solid #e6e9ee;border-radius:8px;padding:9px 11px;font-size:11px">
+                  <b>● 코엔자임Q10</b><br>관련 카테고리 · 항산화 작용<br>추천 상품 · ①○○ 코엔자임Q10 100mg …<br>부족해지는 근거 · 스타틴은 CoQ10 생성을 줄일 수 있음</div>
+              </div>
+            </div>
+            <div class="asis" style="margin-top:12px"><div class="btabs"><span class="b on">현재 처방전 분석</span><span class="b">같은 의사 처방 비교</span><span class="b">직전 처방과 비교</span><span class="b">복용중인 약물 분석</span></div></div>
+          </div>
+        </div>
+        <!-- 디스크립션 -->
+        <ol class="desc">
+          <div class="dh">AIM-C-01 · 추천 상품 영역 컴포넌트 <span class="asis-note">시안 A/B 토글 제공 · CTA·추천 Tip 열은 공통</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>추천 상품 설정 CTA</b> — <b>처방 약물 정보표 우측 상단</b>(시안 A·B 동일). 약사웹 추천 상품 설정 페이지로 이동(새 창).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>처방 약물 정보표(기존 유지)</b> — 기존 컬럼 유지 + 우측에 <b>추천 Tip 열</b>만 추가. 표 안에 추천 상세를 복잡하게 끼워 넣지 않아 가독성 유지.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>시안 A · 약물별 인라인</b> — 각 약물 <b>row 바로 아래</b>에 연한 민트 sub-row로 추천 영역 배치. <b>기본 펼침</b>, 추천 없는 약물은 `추천 없음`만 표시. Tip 버튼으로 접기/펼치기. 영역 = 부족 위험 영양소·관련 카테고리·추천 상품·<b>부족해지는 근거(기본 노출)</b>. 약물별 종속 정보처럼 표시(약물 내 동일 바코드 1회, 약물 간 중복 허용).</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>시안 B · 하단 상세 패널(선택 기반)</b> — 표 아래 한 곳에 <b>선택 약물 1개</b>의 추천만 카드로 표시(첫 추천 약물 자동 선택). 카드에 <b>관련 약물</b> 표기 + 동일 바코드 전체 처방 기준 중복 제거. <b>현재 화면(유지본)</b>.</span></li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <!-- ════════ P2 약사웹 ════════ -->
+  <div class="platform" data-p="pharm" hidden>
+    <section class="screen" data-sid="AIM-P-01">
+      <div class="sc-head"><span class="sid">AIM-P-01</span><span class="nm">추천 상품 설정 — 목록</span><span class="pf">약국 어드민 · 약사웹</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="shell">
+            <div class="hot side" data-n="1"><span class="num">1</span>
+              <div class="br">◭ 굿팜</div>
+              <div class="ni">대시보드</div><div class="ni">경영분석</div><div class="ni on">AI mate 추천 상품</div>
+            </div>
+            <div class="scol">
+              <div class="stop">AI mate 추천 상품 설정<span class="me">임한일 · 대표약사</span></div>
+              <div class="pad">
+                <div class="hot srow" data-n="2"><span class="num">2</span>
+                  <span class="bn" style="background:#e6f8f4;color:#0ea58b;font-weight:800">전체 6건</span><span style="flex:1"></span><span class="bn g" data-n="5">＋ 항목 추가</span>
+                </div>
+                <div class="hot" data-n="3"><span class="num">3</span>
+                  <table class="m"><thead><tr><th>부족 위험 영양소</th><th>관련 성분</th><th>적용 상품</th><th>최종 수정</th><th>관리</th></tr></thead>
+                  <tbody>
+                    <tr class="hot" data-n="4" style="display:table-row"><td><span class="num" style="left:2px;top:2px">4</span>비타민 B12</td><td>메트포르민</td><td>○○ 비타민B</td><td>06-20 · 어드민</td><td><span class="bn g">수정</span> <span class="bn g">삭제</span></td></tr>
+                    <tr><td>코엔자임Q10</td><td>아토르바스타틴</td><td>○○ Q10</td><td>06-24 · 약국</td><td><span class="bn g">수정</span> <span class="bn g">삭제</span></td></tr>
+                    <tr><td>비타민 D</td><td>프레드니솔론</td><td>○○ 비타민D</td><td>06-12 · 약국</td><td><span class="bn g">수정</span> <span class="bn g">삭제</span></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">AIM-P-01 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>사이드바</b> — 굿팜 솔루션 &gt; <b>AI mate 추천 상품</b> 메뉴.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>전체 건수</b> — <b>전체 N건은 좌측 상단</b>에 배치. (검색 필드는 제외 — 목록 건수 적어 우선 미사용)</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>목록 테이블</b> — 부족 위험 영양소·관련 성분·부족해지는 근거·적용 상품·최종 수정(날짜·수정자)·<b>관리</b>. AI mate에 출력되는 내용 기반, 성분코드·노출 설정·상태 값(출처) 미표기.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>관리 열(맨 오른쪽)</b> — <b>수정</b>(상세 가운데 모달) · <b>삭제</b>(바로 삭제, 확인 후). 행 클릭도 수정으로 진입.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>항목 추가</b> — 어드민이 부족 위험 영양소 항목을 <b>하나씩</b> 등록(가운데 모달 폼).</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="screen" data-sid="AIM-P-02">
+      <div class="sc-head"><span class="sid">AIM-P-02</span><span class="nm">추천 상품 설정 — 상세(가운데 모달)</span><span class="pf">약국 어드민 · 약사웹</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="drw">
+            <div class="hot drw-h" data-n="1"><span class="num">1</span>비타민 B12 · 관련 성분 메트포르민</div>
+            <div class="hot blk" data-n="2"><span class="num">2</span>
+              <div class="bh">기본 정보</div>
+              <div class="kvm">부족 위험 영양소 비타민 B12 · 관련 성분 메트포르민</div>
+            </div>
+            <div class="hot blk" data-n="3"><span class="num">3</span>
+              <div class="bh">부족해지는 근거</div>
+              <div class="kvm">메트포르민 장기 복용 시 B12 흡수가 저하되어 부족해질 위험.</div>
+            </div>
+            <div class="blk">
+              <div class="bh">추천 상품 <span style="margin-left:auto;font-size:11px;color:var(--muted)">정렬 · 삭제</span></div>
+              <div class="hot pitem" data-n="4"><span class="num">4</span><span class="nm">○○ 비타민B 컴플렉스</span><span class="bn g" style="display:inline-flex">삭제</span></div>
+              <div class="kvm" style="margin-top:4px">추천 상품 1 / 3개 · 기본값(기본 추천): ○○ 비타민B 컴플렉스</div>
+              <div class="hot" data-n="5" style="margin-top:4px"><span class="num">5</span><span class="bn g" style="display:inline-flex">＋ 상품 추가</span><span class="bn g" style="display:inline-flex">기본값 복원</span></div>
+            </div>
+            <div class="hot footb" data-n="6"><span class="num">6</span><span class="bn g">항목 삭제</span><span class="bn">저장</span></div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">AIM-P-02 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>모달 헤더</b> — 목록 행 클릭 시 <b>가운데 모달</b>로 열림. 선택한 부족 위험 영양소 · 관련 성분.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>기본 정보</b> — 부족 위험 영양소·관련 성분. 성분코드 미표기, 약사 수정 불가('읽기 전용' 배지는 미표기).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>부족해지는 근거</b> — AI mate에 노출되는 부족 사유. 수정 불가.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>추천 상품 항목</b> — 정렬 · 삭제. 약국당 <b>최대 3개</b>(정책 반영, 화면 문구 미노출 — `추천 상품 N / 3개`만 표기). 노출 ON/OFF 없음(모두 노출). 약국 설정이 기본 추천보다 우선. 상품 배지(건기식 등) 미표기.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>상품 추가 / 기본값 복원</b> — 상품 DB 검색으로만 추가(메모형 입력 불가). <b>기본값(기본 추천 상품)</b> 함께 표기, 복원 시 그 상태로 되돌림.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>항목 삭제 / 저장</b> — 수정 또는 삭제만. <b>변경 이력은 노출하지 않으며, 항목 삭제 시 삭제 이력도 어디에도 남기지 않는다.</b> 삭제 → 확인 → 목록에서 제거.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="screen" data-sid="AIM-P-03">
+      <div class="sc-head"><span class="sid">AIM-P-03</span><span class="nm">서버 마스터 상품 검색 모달</span><span class="pf">약국 어드민 · 약사웹</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="drw">
+            <div class="hot drw-h" data-n="1"><span class="num">1</span>상품 검색 · 서버 마스터 상품 데이터 기준</div>
+            <div class="blk">
+              <div class="hot srow" data-n="2"><span class="num">2</span><span class="inp">바코드 ▾</span><span class="inp w">바코드/상품명 입력</span><span class="bn">검색</span></div>
+              <div style="font-size:10px;color:var(--muted);margin:2px 0 8px">POS 미사용 약국도 등록 가능 · 약국 로컬이 아닌 <b>서버 마스터 상품 데이터</b>에서 검색(필수 상품명·바코드)</div>
+              <div class="hot" data-n="3"><span class="num">3</span>
+                <div class="pitem"><span class="nm">○○ 마그네슘 400</span><span class="bn g" style="height:22px;padding:0 8px">＋ 추가</span></div>
+                <div class="pitem"><span class="nm">○○ 비타민D 2000IU</span><span class="bn g" style="height:22px;padding:0 8px">＋ 추가</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">AIM-P-03 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>모달 헤더</b> — 추천 상품 추가용 <b>서버 마스터 상품</b> 검색.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>검색 바</b> — 바코드/상품명 검색. <b>메모형 입력 불가</b> · <b>POS 미사용 약국도</b> 약국 로컬이 아닌 <b>서버 마스터 상품 데이터</b>에서 검색·등록.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>검색 결과 · 추가</b> — 선택 시 약국 설정 상품으로 등록. <b>최대 3개</b> 도달 시·중복·결과 없음 안내 처리.</span></li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <!-- ════════ P3 슈퍼어드민 ════════ -->
+  <div class="platform" data-p="super" hidden>
+    <section class="screen" data-sid="AIM-S-01">
+      <div class="sc-head"><span class="sid">AIM-S-01</span><span class="nm">AI mate 추천 관리 — Master / 통계 / 매칭</span><span class="pf">슈퍼어드민</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="shell">
+            <div class="hot side" data-n="1"><span class="num">1</span>
+              <div class="br">◭ 굿팜</div>
+              <div class="ni">바코드 관리</div><div class="ni on">AI mate 추천 관리</div><div class="ni">마스터 상품 관리</div>
+            </div>
+            <div class="scol">
+              <div class="stop">AI mate 추천 관리</div>
+              <div class="pad">
+                <div class="hot" data-n="2"><span class="num">2</span>
+                  <div class="tabrow" style="padding:0"><span class="t on">추천 Master 목록</span><span class="t" style="opacity:.4">부족 영양소별 통계 (준비중)</span></div>
+                </div>
+                <div class="hot srow" data-n="3" style="margin-top:9px"><span class="num">3</span>
+                  <span class="inp">부족 위험 영양소 ▾</span><span class="inp w">검색</span><span class="bn">검색</span><span class="bn g" data-n="7">＋ 등록</span><span class="bn g">⬆ 업로드</span><span class="bn g">이력</span>
+                </div>
+                <div class="hot" data-n="4"><span class="num">4</span>
+                  <table class="m"><thead><tr><th>성분명</th><th>부족 위험 영양소</th><th>부족해지는 근거</th><th>기본/약국</th><th>노출</th></tr></thead>
+                  <tbody>
+                    <tr class="hot" data-n="8" style="display:table-row"><td><span class="num" style="left:-2px;top:2px">8</span>메트포르민</td><td>비타민 B12</td><td>B12 흡수 저하로 부족 위험</td><td>3 / 128</td><td><span class="hot stt ok" data-n="5" style="display:inline-block"><span class="num" style="top:-8px;left:-8px">5</span>ON</span></td></tr>
+                    <tr><td>프레드니솔론</td><td>비타민 D</td><td>골대사 영향으로 부족 위험</td><td>1 / 31</td><td><span class="stt hide">OFF</span></td></tr>
+                    <tr><td>메토트렉세이트</td><td>엽산</td><td>엽산 길항 — 전문가 확인</td><td>1 / 8</td><td><span class="stt hide">OFF</span></td></tr>
+                    <tr><td>살부타몰</td><td>칼륨</td><td>운영상 제외 항목</td><td>1 / 2</td><td><span class="stt hide">OFF</span></td></tr>
+                  </tbody></table>
+                </div>
+                <div class="hot" data-n="6" style="margin-top:8px;font-size:10.5px;color:var(--muted);border:1px dashed var(--line);border-radius:7px;padding:8px"><span class="num">6</span>
+                  약국별 매칭 현황은 별도 탭 없이 <b>Master 레코드 클릭 → 상세의 '약국별 제출 이력'</b>으로 조회 · 부족 영양소별 통계는 준비중(가림)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">AIM-S-01 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>사이드바</b> — 바코드 관리 &gt; <b>AI mate 추천 관리</b>.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>탭</b> — 추천 Master 목록만 제공. <b>부족 영양소별 통계는 준비중(가림)</b>, 약국별 매칭 현황은 별도 탭 없이 상세로 이동.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>검색 · ＋등록 · 업로드 · 이력</b> — Master 검색, <b>하나씩 등록</b>(가운데 모달), 보유 매칭 데이터 일괄 반영, 변경 이력 조회.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>Master 테이블</b> — <b>성분명이 맨 첫 열</b>. 성분명·부족 위험 영양소(상세 내역 데이터)·부족해지는 근거·기본 추천/약국 설정 수·노출·최종 수정일. 성분코드는 내부 매칭 키로만 사용(미표기). 상세 모달에 <b>근거(참고문헌)</b> 필드 포함.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>노출 ON/OFF</b> — 상태 값 대신 노출 상태만 표기. OFF면 AI mate·약사웹에 미노출.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>약국별 제출 이력</b> — 통계·매칭 별도 탭 없음. 부족 영양소별 통계는 준비중(가림).</span></li>
+          <li data-n="7"><span class="di">7</span><span class="dt"><b>＋ 등록 / 수정</b> — 가운데 모달로 부족 위험 영양소·관련 성분·부족해지는 근거·노출 ON/OFF를 <b>하나씩 등록·수정</b>. 운영자 전용.</span></li>
+          <li data-n="8"><span class="di">8</span><span class="dt"><b>행 클릭 → 상세</b> — Master 레코드를 클릭하면 가운데 상세 모달에서 <b>수정·삭제</b> + <b>약국별 제출 이력</b>(약국명·상품·출처·수정일)을 제출 이력 형식으로 조회.</span></li>
+        </ol>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+function showP(p){
+  document.querySelectorAll('.ptab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-p')===p); });
+  document.querySelectorAll('.platform').forEach(function(pl){ pl.hidden = pl.getAttribute('data-p')!==p; });
+}
+function pickP(el){ showP(el.getAttribute('data-p')); }
+// 딥링크: #client / #pharm / #super 로 진입하면 해당 플랫폼만 열기
+function applyHash(){
+  var p=(location.hash||'').replace('#','');
+  if(['client','pharm','super'].indexOf(p)>=0) showP(p);
+}
+window.addEventListener('hashchange', applyHash);
+applyHash();
+// 컴포넌트 ↔ 디스크립션 하이라이트 (화면 단위 스코프, hover=미리보기 / click=고정)
+document.querySelectorAll('.screen').forEach(function(sc){
+  function set(n,on){ sc.querySelectorAll('[data-n="'+n+'"]').forEach(function(el){ el.classList.toggle('active', on); }); }
+  sc.querySelectorAll('.hot, .desc li').forEach(function(el){
+    var n=el.getAttribute('data-n'); if(!n) return;
+    el.addEventListener('mouseenter', function(){ if(sc.dataset.lock!==n) set(n,true); });
+    el.addEventListener('mouseleave', function(){ if(sc.dataset.lock!==n) set(n,false); });
+    el.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(sc.dataset.lock===n){ sc.dataset.lock=''; set(n,false); }
+      else { if(sc.dataset.lock){ set(sc.dataset.lock,false); } sc.dataset.lock=n; set(n,true); }
+    });
+  });
+});
+</script>
+</body>
+</html>

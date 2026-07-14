@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>굿팜 어드민 · AI mate 추천 관리</title>
+<style>
+  :root{
+    --teal:#16c0a4; --teal-d:#0ea58b; --teal-soft:#e6f8f4; --teal-line:#bfe9e1;
+    --ink:#2a313b; --muted:#7b8794; --faint:#9aa4af; --line:#e7eaee; --bg:#f4f6f8;
+    --amber:#c98a12; --blue:#2a6fc0; --danger:#d8453a; --ok:#16a34a; --purple:#6f5fae;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#eef1f4;font-size:13px;line-height:1.5}
+  .app{display:flex;min-height:100vh;background:#fff}
+  /* 사이드바 */
+  .side{width:196px;flex:none;border-right:1px solid var(--line);background:#fafbfc;padding:14px 10px;overflow:auto}
+  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:16px;padding:2px 6px 6px}
+  .brand .mk{color:var(--teal)}
+  .who{display:flex;align-items:center;gap:7px;font-size:12px;color:#4a525c;padding:7px 8px;border:1px solid var(--line);border-radius:8px;margin:6px 4px 12px;background:#fff}
+  .who .o{margin-left:auto;color:var(--faint);cursor:pointer}
+  .nav-h{font-size:10.5px;font-weight:800;color:var(--faint);letter-spacing:.02em;padding:11px 8px 4px}
+  .nav a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;color:#4a525c;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer}
+  .nav a:hover{background:#eef2f5}
+  .nav a .cv{margin-left:auto;color:var(--faint);font-size:10px}
+  .nav a.grp{font-weight:700}
+  .nav .sub a{padding-left:24px;font-size:12px;color:#5c6671;font-weight:500}
+  .nav .sub a.on{background:var(--teal-soft);color:var(--teal-d);font-weight:800;border-radius:7px}
+  .dot{width:6px;height:6px;border-radius:50%;background:#e0564a;display:inline-block;margin-left:4px}
+
+  /* 메인 */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;padding:15px 24px;border-bottom:1px solid var(--line)}
+  .top .pg{font-size:18px;font-weight:800}
+  .filterbar{font-size:12px;color:var(--muted);background:#f6f8fa;border:1px solid var(--line);border-radius:8px;padding:9px 14px;margin:16px 24px 0}
+  .wrap{padding:16px 24px 24px;flex:1}
+
+  /* 탭 */
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px}
+  .tab{padding:11px 16px;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.on{color:var(--teal-d);border-bottom-color:var(--teal)}
+
+  .bar{display:flex;align-items:center;gap:9px;margin-bottom:13px;flex-wrap:wrap}
+  .sel,.inp{height:34px;border:1px solid var(--line);border-radius:7px;padding:0 11px;font-size:12.5px;color:var(--ink);background:#fff;outline:none;font-family:inherit}
+  .sel{appearance:none;-webkit-appearance:none;padding-right:26px;cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,#9aa0a6 50%),linear-gradient(135deg,#9aa0a6 50%,transparent 50%);
+    background-position:calc(100% - 13px) 15px,calc(100% - 8px) 15px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  .inp.search{width:240px}
+  .btn{height:34px;padding:0 14px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:#4b5158;font-family:inherit}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .spacer{flex:1}
+  .total{font-size:12.5px;font-weight:700;color:#4a525c;background:var(--teal-soft);border-radius:7px;padding:6px 12px}
+  .total b{color:var(--teal-d)}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+  .tbl{border:1px solid var(--line);border-radius:10px;overflow:auto}
+  thead th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:11px 13px;border-bottom:1px solid var(--line)}
+  tbody td{padding:11px 13px;border-bottom:1px solid #eef1f4;color:#3a424c}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#f8fafb}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.c,th.c{text-align:center}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  .nut{font-weight:700}
+  .stt{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
+  .stt.ok{background:#e7f6ee;color:var(--ok)}.stt.need{background:#fbf1dd;color:var(--amber)}
+  .stt.exp{background:#f3eef9;color:var(--purple)}.stt.hide{background:#eef0f2;color:#8b8b97}
+  .pri{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px}
+  .pri.hi{background:#fbe9e6;color:#c0392b}.pri.mid{background:#fbf1dd;color:var(--amber)}.pri.lo{background:#eef2f6;color:#5c6671}.pri.exp{background:#f3eef9;color:var(--purple)}
+  .acts{display:flex;gap:6px}.btn.sm{height:28px;padding:0 10px;font-size:11.5px}
+  .note{font-size:11.5px;color:var(--muted);margin-top:10px}
+  .btn.sm{height:28px;padding:0 10px;font-size:11.5px}
+  .btn.danger{color:var(--danger);border-color:#f0c9c4}
+  tbody tr.click{cursor:pointer}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#28303a;color:#fff;font-size:13px;padding:11px 18px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
+  .toast.show{opacity:1}
+  .hidden{display:none}
+
+  /* 등록/수정 가운데 모달 */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(20,26,32,.45);z-index:70;align-items:center;justify-content:center;padding:24px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:14px;width:100%;max-width:600px;box-shadow:0 34px 90px -30px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column;max-height:88vh}
+  .m-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+  .m-head .dt{font-size:16px;font-weight:800}.m-head .ds{font-size:12px;color:var(--muted);margin-top:3px}
+  .m-head .x{margin-left:auto;font-size:20px;color:var(--faint);cursor:pointer;border:none;background:none}
+  .m-body{padding:16px 20px;overflow:auto;flex:1}
+  .m-foot{padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px}
+  .m-foot .btn{flex:1}
+  .block{margin-bottom:18px}.block:last-child{margin-bottom:0}
+  .block-h{font-size:12.5px;font-weight:800;margin:0 0 8px}
+  .kvs{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .kv{display:flex;font-size:12.5px;border-bottom:1px solid #eef1f4}.kv:last-child{border:none}
+  .kv .k{width:120px;flex:none;background:#f7f9fb;color:var(--muted);font-weight:700;padding:9px 11px;display:flex;align-items:center}
+  .kv .v{padding:7px 11px;flex:1}
+  .fw{width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 10px;font-size:12.5px;font-family:inherit;outline:none;color:var(--ink)}
+  textarea.fw{height:auto;min-height:70px;padding:8px 10px;line-height:1.6;resize:vertical}
+  .exprow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#fbfdfc}
+  .tg{position:relative;width:38px;height:22px;border-radius:999px;background:#d6dde2;cursor:pointer;flex:none;transition:background .15s}
+  .tg.on{background:var(--teal)}
+  .tg::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
+  .tg.on::after{left:18px}
+  .roinfo{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .readbox{border:1px solid var(--line);border-radius:9px;padding:12px 14px;font-size:12px;color:#9aa4af;text-align:center;background:#fbfdfc}
+  .mlist{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .mli{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #eef1f4;font-size:12px}
+  .mli:last-child{border:none}
+  .mli .ph{font-weight:700;width:92px;flex:none}
+  .mli .pr{flex:1;min-width:0}
+  .mli .pr .bc{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint);margin-top:1px}
+  .mli .dt2{color:var(--muted);white-space:nowrap;font-size:11px}
+  .mli .src{font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap;flex:none}
+  .mli .src.store{background:var(--teal-soft);color:var(--teal-d)}.mli .src.base{background:#eef2f6;color:#5c6671}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 사이드바 -->
+  <aside class="side">
+    <div class="brand"><span class="mk">◭</span> 굿팜</div>
+    <div class="who">👤 기술아 (관리자) <span class="o">⎋</span></div>
+    <div class="nav-h">굿팜 공통</div>
+    <nav class="nav">
+      <a class="grp">약국관리 <span class="dot"></span><span class="cv">▾</span></a>
+      <a class="grp">헬스포트 관리 <span class="cv">▾</span></a>
+      <a class="grp">굿팜 서비스 관리 <span class="dot"></span><span class="cv">▾</span></a>
+      <a class="grp">게시판 관리 <span class="cv">▾</span></a>
+    </nav>
+    <div class="nav-h">굿팜 약국 솔루션</div>
+    <nav class="nav">
+      <a class="grp">바코드 프리 <span class="cv">▾</span></a>
+      <a class="grp">전자입고 관리 <span class="cv">▾</span></a>
+      <a class="grp">바코드 관리 <span class="cv">▴</span></a>
+      <div class="sub">
+        <a>마스터 상품 관리</a>
+        <a>약국 등록 상품 관리</a>
+        <a class="on">AI mate 추천 관리</a>
+      </div>
+      <a class="grp">모바일 약국 관리 <span class="cv">▾</span></a>
+      <a class="grp">포인트/쿠폰 관리 <span class="cv">▾</span></a>
+    </nav>
+    <div class="nav-h">기타</div>
+    <nav class="nav">
+      <a class="grp">통계 <span class="cv">▾</span></a>
+      <a class="grp">설정 <span class="cv">▾</span></a>
+    </nav>
+  </aside>
+
+  <!-- 메인 -->
+  <div class="main">
+    <div class="top"><div class="pg">AI mate 추천 관리</div></div>
+    <div class="filterbar">부족 영양소 기준 추천 상품 Master · 굿팜 기본 추천 상품(최대 2)·노출 관리 · 관련 약물/근거는 참고 정보</div>
+    <div class="wrap">
+      <div class="tabs">
+        <div class="tab on">추천 Master 목록</div>
+        <!-- 부족 영양소별 통계 탭: 아직 미제공(가림). 추후 활성화 -->
+      </div>
+
+      <!-- 1. Master 목록 -->
+      <div id="tab0">
+        <div class="bar">
+          <span class="total">전체 <b id="mTotal">0</b> 건</span>
+          <select class="sel"><option>부족 영양소</option><option>관련 약물</option><option>관련 카테고리</option></select>
+          <input class="inp search" placeholder="검색어를 입력하세요" />
+          <button class="btn primary">검색</button>
+          <span class="spacer"></span>
+        </div>
+        <div class="tbl"><table>
+          <thead><tr>
+            <th>부족 영양소</th><th>관련 카테고리</th><th>추천 효능군</th>
+            <th class="num">관련 약물 수</th><th class="num">굿팜 추천 상품 수</th><th class="num">약국 설정 수</th>
+            <th class="c">노출</th><th>최종 수정일</th>
+          </tr></thead>
+          <tbody id="masterBody"></tbody>
+        </table></div>
+        <div class="note">약사 어드민웹에 노출되는 내용과 동일한 항목입니다. <b>노출 OFF</b>인 부족 영양소는 AI mate·약사웹에 노출하지 않습니다. 행을 클릭하면 <b>수정</b>합니다. 성분/약물 정보는 상세의 <b>관련 약물 목록</b>에서 조회 전용으로 제공합니다. <b>MVP</b>: 보유 데이터 기반 조회·수정만 제공(신규 등록·업로드 제외).</div>
+      </div>
+
+      <!-- 2. 부족 영양소별 통계 -->
+      <div id="tab1" class="hidden">
+        <div class="bar">
+          <input class="inp search" placeholder="영양소 검색" />
+          <button class="btn primary">검색</button>
+          <span class="spacer"></span>
+          <span class="total">기준 <b>최근 6개월</b> 조제건</span>
+        </div>
+        <div class="tbl"><table>
+          <thead><tr>
+            <th>부족 영양소</th><th class="num">관련 성분 수</th><th class="num">최근 6개월 조제건</th><th class="num">조제 약국 수</th>
+            <th class="num">기본 추천 / 약국 설정</th><th class="num">미매칭 성분</th><th class="c">보완 우선순위</th>
+          </tr></thead>
+          <tbody id="statBody"></tbody>
+        </table></div>
+        <div class="note">보완 우선순위 = 조제건 수 + 조제 약국 수 + 미매칭 여부 + 약국 수정 빈도 기준.</div>
+      </div>
+
+      <!-- 약국별 매칭 현황: 별도 탭 없이 Master 레코드 클릭 시 상세 모달의 '약국별 제출 이력'으로 표시 -->
+    </div>
+  </div>
+</div>
+
+<!-- 등록/수정 가운데 모달 -->
+<div class="modal-bg" id="mModal" onclick="if(event.target===this)closeMaster()">
+  <div class="modal">
+    <div class="m-head">
+      <div><div class="dt" id="mmTitle">—</div><div class="ds" id="mmSub">—</div></div>
+      <button class="x" onclick="closeMaster()">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="block">
+        <div class="block-h">기본 정보</div>
+        <div class="kvs">
+          <div class="kv"><div class="k">부족 영양소</div><div class="v"><input class="fw" id="fNut" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+          <div class="kv"><div class="k">부족 영양소 ID (매칭 키)</div><div class="v"><input class="fw" id="fNid" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+          <div class="kv"><div class="k">관련 약물 수</div><div class="v"><input class="fw" id="fRelCount" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+        </div>
+        <div class="roinfo"><b>부족 영양소·부족 영양소 ID는 고정값으로 수정할 수 없습니다.</b> 관련 카테고리·추천 효능군·굿팜 추천 상품·노출만 수정할 수 있습니다. 성분/약물 정보는 아래 <b>관련 약물 목록</b>에서 조회만 가능합니다.<br><b>부족 영양소 ID(매칭 키)</b>는 이 영양소를 기준으로 ① 관련 약물(성분코드)–영양소, ② 굿팜 기본 추천 상품, ③ 약국별 우리약국 추천 상품(ID+약국ID), ④ POS 노출을 하나로 연결합니다.</div>
+      </div>
+      <div class="block">
+        <div class="block-h">굿팜 추천 상품 <span style="font-weight:600;color:var(--muted);font-size:11px">부족 영양소별 기본값 · 약국 미설정 시 AI mate 노출 · 최대 2개</span></div>
+        <div id="mDefProds"></div>
+        <div id="mDefAdd" style="margin-top:8px">
+          <input class="fw" id="fDefSearch" placeholder="상품명 또는 바코드로 검색해 굿팜 추천 상품 추가" oninput="searchDef()" autocomplete="off">
+          <div id="fDefRes" style="display:none;border:1px solid #e3e6ea;border-radius:8px;margin-top:4px;max-height:150px;overflow:auto;background:#fff"></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-h">관련 카테고리 <span style="font-weight:600;color:var(--muted);font-size:11px">쉼표(,)로 구분해 여러 개 입력 (예: 비타민 B군, 종합비타민)</span></div>
+        <input class="fw" id="fCat" placeholder="예: 비타민 B군, 종합비타민">
+      </div>
+      <div class="block">
+        <div class="block-h">추천 효능군 <span style="font-weight:600;color:var(--muted);font-size:11px">쉼표(,)로 구분 (예: 대사케어, 면역케어) · DIND 12개 효능군 기준</span></div>
+        <input class="fw" id="fEff" placeholder="예: 항산화&염증케어, 면역케어">
+      </div>
+      <div class="block">
+        <div class="block-h">AI mate 노출</div>
+        <div class="exprow">
+          <div style="flex:1">
+            <div style="font-weight:700">AI mate·약사웹 추천에 노출</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">OFF로 두면 이 부족 영양소는 AI mate·약사웹에 노출되지 않습니다.</div>
+          </div>
+          <div class="tg" id="fExpose" onclick="toggleTg()"></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-h">관련 약물 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">이 부족 영양소와 연결된 약물 (조회 전용) · 성분코드·성분명·제형·부족해지는 이유·근거</span></div>
+        <div id="mRelDrugs"></div>
+        <div class="roinfo" style="margin-top:8px">부족해지는 <b>이유·근거(참고문헌)</b>는 <b>(성분코드 × 부족 영양소)</b> 단위 데이터입니다. 같은 성분이라도 부족 영양소가 다르면 이유·근거가 다릅니다(예: 오메프라졸→B12 vs 오메프라졸→칼슘). 수정하면 <b>이 영양소의 해당 성분 행만</b> 바뀌고, 다른 부족 영양소의 같은 성분 행에는 영향을 주지 않습니다. <b>성분명·제형은 성분 마스터 공용값</b>이라 한 번 고치면 전체에 반영됩니다. (원칙: DIND 버전 재업로드로 일괄 갱신, 개별 정정만 수정 이력으로 처리)</div>
+      </div>
+      <div class="block" id="mmMatchBlock">
+        <div class="block-h">수정 이력 <span style="font-weight:600;color:var(--muted);font-size:11px">슈퍼어드민이 이 부족 영양소를 수정한 이력 (조회 전용)</span></div>
+        <div id="mmMatch"></div>
+      </div>
+    </div>
+    <div class="m-foot" id="mmFoot"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// 데이터 기준 = 부족 영양소(nid = 부족 영양소 매칭 키). 추천 상품·카테고리·효능군은 영양소 종속.
+// drugs[] = 이 영양소를 고갈시키는 관련 약물(성분코드·성분명·제형·이유·근거) — 조회 전용 참고 정보.
+var master = [
+  {nut:"비타민 B12", nid:"NUT-B12", cat:"비타민 B군, 종합비타민", eff:"대사케어",
+   defs:[{nm:"○○ 비타민B 컴플렉스",bc:"8801111000022"},{nm:"△△ 비타민B12 1000mcg",bc:"8809001112223"}], store:128, on:true, mod:"2026-06-20",
+   drugs:[
+     {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12-내인자 복합체 흡수가 저하되어 부족해질 위험", ref:"1) Metformin-associated vitamin B12 deficiency, Diabetes Care"},
+     {code:"A10BA02R", comp:"메트포르민", form:"서방정(TR)", reason:"메트포르민 서방정도 동일 기전으로 B12 흡수가 저하될 수 있어 부족 위험", ref:"1) Metformin and B12 status, Diabetes Care"},
+     {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12의 유리가 감소해 흡수가 저하", ref:"1) Acid suppression and B12 malabsorption, review"},
+     {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 장기 복용 시 부족 위험", ref:"1) PPI use and vitamin B12, JAMA"}
+   ]},
+  {nut:"코엔자임Q10", nid:"NUT-COQ10", cat:"항산화 작용", eff:"항산화&염증케어",
+   defs:[{nm:"○○ 코엔자임Q10 100mg",bc:"8802222000033"},{nm:"△△ 코큐텐 이지 200mg",bc:"8802222000040"}], store:96, on:true, mod:"2026-06-24",
+   drugs:[
+     {code:"C10AA05", comp:"아토르바스타틴", form:"정제(TB)", reason:"스타틴은 메발론산 경로를 억제해 체내 CoQ10 생성을 줄여 부족해질 위험", ref:"1) Statin therapy and CoQ10 depletion, Am J Cardiol"},
+     {code:"C07AB04", comp:"아세부톨롤", form:"경질캡슐(CH)", reason:"베타차단제는 CoQ10 의존 효소 활성을 저해할 수 있어 부족 위험", ref:"1) Beta-blockers and CoQ10, review"}
+   ]},
+  {nut:"칼슘", nid:"NUT-CA", cat:"칼슘 및 미네랄제품", eff:"뼈&관절케어",
+   defs:[{nm:"○○ 칼슘 마그네슘 D",bc:"8804444000055"},{nm:"○○ 칼슘 플러스",bc:"8804444000062"}], store:54, on:true, mod:"2026-06-22",
+   drugs:[
+     {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"위산 감소로 칼슘의 이온화·흡수가 저하되어 장기 복용 시 부족 위험", ref:"1) PPI use and calcium malabsorption"},
+     {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", reason:"스테로이드는 장내 칼슘 흡수를 줄이고 배설을 늘려 부족 위험", ref:"1) Glucocorticoid and calcium balance"}
+   ]},
+  {nut:"마그네슘", nid:"NUT-MG", cat:"마그네슘 및 미네랄제품", eff:"대사케어",
+   defs:[{nm:"△△ 마그네슘 400",bc:"8806666000077"}], store:20, on:true, mod:"2026-06-21",
+   drugs:[
+     {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI 장기 복용은 장내 마그네슘 흡수를 저해해 저마그네슘혈증 위험", ref:"1) PPIs and hypomagnesemia, FDA safety communication"}
+   ]},
+  {nut:"비타민 D", nid:"NUT-VD", cat:"비타민 D", eff:"뼈&관절케어",
+   defs:[{nm:"○○ 비타민D 2000IU",bc:"8803333000044"}], store:31, on:false, mod:"2026-06-12",
+   drugs:[
+     {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", reason:"스테로이드 장기 사용은 비타민 D 대사와 골대사에 영향을 주어 부족 위험", ref:"1) Glucocorticoid-induced bone loss and vitamin D"}
+   ]},
+  {nut:"엽산", nid:"NUT-FOL", cat:"비타민 B군, 종합비타민", eff:"혈액순환&혈관케어",
+   defs:[{nm:"○○ 엽산 400mcg",bc:"8805555000066"}], store:8, on:false, mod:"2026-06-10",
+   drugs:[
+     {code:"L04AX03", comp:"메토트렉세이트", form:"정제(TB)", reason:"엽산 대사를 길항 — 보충 여부는 처방 의도 확인 필요", ref:"1) Methotrexate–folate antagonism, clinical review"}
+   ]},
+  {nut:"칼륨", nid:"NUT-K", cat:"칼륨", eff:"혈액순환&혈관케어",
+   defs:[{nm:"○○ 칼륨 보충제",bc:"8807777000011"}], store:2, on:false, mod:"2026-05-30",
+   drugs:[
+     {code:"R03AC02", comp:"살부타몰", form:"흡입제(SI)", reason:"베타작용제는 칼륨을 세포 내로 이동시켜 일시적 저칼륨혈증을 유발할 수 있음", ref:"1) Beta-agonists and transient hypokalemia"}
+   ]}
+];
+var stats = [
+  {nut:"비타민 B12", comps:6, rx:18420, stores:212, base:3, store:128, unmatched:1, pri:"hi"},
+  {nut:"코엔자임Q10", comps:4, rx:9640, stores:154, base:2, store:96, unmatched:0, pri:"mid"},
+  {nut:"칼슘", comps:5, rx:7330, stores:121, base:2, store:54, unmatched:1, pri:"mid"},
+  {nut:"비타민 D", comps:3, rx:5210, stores:88, base:1, store:31, unmatched:2, pri:"hi"},
+  {nut:"엽산", comps:2, rx:1180, stores:24, base:1, store:8, unmatched:1, pri:"exp"},
+  {nut:"마그네슘", comps:4, rx:6010, stores:102, base:1, store:20, unmatched:3, pri:"mid"}
+];
+// 슈퍼어드민이 부족 영양소를 수정한 이력(부족 영양소 ID별) — 수정일시·변경항목·이전 값·변경 값·수정자
+var adminHist = {
+  "NUT-B12":[
+    {at:"2026-06-20 10:12", field:"굿팜 추천 상품", before:"○○ 비타민B 컴플렉스", after:"○○ 비타민B 컴플렉스, △△ 비타민B12 1000mcg", by:"관리자 김OO"},
+    {at:"2026-06-05 14:30", field:"추천 효능군", before:"(없음)", after:"대사케어", by:"관리자 박OO"}
+  ],
+  "NUT-COQ10":[
+    {at:"2026-06-24 09:40", field:"노출", before:"OFF", after:"ON", by:"관리자 김OO"},
+    {at:"2026-06-18 11:05", field:"관련 카테고리", before:"(없음)", after:"항산화 작용", by:"관리자 김OO"}
+  ],
+  "NUT-CA":[
+    {at:"2026-06-22 15:20", field:"굿팜 추천 상품", before:"○○ 칼슘 마그네슘 D", after:"○○ 칼슘 마그네슘 D, ○○ 칼슘 플러스", by:"관리자 박OO"}
+  ]
+};
+// MVP: 성분 검색·직접 입력·신규 등록·업로드 제외 — 보유 Master 데이터 기반 조회·수정만. 성분명/성분코드는 고정값(읽기 전용).
+function priBadge(p){ return p==='hi'?'<span class="pri hi">상</span>':p==='mid'?'<span class="pri mid">중</span>':p==='exp'?'<span class="pri exp">전문가검토</span>':'<span class="pri lo">하</span>'; }
+// 기본 추천 상품 — Master 기본값(약국 미설정 시 노출). 상품 검색으로 추가/삭제.
+var PRODUCT_DB = [
+  {nm:"○○ 비타민B 컴플렉스", bc:"8801111000022", mfr:"대웅제약"}, {nm:"△△ 비타민B12 1000mcg", bc:"8809001112223", mfr:"종근당건강"},
+  {nm:"○○ 종합비타민 B", bc:"8809001114440", mfr:"유한양행"}, {nm:"○○ 코엔자임Q10 100mg", bc:"8802222000033", mfr:"고려은단"},
+  {nm:"△△ 코큐텐 이지 200mg", bc:"8802222000040", mfr:"뉴트리원"}, {nm:"○○ 칼슘 마그네슘 D", bc:"8804444000055", mfr:"GNM 자연의품격"},
+  {nm:"○○ 칼슘 플러스", bc:"8804444000062", mfr:"안국건강"}, {nm:"○○ 비타민D 2000IU", bc:"8803333000044", mfr:"뉴트리디데이"},
+  {nm:"○○ 엽산 400mcg", bc:"8805555000066", mfr:"솔가"}, {nm:"△△ 마그네슘 400", bc:"8806666000077", mfr:"나우푸드"},
+  {nm:"○○ 칼륨 보충제", bc:"8807777000011", mfr:"종근당건강"}
+];
+function mfrOf(bc){ var d=PRODUCT_DB.find(function(x){return x.bc===bc;}); return (d&&d.mfr)||'-'; }
+var curDefs = [];
+var MAX_DEFS = 2;
+function renderDefProds(){
+  var c=document.getElementById('mDefProds');
+  var full = curDefs.length>=MAX_DEFS;
+  var n=curDefs.length;
+  var list = !n
+    ? '<div class="readbox">등록된 기본 추천 상품이 없습니다. 아래에서 상품을 검색해 추가하세요.</div>'
+    : '<div class="mlist">'+curDefs.map(function(p,i){
+        var ord='<span style="display:flex;flex-direction:column;gap:1px">'+
+          '<button type="button" onclick="moveDef('+i+',-1)" style="border:none;background:none;cursor:pointer;color:'+(i===0?'#d6dde2':'var(--faint)')+';font-size:11px;line-height:1">▲</button>'+
+          '<button type="button" onclick="moveDef('+i+',1)" style="border:none;background:none;cursor:pointer;color:'+(i===n-1?'#d6dde2':'var(--faint)')+';font-size:11px;line-height:1">▼</button></span>';
+        return '<div class="mli">'+ord+'<span style="font-weight:800;color:var(--teal-d);width:16px">'+(i+1)+'</span>'+
+          '<span class="pr" style="flex:1"><div style="font-weight:700">'+p.nm+'</div><div class="bc" style="font-size:11px;color:var(--faint);margin-top:2px">'+(p.mfr||mfrOf(p.bc))+'</div></span>'+
+          '<button class="btn sm danger" onclick="delDef('+i+')">삭제</button></div>';
+      }).join('')+'</div>';
+  c.innerHTML = list + '<div style="font-size:11.5px;color:var(--muted);margin-top:6px">기본 추천 상품 <b>'+n+' / '+MAX_DEFS+'</b>개 · <b>순번(1·2)은 ▲▼로 조정</b>'+(full?' · <b style="color:var(--amber)">최대 개수 도달(추가하려면 삭제)</b>':'')+'</div>';
+  var add=document.getElementById('mDefAdd'); if(add) add.style.display = full ? 'none' : '';
+}
+function moveDef(i,d){ var j=i+d; if(j<0||j>=curDefs.length)return; var t=curDefs[i];curDefs[i]=curDefs[j];curDefs[j]=t; renderDefProds(); }
+function searchDef(){
+  var q=document.getElementById('fDefSearch').value.trim().toLowerCase();
+  var box=document.getElementById('fDefRes');
+  if(!q){ box.style.display='none'; box.innerHTML=''; return; }
+  var res=PRODUCT_DB.filter(function(d){ return d.nm.toLowerCase().indexOf(q)>-1 || d.bc.indexOf(q)>-1; }).slice(0,8);
+  box.style.display='block';
+  if(!res.length){ box.innerHTML='<div style="padding:9px 11px;color:#9aa4af;font-size:12px">검색 결과가 없습니다.</div>'; return; }
+  box.innerHTML=res.map(function(d){
+    return '<div onclick="pickDef(\''+d.bc+'\')" style="padding:9px 11px;cursor:pointer;border-bottom:1px solid #f0f1f4;font-size:12.5px"><b>'+d.nm+'</b> <span style="color:#8a9099;font-size:11px">· '+d.mfr+'</span></div>';
+  }).join('');
+}
+function pickDef(bc){
+  var d=PRODUCT_DB.find(function(x){return x.bc===bc}); if(!d)return;
+  if(curDefs.length>=MAX_DEFS){ toast('기본 추천 상품은 최대 '+MAX_DEFS+'개까지 등록할 수 있습니다.'); return; }
+  if(curDefs.some(function(x){return x.bc===bc})){ toast('이미 추가된 상품입니다.'); return; }
+  curDefs.push({nm:d.nm, bc:d.bc, mfr:d.mfr});
+  document.getElementById('fDefSearch').value=''; document.getElementById('fDefRes').style.display='none';
+  renderDefProds();
+}
+function delDef(i){ curDefs.splice(i,1); renderDefProds(); }
+function srcBadge(s){ return s==='store'?'<span class="stt ok">약국 설정</span>':'<span class="stt hide">기본 추천</span>'; }
+
+function renderMaster(){
+  document.getElementById('masterBody').innerHTML = master.map(function(m,idx){
+    var nd=(m.defs&&m.defs.length)||0;
+    var ndrug=(m.drugs&&m.drugs.length)||0;
+    return '<tr class="click" onclick="openMaster('+idx+')">'+
+      '<td class="nut">'+m.nut+'</td>'+
+      '<td>'+(m.cat||'-')+'</td>'+
+      '<td>'+(m.eff||'-')+'</td>'+
+      '<td class="num">'+ndrug+'</td>'+
+      '<td class="num">'+(nd?nd+'개':'<span style="color:#9aa4af">미설정</span>')+'</td>'+
+      '<td class="num">'+(m.store||0)+'</td>'+
+      '<td class="c"><span class="stt '+(m.on?'ok':'hide')+'">'+(m.on?'ON':'OFF')+'</span></td>'+
+      '<td>'+m.mod+'</td></tr>';
+  }).join('');
+  document.getElementById('mTotal').textContent = master.length.toLocaleString();
+}
+// 관련 약물 목록(조회 전용) — 성분코드·성분명·제형·부족해지는 이유·근거/참고문헌
+function renderRelDrugs(drugs){
+  var c=document.getElementById('mRelDrugs');
+  if(!drugs || !drugs.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
+  c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
+    '<th>성분코드</th><th>성분명</th><th>제형</th><th>부족해지는 이유</th><th>근거/참고문헌</th></tr></thead><tbody>'+
+    drugs.map(function(d){
+      return '<tr><td class="mono" style="white-space:nowrap">'+d.code+'</td><td style="white-space:nowrap">'+d.comp+'</td>'+
+        '<td style="white-space:nowrap">'+(d.form||'-')+'</td>'+
+        '<td style="white-space:normal;min-width:210px">'+(d.reason||'-')+'</td>'+
+        '<td style="white-space:normal;min-width:160px;color:#8a9099">'+(d.ref||'-')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+/* 등록/수정 가운데 모달 */
+var curIdx=-1, curOn=true;
+function openMaster(idx){
+  curIdx=idx;
+  var m = idx<0 ? {nut:'',nid:'',cat:'',eff:'',on:true,defs:[],drugs:[]} : master[idx];
+  curOn = !!m.on;
+  curDefs = (m.defs||[]).map(function(x){return {nm:x.nm,bc:x.bc}});
+  renderDefProds();
+  document.getElementById('fDefSearch').value=''; document.getElementById('fDefRes').style.display='none';
+  var ndrug=(m.drugs&&m.drugs.length)||0;
+  document.getElementById('mmTitle').textContent = idx<0 ? '부족 영양소 추천 등록' : (m.nut || '(영양소 미지정)');
+  document.getElementById('mmSub').textContent = idx<0 ? '부족 영양소별 추천 상품을 등록합니다.' : ('부족 영양소 ID '+(m.nid||'-')+' · 관련 약물 '+ndrug+'개');
+  document.getElementById('fNut').value = m.nut||'';
+  document.getElementById('fNid').value = m.nid||'';
+  document.getElementById('fRelCount').value = ndrug+'개';
+  document.getElementById('fCat').value = m.cat && m.cat!=='-' ? m.cat : '';
+  document.getElementById('fEff').value = m.eff && m.eff!=='-' ? m.eff : '';
+  renderRelDrugs(idx<0 ? [] : (m.drugs||[]));
+  document.getElementById('mmMatchBlock').style.display = idx<0 ? 'none' : '';
+  renderMatchHist(idx<0 ? '' : m.nid);
+  syncTg();
+  document.getElementById('mmFoot').innerHTML = idx<0
+    ? '<button class="btn" onclick="closeMaster()">취소</button><button class="btn primary" onclick="saveMaster()">등록</button>'
+    : '<button class="btn danger" onclick="deleteMaster('+idx+')">삭제</button><button class="btn primary" onclick="saveMaster()">저장</button>';
+  document.getElementById('mModal').classList.add('open');
+}
+function syncTg(){ document.getElementById('fExpose').classList.toggle('on', curOn); }
+function toggleTg(){ curOn=!curOn; syncTg(); }
+function saveMaster(){
+  var nut=document.getElementById('fNut').value.trim();
+  if(!nut){ toast('부족 영양소명이 필요합니다.'); return; }
+  var rec = curIdx<0 ? {store:0, drugs:[], nid:''} : master[curIdx];
+  rec.nut=nut;
+  rec.cat=document.getElementById('fCat').value.trim();
+  rec.eff=document.getElementById('fEff').value.trim();
+  rec.defs=curDefs.map(function(x){return {nm:x.nm,bc:x.bc}});
+  rec.on=curOn; rec.mod='2026-07-14';
+  if(curIdx<0) master.unshift(rec);
+  renderMaster(); closeMaster(); toast(curIdx<0?'부족 영양소 추천을 등록했습니다.':'저장했습니다.');
+}
+function deleteMaster(idx){
+  var m=master[idx];
+  var msg = (m && m.store>0)
+    ? '⚠ 이 부족 영양소에 우리약국 추천 상품을 등록한 약국 '+m.store+'곳이 있습니다.\n삭제하면 해당 약국 설정도 AI mate·약사웹에 노출되지 않습니다.\n\n삭제 대신 「노출 OFF」를 권장합니다. 그래도 삭제할까요?'
+    : '이 부족 영양소를 삭제할까요? AI mate·약사웹 추천에서 제외됩니다.';
+  if(!confirm(msg)) return;
+  master.splice(idx,1); renderMaster(); closeMaster(); toast('삭제했습니다.');
+}
+function closeMaster(){ document.getElementById('mModal').classList.remove('open'); }
+function renderStats(){
+  document.getElementById('statBody').innerHTML = stats.map(function(s){
+    return '<tr><td class="nut">'+s.nut+'</td><td class="num">'+s.comps+'</td><td class="num">'+s.rx.toLocaleString()+'</td>'+
+      '<td class="num">'+s.stores+'</td><td class="num">'+s.base+' / '+s.store+'</td>'+
+      '<td class="num">'+(s.unmatched?'<b style="color:#c0392b">'+s.unmatched+'</b>':'0')+'</td><td class="c">'+priBadge(s.pri)+'</td></tr>';
+  }).join('');
+}
+// Master 레코드별 슈퍼어드민 수정 이력 — 수정일시·변경항목·이전 값·변경 값·수정자
+function renderMatchHist(code){
+  var c=document.getElementById('mmMatch');
+  var list = code ? (adminHist[code]||[]) : [];
+  if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }
+  c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
+    '<th>수정일시</th><th>변경항목</th><th>이전 값</th><th>변경 값</th><th>수정자</th></tr></thead><tbody>'+
+    list.map(function(x){
+      return '<tr><td style="white-space:nowrap">'+x.at+'</td><td>'+x.field+'</td>'+
+        '<td style="color:#98a2ad;text-decoration:line-through">'+x.before+'</td>'+
+        '<td style="color:#0ea58b;font-weight:700">'+x.after+'</td>'+
+        '<td style="white-space:nowrap">'+x.by+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+var te=document.getElementById('toast'),tt;
+function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt); tt=setTimeout(function(){te.classList.remove('show')},2000); }
+renderMaster(); renderStats();
+</script>
+</body>
+</html>
