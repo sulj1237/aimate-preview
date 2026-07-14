@@ -13,21 +13,23 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
     color:var(--ink);background:#eef1f4;font-size:13px;line-height:1.5}
-  .app{display:flex;min-height:100vh;background:#fff}
-  /* 사이드바 */
-  .side{width:196px;flex:none;border-right:1px solid var(--line);background:#fafbfc;padding:14px 10px;overflow:auto}
-  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:16px;padding:2px 6px 6px}
+  .app{display:flex;min-height:100vh;background:#eef1f4}
+  .main{background:#eef1f4}
+  .top{background:#fff}
+  /* 사이드바 (다크 테마) */
+  .side{width:210px;flex:none;background:#262b36;padding:14px 10px;overflow:auto;color:#c7cdd6}
+  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:16px;padding:2px 6px 10px;color:#fff}
   .brand .mk{color:var(--teal)}
-  .who{display:flex;align-items:center;gap:7px;font-size:12px;color:#4a525c;padding:7px 8px;border:1px solid var(--line);border-radius:8px;margin:6px 4px 12px;background:#fff}
-  .who .o{margin-left:auto;color:var(--faint);cursor:pointer}
-  .nav-h{font-size:10.5px;font-weight:800;color:var(--faint);letter-spacing:.02em;padding:11px 8px 4px}
-  .nav a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;color:#4a525c;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer}
-  .nav a:hover{background:#eef2f5}
-  .nav a .cv{margin-left:auto;color:var(--faint);font-size:10px}
-  .nav a.grp{font-weight:700}
-  .nav .sub a{padding-left:24px;font-size:12px;color:#5c6671;font-weight:500}
-  .nav .sub a.on{background:var(--teal-soft);color:var(--teal-d);font-weight:800;border-radius:7px}
-  .dot{width:6px;height:6px;border-radius:50%;background:#e0564a;display:inline-block;margin-left:4px}
+  .who{display:flex;align-items:center;gap:7px;font-size:12px;color:#c7cdd6;padding:7px 8px;border:1px solid #3a4150;border-radius:8px;margin:6px 4px 12px;background:#2f3542}
+  .who .o{margin-left:auto;color:#7c8595;cursor:pointer}
+  .nav-h{font-size:10.5px;font-weight:800;color:#7c8595;letter-spacing:.02em;padding:11px 8px 4px}
+  .nav a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;color:#c7cdd6;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer}
+  .nav a:hover{background:#333a47}
+  .nav a .cv{margin-left:auto;color:#7c8595;font-size:10px}
+  .nav a.grp{font-weight:700;color:#dfe3ea}
+  .nav .sub a{padding-left:24px;font-size:12px;color:#aab2be;font-weight:500}
+  .nav .sub a.on{background:rgba(22,192,164,.15);color:#4fd6bf;font-weight:800;border-radius:7px}
+  .dot{width:6px;height:6px;border-radius:50%;background:#f0883e;display:inline-block;margin-left:4px}
 
   /* 메인 */
   .main{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -105,13 +107,13 @@
   .celltx{width:100%;min-width:170px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11.5px;font-family:inherit;line-height:1.5;resize:vertical;min-height:48px;color:var(--ink);outline:none;background:#fff}
   .celltx:focus{border-color:var(--teal)}
   .edch{font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:5px;padding:1px 6px;margin-left:5px}
-  /* 추천 관리 상세 = 페이지 */
+  /* 추천 관리 상세 = 페이지(흰 카드) · 액션 버튼은 우측 하단 */
+  #recoDetail{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px 22px}
   .dpage-head{display:flex;align-items:center;gap:14px;padding-bottom:15px;border-bottom:1px solid var(--line);margin-bottom:18px}
   .dpage-head .dt{font-size:18px;font-weight:800}
   .dpage-head .ds{font-size:12px;color:var(--muted);margin-top:2px}
-  .dpage-foot{display:flex;gap:8px;margin-left:auto}
-  .dpage-foot .btn{min-width:78px}
-  .dpage-body .block{max-width:860px}
+  .dpage-bottom{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .dpage-bottom .btn{min-width:96px}
   .mlist{border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .mli{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #eef1f4;font-size:12px}
   .mli:last-child{border:none}
@@ -231,7 +233,6 @@
         <div class="dpage-head">
           <button class="btn" onclick="closeMaster()">← 목록</button>
           <div style="flex:1;min-width:0"><div class="dt" id="mmTitle">—</div><div class="ds" id="mmSub">—</div></div>
-          <div class="dpage-foot" id="mmFoot"></div>
         </div>
         <div class="dpage-body">
           <div class="block">
@@ -243,6 +244,7 @@
               </div>
               <div class="tg" id="fExpose" onclick="toggleTg()"></div>
             </div>
+            <div id="offNote" class="roinfo" style="margin-top:8px;display:none">OFF로 변경하면 이 부족 영양소는 <b>POS AI mate 추천 영역에 노출되지 않습니다.</b> 약국별 우리약국 추천 상품 설정값은 삭제되지 않으며, 약사웹에서는 <b>'노출 중지'</b> 상태로 조회됩니다. 다시 ON으로 변경하면 기존 설정값이 POS AI mate 추천에 다시 반영됩니다.</div>
           </div>
           <div class="block">
             <div class="block-h">기본 정보</div>
@@ -269,6 +271,7 @@
             <div id="mmMatch"></div>
           </div>
         </div>
+        <div class="dpage-bottom" id="mmFoot"></div>
       </div>
     </div>
   </div>
@@ -292,11 +295,11 @@
         <div class="roinfo"><b>성분명</b>은 전 화면 공통값(수정 시 공통 반영) · <b>이유·근거</b>는 부족 영양소별로 독립입니다.</div>
       </div>
       <div class="block">
-        <div class="block-h">연결 부족 영양소 목록</div>
+        <div class="block-h">부족 영양소</div>
         <div id="iLinks"></div>
-        <div id="iLinkAdd" style="margin-top:8px;display:flex;gap:8px;align-items:center">
-          <select class="sel" id="fLinkNut" style="flex:1"></select>
-          <button class="btn" onclick="addLink()">＋ 부족 영양소 연결 추가</button>
+        <div id="iLinkAdd" style="margin-top:8px">
+          <input class="fw" id="fLinkSearch" placeholder="부족 영양소명으로 검색해 연결 추가" oninput="searchLink()" autocomplete="off">
+          <div id="fLinkRes" style="display:none;border:1px solid #e3e6ea;border-radius:8px;margin-top:4px;max-height:160px;overflow:auto;background:#fff"></div>
         </div>
       </div>
       <div class="block">
@@ -511,7 +514,8 @@ function openMaster(idx){
   document.getElementById('recoDetail').classList.remove('hidden');
   if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
-function syncTg(){ document.getElementById('fExpose').classList.toggle('on', curOn); }
+function syncTg(){ document.getElementById('fExpose').classList.toggle('on', curOn);
+  var n=document.getElementById('offNote'); if(n) n.style.display = curOn ? 'none' : ''; }
 function toggleTg(){ curOn=!curOn; syncTg(); }
 function saveMaster(){
   var nut=document.getElementById('fNut').value.trim();
@@ -655,7 +659,8 @@ function openIngredient(code){
   document.getElementById('imSub').textContent = g.comp+' · '+g.code;
   document.getElementById('fICode').value=g.code;
   document.getElementById('fIComp').value=g.comp;
-  renderILinks(); refreshLinkAdd(); renderIngHist(code);
+  renderILinks(); renderIngHist(code);
+  document.getElementById('fLinkSearch').value=''; document.getElementById('fLinkRes').style.display='none';
   document.getElementById('iModal').classList.add('open');
 }
 // 추천 관리 관련 약물 목록의 성분명 클릭 → 성분 관리로 이동 후 성분 상세 열기
@@ -676,23 +681,26 @@ function renderILinks(){
         '<td class="c"><button class="btn sm danger" onclick="delLink('+i+')">삭제</button></td></tr>';
     }).join('')+'</tbody></table></div>';
 }
-// 연결 추가 드롭다운 — 아직 연결되지 않은 부족 영양소만
-function refreshLinkAdd(){
-  var sel=document.getElementById('fLinkNut');
-  var avail=master.filter(function(m){ return !curLinks.some(function(l){return l.nid===m.nid;}); });
-  sel.innerHTML = avail.length
-    ? avail.map(function(m){return '<option value="'+m.nid+'">'+m.nut+'</option>';}).join('')
-    : '<option value="">연결 가능한 부족 영양소 없음</option>';
-  document.getElementById('iLinkAdd').style.display = avail.length ? 'flex' : 'none';
+// 연결 추가 — 아직 연결 안 된 부족 영양소만 검색해 추가(개수 많을 때 대비)
+function searchLink(){
+  var q=(document.getElementById('fLinkSearch').value||'').trim().toLowerCase();
+  var box=document.getElementById('fLinkRes');
+  if(!q){ box.style.display='none'; box.innerHTML=''; return; }
+  var avail=master.filter(function(m){ return !curLinks.some(function(l){return l.nid===m.nid;}) && m.nut.toLowerCase().indexOf(q)>-1; });
+  box.style.display='block';
+  if(!avail.length){ box.innerHTML='<div style="padding:9px 11px;color:#9aa4af;font-size:12px">추가할 수 있는 부족 영양소가 없습니다.</div>'; return; }
+  box.innerHTML=avail.slice(0,20).map(function(m){
+    return '<div onclick="addLink(\''+m.nid+'\')" style="padding:9px 11px;cursor:pointer;border-bottom:1px solid #f0f1f4;font-size:12.5px"><b>'+m.nut+'</b> <span style="color:#8a9099;font-size:11px">· '+(m.cat||'-')+'</span></div>';
+  }).join('');
 }
-function addLink(){
-  var nid=document.getElementById('fLinkNut').value; if(!nid) return;
+function addLink(nid){
   var m=master.find(function(x){return x.nid===nid;}); if(!m) return;
   if(curLinks.some(function(l){return l.nid===nid;})) return;
   curLinks.push({nid:m.nid, nut:m.nut, cat:m.cat, reason:'', ref:''});
-  renderILinks(); refreshLinkAdd();
+  document.getElementById('fLinkSearch').value=''; document.getElementById('fLinkRes').style.display='none';
+  renderILinks();
 }
-function delLink(i){ curLinks.splice(i,1); renderILinks(); refreshLinkAdd(); }
+function delLink(i){ curLinks.splice(i,1); renderILinks(); }
 function renderIngHist(code){
   var c=document.getElementById('iHist'); var list=ingHist[code]||[];
   if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }

@@ -13,22 +13,24 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
     color:var(--ink);background:#eef1f4;font-size:13.5px;line-height:1.55}
-  .app{display:flex;min-height:100vh;background:#fff}
-  /* 사이드바 */
-  .side{width:210px;flex:none;border-right:1px solid var(--line);padding:16px 12px;background:#fff}
-  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:17px;padding:4px 6px 14px}
+  .app{display:flex;min-height:100vh;background:#eef1f4}
+  .main{background:#eef1f4}
+  .top{background:#fff}
+  /* 사이드바 (다크 테마) */
+  .side{width:210px;flex:none;padding:16px 12px;background:#262b36;color:#c7cdd6}
+  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:17px;padding:4px 6px 14px;color:#fff}
   .brand .mk{color:var(--teal);font-size:17px}
-  .brand .bdg{font-size:10px;font-weight:700;color:var(--teal-d);background:var(--teal-soft);border-radius:5px;padding:2px 6px}
+  .brand .bdg{font-size:10px;font-weight:700;color:#4fd6bf;background:rgba(22,192,164,.15);border-radius:5px;padding:2px 6px}
   .seg{display:flex;gap:6px;margin:0 4px 16px}
-  .seg button{flex:1;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-weight:700;font-size:12px;border-radius:7px;padding:7px 0;cursor:pointer}
+  .seg button{flex:1;border:1px solid #3a4150;background:#2f3542;color:#aab2be;font-family:inherit;font-weight:700;font-size:12px;border-radius:7px;padding:7px 0;cursor:pointer}
   .seg button.on{background:var(--teal);border-color:var(--teal);color:#fff}
-  .nav-h{font-size:11px;font-weight:700;color:var(--faint);padding:10px 8px 5px}
-  .nav a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:#4a525c;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer}
-  .nav a:hover{background:#f4f6f8}
-  .nav a.on{background:var(--teal-soft);color:var(--teal-d);font-weight:800}
-  .nav a .ic{width:16px;text-align:center;color:var(--faint)}
-  .nav a.on .ic{color:var(--teal-d)}
-  .nav a .cv{margin-left:auto;color:var(--faint);font-size:11px}
+  .nav-h{font-size:11px;font-weight:700;color:#7c8595;padding:10px 8px 5px}
+  .nav a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:#c7cdd6;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer}
+  .nav a:hover{background:#333a47}
+  .nav a.on{background:rgba(22,192,164,.15);color:#4fd6bf;font-weight:800}
+  .nav a .ic{width:16px;text-align:center;color:#7c8595}
+  .nav a.on .ic{color:#4fd6bf}
+  .nav a .cv{margin-left:auto;color:#7c8595;font-size:11px}
 
   /* 메인 */
   .main{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -123,6 +125,8 @@
   .hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.55}
   .ro{color:var(--faint);font-size:11px;font-weight:700;background:#f4f6f8;border-radius:5px;padding:2px 7px}
   .soon{color:var(--amber);font-size:11px;font-weight:700;background:#fbf1dd;border-radius:5px;padding:2px 7px}
+  .offbanner{background:#fff7ed;border:1px solid #f3d9b0;color:#9a5b12;font-size:12px;line-height:1.6;border-radius:9px;padding:11px 13px;margin-bottom:16px}
+  .onoff.stop{background:#fbf1dd;color:var(--amber)}
 
   /* 변경 이력 */
   .hist{border:1px solid var(--line);border-radius:9px;overflow:hidden}
@@ -199,6 +203,7 @@
       <button class="x" onclick="closeDetail()">✕</button>
     </div>
     <div class="m-body">
+      <div id="offBanner" class="offbanner" style="display:none"></div>
       <div class="block">
         <div class="block-h" id="basicH">기본 정보</div>
         <div class="kvs" id="mBasic"></div>
@@ -211,7 +216,7 @@
         <div class="block-h">추천 상품 <span id="mProdMeta" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--muted)">최종 수정일 -</span></div>
         <div class="prod-list" id="mProds"></div>
         <div class="hint" id="mHint"></div>
-        <div style="margin-top:10px">
+        <div style="margin-top:10px" id="addProdWrap">
           <button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button>
         </div>
       </div>
@@ -323,7 +328,7 @@ function renderList(){
       '<td>'+(r.cat||'-')+'</td>'+
       '<td class="c">'+ndrug+'</td>'+
       '<td style="white-space:normal">'+gpTxt+'</td><td style="white-space:normal">'+stTxt+'</td>'+
-      '<td class="c"><span class="onoff '+(r.on?'on':'off')+'">'+(r.on?'ON':'OFF')+'</span></td>'+
+      '<td class="c"><span class="onoff '+(r.on?'on':'stop')+'">'+(r.on?'노출':'노출 중지')+'</span></td>'+
       '<td>'+modtxt+'</td></tr>');
   });
   document.getElementById('cntNum').textContent = rows.length;
@@ -350,9 +355,15 @@ function openDetail(id){
     '<div class="kv"><div class="k">관련 약물 수</div><div class="v">'+ndrug+'개</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
   document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs);
-  document.getElementById('mFoot').innerHTML=
-    '<button class="btn" onclick="closeDetail()">취소</button>'+
-    '<button class="btn primary" onclick="saveDetail()">저장</button>';
+  // 노출 중지(OFF): 안내 배너 + 우리약국 상품 편집 제한(조회만)
+  var off = cur.on===false;
+  var ban=document.getElementById('offBanner');
+  ban.style.display = off ? '' : 'none';
+  if(off) ban.innerHTML='현재 굿팜 정책에 따라 이 부족 영양소의 <b>AI mate 추천 노출이 중지</b>되었습니다. 등록하신 우리약국 추천 상품은 삭제되지 않았으며, 노출이 다시 시작되면 기존 설정값이 다시 사용됩니다.';
+  document.getElementById('addProdWrap').style.display = off ? 'none' : '';
+  document.getElementById('mFoot').innerHTML = off
+    ? '<button class="btn" onclick="closeDetail()">닫기</button>'
+    : '<button class="btn" onclick="closeDetail()">취소</button><button class="btn primary" onclick="saveDetail()">저장</button>';
   renderProds();
   document.getElementById('detailBg').classList.add('open');
 }
@@ -405,19 +416,22 @@ function renderProds(){
   var gpHtml = gp.length
     ? gp.map(function(p){ return '<div class="pitem ro"><div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div><span class="kd gp">굿팜(기본)</span></div>'; }).join('')
     : '<div class="pempty">슈퍼어드민 기본 추천 상품이 없습니다.</div>';
+  var off = cur.on===false;   // 노출 중지 시 우리약국 상품은 조회만
   var multi=store.length>1;
   var storeHtml = store.length
     ? store.map(function(p,si){ var gi=cur.prods.indexOf(p);
-        var ord = multi ? '<div class="ord"><button onclick="moveStore('+gi+',-1)">▲</button><button onclick="moveStore('+gi+',1)">▼</button></div><span class="pnum">'+(si+1)+'</span>' : '';
-        return '<div class="pitem">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div><button class="btn sm danger" onclick="delP('+gi+')">삭제</button></div>'; }).join('')
-    : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다. 서버 마스터 상품에서 검색해 추가하세요.</div>';
+        var ord = (multi && !off) ? '<div class="ord"><button onclick="moveStore('+gi+',-1)">▲</button><button onclick="moveStore('+gi+',1)">▼</button></div><span class="pnum">'+(si+1)+'</span>' : (multi?'<span class="pnum">'+(si+1)+'</span>':'');
+        var del = off ? '' : '<button class="btn sm danger" onclick="delP('+gi+')">삭제</button>';
+        return '<div class="pitem'+(off?' ro':'')+'">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div>'+del+'</div>'; }).join('')
+    : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 서버 마스터 상품에서 검색해 추가하세요.')+'</div>';
   c.innerHTML =
     '<div class="pg-h">굿팜 추천 상품 <span class="info" tabindex="0">ⓘ<span class="tip-pop">슈퍼어드민 등록 상품 · 약국 수정 불가</span></span></div>'+gpHtml+
     '<div class="pg-h store">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml;
   var atMax=store.length>=MAX_PRODS;
-  document.getElementById('mHint').innerHTML = atMax
-    ? '<b style="color:var(--amber)">우리약국 추천 상품 최대 '+MAX_PRODS+'개에 도달했습니다.</b>'
-    : '우리약국 설정 상품은 굿팜(기본) 추천보다 우선 노출됩니다.';
+  document.getElementById('mHint').innerHTML = off
+    ? '<b style="color:var(--amber)">노출 중지 상태 — 조회만 가능합니다. (설정값은 유지)</b>'
+    : (atMax ? '<b style="color:var(--amber)">우리약국 추천 상품 최대 '+MAX_PRODS+'개에 도달했습니다.</b>'
+      : '우리약국 설정 상품은 굿팜(기본) 추천보다 우선 노출됩니다.');
 }
 function moveP(i,d){ var j=i+d; if(j<0||j>=cur.prods.length)return; var t=cur.prods[i];cur.prods[i]=cur.prods[j];cur.prods[j]=t; renderProds(); }
 // 우리약국(비-def) 상품끼리만 순서 이동

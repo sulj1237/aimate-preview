@@ -333,6 +333,8 @@ function reco(x){
   var m=nutMaster[x.nid]||{nut:'(미지정)',cat:'-',gp:[],store:[]};
   return { nut:m.nut, cat:m.cat, gp:m.gp, store:m.store, info:x.info, ref:x.ref };
 }
+// ON/OFF 정책: 부족 영양소가 슈퍼어드민에서 OFF면 POS 추천 영역에 노출하지 않는다(nutMaster[nid].on===false 제외).
+function activeDepl(d){ return (d.depl||[]).filter(function(x){ var m=nutMaster[x.nid]; return !m || m.on!==false; }); }
 // 처방 약물 + 약물이 고갈시키는 부족 영양소(depl). 각 depl은 {nid, info, ref}:
 //   nid=부족 영양소 ID(→ nutMaster에서 추천 상품 조회), info/ref=이 약물×영양소의 부족해지는 근거·참고문헌.
 var drugs = [
@@ -384,9 +386,10 @@ function clean(s){ return s.replace(/<br\/?>/g,' ').replace(/<\/?b>/g,''); }
 function renderDrugCards(){
   var c=document.getElementById('drugCards');
   c.innerHTML=drugs.map(function(d){
-    var hasRec=d.depl.length>0;
+    var dep=activeDepl(d);
+    var hasRec=dep.length>0;
     var body = hasRec
-      ? d.depl.map(function(x){ return '<div class="ablk">'+cardInner(reco(x))+'</div>'; }).join('')
+      ? dep.map(function(x){ return '<div class="ablk">'+cardInner(reco(x))+'</div>'; }).join('')
       : '<div class="norec-b">추천 상품이 없습니다</div>';
     return '<div class="dcard'+(hasRec?'':' off')+'">'+
       '<div class="dcard-h">'+
@@ -455,9 +458,10 @@ function renderTableD(){
       '<td class="c"><span class="img'+(d.pill?' pill':'')+'">'+d.img+'</span></td>'+
       '<td class="comp">'+d.comp+'</td><td class="c">'+d.eff+'</td>'+
       '<td class="dose">'+d.dose+'</td><td class="warn">'+d.warn+'</td></tr>');
-    if(d.depl.length){
-      var items=d.depl.map(function(x,i){ return dmItem(reco(x), i>=DM_MAX); }).join('');
-      var extra=d.depl.length-DM_MAX;
+    var dep=activeDepl(d);
+    if(dep.length){
+      var items=dep.map(function(x,i){ return dmItem(reco(x), i>=DM_MAX); }).join('');
+      var extra=dep.length-DM_MAX;
       var more = extra>0
         ? '<button class="dm-more" data-open="0" onclick="toggleMore('+di+','+extra+')">＋ '+extra+'개 더보기</button>'
         : '';
