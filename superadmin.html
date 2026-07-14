@@ -216,7 +216,6 @@
         <div class="bar">
           <span class="total">전체 <b id="iTotal">0</b> 건</span>
           <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
-          <select class="sel" id="iNut" onchange="renderIngredients()"><option value="">연결 부족 영양소 전체</option></select>
           <span class="spacer"></span>
         </div>
         <div class="tbl"><table>
@@ -625,18 +624,10 @@ function showPage(p){
     : '성분코드 기준 성분 정보 관리';
   if(!reco) renderIngredients();
 }
-function fillIngFilters(){
-  var nuts=[];
-  master.forEach(function(m){ if(nuts.indexOf(m.nut)<0) nuts.push(m.nut); });
-  document.getElementById('iNut').innerHTML='<option value="">연결 부족 영양소 전체</option>'+nuts.map(function(n){return '<option>'+n+'</option>';}).join('');
-}
 function renderIngredients(){
   var q=(document.getElementById('iSearch').value||'').trim().toLowerCase();
-  var nf=document.getElementById('iNut').value;
   var list=ingredients.filter(function(g){
-    var links=ingredientLinks(g.code);
     if(q && g.code.toLowerCase().indexOf(q)<0 && g.comp.toLowerCase().indexOf(q)<0) return false;
-    if(nf && !links.some(function(l){return l.nut===nf;})) return false;
     return true;
   });
   document.getElementById('ingrBody').innerHTML = list.map(function(g){
@@ -761,7 +752,7 @@ function applyIngredient(){
   toast(hist.length ? '성분 정보를 저장했습니다. (성분명은 전 화면 공통 · 이유/근거·연결은 조합별 반영)' : '변경 사항이 없습니다.');
 }
 
-renderMaster(); renderStats(); fillIngFilters(); renderIngredients();
+renderMaster(); renderStats(); renderIngredients();
 </script>
 </body>
 </html>
