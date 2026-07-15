@@ -709,11 +709,12 @@ function renderIngHist(code){
   var c=document.getElementById('iHist'); var list=ingHist[code]||[];
   if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }
   c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
-    '<th>수정일시</th><th>수정자</th><th>수정 항목</th><th>변경 전</th><th>변경 후</th></tr></thead><tbody>'+
+    '<th>수정일시</th><th>수정 항목</th><th>변경 전</th><th>변경 후</th><th>수정자</th></tr></thead><tbody>'+
     list.map(function(x){
-      return '<tr><td style="white-space:nowrap">'+x.at+'</td><td style="white-space:nowrap">'+x.by+'</td><td>'+x.field+'</td>'+
+      return '<tr><td style="white-space:nowrap">'+x.at+'</td><td>'+x.field+'</td>'+
         '<td style="color:#98a2ad;text-decoration:line-through">'+x.before+'</td>'+
-        '<td style="color:#0ea58b;font-weight:700">'+x.after+'</td></tr>';
+        '<td style="color:#0ea58b;font-weight:700">'+x.after+'</td>'+
+        '<td style="white-space:nowrap">'+x.by+'</td></tr>';
     }).join('')+'</tbody></table></div>';
 }
 function closeIngredient(){ document.getElementById('iModal').classList.remove('open'); }
