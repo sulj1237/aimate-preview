@@ -76,6 +76,9 @@
   .btn.danger{color:var(--red-text);border-color:var(--red-border);background:#fff}
   .btn.danger:hover{background:var(--red-bg)}
   .btn.ghost{border:0;background:transparent;color:var(--g-9)}
+  .btn:disabled,.btn[disabled]{opacity:.45;cursor:not-allowed;background:#fff}
+  .btn.danger:disabled{background:#fff}
+  .pitem .ord button:disabled{opacity:.35;cursor:not-allowed}
   .spacer{flex:1}
   .cnt{font-size:12.5px;color:var(--g-7)}.cnt b{color:var(--ink)}
 
@@ -223,7 +226,7 @@
             <thead><tr>
               <th>부족 영양소</th><th>관련 카테고리</th>
               <th class="c">관련 약물 수</th><th>굿팜 추천 상품</th><th>우리약국 추천 상품</th>
-              <th class="c">노출 상태</th><th>최종 수정</th>
+              <th class="c">AI mate 노출 상태 <span class="info" tabindex="0" style="text-transform:none">ⓘ<span class="tip-pop" style="left:auto;right:0">POS AI mate 추천 영역에 노출되는 상태입니다. 노출 중지 상태여도 약사웹에서는 기존 설정값을 조회할 수 있습니다.</span></span></th><th>최종 수정</th>
             </tr></thead>
             <tbody id="listBody"></tbody>
           </table>
@@ -364,7 +367,7 @@ function renderList(){
       '<td>'+(r.cat||'-')+'</td>'+
       '<td class="c">'+ndrug+'</td>'+
       '<td style="white-space:normal">'+gpTxt+'</td><td style="white-space:normal">'+stTxt+'</td>'+
-      '<td class="c"><span class="onoff '+(r.on?'on':'stop')+'">'+(r.on?'노출':'노출 중지')+'</span></td>'+
+      '<td class="c"><span class="onoff '+(r.on?'on':'stop')+'">'+(r.on?'AI mate 노출':'AI mate 노출 중지')+'</span></td>'+
       '<td>'+modtxt+'</td></tr>');
   });
   document.getElementById('cntNum').textContent = rows.length;
@@ -395,7 +398,7 @@ function openDetail(id){
   var off = cur.on===false;
   var ban=document.getElementById('offBanner');
   ban.style.display = off ? '' : 'none';
-  if(off) ban.innerHTML='현재 굿팜 정책에 따라 이 부족 영양소의 <b>AI mate 추천 노출이 중지</b>되었습니다. 등록하신 우리약국 추천 상품은 삭제되지 않았으며, 노출이 다시 시작되면 기존 설정값이 다시 사용됩니다.';
+  if(off) ban.innerHTML='현재 굿팜 정책에 따라 이 부족 영양소의 <b>POS AI mate 추천 노출이 중지</b>되었습니다. 등록된 우리약국 추천 상품은 삭제되지 않으며, 노출이 다시 시작되면 기존 설정값이 다시 사용됩니다.';
   document.getElementById('addProdWrap').style.display = off ? 'none' : '';
   document.getElementById('mFoot').innerHTML = off
     ? ''
@@ -403,6 +406,7 @@ function openDetail(id){
   renderProds();
   document.getElementById('listView').style.display='none';
   document.getElementById('detailView').style.display='';
+  document.body.style.background='#fff';   // 상세 화면 배경 흰색
   if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
 // 관련 약물(조회 전용) — 성분명·부족해지는 이유·근거(참고문헌)
@@ -455,22 +459,34 @@ function renderProds(){
   var gpHtml = gp.length
     ? gp.map(function(p){ return '<div class="pitem ro"><div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div></div>'; }).join('')
     : '<div class="pempty">슈퍼어드민 기본 추천 상품이 없습니다.</div>';
-  var off = cur.on===false;   // 노출 중지 시 우리약국 상품은 조회만
+  var off = cur.on===false;   // 노출 중지: 상품 조회만, 수정 버튼은 비활성화 + 툴팁
+  var OFFTIP='AI mate 노출 중지 상태에서는 추천 상품을 수정할 수 없습니다.';
   var multi=store.length>1;
   var storeHtml = store.length
     ? store.map(function(p,si){ var gi=cur.prods.indexOf(p);
-        var ord = (multi && !off) ? '<div class="ord"><button onclick="moveStore('+gi+',-1)">▲</button><button onclick="moveStore('+gi+',1)">▼</button></div><span class="pnum">'+(si+1)+'</span>' : (multi?'<span class="pnum">'+(si+1)+'</span>':'');
-        var del = off ? '' : '<button class="btn sm danger" onclick="delP('+gi+')">삭제</button>';
+        var ord = multi
+          ? '<div class="ord">'+(off
+              ? '<button disabled>▲</button><button disabled>▼</button>'
+              : '<button onclick="moveStore('+gi+',-1)">▲</button><button onclick="moveStore('+gi+',1)">▼</button>')+'</div><span class="pnum">'+(si+1)+'</span>'
+          : '';
+        var del = off
+          ? '<span title="'+OFFTIP+'"><button class="btn sm danger" disabled>삭제</button></span>'
+          : '<button class="btn sm danger" onclick="delP('+gi+')">삭제</button>';
         return '<div class="pitem'+(off?' ro':'')+'">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div>'+del+'</div>'; }).join('')
     : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 서버 마스터 상품에서 검색해 추가하세요.')+'</div>';
   c.innerHTML =
     '<div class="pg-h store" style="margin-top:2px">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml+
     '<div class="pg-h" style="margin-top:16px">굿팜 추천 상품</div>'+gpHtml;
   var atMax=store.length>=MAX_PRODS;
-  // 최대(3개) 도달 또는 노출 중지 시 '추가' 버튼 숨김
-  var aw=document.getElementById('addProdWrap'); if(aw) aw.style.display = (off||atMax) ? 'none' : '';
+  // OFF: '추가' 버튼 비활성화 + 툴팁(숨기지 않음) / 최대 도달: 숨김 / 그 외: 정상
+  var aw=document.getElementById('addProdWrap');
+  if(aw){
+    if(off){ aw.style.display=''; aw.innerHTML='<span title="'+OFFTIP+'"><button class="btn sm" disabled>＋ 우리약국 추천 상품 추가</button></span>'; }
+    else if(atMax){ aw.style.display='none'; }
+    else { aw.style.display=''; aw.innerHTML='<button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button>'; }
+  }
   document.getElementById('mHint').innerHTML = off
-    ? '<b style="color:var(--amber)">노출 중지 상태 — 조회만 가능합니다. (설정값은 유지)</b>'
+    ? '<b style="color:var(--amber)">AI mate 노출 중지 상태 — 조회만 가능합니다. (설정값은 유지)</b>'
     : (atMax ? '<b style="color:var(--amber)">우리약국 추천 상품 최대 '+MAX_PRODS+'개에 도달했습니다.</b>'
       : '우리약국 설정 상품은 굿팜(기본) 추천보다 우선 노출됩니다.');
 }
@@ -513,6 +529,7 @@ function saveDetail(){
 function closeDetail(){
   document.getElementById('detailView').style.display='none';
   document.getElementById('listView').style.display='';
+  document.body.style.background='';   // 목록 복귀 시 원래 배경(--g-0)
 }
 
 // 서버 마스터 상품 검색 모달
