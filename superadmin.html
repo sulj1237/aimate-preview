@@ -179,6 +179,7 @@
           <input class="inp search" placeholder="검색어를 입력하세요" />
           <button class="btn primary">검색</button>
           <span class="spacer"></span>
+          <button class="btn primary" onclick="openDind()">＋ DIND 추가</button>
         </div>
         <div class="tbl"><table>
           <thead><tr>
@@ -218,6 +219,7 @@
           <span class="total">전체 <b id="iTotal">0</b> 건</span>
           <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
           <span class="spacer"></span>
+          <button class="btn primary" onclick="openDind()">＋ DIND 추가</button>
         </div>
         <div class="tbl"><table>
           <thead><tr>
@@ -332,6 +334,38 @@
       <div style="font-size:13px;line-height:1.7">삭제 시 이 부족 영양소의 <b>굿팜 추천 상품, 관련 카테고리, 추천 효능군, 관련 약물 매칭 정보</b>가 함께 삭제 또는 미노출 처리됩니다. <b>삭제 후 복구가 어려울 수 있습니다.</b></div>
     </div>
     <div class="m-foot"><button class="btn" onclick="closeDelConfirm()">취소</button><button class="btn danger" onclick="performDelete()">삭제</button></div>
+  </div>
+</div>
+<!-- DIND 단건 추가 모달 (성분 × 부족 영양소 매칭 수동 등록) -->
+<div class="modal-bg" id="dindModal" onclick="if(event.target===this)closeDind()" style="z-index:76">
+  <div class="modal" style="max-width:560px">
+    <div class="m-head"><div><div class="dt">DIND 추가</div><div class="ds">성분코드 × 부족 영양소 매칭을 하나 등록합니다.</div></div><button class="x" onclick="closeDind()">✕</button></div>
+    <div class="m-body">
+      <div class="block">
+        <div class="block-h">성분 (성분코드 기준)</div>
+        <div class="kvs">
+          <div class="kv"><div class="k">성분코드 *</div><div class="v"><input class="fw" id="dCode" placeholder="예: A10BA02"></div></div>
+          <div class="kv"><div class="k">성분명 *</div><div class="v"><input class="fw" id="dComp" placeholder="예: 메트포르민 (기존 성분코드면 성분명 자동 사용)"></div></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-h">부족 영양소 (굿팜 표준명)</div>
+        <div class="kvs">
+          <div class="kv"><div class="k">부족 영양소 *</div><div class="v"><input class="fw" id="dNut" placeholder="예: 비타민 B12"></div></div>
+          <div class="kv"><div class="k">관련 카테고리</div><div class="v"><input class="fw" id="dCat" placeholder="예: 비타민 B군, 종합비타민"></div></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-h">부족해지는 이유 <span style="font-weight:600;color:var(--muted);font-size:11px">성분 × 이 영양소 조합</span></div>
+        <textarea class="fw" id="dReason" placeholder="이 성분이 이 영양소를 부족하게 하는 이유"></textarea>
+      </div>
+      <div class="block">
+        <div class="block-h">근거 (참고문헌)</div>
+        <textarea class="fw" id="dRef" placeholder="예: 1) ..."></textarea>
+      </div>
+      <div class="roinfo">추가된 DIND는 <b>검토 필요</b> 상태로 등록되어 <b>기본 노출 OFF</b>(AI mate·약사웹 미노출)입니다. 검토 후 추천 관리에서 <b>노출 ON</b>으로 전환하세요. 기존 성분코드/부족 영양소면 자동으로 연결(매칭)만 추가됩니다.</div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeDind()">취소</button><button class="btn primary" onclick="saveDind()">추가</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -765,6 +799,42 @@ function applyIngredient(){
     hist.forEach(function(h){ ingHist[curIng.code].unshift({at:'2026-07-14 10:00', by:'관리자 김OO', field:h.field, before:h.before, after:h.after}); }); }
   closeIConfirm(); closeIngredient(); renderIngredients();
   toast(hist.length ? '성분 정보를 저장했습니다. (성분명은 전 화면 공통 · 이유/근거·연결은 조합별 반영)' : '변경 사항이 없습니다.');
+}
+
+/* ===== DIND 단건 추가 (성분 × 부족 영양소 매칭 수동 등록) ===== */
+var nutSeq=1;
+function openDind(){
+  ['dCode','dComp','dNut','dCat','dReason','dRef'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('dindModal').classList.add('open');
+}
+function closeDind(){ document.getElementById('dindModal').classList.remove('open'); }
+function saveDind(){
+  var code=document.getElementById('dCode').value.trim();
+  var comp=document.getElementById('dComp').value.trim();
+  var nut=document.getElementById('dNut').value.trim();
+  var cat=document.getElementById('dCat').value.trim();
+  var reason=document.getElementById('dReason').value.trim();
+  var ref=document.getElementById('dRef').value.trim();
+  if(!code || !comp || !nut){ toast('성분코드·성분명·부족 영양소는 필수입니다.'); return; }
+  var today='2026-07-15';
+  // 1) 성분 마스터 확보(신규면 검토 상태로 추가, 기존이면 공통 성분명 사용)
+  var ing=ingredients.find(function(x){return x.code===code;});
+  if(!ing){ ing={code:code, comp:comp, form:'', status:'검토', mod:today, modBy:'관리자 김OO'}; ingredients.push(ing); }
+  var finalComp=ing.comp;   // 성분명은 성분코드 기준 공통값
+  // 2) 부족 영양소 마스터 확보(표준명 기준, 신규면 노출 OFF)
+  var m=master.find(function(x){return x.nut===nut;});
+  if(!m){ m={nut:nut, nid:'NUT-NEW'+(nutSeq++), cat:cat, eff:'', defs:[], store:0, on:false, mod:today, drugs:[]}; master.push(m); }
+  else if(cat && (!m.cat || m.cat==='-')){ m.cat=cat; }
+  // 3) 매칭(성분 × 영양소) 링크 — 있으면 갱신, 없으면 추가
+  var d=(m.drugs||[]).find(function(x){return x.code===code;});
+  if(d){ d.comp=finalComp; d.reason=reason; d.ref=ref; }
+  else { m.drugs.push({code:code, comp:finalComp, form:'', reason:reason, ref:ref}); }
+  m.mod=today;
+  // 4) 이력
+  if(!ingHist[code]) ingHist[code]=[];
+  ingHist[code].unshift({at:today+' 10:00', by:'관리자 김OO', field:'DIND 추가 · '+nut, before:'-', after:finalComp+' → '+nut});
+  renderMaster(); renderIngredients(); closeDind();
+  toast('DIND를 추가했습니다. (검토 필요 · 노출 OFF)');
 }
 
 renderMaster(); renderStats(); renderIngredients();
