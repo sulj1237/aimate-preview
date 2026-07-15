@@ -508,7 +508,18 @@ function openSetting(){
 }
 var te=document.getElementById('toast'),tt;
 function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt); tt=setTimeout(function(){te.classList.remove('show')},2200); }
-setVariant('D');
+/* 스토리보드용 데모 케이스 파라미터 (?case=, ?view=). 쿼리 없으면 기본 동작 유지 */
+(function(){
+  var q=new URLSearchParams(location.search), c=q.get('case'), N=nutMaster;
+  if(c==='store-only'){ drugs=[drugs[1]]; N["NUT-COQ10"].gp=[]; }          /* 우리약국 3개만 */
+  else if(c==='gp-only'){ drugs=[drugs[1]]; N["NUT-COQ10"].store=[]; }     /* 굿팜만 + 우리약국 등록 CTA */
+  else if(c==='both'){ drugs=[drugs[1]]; }                                  /* 우리약국3 + 굿팜2 */
+  else if(c==='no-product'||c==='norec'){ drugs=[drugs[0]]; }              /* 매칭 없음 → 추천 없음 */
+  else if(c==='off'){ drugs=[drugs[1]]; N["NUT-COQ10"].on=false; }         /* 노출 OFF → 영역 미노출 */
+  else if(c==='more'){ drugs=[drugs[5]]; }                                  /* 11개 → 3개 + 더보기 */
+  else if(c==='mixed'){ drugs=[drugs[4]]; }                                 /* 혼합(굿팜만/우리약국만/미노출) */
+  setVariant(q.get('view')==='C'?'C':'D');
+})();
 </script>
 </body>
 </html>

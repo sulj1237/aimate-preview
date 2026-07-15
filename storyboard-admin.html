@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI mate 영양소 상담 추천 MVP · 화면설계서(스토리보드 · 케이스별)</title>
+<style>
+  :root{
+    --ink:#20262e; --muted:#66707b; --faint:#9aa4af; --line:#e3e7ec; --bg:#eef1f4;
+    --teal:#0ea58b; --teal-soft:#e6f7f4; --teal-line:#bfe8e1;
+    --amber:#b8790c; --amber-soft:#fbf1dd; --danger:#c0392b; --danger-soft:#fbe9e6;
+    --blue:#2a6fc0; --blue-soft:#eaf1fb; --purple:#6f5fae; --purple-soft:#f1ecfa; --gray-soft:#eef1f4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:var(--bg);font-size:13px;line-height:1.6;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page{max-width:min(1720px,97vw);margin:0 auto;padding:22px 24px}
+  h1,h2,h3,h4{margin:0}
+  a{color:var(--blue)}
+
+  /* 표지 */
+  .cover{background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px 30px;margin-bottom:18px;box-shadow:0 10px 30px -22px rgba(0,0,0,.35)}
+  .cover .eyebrow{font-size:12px;font-weight:800;color:var(--teal);letter-spacing:.04em}
+  .cover h1{font-size:25px;font-weight:800;margin:6px 0 4px}
+  .cover .sub{font-size:13.5px;color:var(--muted);margin-bottom:16px}
+  .metagrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:820px){.metagrid{grid-template-columns:repeat(2,1fr)}}
+  .metagrid .m{border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#fbfcfd}
+  .metagrid .m .k{font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.03em}
+  .metagrid .m .v{font-size:13px;font-weight:700;margin-top:3px;color:var(--ink)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:12px}
+  .legend b{font-size:11px;color:var(--faint);font-weight:800;margin-right:2px}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;border-radius:6px;padding:3px 9px;white-space:nowrap}
+  .badge.new{background:var(--teal-soft);color:var(--teal)}
+  .badge.asis{background:var(--gray-soft);color:#5c6671}
+  .badge.tbu{background:var(--danger-soft);color:var(--danger)}
+  .badge.na{background:var(--amber-soft);color:var(--amber)}
+  .badge.blue{background:var(--blue-soft);color:var(--blue)}
+
+  /* 플랫폼 섹션 */
+  .platform{margin:32px 0 6px}
+  .platform .pv{display:inline-block;font-size:12px;font-weight:800;color:#fff;background:var(--teal);border-radius:7px;padding:4px 12px}
+  .platform.pos .pv{background:var(--blue)}
+  .platform.web .pv{background:var(--teal)}
+  .platform.adm .pv{background:var(--purple)}
+  .platform h2{font-size:20px;font-weight:800;margin-top:10px}
+  .platform p{font-size:13px;color:var(--muted);margin:5px 0 0;max-width:1000px}
+
+  /* 화면 카드 */
+  .screen{background:#fff;border:1px solid var(--line);border-radius:14px;margin:16px 0;overflow:hidden;box-shadow:0 8px 26px -22px rgba(0,0,0,.4)}
+  .sc-head{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--line);background:#fbfcfd;flex-wrap:wrap}
+  .sc-id{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:800;color:#fff;background:#2a313b;border-radius:6px;padding:4px 9px}
+  .sc-name{font-size:15.5px;font-weight:800}
+  .sc-head .sp{flex:1}
+  .cbadge{font-size:11px;font-weight:800;color:#fff;border-radius:6px;padding:3px 10px;white-space:nowrap}
+  .cbadge.pos{background:var(--blue)} .cbadge.web{background:var(--teal)} .cbadge.adm{background:var(--purple)}
+
+  .info{width:100%;border-collapse:collapse;font-size:12.5px}
+  .info td{border:1px solid var(--line);padding:8px 12px;vertical-align:top}
+  .info td.k{background:#f6f8fa;color:var(--muted);font-weight:800;width:96px;white-space:nowrap}
+
+  /* 화면 = 실제 프로토타입 임베드(스케일/오버레이 핀 없음) + 디스크립션 옆 토글 */
+  .body2{display:block;padding:0}
+  .body2 .desc{display:none}
+  .body2.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,460px);gap:16px;align-items:start;padding:14px 16px}
+  .body2.on .desc{display:block}
+  .body2.on .screenview{position:sticky;top:10px}   /* 좁은 화면에서 스택돼도 화면이 계속 보이도록 */
+  @media(max-width:1180px){.body2.on{grid-template-columns:1fr}}
+  .cap{font-size:11.5px;color:var(--muted);padding:9px 15px;border-bottom:1px dashed var(--line);background:#fcfcfd;line-height:1.6}
+  .cap b{color:var(--ink)}
+  .screenview{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#eef1f4;margin:0;min-width:0}
+  .body2:not(.on) .screenview{border-radius:0;border-left:0;border-right:0;border-top:0}
+  .framewrap{overflow:auto;background:#eef1f4;padding:14px}
+  .framewrap iframe{border:0;display:block;margin:0 auto;background:#fff;box-shadow:0 8px 26px -14px rgba(0,0,0,.45);border-radius:7px;max-width:none}
+
+  .dtoggle{border:1px solid var(--teal-line);background:var(--teal-soft);color:var(--teal);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  .dtoggle:hover{background:#d9f2ee}
+  .dtoggle.on{background:var(--teal);border-color:var(--teal);color:#fff}
+
+  /* 디스크립션 표 */
+  .desc{padding:0}
+  .desc .dh{font-size:12px;font-weight:800;color:var(--muted);padding:2px 2px 8px}
+  table.d{width:100%;border-collapse:collapse;font-size:11.6px;table-layout:fixed}
+  table.d th{background:#eef2f5;color:#48525c;font-weight:800;text-align:left;padding:7px 9px;border:1px solid var(--line);font-size:10.8px}
+  table.d td{padding:7px 9px;border:1px solid var(--line);vertical-align:top;word-break:break-word;line-height:1.5}
+  table.d td.n{text-align:center;font-weight:800;width:24px;background:#fafbfc}
+  table.d .area{font-weight:700}
+  table.d col.c1{width:24px}table.d col.c2{width:20%}table.d col.c3{width:34%}table.d col.c4{width:44%}
+  code.t{background:#f2f4f7;border-radius:4px;padding:1px 5px;font-size:11px;color:#375}
+  .tag{font-size:10px;font-weight:800;border-radius:5px;padding:1px 6px;white-space:nowrap;vertical-align:middle}
+  .tag.tbu{background:var(--danger-soft);color:var(--danger)}
+  .tag.na{background:var(--amber-soft);color:var(--amber)}
+  .tag.asis{background:var(--gray-soft);color:#5c6671}
+  .tag.new{background:var(--teal-soft);color:var(--teal)}
+
+  /* 상태 표 */
+  .states{margin-top:14px}
+  .states .dh{padding:0 0 8px;font-size:12px;font-weight:800;color:var(--muted)}
+  table.s{width:100%;border-collapse:collapse;font-size:11.6px}
+  table.s th{background:#eef2f5;color:#48525c;font-weight:800;text-align:left;padding:7px 9px;border:1px solid var(--line);font-size:10.8px}
+  table.s td{padding:7px 9px;border:1px solid var(--line);vertical-align:top;line-height:1.5}
+  table.s td.st{font-weight:700;width:128px;white-space:nowrap}
+  .yn{font-size:10px;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap}
+  .yn.y{background:var(--teal-soft);color:var(--teal)}
+  .yn.n{background:var(--gray-soft);color:#8b939c}
+  .yn.q{background:var(--danger-soft);color:var(--danger)}
+
+  /* 케이스 카드(간결 설명) */
+  .caseband{margin:22px 0 4px;display:flex;align-items:center;gap:10px}
+  .caseband .t{font-size:15px;font-weight:800}
+  .caseband .d{font-size:12px;color:var(--muted)}
+  .cnote{list-style:none;margin:0;padding:13px 16px;display:flex;flex-direction:column;gap:7px;font-size:12px;border-top:1px solid var(--line);background:#fff}
+  .cnote li{padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:#fbfcfd;line-height:1.55}
+  .cnote li b{color:var(--ink)}
+  .cnote .k{display:inline-block;min-width:76px;font-weight:800;color:var(--teal);vertical-align:top}
+  .cnote .k.warn{color:var(--danger)}
+
+  .note-inline{font-size:11.5px;color:var(--muted);background:#fbfcfd;border-top:1px solid var(--line);padding:10px 16px;line-height:1.6}
+  .note-inline b{color:var(--ink)}
+
+  .toolbar{position:sticky;top:0;z-index:20;background:rgba(238,241,244,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:8px 24px;display:flex;gap:10px;align-items:center}
+  .toolbar .t{font-size:12.5px;font-weight:800}
+  .toolbar .sp{flex:1}
+  .toolbar button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:#3a424c}
+  .toolbar button:hover{background:#f0f3f5}
+
+  @media print{
+    body{background:#fff}
+    .toolbar{display:none}
+    .page{max-width:none;padding:0}
+    .screen{break-inside:avoid;box-shadow:none;page-break-inside:avoid}
+    .platform{break-after:avoid}
+    .body2 .desc{display:block !important}
+    .body2.on{display:block}
+    .screenview,.framewrap{background:#fff}
+    .framewrap{overflow:visible}
+    .framewrap iframe{box-shadow:none}
+    .cover,.legend{box-shadow:none}
+    a{color:var(--ink);text-decoration:none}
+  }
+  .hlrow{cursor:pointer}
+  .hlrow:hover{background:#fff8e6}
+  .hlrow.active{background:#fff2cc}
+  .hlrow.active td.n{background:var(--amber);color:#fff}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <span class="t">화면설계서 · 슈퍼어드민</span>
+  <a href="./storyboard-index.html" style="text-decoration:none;color:#3a424c;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700">← 인덱스</a><a href="./storyboard-pos.html" style="text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;background:#fff;color:#3a424c">POS</a><a href="./storyboard-web.html" style="text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;background:#fff;color:#3a424c">약사웹</a><a href="./storyboard-admin.html" style="text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;background:var(--ink);color:#fff;border-color:var(--ink)">슈퍼어드민</a>
+  <span class="sp"></span>
+  <button id="allDescBtn" onclick="toggleAllDesc(this)">디스크립션 전체 보기</button>
+  <button onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+</div>
+
+<div class="page">
+
+  <div class="cover">
+    <div class="eyebrow">SCREEN DESIGN · 슈퍼어드민 · CASE-BY-CASE</div>
+    <h1>AI mate 영양소 상담 추천 — 슈퍼어드민 화면설계서</h1>
+    <div class="sub">운영자 · AI mate 추천 관리(부족 영양소) + 성분 관리(성분코드) + DIND 추가 + soft delete. 3층 grain·노출 ON/OFF·삭제 확인 모달까지 케이스별로 그린다.</div>
+    <div class="metagrid">
+      <div class="m"><div class="k">플랫폼</div><div class="v">슈퍼어드민</div></div>
+      <div class="m"><div class="k">공개 범위</div><div class="v">내부 전용(Internal)</div></div>
+      <div class="m"><div class="k">작성일</div><div class="v">2026-07-15</div></div>
+      <div class="m"><div class="k">기준</div><div class="v">policy.mdx v2 · 최종 프로토타입</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><b>표기</b></span>
+    <span class="badge new">신규</span> 이번 MVP 신규
+    <span class="badge asis">as-is</span> 기존 화면
+    <span class="badge tbu">확인 필요</span> 정책 미확정(TBU)
+    <span class="badge na">미구현</span> 정책엔 있으나 화면 없음
+    <span style="width:100%;height:0"></span>
+    <span style="color:var(--faint)">실제 프로토타입을 <b>케이스별 파라미터(<code class="t">?case=</code>)로 임베드</b>. iframe 내부는 실제 클릭·조작 가능. 메인 화면은 우측 <b>[＋ 디스크립션 보기]</b>로 번호별 설명을 옆에 펼침(좁은 화면에서는 화면이 상단 고정된 채 설명 스크롤).</span>
+    <span style="width:100%;height:0"></span>
+    <span style="color:var(--amber);font-weight:700">🔎 디스크립션을 켜고 <b>표의 행을 클릭</b>하면 화면에서 해당 영역이 하이라이트됩니다(다시 클릭 시 해제).</span>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="sc-name">화면 인벤토리</span><span class="sp"></span><span class="badge new">v2</span></div>
+    <table class="info">
+      <tr><td class="k">슈퍼어드민</td><td><b>AIM-S-01</b> 추천 관리 목록 · <b>AIM-S-02</b> 추천 관리 상세 · <b>AIM-S-03</b> 성분 관리 · <b>DIND 추가</b> · <b>성분 soft delete</b> <span class="badge new">신규</span> — Case 다수</td></tr>
+    </table>
+  </div>
+
+<div class="platform adm">
+    <span class="pv">C · 슈퍼어드민 (WEB · 운영자)</span>
+    <h2>AI mate 추천 관리 · 성분 관리</h2>
+    <p>부족 영양소 기준(v2)으로 <b>추천 관리(부족 영양소)</b>와 <b>성분 관리(성분코드)</b>를 운영한다. 3층 grain — 부족 영양소는 추천 관리에서, 성분명·제형(성분코드 공통값)과 부족해지는 이유·근거(성분코드×부족영양소 조합값)는 성분 관리에서 편집한다. 노출은 <b>ON/OFF</b>, 제거는 <b>soft delete</b>(원천 보존·전 서비스 미노출)로 처리한다.</p>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="sc-id">AIM-S-01</span><span class="sc-name">AI mate 추천 관리 — 목록(부족 영양소)</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <table class="info">
+      <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-01</td></tr>
+      <tr><td class="k">화면 경로</td><td>바코드 관리 &gt; AI mate 추천 관리</td><td class="k">권한</td><td>운영자/관리자</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소를 한 행으로 하는 추천 Master 목록. 부족 영양소·관련 카테고리·관련 약물 수·노출(ON/OFF)·최종 수정일을 보여주고, 행 클릭 시 상세(AIM-S-02)로 이동한다. 상단에서 <code class="t">＋ DIND 추가</code>(성분×부족영양소 매칭 단건 등록) 진입.</td></tr>
+    </table>
+    <div class="body2">
+      <div class="screenview"><div class="cap">▶ 실제 프로토타입(<code>superadmin.html</code>) · <b>추천 Master 목록</b>(파라미터 없음). 행 클릭 → 상세 이동, 상단 <b>＋ DIND 추가</b>.</div>
+        <div class="framewrap"><iframe src="./superadmin.html" width="1180" height="900" scrolling="auto" title="슈퍼어드민 추천 관리 목록"></iframe></div></div>
+      <div class="desc"><div class="dh">디스크립션 (영역·기능·인터랙션)</div>
+        <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+          <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
+          <tbody>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">1</td><td class="area">상단 바 · 건수/검색</td><td>전체 건수 표기, 검색 대상 선택(부족 영양소·관련 카테고리) + 검색어 입력.</td><td>검색 실행 시 조건 매칭 행만 노출. 결과 0 → <code class="t">데이터가 없습니다.</code></td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">2</td><td class="area">＋ DIND 추가</td><td>성분코드×부족영양소 매칭을 단건 수동 등록하는 모달 진입점. 성분/성분관리 양쪽에서 진입 가능.</td><td>등록 시 <span class="tag na">검토 필요</span>·<b>노출 OFF</b>로 진입. 기존 성분코드/부족영양소면 연결만 추가. <span class="tag tbu">Q8 일괄 업로드 TBU</span></td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">3</td><td class="area">부족 영양소</td><td>추천 Master의 기준 값(굿팜 표준명). 목록의 1차 식별자.</td><td>행 전체 클릭 → 상세(AIM-S-02) 페이지 이동.</td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">4</td><td class="area">관련 카테고리</td><td>부족 영양소에 연결된 굿팜 카테고리(예: 비타민 B군, 종합비타민). 영양소 종속 값.</td><td>미등록 시 <code class="t">-</code> 표기.</td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">5</td><td class="area">관련 약물 수</td><td>이 영양소를 고갈시키는 관련 약물(성분코드) 개수. <b>삭제(soft delete)된 성분은 집계에서 제외</b>.</td><td>성분 삭제 시 실시간 감소 → Case(soft-delete 반영) 참고.</td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">6</td><td class="area">노출(ON/OFF)</td><td>AI mate 노출 상태 배지. ON=POS·약사웹 노출, OFF=미노출. 하나의 목록에 ON/OFF 행이 공존.</td><td>상태 변경은 상세에서 토글로 수행(목록은 조회).</td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">7</td><td class="area">최종 수정일</td><td>Master·연결 정보의 마지막 수정일.</td><td>정렬·이력 추적 기준.</td></tr>
+          </tbody></table>
+        <div class="states"><div class="dh">필수 화면 상태</div>
+          <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
+            <tbody>
+              <tr><td class="st">기본(데이터 있음)</td><td><span class="yn y">해당</span></td><td>ON/OFF 행이 함께 노출. 전체 건수 = 삭제되지 않은 Master 수.</td></tr>
+              <tr><td class="st">데이터 0건</td><td><span class="yn y">해당</span></td><td><code class="t">데이터가 없습니다.</code></td></tr>
+              <tr><td class="st">soft delete 반영</td><td><span class="yn y">해당</span></td><td>삭제된 부족 영양소는 목록에서 사라지고, 삭제된 성분은 관련 약물 수에서 빠짐.</td></tr>
+              <tr><td class="st">권한 없음</td><td><span class="yn n">미해당</span></td><td>운영자/관리자만 접근(메뉴 노출 제어).</td></tr>
+            </tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="sc-id">AIM-S-02</span><span class="sc-name">AI mate 추천 관리 — 상세(부족 영양소)</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <table class="info">
+      <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-02</td></tr>
+      <tr><td class="k">화면 경로</td><td>AI mate 추천 관리 &gt; 상세(부족 영양소)</td><td class="k">권한</td><td>운영자/관리자</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소 1건의 상세 페이지. 상단 <b>AI mate 노출 토글</b> / 기본정보(부족영양소·관련 약물 수·관련 카테고리) / <b>굿팜 추천 상품 최대 2</b>(검색 추가·순서·삭제) / 관련 약물 목록(성분명 클릭→성분 관리 이동) / 수정 이력. 저장·삭제는 우측 하단.</td></tr>
+    </table>
+    <div class="body2">
+      <div class="screenview"><div class="cap">▶ <code>superadmin.html?master=0</code> · <b>비타민 B12(노출 ON)</b> 상세. 상단 토글·굿팜 추천 상품·관련 약물·수정 이력·우측 하단 저장/삭제.</div>
+        <div class="framewrap"><iframe src="./superadmin.html?master=0" width="1180" height="1350" scrolling="auto" title="슈퍼어드민 추천 관리 상세"></iframe></div></div>
+      <div class="desc"><div class="dh">디스크립션 (영역·기능·인터랙션)</div>
+        <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+          <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
+          <tbody>
+            <tr class="hlrow" data-hl="#fExpose"><td class="n">1</td><td class="area">AI mate 노출 토글</td><td>상단에서 이 부족 영양소의 노출 ON/OFF 제어. OFF=POS 미노출, 약사웹 <code class="t">노출 중지</code> 표시.</td><td>토글 즉시 반영, 저장 시 확정. 목록의 노출 배지와 연동.</td></tr>
+            <tr class="hlrow" data-hl="#recoDetail"><td class="n">2</td><td class="area">기본정보</td><td>부족 영양소·관련 약물 수·관련 카테고리(영양소 종속 값) 조회.</td><td>부족 영양소명 자체는 조합 기준값 → 여기서는 참조.</td></tr>
+            <tr class="hlrow" data-hl="#mDefProds"><td class="n">3</td><td class="area">굿팜 추천 상품(최대 2)</td><td>상담 참고용 추천 상품 <b>최대 2개</b> 등록. 서버 마스터 상품 검색으로 추가·순서 조정·삭제.</td><td>2개 초과 추가 시 <code class="t">기본 추천 상품은 최대 2개까지 등록할 수 있습니다.</code> · 중복 시 <code class="t">이미 추가된 상품입니다.</code></td></tr>
+            <tr class="hlrow" data-hl="#mRelDrugs"><td class="n">4</td><td class="area">관련 약물 목록</td><td>이 영양소를 고갈시키는 관련 약물(성분코드·성분명·이유·근거). <b>조회 전용</b>.</td><td>성분명 클릭 → <b>AI mate 성분 관리</b> 상세로 이동해 성분명·제형·이유·근거 수정. 삭제된 성분은 미노출.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">5</td><td class="area">override 상태(§3)</td><td>원천 대비 운영 수정 상태값: <code class="t">원천값 사용</code>/<code class="t">운영 수정값 사용</code>/<code class="t">원천 변경 있음</code>/<code class="t">검토 필요</code>.</td><td>운영 수정 중이면 <span class="tag na">운영 수정 적용 중</span> 배지, 원천 변경 시 <span class="tag tbu">원천 변경 있음</span> 알림.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">결측 표기(§7)</td><td>이유/근거 미입력 조합은 <code class="t">근거 미등록</code>/<code class="t">이유 미등록</code>/<code class="t">검토 필요</code>로 표기.</td><td>결측이면 노출 전 검토 유도.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">7</td><td class="area">수정 이력</td><td>필드·전/후·수정일시·수정자 기록.</td><td>감사·롤백 근거.</td></tr>
+            <tr class="hlrow" data-hl="#mmFoot"><td class="n">8</td><td class="area">저장 / 삭제</td><td>우측 하단. 삭제는 soft delete(전 서비스 미노출·원천 보존).</td><td>삭제 클릭 → 확인 모달(취소/확인) → Case(삭제 확인 모달) 참고.</td></tr>
+          </tbody></table>
+        <div class="states"><div class="dh">필수 화면 상태</div>
+          <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
+            <tbody>
+              <tr><td class="st">노출 ON</td><td><span class="yn y">해당</span></td><td>POS·약사웹 노출. 굿팜 추천 상품·관련 약물 표시.</td></tr>
+              <tr><td class="st">노출 OFF</td><td><span class="yn y">해당</span></td><td>POS 미노출, 약사웹 <code class="t">노출 중지</code>.</td></tr>
+              <tr><td class="st">추천 상품 2 도달</td><td><span class="yn y">해당</span></td><td>추가 차단 토스트. 삭제 후 재추가 가능.</td></tr>
+              <tr><td class="st">override/결측</td><td><span class="yn y">해당</span></td><td>상태 배지·미등록 문구 표기.</td></tr>
+              <tr><td class="st">삭제 확인</td><td><span class="yn q">모달</span></td><td><code class="t">부족 영양소를 삭제하시겠습니까?</code>(취소/확인)</td></tr>
+            </tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caseband"><span class="cbadge adm">CASES</span><span class="t">추천 관리 · 케이스별 화면</span><span class="d">— 목록 ON/OFF 공존 · 데이터 0 · soft delete 반영 · 상세 OFF · 삭제 확인 모달 · 데이터 조건별</span></div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 1</span><span class="sc-name">목록 — ON/OFF 행 공존</span><span class="sp"></span><span class="badge new">기본</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html</code> · 노출 ON(비타민B12·코엔자임Q10·칼슘·마그네슘)과 OFF(비타민D·엽산·칼륨)가 한 목록에 공존.</div>
+      <div class="framewrap"><iframe src="./superadmin.html" width="1180" height="900" scrolling="auto" title="Case 목록 ON/OFF 공존"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 노출 배지가 ON/OFF로 섞여 표시 — 노출 여부와 무관하게 Master는 목록에 유지된다(노출 OFF ≠ 삭제).</li><li><span class="k">정책 근거</span> 노출은 운영 토글, 제거는 soft delete로 분리. OFF는 언제든 다시 ON 가능.</li><li><span class="k">인터랙션</span> 행 클릭 → 상세 이동. 노출 상태 변경은 상세 토글에서.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 2</span><span class="sc-name">목록 — 데이터 0건</span><span class="sp"></span><span class="badge na">빈 상태</span></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 검색 결과나 등록 Master가 없을 때 표 본문에 <code class="t">데이터가 없습니다.</code> 한 줄만 노출.</li><li><span class="k">정책 근거</span> 목록0 표준 문구(추천 관리). 성분 관리 이력0은 <code class="t">데이터가 존재하지 않습니다.</code>로 구분.</li><li><span class="k">인터랙션</span> 검색 조건 해제 또는 ＋ DIND 추가로 데이터 생성.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 3</span><span class="sc-name">목록 — soft delete 반영</span><span class="sp"></span><span class="badge tbu">삭제 반영</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?case=deleted</code> · 오메프라졸(A02BC01) 성분 삭제 처리 → 관련 약물 수에서 빠지고 관련 약물 목록·매칭에서 사라짐.</div>
+      <div class="framewrap"><iframe src="./superadmin.html?case=deleted" width="1180" height="900" scrolling="auto" title="Case soft delete 반영 목록"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제된 성분과 매칭된 부족 영양소(비타민B12·칼슘·마그네슘)의 <b>관련 약물 수가 감소</b>. 부족 영양소 자체 삭제 시엔 목록 행이 사라짐.</li><li><span class="k">정책 근거</span> soft delete — 원천 보존, 전 서비스 미노출. 성분 삭제는 관련 약물 집계·목록에서 제외.</li><li><span class="k">인터랙션</span> 관련 약물 수 클릭 없이 즉시 반영. 삭제 이력은 성분 관리에서 확인.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 4</span><span class="sc-name">추천 상세 — 노출 OFF</span><span class="sp"></span><span class="badge na">OFF</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?master=4</code> · 비타민 D(노출 OFF) 상세. 상단 토글이 OFF 상태.</div>
+      <div class="framewrap"><iframe src="./superadmin.html?master=4" width="1180" height="1350" scrolling="auto" title="Case 추천 상세 OFF"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 노출 토글이 OFF — POS AI mate 미노출, 약사웹에는 <code class="t">노출 중지</code> 표시. 데이터는 그대로 편집 가능.</li><li><span class="k">정책 근거</span> 노출 OFF는 일시 중지 수단(삭제 아님). 검토 필요/결측 항목은 OFF로 두고 보완 후 ON.</li><li><span class="k">인터랙션</span> 토글 ON → 저장 시 전 서비스 노출 반영.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 5</span><span class="sc-name">부족 영양소 삭제 확인 모달</span><span class="sp"></span><span class="badge tbu">soft delete</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?master=4&amp;modal=reco-del</code> · <b>부족 영양소를 삭제하시겠습니까?</b> 확인 모달(취소/확인).</div>
+      <div class="framewrap"><iframe src="./superadmin.html?master=4&amp;modal=reco-del" width="1180" height="940" scrolling="auto" title="Case 부족 영양소 삭제 확인 모달"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 상세 우측 하단 삭제 → 확인 모달. 안내: 슈퍼어드민·약사 어드민웹·POS AI mate 모두 미노출, 연결된 굿팜 추천 상품·관련 카테고리·관련 약물 매칭도 함께 미노출.</li><li><span class="k warn">정책 근거</span> soft delete — 원천 데이터 보존, 화면에서만 미노출. 삭제 후 목록·관련 약물에서 사라짐. <span class="tag tbu">Q10 삭제 액션 세부 TBU</span></li><li><span class="k">인터랙션</span> [취소]=닫기 / [확인]=삭제 실행 후 목록 복귀.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 6</span><span class="sc-name">데이터 조건 — 추천 상품 2 도달 · override · 결측</span><span class="sp"></span><span class="badge blue">데이터</span></div>
+    <ul class="cnote">
+      <li><span class="k">2 도달</span> 굿팜 추천 상품이 이미 2개면 검색 추가 차단 → <code class="t">기본 추천 상품은 최대 2개까지 등록할 수 있습니다.</code> 삭제로 슬롯을 비운 뒤 재추가.</li>
+      <li><span class="k">override</span> 운영 수정이 원천과 다르면 <span class="tag na">운영 수정 적용 중</span> 배지 · 원천이 이후 변경되면 <span class="tag tbu">원천 변경 있음</span>으로 재검토 유도. 상태값=원천값 사용/운영 수정값 사용/원천 변경 있음/검토 필요.</li>
+      <li><span class="k">결측</span> 조합별 이유/근거 미입력 시 <code class="t">근거 미등록</code>/<code class="t">이유 미등록</code>/<code class="t">검토 필요</code> 표기. 결측 항목은 노출 전 보완 권장.</li>
+    </ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="sc-id">AIM-S-03</span><span class="sc-name">AI mate 성분 관리 — 목록(성분코드)</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <table class="info">
+      <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-03</td></tr>
+      <tr><td class="k">화면 경로</td><td>바코드 관리 &gt; AI mate 성분 관리</td><td class="k">권한</td><td>운영자/관리자</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">성분코드를 한 행으로 하는 성분 목록. 성분코드·성분명·연결 부족 영양소 수·최종 수정일을 보여준다. 성분명·제형은 성분코드 <b>공통값</b>, 부족해지는 이유·근거는 성분코드×부족영양소 <b>조합값</b>. 성분 삭제는 soft delete로 전 서비스 공통 반영.</td></tr>
+    </table>
+    <div class="body2">
+      <div class="screenview"><div class="cap">▶ <code>superadmin.html?page=ingr</code> · <b>성분 관리 목록</b>. 성분코드·성분명 검색, 행 클릭 → 성분 상세.</div>
+        <div class="framewrap"><iframe src="./superadmin.html?page=ingr" width="1180" height="900" scrolling="auto" title="슈퍼어드민 성분 관리 목록"></iframe></div></div>
+      <div class="desc"><div class="dh">디스크립션 (영역·기능·인터랙션)</div>
+        <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+          <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
+          <tbody>
+            <tr class="hlrow" data-hl="#ingrBody"><td class="n">1</td><td class="area">검색</td><td>성분코드·성분명으로 검색.</td><td>결과 0 → <code class="t">데이터가 없습니다.</code></td></tr>
+            <tr class="hlrow" data-hl="#ingrBody"><td class="n">2</td><td class="area">성분코드</td><td>성분 식별자(ATC 등). 목록 기준 값·공통값 키.</td><td>클릭 → 성분 상세 이동. <span class="tag tbu">Q9 함량 병합 범위 TBU</span></td></tr>
+            <tr class="hlrow" data-hl="#ingrBody"><td class="n">3</td><td class="area">성분명</td><td>성분코드 <b>공통값</b>. 상세에서 수정 시 전 화면 공통 반영.</td><td>수정은 상세 → 확인 모달 경유.</td></tr>
+            <tr class="hlrow" data-hl="#ingrBody"><td class="n">4</td><td class="area">연결 부족 영양소 수</td><td>이 성분코드와 매칭된 부족 영양소 개수(조합 수). 삭제된 부족 영양소 제외.</td><td>0이면 연결 없음.</td></tr>
+            <tr class="hlrow" data-hl="#ingrBody"><td class="n">5</td><td class="area">최종 수정일</td><td>공통값/조합값 마지막 수정일.</td><td>정렬·추적 기준.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">＋ DIND 추가 / 삭제 이력</td><td>성분×부족영양소 매칭 단건 등록 진입점, 성분 삭제 이력 조회 진입점.</td><td>모달로 진입 → Case(DIND 추가/삭제 이력) 참고.</td></tr>
+          </tbody></table>
+        <div class="states"><div class="dh">필수 화면 상태</div>
+          <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
+            <tbody>
+              <tr><td class="st">기본</td><td><span class="yn y">해당</span></td><td>성분코드별 행 노출(오메프라졸·아토르바스타틴·살부타몰·메토트렉세이트 등).</td></tr>
+              <tr><td class="st">목록 0건</td><td><span class="yn y">해당</span></td><td><code class="t">데이터가 없습니다.</code></td></tr>
+              <tr><td class="st">삭제 이력 0건</td><td><span class="yn y">해당</span></td><td><code class="t">데이터가 존재하지 않습니다.</code></td></tr>
+              <tr><td class="st">soft delete 반영</td><td><span class="yn y">해당</span></td><td>삭제 성분은 목록·관련 약물·약사웹·POS 미노출. 복합제는 나머지 성분 정상.</td></tr>
+            </tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caseband"><span class="cbadge adm">CASES</span><span class="t">성분 관리 · 케이스별 화면</span><span class="d">— 성분 상세 · DIND 추가 모달 · 성분 삭제 확인 모달 · 삭제 이력 · soft delete 반영 · 데이터 조건별</span></div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 1</span><span class="sc-name">성분 상세 — 공통값·조합값 편집</span><span class="sp"></span><span class="badge new">상세</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?ing=A02BC01</code> · 오메프라졸. 성분명(공통값)·제형 / 연결 부족영양소 목록(조합별 이유·근거) / 연결 추가·삭제 / 수정 이력.</div>
+      <div class="framewrap"><iframe src="./superadmin.html?ing=A02BC01" width="1180" height="1350" scrolling="auto" title="Case 성분 상세"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 성분명·제형은 성분코드 공통값(한 번 수정 → 연결된 모든 조합 반영). 연결 부족영양소마다 부족해지는 이유·근거를 개별(조합값) 편집.</li><li><span class="k">정책 근거</span> 3층 grain — 공통값=성분 관리 상단, 조합값=연결목록. 편집 위치가 축으로 갈림.</li><li><span class="k">인터랙션</span> ＋ 부족 영양소 추가로 연결 확장, 각 행 삭제로 연결 해제. 성분명 수정 시 확인 모달(Case 6-데이터).</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 2</span><span class="sc-name">DIND 추가 모달</span><span class="sp"></span><span class="badge na">검토 필요·OFF</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?modal=dind</code> · 성분코드×부족영양소 매칭 단건 등록. 성분코드·성분명·부족 영양소·이유·근거 입력.</div>
+      <div class="framewrap"><iframe src="./superadmin.html?modal=dind" width="1180" height="940" scrolling="auto" title="Case DIND 추가 모달"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 새 DIND(약물-영양소 상호작용) 매칭을 수동 등록. 기존 성분코드면 성분명 자동 사용, 기존 조합이면 연결만 추가.</li><li><span class="k">정책 근거</span> 등록 DIND는 <span class="tag na">검토 필요</span>·<b>기본 노출 OFF</b>(AI mate·약사웹 미노출)로 진입 → 검토 후 추천 관리에서 노출 ON. <span class="tag tbu">Q8 일괄/재업로드 TBU</span></li><li><span class="k">인터랙션</span> [취소]/[추가]. 추가 후 성분·추천 관리 양쪽 연결 반영.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 3</span><span class="sc-name">성분 삭제 확인 모달</span><span class="sp"></span><span class="badge tbu">soft delete</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?ing=A02BC01&amp;modal=ing-del</code> · <b>성분값을 삭제하시겠습니까?</b> 확인 모달(취소/확인).</div>
+      <div class="framewrap"><iframe src="./superadmin.html?ing=A02BC01&amp;modal=ing-del" width="1180" height="940" scrolling="auto" title="Case 성분 삭제 확인 모달"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 성분 상세 하단 삭제 → 확인 모달. 안내: 슈퍼어드민·약사 어드민웹·POS AI mate 모두 미노출, 연결된 부족 영양소·부족해지는 이유·근거도 함께 미노출.</li><li><span class="k warn">정책 근거</span> 성분 soft delete(§8) — <code class="t">is_deleted/deleted_at/deleted_by/delete_reason</code>. POS는 삭제 성분 기준만 미노출(복합제 나머지 정상). 일시 제외는 삭제 아닌 노출 OFF.</li><li><span class="k">인터랙션</span> [취소]/[확인]. 확인 시 목록·관련 약물에서 제거, 삭제 이력에 기록.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 4</span><span class="sc-name">성분 삭제 이력</span><span class="sp"></span><span class="badge blue">이력</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?modal=ingdelhist</code> · 삭제일시·삭제자·성분코드·성분명·연결 부족 영양소 수 기록. 원천 보존.</div>
+      <div class="framewrap"><iframe src="./superadmin.html?modal=ingdelhist" width="1180" height="940" scrolling="auto" title="Case 성분 삭제 이력"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제된 성분의 이력을 조회. 컬럼=삭제일시·삭제자·성분코드·성분명·연결 부족 영양소 수.</li><li><span class="k">정책 근거</span> soft delete는 원천 보존·화면 미노출 → 이력으로 추적/복원 근거 확보. 이력 0건 → <code class="t">데이터가 존재하지 않습니다.</code></li><li><span class="k">인터랙션</span> [확인]으로 닫기. (복원 액션은 원천 보존 전제 <span class="tag tbu">TBU</span>)</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 5</span><span class="sc-name">성분 관리 — soft delete 반영</span><span class="sp"></span><span class="badge tbu">삭제 반영</span></div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?page=ingr&amp;case=deleted</code> · 오메프라졸(A02BC01) 삭제 처리되어 성분 목록에서 사라짐.</div>
+      <div class="framewrap"><iframe src="./superadmin.html?page=ingr&amp;case=deleted" width="1180" height="900" scrolling="auto" title="Case 성분 관리 soft delete 반영"></iframe></div></div>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제 성분이 성분 목록에서 제거되고, 추천 관리 관련 약물·약사웹·POS에서도 공통 미노출. 삭제 이력에는 남음.</li><li><span class="k">정책 근거</span> 적용범위=슈퍼어드민 성분관리·추천관리 관련약물·약사웹·POS 모두 미노출. POS 복합제는 나머지 성분 정상 노출.</li><li><span class="k">인터랙션</span> 삭제 이력 모달에서 확인 가능.</li></ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge adm">Case 6</span><span class="sc-name">데이터 조건 — 성분명 공통 반영 · 연결 추가/삭제</span><span class="sp"></span><span class="badge blue">데이터</span></div>
+    <ul class="cnote">
+      <li><span class="k">성분명 수정</span> 성분명(공통값) 변경 → 확인 모달: <b>이 성분과 연결된 모든 부족 영양소 항목 및 AI mate 화면에 공통 반영</b>. 영향 범위(연결 부족 영양소·관련 노출 대상) 표기 후 [저장].</li>
+      <li><span class="k">연결 추가</span> ＋ 부족 영양소 추가로 조합 신설 — 새 조합은 이유·근거 <code class="t">이유 미등록</code>/<code class="t">근거 미등록</code>·검토 필요로 진입.</li>
+      <li><span class="k">연결 삭제</span> 특정 부족 영양소 연결만 해제(성분 자체 삭제 아님). 이력에 항목·전/후 기록. 성분 전체 제거는 성분 삭제(soft delete) 사용.</li>
+    </ul>
+  </div>
+
+
+  
+
+  <div style="height:16px"></div>
+  <div class="legend" style="display:block">
+    <b style="display:block;margin-bottom:8px">문서 이력 · 근거</b>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      · 근거 산출물: <code class="t">policy.mdx</code>(v2 · 부족 영양소 기준) · <code class="t">screens.mdx</code> · 최종 프로토타입. 불일치·미확정은 <span class="tag tbu">확인 필요</span>로 병기.<br>
+      · 인쇄/PDF: 상단 🖨 버튼(인쇄 시 모든 디스크립션이 펼쳐집니다).
+    </div>
+  </div>
+
+</div>
+<script>
+  function syncToggleBtn(btn){
+    var on = btn.closest('.screen').querySelector('.body2').classList.contains('on');
+    btn.textContent = on ? '－ 디스크립션 숨기기' : '＋ 디스크립션 보기';
+    btn.classList.toggle('on', on);
+  }
+  function toggleDesc(btn){
+    var body = btn.closest('.screen').querySelector('.body2');
+    if(!body) return;
+    body.classList.toggle('on');
+    syncToggleBtn(btn);
+  }
+  function toggleAllDesc(btn){
+    var bodies = document.querySelectorAll('.body2');
+    var turnOn = [].some.call(bodies, function(b){ return !b.classList.contains('on'); });
+    bodies.forEach(function(b){ b.classList.toggle('on', turnOn); });
+    document.querySelectorAll('.dtoggle').forEach(syncToggleBtn);
+    btn.textContent = turnOn ? '디스크립션 전체 숨기기' : '디스크립션 전체 보기';
+  }
+  function sbFlashFrame(ifr){ ifr.style.transition="box-shadow .15s"; ifr.style.boxShadow="0 0 0 3px #f39c12"; setTimeout(function(){ifr.style.boxShadow="";},700); }
+  function sbHighlight(row){
+    var body=row.closest(".body2"); if(!body) return;
+    var ifr=body.querySelector("iframe"); var sel=row.getAttribute("data-hl");
+    var was=row.classList.contains("active");
+    body.querySelectorAll(".hlrow.active").forEach(function(r){ r.classList.remove("active"); });
+    if(!was) row.classList.add("active");
+    if(!ifr) return;
+    var doc=null; try{ doc=ifr.contentDocument; }catch(e){ doc=null; }
+    if(!doc){ sbFlashFrame(ifr); return; }
+    if(!doc.getElementById("sb-hl-style")){ var st=doc.createElement("style"); st.id="sb-hl-style";
+      st.textContent=".sb-hl{outline:3px solid #f39c12 !important;outline-offset:2px;background:rgba(243,156,18,.14) !important;border-radius:4px}";
+      (doc.head||doc.documentElement).appendChild(st); }
+    doc.querySelectorAll(".sb-hl").forEach(function(e){ e.classList.remove("sb-hl"); });
+    var el = (sel && was===false) ? doc.querySelector(sel) : (sel?doc.querySelector(sel):null);
+    if(!was && el){ el.classList.add("sb-hl"); try{ el.scrollIntoView({block:"center",behavior:"smooth"}); }catch(e){} setTimeout(function(){ el.classList.remove("sb-hl"); },2600); }
+    else if(!was){ sbFlashFrame(ifr); }
+  }
+  document.addEventListener("click",function(e){ var r=e.target.closest?e.target.closest(".hlrow"):null; if(r) sbHighlight(r); });
+</script>
+</body>
+</html>

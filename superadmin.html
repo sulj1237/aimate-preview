@@ -897,7 +897,20 @@ function saveDind(){
   toast('DIND를 추가했습니다. (검토 필요 · 노출 OFF)');
 }
 
-renderMaster(); renderStats(); renderIngredients();
+/* 스토리보드용 데모 케이스 (?case=, ?page=, ?master=idx, ?ing=code, ?modal=) */
+(function(){
+  var q=new URLSearchParams(location.search), c=q.get('case');
+  if(c==='deleted'){ var g=ingredients.find(function(x){return x.code==='A02BC01';}); if(g){ g.deleted=true; } }
+  renderMaster(); renderStats(); renderIngredients();
+  if(q.get('page')==='ingr') showPage('ingr');
+  var mi=q.get('master'); if(mi!==null&&mi!=='') openMaster(+mi);
+  var ic=q.get('ing'); if(ic){ showPage('ingr'); openIngredient(ic); }
+  var md=q.get('modal');
+  if(md==='dind') openDind();
+  else if(md==='ingdelhist') openIngDelHist();
+  else if(md==='reco-del'){ if(mi!==null&&mi!=='') askDeleteMaster(); }
+  else if(md==='ing-del'){ if(ic) askDeleteIngredient(); }
+})();
 </script>
 </body>
 </html>

@@ -558,7 +558,17 @@ var te=document.getElementById('toast'),tt;
 function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt); tt=setTimeout(function(){te.classList.remove('show')},2200); }
 // 각 항목의 기본값(기본 추천 상품) 스냅샷 — 「기본값 복원」 기준
 rows.forEach(function(r){ r.defaults = r.prods.filter(function(p){return p.def}).map(clone); });
-renderList();
+/* 스토리보드용 데모 케이스 (?case=, ?open=id, ?modal=search). 쿼리 없으면 기본 동작 유지 */
+(function(){
+  var q=new URLSearchParams(location.search), c=q.get('case');
+  if(c==='empty'){ rows=[rows[2]]; }            /* 마그네슘: 완전 미설정 */
+  else if(c==='store-set'){ rows=[rows[1]]; }   /* 코엔자임Q10: 우리약국 2개 */
+  else if(c==='off-list'){ rows=[rows[3]]; }    /* 비타민 D: 노출 중지 */
+  else if(c==='gp-only'){ rows=[rows[0]]; }     /* B12: 굿팜만(우리약국 미설정) */
+  renderList();
+  var op=q.get('open'); if(op) openDetail(+op);
+  if(q.get('modal')==='search') openSearch();
+})();
 </script>
 </body>
 </html>
