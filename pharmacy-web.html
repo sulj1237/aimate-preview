@@ -168,6 +168,18 @@
   .res .r .add{margin-left:auto;font-size:12px;font-weight:700;color:var(--mint-700)}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#212529;color:#fff;font-size:13px;padding:11px 18px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:70;box-shadow:var(--shadow-pop)}
   .toast.show{opacity:1}
+
+  /* 상세 = 페이지 형식 */
+  #detailView{max-width:1000px}
+  .dpg-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .dpg-back{width:30px;height:30px;border-radius:6px;border:1px solid var(--g-3);background:#fff;cursor:pointer;display:grid;place-items:center;color:var(--g-9);font-size:18px;line-height:1}
+  .dpg-back:hover{background:var(--g-0)}
+  .dpg-head h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.02em}
+  .dpg-head .dpg-sub{font-size:12px;color:var(--g-7)}
+  .sec{margin-bottom:28px}
+  .sec-h{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:var(--ink);margin:0 0 14px}
+  .sec-h .secmeta{margin-left:auto;font-size:11px;font-weight:500;color:var(--g-7)}
+  .sec-h .act .btn{height:32px}
 </style>
 </head>
 <body>
@@ -199,6 +211,7 @@
       <div class="me"><span class="av"></span><div><b>임한일</b><span>대표약사</span></div></div>
     </header>
     <main class="wrap">
+      <div id="listView">
       <div class="hero">
         <h1>AI mate 추천 상품 설정</h1>
         <div class="sub">부족 영양소별로 우리약국 추천 상품을 설정합니다. 굿팜 기본 추천 상품은 조회만 가능합니다.</div>
@@ -216,37 +229,35 @@
           </table>
         </div>
       </div>
-    </main>
-  </div>
-</div>
+      </div><!-- /listView -->
 
-<!-- 상세 / 항목 추가 (가운데 모달) -->
-<div class="modal-bg" id="detailBg" onclick="if(event.target===this)closeDetail()">
-  <div class="modal lg">
-    <div class="m-head">
-      <div><div class="dt" id="mTitle">—</div><div class="ds" id="mSub">—</div></div>
-      <button class="x" onclick="closeDetail()">✕</button>
-    </div>
-    <div class="m-body">
-      <div id="offBanner" class="offbanner" style="display:none"></div>
-      <div class="block">
-        <div class="block-h" id="basicH">기본 정보</div>
-        <div class="kvs" id="mBasic"></div>
-      </div>
-      <div class="block">
-        <div class="block-h" id="infoH">부족해지는 근거</div>
-        <div id="mInfoWrap"></div>
-      </div>
-      <div class="block">
-        <div class="block-h">추천 상품 <span id="mProdMeta" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--muted)">최종 수정일 -</span></div>
-        <div class="prod-list" id="mProds"></div>
-        <div class="hint" id="mHint"></div>
-        <div style="margin-top:10px" id="addProdWrap">
-          <button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button>
+      <!-- 상세 (페이지 형식) -->
+      <div id="detailView" style="display:none">
+        <div class="dpg-head">
+          <button class="dpg-back" onclick="closeDetail()">‹</button>
+          <h1 id="mTitle">—</h1>
+          <span class="dpg-sub" id="mSub"></span>
         </div>
+        <div id="offBanner" class="offbanner" style="display:none"></div>
+
+        <section class="sec">
+          <div class="sec-h" id="basicH">기본 정보</div>
+          <div class="kvs" id="mBasic"></div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h" id="infoH">관련 약물</div>
+          <div id="mInfoWrap"></div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h">추천 상품 설정<span class="secmeta" id="mProdMeta">최종 수정일 -</span><span class="act" id="mFoot"></span></div>
+          <div class="prod-list" id="mProds"></div>
+          <div class="hint" id="mHint"></div>
+          <div style="margin-top:10px" id="addProdWrap"><button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button></div>
+        </section>
       </div>
-    </div>
-    <div class="m-foot" id="mFoot"></div>
+    </main>
   </div>
 </div>
 
@@ -387,10 +398,12 @@ function openDetail(id){
   if(off) ban.innerHTML='현재 굿팜 정책에 따라 이 부족 영양소의 <b>AI mate 추천 노출이 중지</b>되었습니다. 등록하신 우리약국 추천 상품은 삭제되지 않았으며, 노출이 다시 시작되면 기존 설정값이 다시 사용됩니다.';
   document.getElementById('addProdWrap').style.display = off ? 'none' : '';
   document.getElementById('mFoot').innerHTML = off
-    ? '<button class="btn" onclick="closeDetail()">닫기</button>'
-    : '<button class="btn" onclick="closeDetail()">취소</button><button class="btn primary" onclick="saveDetail()">저장</button>';
+    ? ''
+    : '<button class="btn primary sm" onclick="saveDetail()">저장하기</button>';
   renderProds();
-  document.getElementById('detailBg').classList.add('open');
+  document.getElementById('listView').style.display='none';
+  document.getElementById('detailView').style.display='';
+  if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
 // 관련 약물(조회 전용) — 성분명·부족해지는 이유·근거(참고문헌)
 function relDrugsHtml(drugs){
@@ -420,7 +433,8 @@ function openAdd(){
     '<button class="btn" onclick="closeDetail()">취소</button>'+
     '<button class="btn primary" onclick="saveDetail()">항목 저장</button>';
   renderProds();
-  document.getElementById('detailBg').classList.add('open');
+  document.getElementById('listView').style.display='none';
+  document.getElementById('detailView').style.display='';
 }
 
 function renderHist(){
@@ -439,7 +453,7 @@ function renderProds(){
   var gp=cur.prods.filter(function(p){return p.def;});
   var store=cur.prods.filter(function(p){return !p.def;});
   var gpHtml = gp.length
-    ? gp.map(function(p){ return '<div class="pitem ro"><div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div><span class="kd gp">굿팜(기본)</span></div>'; }).join('')
+    ? gp.map(function(p){ return '<div class="pitem ro"><div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div></div>'; }).join('')
     : '<div class="pempty">슈퍼어드민 기본 추천 상품이 없습니다.</div>';
   var off = cur.on===false;   // 노출 중지 시 우리약국 상품은 조회만
   var multi=store.length>1;
@@ -496,7 +510,10 @@ function saveDetail(){
   cur.history=(cur.history||[]).concat([{date:'2026-06-26', by:ME, note:'추천 상품 설정 변경'}]);
   rows[idx]=cur; renderList(); closeDetail(); toast('추천 상품 설정을 저장했습니다. (변경 이력 기록)');
 }
-function closeDetail(){ document.getElementById('detailBg').classList.remove('open'); }
+function closeDetail(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('listView').style.display='';
+}
 
 // 서버 마스터 상품 검색 모달
 function storeCount(){ return cur.prods.filter(function(p){return !p.def;}).length; }
