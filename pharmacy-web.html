@@ -274,40 +274,40 @@
 var rows = [
   { id:1, nut:"비타민 B12", nid:"NUT-B12", cat:"비타민 B군, 종합비타민", eff:"대사케어", on:true,
     mod:"2026-06-20", modBy:"admin",
-    drugs:[ {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12 흡수가 저하되어 부족해질 위험"},
-            {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12 유리가 감소해 흡수 저하"},
-            {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 부족 위험"} ],
+    drugs:[ {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12 흡수가 저하되어 부족해질 위험", ref:"1) Metformin-associated vitamin B12 deficiency, Diabetes Care"},
+            {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12 유리가 감소해 흡수 저하", ref:"1) Acid suppression and B12 malabsorption, review"},
+            {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 부족 위험", ref:"1) PPI use and vitamin B12, JAMA"} ],
     prods:[ {nm:"○○ 비타민B 컴플렉스", bc:"8801111000022", kind:"건기식", on:true, def:true} ],
     history:[ {date:"2026-06-20", by:"admin", note:"기본 추천 상품 등록"} ] },
   { id:2, nut:"코엔자임Q10", nid:"NUT-COQ10", cat:"항산화 작용", eff:"항산화&염증케어", on:true,
     mod:"2026-06-24", modBy:"store",
-    drugs:[ {code:"C10AA05", comp:"아토르바스타틴", form:"정제(TB)", reason:"스타틴은 메발론산 경로를 억제해 CoQ10 생성을 줄여 부족 위험"},
-            {code:"C07AB04", comp:"아세부톨롤", form:"경질캡슐(CH)", reason:"베타차단제는 CoQ10 의존 효소 활성을 저해할 수 있어 부족 위험"} ],
+    drugs:[ {code:"C10AA05", comp:"아토르바스타틴", form:"정제(TB)", reason:"스타틴은 메발론산 경로를 억제해 CoQ10 생성을 줄여 부족 위험", ref:"1) Statin therapy and CoQ10 depletion, Am J Cardiol"},
+            {code:"C07AB04", comp:"아세부톨롤", form:"경질캡슐(CH)", reason:"베타차단제는 CoQ10 의존 효소 활성을 저해할 수 있어 부족 위험", ref:"1) Beta-blockers and CoQ10, review"} ],
     prods:[ {nm:"○○ 코엔자임Q10 100mg", bc:"8802222000033", kind:"건기식", on:true, def:false, mod:"2026-06-18"},
             {nm:"△△ 코큐텐 이지", bc:"8802222000040", kind:"건기식", on:false, def:false, mod:"2026-06-24"} ],
     history:[ {date:"2026-06-18", by:"admin", note:"기본 추천 항목 생성"},
               {date:"2026-06-24", by:"store", note:"약국 상품 2건 추가 · 표시 순서 조정"} ] },
   { id:3, nut:"마그네슘", nid:"NUT-MG", cat:"마그네슘 및 미네랄제품", eff:"대사케어", on:true,
     mod:"-", modBy:"admin",
-    drugs:[ {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI 장기 복용은 장내 마그네슘 흡수를 저해해 저마그네슘혈증 위험"} ],
+    drugs:[ {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI 장기 복용은 장내 마그네슘 흡수를 저해해 저마그네슘혈증 위험", ref:"1) PPIs and hypomagnesemia, FDA safety communication"} ],
     prods:[],
     history:[ {date:"2026-06-15", by:"admin", note:"기본 항목 생성 (상품 미설정)"} ] },
   { id:4, nut:"비타민 D", nid:"NUT-VD", cat:"비타민 D", eff:"뼈&관절케어", on:false,
     mod:"2026-06-12", modBy:"store",
-    drugs:[ {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", reason:"스테로이드 장기 사용은 비타민 D 대사와 골대사에 영향을 주어 부족 위험"} ],
+    drugs:[ {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", reason:"스테로이드 장기 사용은 비타민 D 대사와 골대사에 영향을 주어 부족 위험", ref:"1) Glucocorticoid-induced bone loss and vitamin D"} ],
     prods:[ {nm:"○○ 비타민D 2000IU", bc:"8803333000044", kind:"건기식", def:true} ],
     history:[ {date:"2026-06-10", by:"admin", note:"기본 추천 상품 등록"},
               {date:"2026-06-12", by:"store", note:"우리약국 추천 상품 조정"} ] },
   { id:5, nut:"칼슘", nid:"NUT-CA", cat:"칼슘 및 미네랄제품", eff:"뼈&관절케어", on:true,
     mod:"2026-06-22", modBy:"store",
-    drugs:[ {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"위산 감소로 칼슘의 이온화·흡수가 저하되어 부족 위험"},
-            {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", reason:"스테로이드는 장내 칼슘 흡수를 줄이고 배설을 늘려 부족 위험"} ],
+    drugs:[ {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"위산 감소로 칼슘의 이온화·흡수가 저하되어 부족 위험", ref:"1) PPI use and calcium malabsorption"},
+            {code:"H02AB06", comp:"프레드니솔론", form:"정제(TB)", reason:"스테로이드는 장내 칼슘 흡수를 줄이고 배설을 늘려 부족 위험", ref:"1) Glucocorticoid and calcium balance"} ],
     prods:[ {nm:"○○ 칼슘 마그네슘 D", bc:"8804444000055", kind:"건기식", on:true, def:false} ],
     history:[ {date:"2026-06-17", by:"admin", note:"기본 항목 생성"},
               {date:"2026-06-22", by:"store", note:"약국 상품으로 교체"} ] },
   { id:6, nut:"엽산", nid:"NUT-FOL", cat:"비타민 B군, 종합비타민", eff:"혈액순환&혈관케어", on:false,
     mod:"-", modBy:"admin",
-    drugs:[ {code:"L04AX03", comp:"메토트렉세이트", form:"정제(TB)", reason:"엽산 대사를 길항 — 보충 여부는 처방 의도 확인 필요"} ],
+    drugs:[ {code:"L04AX03", comp:"메토트렉세이트", form:"정제(TB)", reason:"엽산 대사를 길항 — 보충 여부는 처방 의도 확인 필요", ref:"1) Methotrexate–folate antagonism, clinical review"} ],
     prods:[ {nm:"○○ 엽산 400mcg", bc:"8805555000066", kind:"건기식", on:true, def:true} ],
     history:[ {date:"2026-06-14", by:"admin", note:"기본 추천 상품 등록"} ] }
 ];
@@ -392,15 +392,15 @@ function openDetail(id){
   renderProds();
   document.getElementById('detailBg').classList.add('open');
 }
-// 관련 약물(조회 전용) — 성분코드·성분명·부족해지는 이유
+// 관련 약물(조회 전용) — 성분명·부족해지는 이유·근거(참고문헌)
 function relDrugsHtml(drugs){
   if(!drugs || !drugs.length) return '<div class="readbox">연결된 약물 데이터가 없습니다.</div>';
-  return '<div class="tbl" style="overflow:auto"><table><thead><tr>'+
-    '<th>성분코드</th><th>성분명</th><th>부족해지는 이유</th></tr></thead><tbody>'+
+  return '<div class="tbl" style="border:1px solid var(--g-2);border-radius:6px;overflow:auto"><table><thead><tr>'+
+    '<th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
     drugs.map(function(d){
-      return '<tr><td style="white-space:nowrap;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8a9099">'+d.code+'</td>'+
-        '<td style="white-space:nowrap">'+d.comp+'</td>'+
-        '<td style="white-space:normal;min-width:200px">'+(d.reason||'-')+'</td></tr>';
+      return '<tr><td style="white-space:nowrap">'+d.comp+'</td>'+
+        '<td style="white-space:normal;min-width:200px">'+(d.reason||'-')+'</td>'+
+        '<td style="white-space:normal;min-width:160px;color:var(--g-7)">'+(d.ref||'-')+'</td></tr>';
     }).join('')+'</tbody></table></div>';
 }
 function openAdd(){
@@ -450,8 +450,8 @@ function renderProds(){
         return '<div class="pitem'+(off?' ro':'')+'">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div>'+del+'</div>'; }).join('')
     : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 서버 마스터 상품에서 검색해 추가하세요.')+'</div>';
   c.innerHTML =
-    '<div class="pg-h">굿팜 추천 상품 <span class="info" tabindex="0">ⓘ<span class="tip-pop">슈퍼어드민 등록 상품 · 약국 수정 불가</span></span></div>'+gpHtml+
-    '<div class="pg-h store">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml;
+    '<div class="pg-h store" style="margin-top:2px">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml+
+    '<div class="pg-h" style="margin-top:16px">굿팜 추천 상품 <span class="info" tabindex="0">ⓘ<span class="tip-pop">슈퍼어드민 등록 상품 · 약국 수정 불가</span></span></div>'+gpHtml;
   var atMax=store.length>=MAX_PRODS;
   document.getElementById('mHint').innerHTML = off
     ? '<b style="color:var(--amber)">노출 중지 상태 — 조회만 가능합니다. (설정값은 유지)</b>'
