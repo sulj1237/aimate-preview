@@ -343,17 +343,9 @@
   <div class="modal" style="max-width:460px">
     <div class="m-head"><div><div class="dt">성분값을 삭제하시겠습니까?</div></div><button class="x" onclick="closeIngDelConfirm()">✕</button></div>
     <div class="m-body">
-      <div style="font-size:13px;line-height:1.7">삭제 시 이 성분은 <b>슈퍼어드민, 약사 어드민웹, POS AI mate</b>에서 모두 노출되지 않습니다. 해당 성분과 연결된 <b>부족 영양소, 부족해지는 이유, 근거/참고문헌</b> 정보도 함께 미노출됩니다.</div>
-      <div class="block-h" style="margin:16px 0 8px">영향 범위</div>
-      <div class="kvs">
-        <div class="kv"><div class="k">연결 부족 영양소 수</div><div class="v" id="idNut">-</div></div>
-        <div class="kv"><div class="k">관련 추천 노출 대상</div><div class="v" id="idExp">-</div></div>
-      </div>
-      <div class="block-h" style="margin:16px 0 8px">삭제 사유</div>
-      <textarea class="fw" id="idReason" placeholder="삭제 사유를 입력하세요 (이력에 기록됩니다)"></textarea>
-      <div class="roinfo" style="border-color:#f3c9c4;background:#fdf3f2;color:#a23c33;margin-top:12px">원천 데이터와 삭제 이력은 DB에 보존되며(soft delete), 화면에서만 미노출 처리됩니다. 일시 제외는 <b>노출 OFF</b>를 사용하세요.</div>
+      <div style="font-size:13px;line-height:1.7">이 성분을 삭제하면 <b>슈퍼어드민, 약사 어드민웹, POS AI mate</b>에서 모두 미노출됩니다. 연결된 <b>부족 영양소, 부족해지는 이유, 근거/참고문헌</b>도 함께 미노출됩니다.</div>
     </div>
-    <div class="m-foot"><button class="btn" onclick="closeIngDelConfirm()">취소</button><button class="btn danger" onclick="performDeleteIngredient()">삭제</button></div>
+    <div class="m-foot"><button class="btn" onclick="closeIngDelConfirm()">취소</button><button class="btn danger" onclick="performDeleteIngredient()">확인</button></div>
   </div>
 </div>
 <!-- 성분 삭제 이력 모달 -->
@@ -843,26 +835,18 @@ function applyIngredient(){
 /* ===== 성분 삭제 (soft delete) — 전 서비스 미노출 ===== */
 function askDeleteIngredient(){
   if(!curIng) return;
-  var links=ingredientLinks(curIng.code);
-  var expo=links.filter(function(l){return l.on;}).length;   // 노출 ON인 부족 영양소(추천 노출 대상)
-  document.getElementById('idNut').innerHTML='<b>'+links.length+'</b>개';
-  document.getElementById('idExp').innerHTML='<b>'+expo+'</b>건 <span style="color:var(--muted);font-size:11px">(노출 ON 부족 영양소)</span>';
-  document.getElementById('idReason').value='';
   document.getElementById('ingDelConfirm').classList.add('open');
 }
 function closeIngDelConfirm(){ document.getElementById('ingDelConfirm').classList.remove('open'); }
 function performDeleteIngredient(){
   if(!curIng) return;
-  var reason=(document.getElementById('idReason').value||'').trim();
-  if(!reason){ toast('삭제 사유를 입력해 주세요.'); return; }
   var nlink=ingredientLinks(curIng.code).length;
   // soft delete — 원천 보존, is_deleted 플래그만 설정
   curIng.deleted=true;
   curIng.delAt='2026-07-15 10:30';
   curIng.delBy='관리자 김OO';
-  curIng.delReason=reason;
   // 삭제 이력 적재
-  ingDelHist.unshift({at:curIng.delAt, by:curIng.delBy, reason:reason, code:curIng.code, comp:curIng.comp, nlink:nlink});
+  ingDelHist.unshift({at:curIng.delAt, by:curIng.delBy, reason:'', code:curIng.code, comp:curIng.comp, nlink:nlink});
   closeIngDelConfirm(); closeIngredient();
   renderMaster(); renderIngredients();
   toast('성분을 삭제했습니다. (전 서비스 미노출 · 이력 보존)');
