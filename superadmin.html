@@ -74,6 +74,7 @@
   .note{font-size:11.5px;color:var(--muted);margin-top:10px}
   .btn.sm{height:28px;padding:0 10px;font-size:11.5px}
   .btn.danger{color:var(--danger);border-color:#f0c9c4}
+  .btn:disabled,.btn[disabled]{opacity:.45;cursor:not-allowed}
   tbody tr.click{cursor:pointer}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#28303a;color:#fff;font-size:13px;padding:11px 18px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
   .toast.show{opacity:1}
@@ -325,14 +326,14 @@
     <div class="m-foot"><button class="btn" onclick="closeIConfirm()">취소</button><button class="btn primary" onclick="applyIngredient()">저장</button></div>
   </div>
 </div>
-<!-- 삭제 불가 경고 모달 (노출 ON일 때) -->
-<div class="modal-bg" id="delWarn" onclick="if(event.target===this)closeDelWarn()" style="z-index:78">
-  <div class="modal" style="max-width:420px">
-    <div class="m-head"><div><div class="dt">삭제할 수 없습니다</div></div><button class="x" onclick="closeDelWarn()">✕</button></div>
+<!-- 삭제 확인 모달 (삭제 가능 조건을 모두 만족할 때만 진입) -->
+<div class="modal-bg" id="delConfirm" onclick="if(event.target===this)closeDelConfirm()" style="z-index:78">
+  <div class="modal" style="max-width:440px">
+    <div class="m-head"><div><div class="dt">부족 영양소 Master를 삭제하시겠습니까?</div></div><button class="x" onclick="closeDelConfirm()">✕</button></div>
     <div class="m-body">
-      <div style="font-size:13px;line-height:1.7"><b>노출 ON 상태에서는 삭제할 수 없습니다.</b><br>삭제하려면 먼저 <b>AI mate 노출</b>을 OFF로 변경해 주세요.</div>
+      <div style="font-size:13px;line-height:1.7">삭제 시 이 부족 영양소의 <b>굿팜 추천 상품, 관련 카테고리, 추천 효능군, 관련 약물 매칭 정보</b>가 함께 삭제 또는 미노출 처리됩니다. <b>삭제 후 복구가 어려울 수 있습니다.</b></div>
     </div>
-    <div class="m-foot"><button class="btn" onclick="closeDelWarn()">닫기</button><button class="btn primary" onclick="offAndClose()">노출 OFF로 변경</button></div>
+    <div class="m-foot"><button class="btn" onclick="closeDelConfirm()">취소</button><button class="btn danger" onclick="performDelete()">삭제</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -508,13 +509,26 @@ function openMaster(idx){
   syncTg();
   document.getElementById('mmFoot').innerHTML = idx<0
     ? '<button class="btn" onclick="closeMaster()">취소</button><button class="btn primary" onclick="saveMaster()">등록</button>'
-    : '<button class="btn danger" onclick="deleteMaster('+idx+')">삭제</button><button class="btn primary" onclick="saveMaster()">저장</button>';
+    : '<span id="delBtnWrap"></span><button class="btn primary" onclick="saveMaster()">저장</button>';
+  if(idx>=0) renderDeleteBtn();
   document.getElementById('pageReco').classList.add('hidden');
   document.getElementById('recoDetail').classList.remove('hidden');
   if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
 function syncTg(){ document.getElementById('fExpose').classList.toggle('on', curOn);
-  var n=document.getElementById('offNote'); if(n) n.style.display = curOn ? 'none' : ''; }
+  var n=document.getElementById('offNote'); if(n) n.style.display = curOn ? 'none' : '';
+  renderDeleteBtn(); }  // 노출 토글 시 삭제 가능 여부 재평가
+// 삭제 가능 조건: 노출 OFF + 약국 설정 수 0 (= 약국별 우리약국 추천 상품 0건). 하나라도 위반 시 버튼 비활성화+툴팁.
+function renderDeleteBtn(){
+  var w=document.getElementById('delBtnWrap'); if(!w) return;
+  var m=master[curIdx]; var storeN=(m&&m.store)||0;
+  var deletable = !curOn && storeN===0;
+  if(deletable){ w.innerHTML='<button class="btn danger" onclick="askDeleteMaster()">삭제</button>'; return; }
+  var tip = storeN>0
+    ? '약국이 등록한 우리약국 추천 상품이 있어 삭제할 수 없습니다. 운영 제외가 필요한 경우 노출 OFF로 변경해 주세요.'
+    : 'AI mate에 노출 중인 항목은 삭제할 수 없습니다. 삭제하려면 먼저 노출을 OFF로 변경해 주세요.';
+  w.innerHTML='<span title="'+tip+'"><button class="btn danger" disabled>삭제</button></span>';
+}
 function toggleTg(){ curOn=!curOn; syncTg(); }
 function saveMaster(){
   var nut=document.getElementById('fNut').value.trim();
@@ -536,22 +550,21 @@ function saveMaster(){
   if(curIdx<0) master.unshift(rec);
   renderMaster(); closeMaster(); toast(curIdx<0?'부족 영양소 추천을 등록했습니다.':'저장했습니다.');
 }
-function deleteMaster(idx){
-  // 삭제는 노출 OFF 상태에서만 가능 — ON이면 경고 모달
-  if(curOn){ document.getElementById('delWarn').classList.add('open'); return; }
-  var m=master[idx];
-  var msg = (m && m.store>0)
-    ? '⚠ 이 부족 영양소에 우리약국 추천 상품을 등록한 약국 '+m.store+'곳이 있습니다.\n삭제하면 해당 약국 설정도 AI mate·약사웹에 노출되지 않습니다.\n\n그래도 삭제할까요?'
-    : '이 부족 영양소를 삭제할까요? AI mate·약사웹 추천에서 제외됩니다.';
-  if(!confirm(msg)) return;
-  master.splice(idx,1); renderMaster(); closeMaster(); toast('삭제했습니다.');
+// 삭제 가능 조건을 모두 만족할 때만 확인 모달을 연다(버튼이 활성일 때만 호출됨).
+function askDeleteMaster(){
+  var m=master[curIdx];
+  if(curOn || ((m&&m.store)||0)>0) return;   // 이중 가드
+  document.getElementById('delConfirm').classList.add('open');
+}
+function closeDelConfirm(){ document.getElementById('delConfirm').classList.remove('open'); }
+function performDelete(){
+  closeDelConfirm();
+  master.splice(curIdx,1); renderMaster(); closeMaster(); toast('부족 영양소 Master를 삭제했습니다.');
 }
 function closeMaster(){
   document.getElementById('recoDetail').classList.add('hidden');
   document.getElementById('pageReco').classList.remove('hidden');
 }
-function closeDelWarn(){ document.getElementById('delWarn').classList.remove('open'); }
-function offAndClose(){ curOn=false; syncTg(); closeDelWarn(); toast('노출을 OFF로 변경했습니다. 이제 삭제할 수 있습니다.'); }
 function renderStats(){
   document.getElementById('statBody').innerHTML = stats.map(function(s){
     return '<tr><td class="nut">'+s.nut+'</td><td class="num">'+s.comps+'</td><td class="num">'+s.rx.toLocaleString()+'</td>'+

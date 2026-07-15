@@ -177,6 +177,8 @@
   .pcard{font-size:12px;line-height:1.35;border-radius:7px;padding:6px 9px;background:#f1f3f5;color:#5c6671;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
   .pcard.store{background:var(--teal-soft);color:var(--teal-d);font-weight:700;border:1px solid var(--teal-line)}
+  .pcard-n{display:inline-block;min-width:15px;height:15px;line-height:15px;text-align:center;font-size:9.5px;font-weight:800;background:var(--teal-d);color:#fff;border-radius:4px;margin-right:5px;vertical-align:1px}
+  .dm-cnt{display:inline-block;min-width:15px;height:15px;line-height:15px;text-align:center;font-size:9.5px;font-weight:800;background:var(--teal-d);color:#fff;border-radius:999px;padding:0 4px;margin-left:3px;vertical-align:1px}
   .dm-cta{font-size:11px;font-weight:700;color:var(--teal-d);background:none;border:1px dashed var(--teal-line);border-radius:7px;padding:6px 9px;cursor:pointer;text-align:left;width:100%;font-family:inherit}
   .dm-more{margin-top:10px;font-size:11.5px;font-weight:700;color:var(--teal-d);background:none;border:none;cursor:pointer;padding:2px 0;font-family:inherit}
   .dm-more:hover{text-decoration:underline}
@@ -315,7 +317,8 @@
 // → 화면 흐름: "이 약물 때문에 → 이 영양소가 부족 → 그래서 이 상품 추천". 같은 영양소라도 약물이 다르면 근거 문구가 다르다.
 var nutMaster = {
   "NUT-COQ10":{ nut:"코엔자임Q10", cat:"항산화 작용",
-    gp:[{nm:"○○ 코엔자임Q10 100mg"},{nm:"△△ 코큐텐 이지 200mg"}], store:[{nm:"□□ 코엔자임Q10 이지"}] },
+    gp:[{nm:"○○ 코엔자임Q10 100mg"},{nm:"△△ 코큐텐 이지 200mg"}],
+    store:[{nm:"□□ 코엔자임Q10 이지 100mg 60캡슐"},{nm:"□□ 프리미엄 코큐텐 200mg 90정 대용량"},{nm:"□□ 코엔자임Q10 액티브 이지드링크 스틱 30포"}] },
   // 우리약국 미등록 + 굿팜 있음 → 우측에 등록 CTA(정책5)
   "NUT-B12":{ nut:"비타민 B12", cat:"비타민 B군, 종합비타민",
     gp:[{nm:"○○ 비타민B 컴플렉스"}], store:[] },
@@ -440,18 +443,20 @@ function setVariant(v){
   if(v==='D') renderTableD();
 }
 // 상품 카드 목록(긴 이름=2줄+말줄임, hover=전체명 tooltip)
-function prodCards(list, cls){
-  return '<div class="dm-plist">'+list.map(function(p){
-    return '<div class="pcard '+cls+'" title="'+(p.nm||'').replace(/"/g,'&quot;')+'">'+p.nm+'</div>';
+// numbered: 2개 이상일 때 우선순위 번호(1·2·3) 표기 — 우리약국 상품이 여러 개(최대 3)일 때 순서 명확화
+function prodCards(list, cls, numbered){
+  return '<div class="dm-plist">'+list.map(function(p,i){
+    var n = numbered ? '<span class="pcard-n">'+(i+1)+'</span>' : '';
+    return '<div class="pcard '+cls+'" title="'+(p.nm||'').replace(/"/g,'&quot;')+'">'+n+p.nm+'</div>';
   }).join('')+'</div>';
 }
 function dmCol(label, inner, cls){ return '<div class="dm-col'+(cls?' '+cls:'')+'"><div class="dm-cl">'+label+'</div>'+inner+'</div>'; }
 // 시안 D 우측: 우리약국(우선 강조) | 굿팜(보조) 2열. 우리약국 없으면 등록 CTA, 굿팜은 있을 때만.
 function dmRight(r){
   var store=(r.store||[]).slice(0,3), gp=(r.gp||[]).slice(0,2);
-  var storeInner = store.length ? prodCards(store,'store')
+  var storeInner = store.length ? prodCards(store,'store', store.length>1)
     : '<button class="dm-cta" onclick="openSetting()">＋ 우리약국 추천 등록</button>';
-  var out = dmCol('우리약국 추천 상품', storeInner, 'store');
+  var out = dmCol('우리약국 추천 상품 '+(store.length>1?'<span class="dm-cnt">'+store.length+'</span>':''), storeInner, 'store');
   if(gp.length) out += dmCol('굿팜 추천 상품', prodCards(gp,'gp'));
   return '<div class="dm-right">'+out+'</div>';
 }
