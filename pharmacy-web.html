@@ -183,6 +183,7 @@
   .sec-h{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:var(--ink);margin:0 0 14px}
   .sec-h .secmeta{margin-left:auto;font-size:11px;font-weight:500;color:var(--g-7)}
   .sec-h .act .btn{height:32px}
+  .dpg-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-top:20px;border-top:1px solid var(--g-2)}
 </style>
 </head>
 <body>
@@ -254,11 +255,11 @@
         </section>
 
         <section class="sec">
-          <div class="sec-h">추천 상품 설정<span class="secmeta" id="mProdMeta">최종 수정일 -</span><span class="act" id="mFoot"></span></div>
+          <div class="sec-h">추천 상품 설정<span class="secmeta" id="mProdMeta">최종 수정일 -</span></div>
           <div class="prod-list" id="mProds"></div>
           <div class="hint" id="mHint"></div>
-          <div style="margin-top:10px" id="addProdWrap"><button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button></div>
         </section>
+        <div class="dpg-foot" id="mFoot"></div>
       </div>
     </main>
   </div>
@@ -398,11 +399,11 @@ function openDetail(id){
   var off = cur.on===false;
   var ban=document.getElementById('offBanner');
   ban.style.display = off ? '' : 'none';
-  if(off) ban.innerHTML='현재 굿팜 정책에 따라 이 부족 영양소의 <b>POS AI mate 추천 노출이 중지</b>되었습니다. 등록된 우리약국 추천 상품은 삭제되지 않으며, 노출이 다시 시작되면 기존 설정값이 다시 사용됩니다.';
-  document.getElementById('addProdWrap').style.display = off ? 'none' : '';
+  if(off) ban.innerHTML='<b>AI mate 노출 중지 상태</b> — 현재 굿팜 정책에 따라 이 부족 영양소의 <b>POS AI mate 추천 노출이 중지</b>되었습니다. 등록된 우리약국 추천 상품은 삭제되지 않으며, 노출이 다시 시작되면 기존 설정값이 다시 사용됩니다.';
   document.getElementById('mFoot').innerHTML = off
     ? ''
-    : '<button class="btn primary sm" onclick="saveDetail()">저장하기</button>';
+    : '<button class="btn primary" onclick="saveDetail()">저장하기</button>';
+  document.getElementById('mFoot').style.display = off ? 'none' : 'flex';   // OFF: 저장 없음 → 하단바 숨김
   renderProds();
   document.getElementById('listView').style.display='none';
   document.getElementById('detailView').style.display='';
@@ -474,19 +475,17 @@ function renderProds(){
           : '<button class="btn sm danger" onclick="delP('+gi+')">삭제</button>';
         return '<div class="pitem'+(off?' ro':'')+'">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div>'+del+'</div>'; }).join('')
     : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 서버 마스터 상품에서 검색해 추가하세요.')+'</div>';
+  var atMax=store.length>=MAX_PRODS;
+  // 추가 버튼: OFF → 비활성화+툴팁 / 최대 도달 → 숨김 / 그 외 → 정상. 우리약국 목록 바로 하단에 위치.
+  var addHtml = off
+    ? '<span title="'+OFFTIP+'"><button class="btn sm" disabled>＋ 우리약국 추천 상품 추가</button></span>'
+    : (atMax ? '' : '<button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button>');
   c.innerHTML =
     '<div class="pg-h store" style="margin-top:2px">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml+
-    '<div class="pg-h" style="margin-top:16px">굿팜 추천 상품</div>'+gpHtml;
-  var atMax=store.length>=MAX_PRODS;
-  // OFF: '추가' 버튼 비활성화 + 툴팁(숨기지 않음) / 최대 도달: 숨김 / 그 외: 정상
-  var aw=document.getElementById('addProdWrap');
-  if(aw){
-    if(off){ aw.style.display=''; aw.innerHTML='<span title="'+OFFTIP+'"><button class="btn sm" disabled>＋ 우리약국 추천 상품 추가</button></span>'; }
-    else if(atMax){ aw.style.display='none'; }
-    else { aw.style.display=''; aw.innerHTML='<button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button>'; }
-  }
+    (addHtml?'<div style="margin-top:10px">'+addHtml+'</div>':'')+
+    '<div class="pg-h" style="margin-top:18px">굿팜 추천 상품</div>'+gpHtml;
   document.getElementById('mHint').innerHTML = off
-    ? '<b style="color:var(--amber)">AI mate 노출 중지 상태 — 조회만 가능합니다. (설정값은 유지)</b>'
+    ? '<b style="color:var(--amber)">AI mate 노출 중지 상태로, 정보 조회만 가능합니다. (기존 설정값은 유지되어 보존)</b>'
     : (atMax ? '<b style="color:var(--amber)">우리약국 추천 상품 최대 '+MAX_PRODS+'개에 도달했습니다.</b>'
       : '우리약국 설정 상품은 굿팜(기본) 추천보다 우선 노출됩니다.');
 }
