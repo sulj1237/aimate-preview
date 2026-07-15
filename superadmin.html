@@ -219,6 +219,7 @@
           <span class="total">전체 <b id="iTotal">0</b> 건</span>
           <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
           <span class="spacer"></span>
+          <button class="btn" onclick="openIngDelHist()">삭제 이력</button>
           <button class="btn primary" onclick="openDind()">＋ DIND 추가</button>
         </div>
         <div class="tbl"><table>
@@ -304,8 +305,9 @@
             <div class="block-h">수정 이력</div>
             <div id="iHist"></div>
           </div>
+          <div class="roinfo" style="border-color:#f3c9c4;background:#fdf3f2;color:#a23c33"><b>성분 삭제는 슈퍼어드민·약사 어드민웹·POS AI mate에 공통 반영</b>됩니다. 일시적으로 추천에서 제외하려면 삭제가 아니라 <b>노출 OFF</b>를 사용해 주세요.</div>
         </div>
-        <div class="dpage-bottom"><button class="btn" onclick="closeIngredient()">취소</button><button class="btn primary" onclick="askSaveIngredient()">저장</button></div>
+        <div class="dpage-bottom"><button class="btn danger" onclick="askDeleteIngredient()">성분 삭제</button><span style="flex:1"></span><button class="btn" onclick="closeIngredient()">취소</button><button class="btn primary" onclick="askSaveIngredient()">저장</button></div>
       </div>
     </div>
   </div>
@@ -334,6 +336,32 @@
       <div style="font-size:13px;line-height:1.7">삭제 시 이 부족 영양소의 <b>굿팜 추천 상품, 관련 카테고리, 추천 효능군, 관련 약물 매칭 정보</b>가 함께 삭제 또는 미노출 처리됩니다. <b>삭제 후 복구가 어려울 수 있습니다.</b></div>
     </div>
     <div class="m-foot"><button class="btn" onclick="closeDelConfirm()">취소</button><button class="btn danger" onclick="performDelete()">삭제</button></div>
+  </div>
+</div>
+<!-- 성분 삭제 확인 모달 (soft delete) -->
+<div class="modal-bg" id="ingDelConfirm" onclick="if(event.target===this)closeIngDelConfirm()" style="z-index:79">
+  <div class="modal" style="max-width:460px">
+    <div class="m-head"><div><div class="dt">성분값을 삭제하시겠습니까?</div></div><button class="x" onclick="closeIngDelConfirm()">✕</button></div>
+    <div class="m-body">
+      <div style="font-size:13px;line-height:1.7">삭제 시 이 성분은 <b>슈퍼어드민, 약사 어드민웹, POS AI mate</b>에서 모두 노출되지 않습니다. 해당 성분과 연결된 <b>부족 영양소, 부족해지는 이유, 근거/참고문헌</b> 정보도 함께 미노출됩니다.</div>
+      <div class="block-h" style="margin:16px 0 8px">영향 범위</div>
+      <div class="kvs">
+        <div class="kv"><div class="k">연결 부족 영양소 수</div><div class="v" id="idNut">-</div></div>
+        <div class="kv"><div class="k">관련 추천 노출 대상</div><div class="v" id="idExp">-</div></div>
+      </div>
+      <div class="block-h" style="margin:16px 0 8px">삭제 사유</div>
+      <textarea class="fw" id="idReason" placeholder="삭제 사유를 입력하세요 (이력에 기록됩니다)"></textarea>
+      <div class="roinfo" style="border-color:#f3c9c4;background:#fdf3f2;color:#a23c33;margin-top:12px">원천 데이터와 삭제 이력은 DB에 보존되며(soft delete), 화면에서만 미노출 처리됩니다. 일시 제외는 <b>노출 OFF</b>를 사용하세요.</div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeIngDelConfirm()">취소</button><button class="btn danger" onclick="performDeleteIngredient()">삭제</button></div>
+  </div>
+</div>
+<!-- 성분 삭제 이력 모달 -->
+<div class="modal-bg" id="ingDelHistModal" onclick="if(event.target===this)closeIngDelHist()" style="z-index:79">
+  <div class="modal" style="max-width:720px">
+    <div class="m-head"><div><div class="dt">성분 삭제 이력</div><div class="ds">soft delete — 원천 데이터는 보존되고 화면에서만 미노출됩니다.</div></div><button class="x" onclick="closeIngDelHist()">✕</button></div>
+    <div class="m-body"><div id="ingDelHistBody"></div></div>
+    <div class="m-foot"><button class="btn primary" onclick="closeIngDelHist()">확인</button></div>
   </div>
 </div>
 <!-- DIND 단건 추가 모달 (성분 × 부족 영양소 매칭 수동 등록) -->
@@ -495,7 +523,7 @@ function srcBadge(s){ return s==='store'?'<span class="stt ok">약국 설정</sp
 
 function renderMaster(){
   document.getElementById('masterBody').innerHTML = master.map(function(m,idx){
-    var ndrug=(m.drugs&&m.drugs.length)||0;
+    var ndrug=activeDrugCount(m);
     return '<tr class="click" onclick="openMaster('+idx+')">'+
       '<td class="nut">'+m.nut+'</td>'+
       '<td>'+(m.cat||'-')+'</td>'+
@@ -508,7 +536,8 @@ function renderMaster(){
 // 관련 약물 목록 — 조회 전용. 성분명 클릭 시 「AI mate 성분 관리」로 이동해 성분명·제형·이유·근거를 수정.
 function renderRelDrugs(drugs){
   var c=document.getElementById('mRelDrugs');
-  if(!drugs || !drugs.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
+  drugs=(drugs||[]).filter(function(d){return !isDeletedCode(d.code);});   // 삭제된 성분은 미노출
+  if(!drugs.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
   c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
     '<th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거/참고문헌</th></tr></thead><tbody>'+
     drugs.map(function(d){
@@ -529,7 +558,7 @@ function openMaster(idx){
   curDefs = (m.defs||[]).map(function(x){return {nm:x.nm,bc:x.bc}});
   renderDefProds();
   document.getElementById('fDefSearch').value=''; document.getElementById('fDefRes').style.display='none';
-  var ndrug=(m.drugs&&m.drugs.length)||0;
+  var ndrug=activeDrugCount(m);
   document.getElementById('mmTitle').textContent = idx<0 ? '부족 영양소 추천 등록' : (m.nut || '(영양소 미지정)');
   document.getElementById('mmSub').textContent = idx<0 ? '부족 영양소별 추천 상품을 등록합니다.' : ('관련 약물 '+ndrug+'개');
   document.getElementById('fNut').value = m.nut||'';
@@ -648,6 +677,15 @@ var ingHist = {
   ]
 };
 function ingStt(s){ return s==='사용'?'<span class="stt ok">사용</span>':s==='검토'?'<span class="stt need">검토</span>':'<span class="stt hide">제외</span>'; }
+// 성분 삭제 이력 (soft delete) — 원천 데이터는 보존, 화면에서만 미노출
+// 필드 대응: is_deleted / deleted_at / deleted_by / delete_reason
+var ingDelHist = [
+  {at:"2026-07-10 14:20", by:"관리자 박OO", reason:"타 성분코드와 중복 등록되어 정리", code:"N02BE01", comp:"아세트아미노펜", nlink:0}
+];
+// 삭제된 성분코드 여부 (전 화면 미노출 판단용)
+function isDeletedCode(code){ var g=ingredients.find(function(x){return x.code===code;}); return !!(g&&g.deleted); }
+// 삭제되지 않은 관련 약물(성분) 수 — 노출 대상 카운트
+function activeDrugCount(m){ return (m.drugs||[]).filter(function(d){return !isDeletedCode(d.code);}).length; }
 // 성분코드 → 연결된 부족 영양소(master의 drugs에서 code 매칭)
 function ingredientLinks(code){
   var out=[];
@@ -673,6 +711,7 @@ function showPage(p){
 function renderIngredients(){
   var q=(document.getElementById('iSearch').value||'').trim().toLowerCase();
   var list=ingredients.filter(function(g){
+    if(g.deleted) return false;   // soft delete → 목록 미노출
     if(q && g.code.toLowerCase().indexOf(q)<0 && g.comp.toLowerCase().indexOf(q)<0) return false;
     return true;
   });
@@ -799,6 +838,51 @@ function applyIngredient(){
     hist.forEach(function(h){ ingHist[curIng.code].unshift({at:'2026-07-14 10:00', by:'관리자 김OO', field:h.field, before:h.before, after:h.after}); }); }
   closeIConfirm(); closeIngredient(); renderIngredients();
   toast(hist.length ? '성분 정보를 저장했습니다. (성분명은 전 화면 공통 · 이유/근거·연결은 조합별 반영)' : '변경 사항이 없습니다.');
+}
+
+/* ===== 성분 삭제 (soft delete) — 전 서비스 미노출 ===== */
+function askDeleteIngredient(){
+  if(!curIng) return;
+  var links=ingredientLinks(curIng.code);
+  var expo=links.filter(function(l){return l.on;}).length;   // 노출 ON인 부족 영양소(추천 노출 대상)
+  document.getElementById('idNut').innerHTML='<b>'+links.length+'</b>개';
+  document.getElementById('idExp').innerHTML='<b>'+expo+'</b>건 <span style="color:var(--muted);font-size:11px">(노출 ON 부족 영양소)</span>';
+  document.getElementById('idReason').value='';
+  document.getElementById('ingDelConfirm').classList.add('open');
+}
+function closeIngDelConfirm(){ document.getElementById('ingDelConfirm').classList.remove('open'); }
+function performDeleteIngredient(){
+  if(!curIng) return;
+  var reason=(document.getElementById('idReason').value||'').trim();
+  if(!reason){ toast('삭제 사유를 입력해 주세요.'); return; }
+  var nlink=ingredientLinks(curIng.code).length;
+  // soft delete — 원천 보존, is_deleted 플래그만 설정
+  curIng.deleted=true;
+  curIng.delAt='2026-07-15 10:30';
+  curIng.delBy='관리자 김OO';
+  curIng.delReason=reason;
+  // 삭제 이력 적재
+  ingDelHist.unshift({at:curIng.delAt, by:curIng.delBy, reason:reason, code:curIng.code, comp:curIng.comp, nlink:nlink});
+  closeIngDelConfirm(); closeIngredient();
+  renderMaster(); renderIngredients();
+  toast('성분을 삭제했습니다. (전 서비스 미노출 · 이력 보존)');
+}
+/* ===== 성분 삭제 이력 뷰어 ===== */
+function openIngDelHist(){ renderIngDelHist(); document.getElementById('ingDelHistModal').classList.add('open'); }
+function closeIngDelHist(){ document.getElementById('ingDelHistModal').classList.remove('open'); }
+function renderIngDelHist(){
+  var c=document.getElementById('ingDelHistBody');
+  if(!ingDelHist.length){ c.innerHTML='<div class="readbox">삭제 이력이 없습니다.</div>'; return; }
+  c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
+    '<th>삭제일시</th><th>성분코드</th><th>성분명</th><th class="num">연결 부족 영양소 수</th><th>삭제 사유</th><th>삭제자</th></tr></thead><tbody>'+
+    ingDelHist.map(function(x){
+      return '<tr><td style="white-space:nowrap">'+x.at+'</td>'+
+        '<td class="mono" style="white-space:nowrap;color:#8a9099">'+x.code+'</td>'+
+        '<td style="white-space:nowrap">'+x.comp+'</td>'+
+        '<td class="num">'+x.nlink+'</td>'+
+        '<td style="min-width:180px">'+(x.reason||'-')+'</td>'+
+        '<td style="white-space:nowrap">'+x.by+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
 }
 
 /* ===== DIND 단건 추가 (성분 × 부족 영양소 매칭 수동 등록) ===== */
