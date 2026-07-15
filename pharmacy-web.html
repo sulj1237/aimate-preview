@@ -451,8 +451,10 @@ function renderProds(){
     : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 서버 마스터 상품에서 검색해 추가하세요.')+'</div>';
   c.innerHTML =
     '<div class="pg-h store" style="margin-top:2px">우리약국 추천 상품 <span class="pg-cnt">'+store.length+' / '+MAX_PRODS+'</span></div>'+storeHtml+
-    '<div class="pg-h" style="margin-top:16px">굿팜 추천 상품 <span class="info" tabindex="0">ⓘ<span class="tip-pop">슈퍼어드민 등록 상품 · 약국 수정 불가</span></span></div>'+gpHtml;
+    '<div class="pg-h" style="margin-top:16px">굿팜 추천 상품</div>'+gpHtml;
   var atMax=store.length>=MAX_PRODS;
+  // 최대(3개) 도달 또는 노출 중지 시 '추가' 버튼 숨김
+  var aw=document.getElementById('addProdWrap'); if(aw) aw.style.display = (off||atMax) ? 'none' : '';
   document.getElementById('mHint').innerHTML = off
     ? '<b style="color:var(--amber)">노출 중지 상태 — 조회만 가능합니다. (설정값은 유지)</b>'
     : (atMax ? '<b style="color:var(--amber)">우리약국 추천 상품 최대 '+MAX_PRODS+'개에 도달했습니다.</b>'
