@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI mate 영양소 상담 추천 — 정책서 (v2)</title>
+<style>
+  :root{--mint:#16A59F;--mint-d:#0F8787;--mint-bg:#E7FBFA;--ink:#212529;--g9:#5E646C;--g7:#868E96;--g5:#ADB5BD;--g3:#DDE1E6;--g2:#E9ECEF;--g1:#F1F3F5;--g0:#F7F9FA;--red:#C72332;--red-bg:#FFECEE;--amber:#9A6B00;--amber-bg:#FFF9E7}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;color:var(--ink);background:var(--g0);line-height:1.65;font-size:14px;letter-spacing:-.003em}
+  .wrap{max-width:920px;margin:0 auto;padding:40px 24px 80px}
+  .doc{background:#fff;border:1px solid var(--g2);border-radius:14px;padding:34px 40px 44px;box-shadow:0 1px 3px rgba(31,33,42,.05)}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+  .v2{display:inline-block;font-size:12px;font-weight:800;color:#fff;background:var(--mint);border-radius:6px;padding:2px 9px;vertical-align:6px;margin-left:8px}
+  .sub{color:var(--g7);font-size:13px;margin:0 0 20px}
+  h2{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:34px 0 12px;padding-top:20px;border-top:1px solid var(--g1)}
+  h3{font-size:15px;font-weight:800;margin:20px 0 8px;color:#2b3138}
+  p{margin:8px 0}
+  ul{margin:8px 0 8px 2px;padding-left:20px}
+  li{margin:4px 0}
+  b,strong{font-weight:800}
+  code{background:var(--g1);border-radius:5px;padding:1px 6px;font-size:12.5px;font-family:ui-monospace,Menlo,monospace;color:#2b3138}
+  table{width:100%;border-collapse:collapse;font-size:12.8px;margin:12px 0;display:block;overflow-x:auto}
+  thead th{background:var(--g0);color:var(--g9);font-weight:700;text-align:left;padding:9px 12px;border-bottom:1.5px solid var(--g2);white-space:nowrap}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--g1);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  .lead{font-size:15px;color:#2b3138;background:var(--mint-bg);border:1px solid #C7F0EC;border-radius:10px;padding:14px 16px;margin:0 0 18px;line-height:1.7}
+  .meta{border:1px solid var(--g2);border-radius:10px;overflow:hidden;margin:0 0 18px}
+  .meta .row{display:grid;grid-template-columns:130px 1fr;font-size:12.5px;border-bottom:1px solid var(--g1)}
+  .meta .row:last-child{border:none}
+  .meta .k{background:var(--g0);color:var(--g7);font-weight:700;padding:8px 12px}
+  .meta .val{padding:8px 12px}
+  .note{border:1px solid var(--g2);background:var(--g0);border-radius:9px;padding:11px 14px;margin:12px 0;font-size:13px}
+  .note.legal{background:var(--red-bg);border-color:#FFD0D6;color:#8f2a34}
+  .note.open{background:var(--amber-bg);border-color:#F3E4B0;color:#7a5a12}
+  .note .tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:5px;padding:1px 7px;margin-right:7px;vertical-align:1px}
+  .note.open .tag{background:#F0D98A;color:#6b4e0a}
+  .note.legal .tag{background:#f6c3c9;color:#8f2a34}
+  .tbu{color:var(--red);font-weight:800}
+  .steps{counter-reset:s;margin:12px 0;padding:0;list-style:none}
+  .steps li{counter-increment:s;position:relative;padding:6px 0 6px 34px;font-size:13.5px}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:22px;height:22px;border-radius:50%;background:var(--mint);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+  blockquote{margin:12px 0;padding:10px 14px;border-left:3px solid var(--mint);background:var(--g0);border-radius:0 8px 8px 0;color:#3a424c;font-size:13.5px}
+  .foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--g1);color:var(--g7);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .back{display:inline-block;margin-bottom:16px;font-size:13px;color:var(--mint-d);text-decoration:none;font-weight:700}
+  .back:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./index.html">‹ 프로토타입 프리뷰로</a>
+  <div class="doc">
+    <h1>AI mate 영양소 상담 추천 — 정책서<span class="v2">v2</span></h1>
+    <p class="sub">부족 영양소 기준 전환 · 2026-07-15 기준 · <b>참고용 렌더</b>(원본: planning-portal <code>policy.mdx</code>)</p>
+
+    <div class="lead">AI mate 영양소 상담 추천 MVP의 <b>데이터 매칭·관리 기준·노출/OFF·DIND 원천 vs 운영 수정·영양소 정규화·복합제·결측·삭제</b> 정책을 정의한다(정책 v2 — <b>부족 영양소 기준 전환</b>). 추천 표현은 치료/예방이 아닌 <b>"상담 참고" 중심</b>이다.</div>
+
+    <div class="meta">
+      <div class="row"><div class="k">상태</div><div class="val">진행 중 (v2 갱신)</div></div>
+      <div class="row"><div class="k">플랫폼</div><div class="val">GPC(POS·AI mate) · WEB(약사웹·슈퍼어드민) — 내부 전용</div></div>
+      <div class="row"><div class="k">법무</div><div class="val">검토 필요 — 추천 표현(상담 참고) 리스크 검수</div></div>
+    </div>
+
+    <div class="note legal"><span class="tag">표현 정책</span>추천/문구는 <b>치료·예방·효능 단정 표현을 쓰지 않고 "상담 참고" 중심</b>으로 작성한다. 근거·표현 리스크가 있는 항목은 <b>노출 OFF</b>로 분리하여 AI mate에 노출하지 않는다.</div>
+    <div class="note open"><span class="tag">v2 배경 · 전제(A-1)</span>처방약 ↔ 성분코드 매핑 이슈는 <b>우선 제외</b>. POS/DB에서 처방약 수신 시 <b>성분코드도 함께 받는 것</b>으로 전제하고, 이번 범위는 <b>성분코드 이후의 DIND 매칭·관리·노출</b>로 한정한다.</div>
+
+    <h2>1. 데이터 모델 · 관리 기준</h2>
+    <p>관리·편집 기준(grain)을 3층으로 분리한다. 성분↔영양소가 M:N이므로, 각 정보가 어느 축에 종속되는지에 따라 편집 위치가 갈린다.</p>
+    <table><thead><tr><th>정보</th><th>관리 기준</th><th>편집 화면</th></tr></thead><tbody>
+      <tr><td>추천 상품 · 관련 카테고리 · 추천 효능군 · 노출 상태</td><td><b>부족 영양소</b></td><td>슈퍼어드민 <code>AI mate 추천 관리</code></td></tr>
+      <tr><td>성분명 · 제형</td><td><b>성분코드</b>(공통값)</td><td>슈퍼어드민 <code>AI mate 성분 관리</code></td></tr>
+      <tr><td>부족해지는 이유 · 근거/참고문헌</td><td><b>성분코드 × 부족 영양소</b>(교차)</td><td>성분 관리 → 연결 부족 영양소 목록</td></tr>
+    </tbody></table>
+    <ul><li><b>성분명</b>은 성분코드 기준 공통값 → 한 번 수정하면 연결된 모든 부족 영양소·AI mate에 공통 반영.</li>
+    <li><b>이유·근거</b>는 (성분코드 × 부족 영양소) 조합 고유값 → 조합별 독립(같은 성분이어도 영양소 다르면 내용 다름).</li></ul>
+
+    <h2>2. 성분코드 병합 정책 (함량/제형 차이 유지)</h2>
+    <ul>
+      <li>성분코드 <b>앞자리만으로 단순 병합하지 않는다.</b></li>
+      <li>DIND 성분코드는 <b>성분 + 함량 + 제형</b>에 따라 세분화되며, 함량/제형에 따라 <b>부족 영양소·이유·근거가 달라질 수 있다.</b></li>
+      <li>따라서 <b>상세 성분코드의 함량/제형 차이를 무시하고 근거를 병합하지 않는다.</b></li>
+      <li>"같은 성분" 범위(함량 포함 여부)는 <span class="tbu">정책 확정 필요</span>.</li>
+    </ul>
+    <h3>POS 조회 흐름</h3>
+    <ol class="steps">
+      <li>처방약 성분코드 수신 (POS/DB에서 함께 전달 — 전제)</li>
+      <li>DIND 상세 성분코드 매칭</li>
+      <li>상세 성분코드 → 부족 영양소 조회</li>
+      <li>부족 영양소 기준 추천 상품 조회(굿팜/우리약국)</li>
+      <li>(상세 성분코드 × 부족 영양소) 기준 부족해지는 이유·근거 문구 조회</li>
+    </ol>
+    <blockquote><b>핵심</b>: 추천 상품은 <b>부족 영양소</b>에 붙인다. 단, <b>이유·참고문헌은 상세 성분코드 기준으로 유지</b>하고 함량/제형 차이를 무시해 병합하지 않는다.</blockquote>
+
+    <h2>3. DIND 원천 vs 운영 수정(override) · 재업로드</h2>
+    <div class="note open"><span class="tag">상세 정책 필요 (4·5번)</span>override 저장 구조·재업로드 충돌 처리 상세 설계 필요. <b>현재 슈퍼어드민에는 DIND 신규 추가·일괄 업로드 기능이 없음</b> → 재업로드 UX는 이 기능 부활 여부와 함께 확정.</div>
+    <h3>기본 원칙</h3>
+    <ul><li><b>DIND 원천값은 보존</b>한다.</li><li><b>운영자 수정값은 override로 별도 저장</b>한다.</li><li>노출 시 <b>override 있으면 우선</b>, 없으면 DIND 원천값 사용.</li></ul>
+    <h3>수동 수정 가능 항목</h3>
+    <p>부족해지는 이유 · 근거/참고문헌 · 관련 카테고리 · 추천 효능군 · 굿팜 추천 상품 · 노출 상태.</p>
+    <h3>재업로드 시 처리</h3>
+    <ul><li>재업로드해도 <b>override는 자동 삭제하지 않는다.</b></li><li>원천이 바뀌면 <b><code>원천 변경 있음</code></b> 상태 표시 → 운영자가 override 유지/해제 판단.</li></ul>
+    <table><thead><tr><th>상태</th><th>의미</th></tr></thead><tbody>
+      <tr><td>원천값 사용</td><td>override 없음 — DIND 원천 그대로</td></tr>
+      <tr><td>운영 수정값 사용</td><td>override 우선 노출(<code>운영 수정 적용 중</code> 배지)</td></tr>
+      <tr><td>원천 변경 있음</td><td>override 있는 항목에서 DIND 원천이 바뀜 — 판단 대기</td></tr>
+      <tr><td>검토 필요</td><td>결측·표현/근거 리스크 등 노출 전 검수 대상</td></tr>
+    </tbody></table>
+
+    <h2>4. 영양소명 정규화</h2>
+    <p>DIND 표기값을 그대로 쓰지 않고 <b>굿팜 표준 영양소명</b>으로 정규화한다. (DIND에 <code>Vit-B12</code>/<code>비타민 B12</code>/<code>cobalamin</code> 등 혼재 → 같은 영양소가 분리되면 관리가 꼬임)</p>
+    <p>매핑: <code>DIND 표기값 → 굿팜 표준 영양소명 → 부족 영양소 Master</code></p>
+    <table><thead><tr><th>DIND 표기(예)</th><th>굿팜 표준 영양소명</th></tr></thead><tbody>
+      <tr><td>Vit-B12 / cobalamin</td><td>비타민 B12</td></tr><tr><td>Ca</td><td>칼슘</td></tr><tr><td>Mg</td><td>마그네슘</td></tr><tr><td>CoQ10</td><td>코엔자임Q10</td></tr>
+    </tbody></table>
+    <ul><li>운영 화면에는 <b>표준 영양소명만</b> 노출, DIND 원문은 상세/관리 참고값으로만 제공.</li></ul>
+
+    <h2>5. 추천 상품 연결 (수동 큐레이션)</h2>
+    <ul>
+      <li><b>굿팜 추천 상품</b>: 슈퍼어드민 부족 영양소별 <b>최대 2개</b>.</li>
+      <li><b>우리약국 추천 상품</b>: 약사웹 부족 영양소별 <b>최대 3개</b>.</li>
+      <li>관련 카테고리·추천 효능군은 MVP에서 <b>자동 매칭 Key 아님</b> — 표시/운영 참고값.</li>
+      <li>후순위: 고도화 시 카테고리/효능군 기반 <b>상품 후보 자동 추천</b> 검토.</li>
+    </ul>
+
+    <h2>6. 복합제 처리</h2>
+    <ul>
+      <li>복합제는 <b>성분별로 분해</b>해 매칭하고(예: 세비카정 → 성분 A/B), 각 성분의 부족 영양소를 <b>합산</b>한다.</li>
+      <li>동일 영양소가 여러 성분에서 중복되면 <b>POS에서 1회만 노출</b>, 단 근거에는 <b>관련 성분을 함께 표시</b>한다.</li>
+      <li>UI: 하나의 영양소 블록 + 내부 <b><code>관련 성분</code></b>.</li>
+    </ul>
+    <blockquote>예 — 부족 영양소: 마그네슘 / 관련 성분: 성분 A, 성분 B / 근거: · 성분 A 기준 · 성분 B 기준</blockquote>
+
+    <h2>7. 결측 데이터 노출</h2>
+    <table><thead><tr><th>부족해지는 이유</th><th>근거/참고문헌</th><th>추천 상품</th><th>POS 노출</th></tr></thead><tbody>
+      <tr><td>있음</td><td>있음</td><td>있음</td><td><b>노출</b></td></tr>
+      <tr><td>있음</td><td>없음</td><td>있음</td><td><b>노출</b>(이유 노출, 참고문헌 ⓘ만 미노출)</td></tr>
+      <tr><td>없음</td><td>—</td><td>있음</td><td><b>검토 필요</b> · POS 기본 노출 제외</td></tr>
+      <tr><td>—</td><td>—</td><td>없음</td><td><b>노출 안 함</b>(추천 영역 자체 미노출)</td></tr>
+    </tbody></table>
+    <ul><li>관리 화면에 <code>근거 미등록</code> · <code>이유 미등록</code> · <code>검토 필요</code> 상태 표시.</li></ul>
+
+    <h2>8. 삭제 정책 재정리</h2>
+    <div class="note open"><span class="tag">정책 확정 필요</span>삭제 액션 제공 여부·조건은 논의 필요. 아래는 현재 제안(프로토타입 반영).</div>
+    <ul>
+      <li>부족 영양소 Master 삭제는 <b>기본 액션으로 제공하지 않는다.</b> 운영 제외는 <b><code>AI mate 노출 OFF</code></b>.</li>
+      <li><b>삭제 가능(모두 충족 시)</b>: 노출 <b>OFF</b> · 약국 설정 상품 <b>0건</b> · 우리약국 추천 상품 <b>0건</b>.</li>
+      <li><b>삭제 불가</b>: 노출 ON · 약국 설정 1건 이상 · 운영 중 → 삭제 버튼 <b>비활성화 + 사유 툴팁</b>.</li>
+      <li>권장: MVP에서 <b>강제 삭제 없음</b>, 삭제보다 <b>OFF를 기본</b>으로.</li>
+    </ul>
+    <h3>약국 설정 수 (참고 정보) — <span class="tbu">논의 필요</span></h3>
+    <div class="note open"><span class="tag">논의 필요</span>삭제 기능 제거 기준에서는 <b>약국 설정 수를 삭제 판단용 필수값으로 쓰지 않는다.</b> 다만 <b>운영 현황 파악을 위해 상세 화면에 참고 정보로 표시</b>한다.</div>
+    <ul><li>표시 예: <code>우리약국 추천 상품을 등록한 약국 수: N곳</code></li><li>삭제 게이트가 아니라 <b>운영 참고 지표</b>로만 사용.</li></ul>
+
+    <h2>9. 약사웹 OFF 상태 정책</h2>
+    <p>슈퍼어드민에서 OFF로 변경해도 약사웹에서 <b>완전히 숨기지 않는다.</b></p>
+    <table><thead><tr><th>구분</th><th>처리</th></tr></thead><tbody>
+      <tr><td>POS AI mate</td><td><b>미노출</b></td></tr>
+      <tr><td>약사웹 목록</td><td><b><code>AI mate 노출 중지</code></b> 상태로 표시(숨기지 않음)</td></tr>
+      <tr><td>약사웹 상세</td><td>기존 우리약국 추천 상품 <b>조회 가능</b></td></tr>
+      <tr><td>신규 등록/수정/삭제</td><td><b>제한</b>(버튼 비활성화 + 툴팁)</td></tr>
+      <tr><td>기존 설정값</td><td><b>보존</b> · 다시 ON 시 <b>재노출</b></td></tr>
+    </tbody></table>
+    <blockquote><b>핵심</b>: OFF는 데이터 삭제가 아니라 <b>POS 추천 노출 중지 상태</b>. 약사가 "설정이 사라졌다" 오해하지 않도록 노출 중지 상태로 보여준다.</blockquote>
+
+    <h2>10. 화면별 반영 (현재 프로토타입)</h2>
+    <ul>
+      <li><b>슈퍼어드민 · AI mate 추천 관리</b>(부족 영양소): 목록(카테고리·관련 약물 수·노출·수정일) → 상세 <b>페이지</b>(노출 토글 상단·카테고리·굿팜 상품 최대 2·관련 약물·수정 이력, 저장/삭제 우측 하단).</li>
+      <li><b>슈퍼어드민 · AI mate 성분 관리</b>(성분코드): 목록(성분코드·성분명·부족 영양소 개수) → 상세 <b>페이지</b>(성분명 공통값 수정·연결 부족 영양소별 이유/근거 수정·연결 추가/삭제).</li>
+      <li><b>약사웹</b>(GP 디자인): 부족 영양소별 우리약국 상품 설정, 상세 페이지, ON/OFF 정책, 바코드→제조사.</li>
+      <li><b>POS(시안 D)</b>: 좌(근거)/우(우리약국·굿팜 2열), 상품 있는 영양소만 노출, 10개+더보기, 우리약국 3개 우선순위.</li>
+    </ul>
+
+    <h2>최종 방향 (요약)</h2>
+    <table><thead><tr><th>#</th><th>원칙</th><th>미확정</th></tr></thead><tbody>
+      <tr><td>1</td><td>상세 성분코드의 <b>함량/제형 차이 무시하지 않음</b></td><td><span class="tbu">"같은 성분" 범위(함량)</span></td></tr>
+      <tr><td>2</td><td>추천 상품 = <b>부족 영양소 기준</b></td><td>—</td></tr>
+      <tr><td>3</td><td>이유/근거 = <b>성분코드 × 부족 영양소</b></td><td>—</td></tr>
+      <tr><td>4</td><td><b>DIND 원천 vs 운영 override 분리</b></td><td><span class="tbu">override 저장 구조</span></td></tr>
+      <tr><td>5</td><td>재업로드 시 <b>override 보존 + 충돌 표시</b></td><td><span class="tbu">재업로드 UX(업로드 기능 없음)</span></td></tr>
+      <tr><td>6</td><td>영양소명 <b>굿팜 표준 정규화</b></td><td>표준 사전 구축</td></tr>
+      <tr><td>7</td><td>복합제 <b>분해 → 합산 → 중복 제거</b></td><td>—</td></tr>
+      <tr><td>8</td><td><b>삭제보다 OFF 기본</b></td><td><span class="tbu">삭제 액션 제공 여부</span></td></tr>
+    </tbody></table>
+
+    <div class="foot"><span>AI mate 영양소 상담 추천 · 정책 v2</span><span>최종 갱신 2026-07-15</span></div>
+  </div>
+</div>
+</body>
+</html>
