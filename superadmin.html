@@ -147,8 +147,11 @@
       <div class="sub">
         <a>마스터 상품 관리</a>
         <a>약국 등록 상품 관리</a>
-        <a id="navReco" class="on" onclick="showPage('reco')">AI mate 추천 관리</a>
-        <a id="navIngr" onclick="showPage('ingr')">AI mate 성분 관리</a>
+      </div>
+      <a class="grp">AI Mate 추천 상품 관리 <span class="cv">▴</span></a>
+      <div class="sub">
+        <a id="navReco" class="on" onclick="showPage('reco')">추천 상품 관리</a>
+        <a id="navIngr" onclick="showPage('ingr')">성분 관리</a>
       </div>
       <a class="grp">모바일 약국 관리 <span class="cv">▾</span></a>
       <a class="grp">포인트/쿠폰 관리 <span class="cv">▾</span></a>
@@ -162,7 +165,7 @@
 
   <!-- 메인 -->
   <div class="main">
-    <div class="top"><div class="pg" id="pgTitle">AI mate 추천 관리</div></div>
+    <div class="top"><div class="pg" id="pgTitle">추천 상품 관리</div></div>
     <div class="filterbar" id="pgFilter">부족 영양소 기준 추천 상품 관리</div>
     <div class="wrap">
       <div id="pageReco">
@@ -686,7 +689,7 @@ function showPage(p){
   document.getElementById('pageIngr').classList.toggle('hidden', reco);
   document.getElementById('navReco').classList.toggle('on', reco);
   document.getElementById('navIngr').classList.toggle('on', !reco);
-  document.getElementById('pgTitle').textContent = reco ? 'AI mate 추천 관리' : 'AI mate 성분 관리';
+  document.getElementById('pgTitle').textContent = reco ? '추천 상품 관리' : '성분 관리';
   document.getElementById('pgFilter').textContent = reco
     ? '부족 영양소 기준 추천 상품 관리'
     : '성분코드 기준 성분 정보 관리';
