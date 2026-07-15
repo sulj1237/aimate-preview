@@ -109,7 +109,7 @@
   .celltx:focus{border-color:var(--teal)}
   .edch{font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:5px;padding:1px 6px;margin-left:5px}
   /* 추천 관리 상세 = 페이지(흰 카드) · 액션 버튼은 우측 하단 */
-  #recoDetail{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px 22px}
+  #recoDetail,#ingrDetail{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px 22px}
   .dpage-head{display:flex;align-items:center;gap:14px;padding-bottom:15px;border-bottom:1px solid var(--line);margin-bottom:18px}
   .dpage-head .dt{font-size:18px;font-weight:800}
   .dpage-head .ds{font-size:12px;color:var(--muted);margin-top:2px}
@@ -221,7 +221,7 @@
         </div>
         <div class="tbl"><table>
           <thead><tr>
-            <th>성분코드</th><th>성분명</th><th class="num">연결 부족 영양소 수</th><th>최종 수정일</th>
+            <th>성분코드</th><th>성분명</th><th class="num">부족 영양소 개수</th><th>최종 수정일</th>
           </tr></thead>
           <tbody id="ingrBody"></tbody>
         </table></div>
@@ -273,41 +273,39 @@
         </div>
         <div class="dpage-bottom" id="mmFoot"></div>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- 성분 정보 상세 모달 (AI mate 성분 관리) -->
-<div class="modal-bg" id="iModal" onclick="if(event.target===this)closeIngredient()">
-  <div class="modal">
-    <div class="m-head">
-      <div><div class="dt" id="imTitle">성분 정보 상세</div><div class="ds" id="imSub">—</div></div>
-      <button class="x" onclick="closeIngredient()">✕</button>
-    </div>
-    <div class="m-body">
-      <div class="block">
-        <div class="block-h">기본 정보</div>
-        <div class="kvs">
-          <div class="kv"><div class="k">성분코드</div><div class="v"><input class="fw" id="fICode" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
-          <div class="kv"><div class="k">성분명 *</div><div class="v"><input class="fw" id="fIComp" placeholder="성분명"></div></div>
-          <div class="kv"><div class="k">연결 부족 영양소 수</div><div class="v"><input class="fw" id="fILink" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+      <!-- 성분 정보 상세 (페이지 형식) -->
+      <div id="ingrDetail" class="hidden">
+        <div class="dpage-head">
+          <button class="btn" onclick="closeIngredient()">← 목록</button>
+          <div style="flex:1;min-width:0"><div class="dt" id="imTitle">성분 정보 상세</div><div class="ds" id="imSub">—</div></div>
         </div>
-        <div class="roinfo"><b>성분명</b>은 전 화면 공통값(수정 시 공통 반영) · <b>이유·근거</b>는 부족 영양소별로 독립입니다.</div>
-      </div>
-      <div class="block">
-        <div class="block-h">부족 영양소</div>
-        <div id="iLinks"></div>
-        <div id="iLinkAdd" style="margin-top:8px">
-          <input class="fw" id="fLinkSearch" placeholder="부족 영양소명으로 검색해 연결 추가" oninput="searchLink()" autocomplete="off">
-          <div id="fLinkRes" style="display:none;border:1px solid #e3e6ea;border-radius:8px;margin-top:4px;max-height:160px;overflow:auto;background:#fff"></div>
+        <div class="dpage-body">
+          <div class="block">
+            <div class="block-h">기본 정보</div>
+            <div class="kvs">
+              <div class="kv"><div class="k">성분코드</div><div class="v"><input class="fw" id="fICode" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+              <div class="kv"><div class="k">성분명 *</div><div class="v"><input class="fw" id="fIComp" placeholder="성분명"></div></div>
+              <div class="kv"><div class="k">부족 영양소 개수</div><div class="v"><input class="fw" id="fILink" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+            </div>
+            <div class="roinfo"><b>성분명</b>은 전 화면 공통값(수정 시 공통 반영) · <b>이유·근거</b>는 부족 영양소별로 독립입니다.</div>
+          </div>
+          <div class="block">
+            <div class="block-h">부족 영양소</div>
+            <div id="iLinks"></div>
+            <div id="iLinkAdd" style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <select class="sel" id="fLinkNut" style="flex:1"></select>
+              <button class="btn" onclick="addLink()">＋ 부족 영양소 추가</button>
+            </div>
+          </div>
+          <div class="block">
+            <div class="block-h">수정 이력</div>
+            <div id="iHist"></div>
+          </div>
         </div>
-      </div>
-      <div class="block">
-        <div class="block-h">수정 이력</div>
-        <div id="iHist"></div>
+        <div class="dpage-bottom"><button class="btn" onclick="closeIngredient()">취소</button><button class="btn primary" onclick="askSaveIngredient()">저장</button></div>
       </div>
     </div>
-    <div class="m-foot"><button class="btn" onclick="closeIngredient()">취소</button><button class="btn primary" onclick="askSaveIngredient()">저장</button></div>
   </div>
 </div>
 
@@ -627,6 +625,7 @@ function ingredientLinks(code){
 function showPage(p){
   var reco = p!=='ingr';
   document.getElementById('recoDetail').classList.add('hidden');
+  document.getElementById('ingrDetail').classList.add('hidden');
   document.getElementById('pageReco').classList.toggle('hidden', !reco);
   document.getElementById('pageIngr').classList.toggle('hidden', reco);
   document.getElementById('navReco').classList.toggle('on', reco);
@@ -663,9 +662,11 @@ function openIngredient(code){
   document.getElementById('imSub').textContent = g.comp+' · '+g.code;
   document.getElementById('fICode').value=g.code;
   document.getElementById('fIComp').value=g.comp;
-  renderILinks(); renderIngHist(code);
-  document.getElementById('fLinkSearch').value=''; document.getElementById('fLinkRes').style.display='none';
-  document.getElementById('iModal').classList.add('open');
+  renderILinks(); refreshLinkAdd(); renderIngHist(code);
+  document.getElementById('pageReco').classList.add('hidden');
+  document.getElementById('pageIngr').classList.add('hidden');
+  document.getElementById('ingrDetail').classList.remove('hidden');
+  if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
 // 추천 관리 관련 약물 목록의 성분명 클릭 → 성분 관리로 이동 후 성분 상세 열기
 function openIngredientByCode(code){ closeMaster(); showPage('ingr'); openIngredient(code); }
@@ -685,26 +686,23 @@ function renderILinks(){
         '<td class="c"><button class="btn sm danger" onclick="delLink('+i+')">삭제</button></td></tr>';
     }).join('')+'</tbody></table></div>';
 }
-// 연결 추가 — 아직 연결 안 된 부족 영양소만 검색해 추가(개수 많을 때 대비)
-function searchLink(){
-  var q=(document.getElementById('fLinkSearch').value||'').trim().toLowerCase();
-  var box=document.getElementById('fLinkRes');
-  if(!q){ box.style.display='none'; box.innerHTML=''; return; }
-  var avail=master.filter(function(m){ return !curLinks.some(function(l){return l.nid===m.nid;}) && m.nut.toLowerCase().indexOf(q)>-1; });
-  box.style.display='block';
-  if(!avail.length){ box.innerHTML='<div style="padding:9px 11px;color:#9aa4af;font-size:12px">추가할 수 있는 부족 영양소가 없습니다.</div>'; return; }
-  box.innerHTML=avail.slice(0,20).map(function(m){
-    return '<div onclick="addLink(\''+m.nid+'\')" style="padding:9px 11px;cursor:pointer;border-bottom:1px solid #f0f1f4;font-size:12.5px"><b>'+m.nut+'</b> <span style="color:#8a9099;font-size:11px">· '+(m.cat||'-')+'</span></div>';
-  }).join('');
+// 연결 추가 — 아직 연결 안 된 부족 영양소 드롭다운 + 「＋ 부족 영양소 추가」 버튼
+function refreshLinkAdd(){
+  var sel=document.getElementById('fLinkNut');
+  var avail=master.filter(function(m){ return !curLinks.some(function(l){return l.nid===m.nid;}); });
+  sel.innerHTML = avail.length
+    ? avail.map(function(m){return '<option value="'+m.nid+'">'+m.nut+' · '+(m.cat||'-')+'</option>';}).join('')
+    : '<option value="">추가할 수 있는 부족 영양소가 없습니다</option>';
+  document.getElementById('iLinkAdd').style.display = avail.length ? 'flex' : 'none';
 }
-function addLink(nid){
+function addLink(){
+  var nid=document.getElementById('fLinkNut').value; if(!nid) return;
   var m=master.find(function(x){return x.nid===nid;}); if(!m) return;
   if(curLinks.some(function(l){return l.nid===nid;})) return;
   curLinks.push({nid:m.nid, nut:m.nut, cat:m.cat, reason:'', ref:''});
-  document.getElementById('fLinkSearch').value=''; document.getElementById('fLinkRes').style.display='none';
-  renderILinks();
+  renderILinks(); refreshLinkAdd();
 }
-function delLink(i){ curLinks.splice(i,1); renderILinks(); }
+function delLink(i){ curLinks.splice(i,1); renderILinks(); refreshLinkAdd(); }
 function renderIngHist(code){
   var c=document.getElementById('iHist'); var list=ingHist[code]||[];
   if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }
@@ -717,7 +715,10 @@ function renderIngHist(code){
         '<td style="white-space:nowrap">'+x.by+'</td></tr>';
     }).join('')+'</tbody></table></div>';
 }
-function closeIngredient(){ document.getElementById('iModal').classList.remove('open'); }
+function closeIngredient(){
+  document.getElementById('ingrDetail').classList.add('hidden');
+  document.getElementById('pageIngr').classList.remove('hidden');
+}
 function askSaveIngredient(){
   if(!curIng) return;
   var comp=document.getElementById('fIComp').value.trim();
