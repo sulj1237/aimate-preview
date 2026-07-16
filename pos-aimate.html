@@ -464,11 +464,8 @@ function dmRight(r){
 function dmItem(r, hidden){
   var ref = r.ref ? ' <span class="info" tabindex="0">ⓘ<span class="tip-pop">'+r.ref+'</span></span>' : '';   // 참고문헌 없으면 ⓘ 미표기(§7)
   var catb = (r.cat && r.cat!=='-') ? '<span class="catb">'+r.cat+'</span>' : '';                              // 관련 카테고리 없으면 배지 미표기(§7)
-  var basis = r.info ? (r.info+ref) : '<span style="color:#9aa4af">부족해지는 근거 준비 중 · 검토 필요</span>'; // 이유 없으면 POS 노출 제외(아래 필터) — 안전용 폴백
-  var left = '<div class="dm-left">'+
-    '<div class="dm-nut"><b>'+r.nut+'</b>'+catb+'</div>'+
-    '<div class="dm-basis"><span class="dm-bk">부족해지는 근거</span>'+basis+'</div>'+
-  '</div>';
+  var basis = r.info ? '<div class="dm-basis"><span class="dm-bk">부족해지는 근거</span>'+r.info+ref+'</div>' : '';  // 부족 이유 없으면 근거 줄만 생략(필수값 있으면 블록은 노출, §7)
+  var left = '<div class="dm-left"><div class="dm-nut"><b>'+r.nut+'</b>'+catb+'</div>'+basis+'</div>';
   return '<div class="dm-item'+(hidden?' dm-extra more-hidden':'')+'">'+left+dmRight(r)+'</div>';
 }
 // 상위 5개까지 기본 노출, 6개 이상이면 '+ N개 더보기'로 접어둠(DIND 분포 근거: 완제품 82%가 영양소 5개 이하)
@@ -491,7 +488,7 @@ function renderTableD(){
       '<td class="dose">'+d.dose+'</td><td class="warn">'+d.warn+'</td></tr>');
     // 노출 정책: 우리약국 또는 굿팜 추천 상품이 하나라도 있는 부족 영양소만 노출.
     //   둘 다 없으면 그 영양소 블록은 물론 '추천 상품이 없습니다'도 노출하지 않는다(행 자체 생략).
-    var dep=activeDepl(d).filter(function(x){ var m=nutMaster[x.nid]; return m && x.info && (((m.store||[]).length)||((m.gp||[]).length)); });  // 부족 이유 없으면 POS 노출 제외(검토 필요, §7)
+    var dep=activeDepl(d).filter(function(x){ var m=nutMaster[x.nid]; return m && (((m.store||[]).length)||((m.gp||[]).length)); });  // 필수 값(추천 상품)이 있으면 노출. 상품 부재 시에만 블록 미노출(§7 · hide-when-no-products)
     if(dep.length){
       var items=dep.map(function(x,i){ return dmItem(reco(x), i>=DM_MAX); }).join('');
       var extra=dep.length-DM_MAX;
