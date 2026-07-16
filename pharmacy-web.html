@@ -265,17 +265,17 @@
   </div>
 </div>
 
-<!-- 서버 마스터 상품 검색 모달 -->
+<!-- 굿팜 보유 상품 검색 모달 -->
 <div class="modal-bg" id="searchModal">
   <div class="modal sm">
-    <div class="m-head" style="padding-bottom:16px"><div class="dt">상품 검색 <span style="font-size:12px;font-weight:600;color:var(--muted)">서버 마스터 상품 데이터 기준</span></div><button class="x" onclick="closeSearch()">✕</button></div>
+    <div class="m-head" style="padding-bottom:16px"><div class="dt">상품 검색 <span style="font-size:12px;font-weight:600;color:var(--muted)">굿팜 보유 상품 기준</span></div><button class="x" onclick="closeSearch()">✕</button></div>
     <div class="m-body">
       <div class="bar" style="margin:0">
         <select class="sel"><option>바코드</option><option>상품명</option></select>
         <input class="inp search" id="searchInp" placeholder="바코드 또는 상품명 입력" oninput="renderRes()" />
         <button class="btn primary sm">검색</button>
       </div>
-      <div class="hint" style="margin:8px 2px 0">약국 로컬이 아닌 <b>서버 마스터 상품</b>에서 검색합니다.</div>
+      <div class="hint" style="margin:8px 2px 0">약국 로컬(POS) 재고가 아닌 <b>굿팜 보유 상품</b>에서 검색합니다.</div>
       <div class="res" id="searchRes"></div>
     </div>
   </div>
@@ -326,7 +326,7 @@ var rows = [
     prods:[ {nm:"○○ 엽산 400mcg", bc:"8805555000066", kind:"건기식", on:true, def:true} ],
     history:[ {date:"2026-06-14", by:"admin", note:"기본 추천 상품 등록"} ] }
 ];
-// 서버 마스터 상품 데이터(전체 상품 마스터) — 약국 로컬/POS 데이터가 아니라 서버에서 검색·등록.
+// 굿팜 보유 상품(굿팜이 보유한 전체 상품) — 약국 로컬/POS 재고가 아니라 굿팜 보유 상품에서 검색·등록.
 // 표시 기준은 제조사(mfr): 바코드는 약국 매입처마다 다를 수 있어 제조사 표기가 더 정확.
 var DB = [
   {nm:"○○ 비타민B 컴플렉스", bc:"8801111000022", kind:"건기식", mfr:"대웅제약"},
@@ -336,7 +336,7 @@ var DB = [
   {nm:"□□ 락토페린 이뮨", bc:"8807777000088", kind:"건기식", mfr:"일동제약"},
   {nm:"△△ 오메가3 알티지", bc:"8808888000099", kind:"건기식", mfr:"종근당건강"}
 ];
-// 상품 제조사 조회(서버 마스터 기준) — 목록/상세에 바코드 대신 제조사 표기
+// 상품 제조사 조회(굿팜 보유 상품 기준) — 목록/상세에 바코드 대신 제조사 표기
 var MFR_MAP = {
   "8801111000022":"대웅제약", "8809001112223":"종근당건강", "8802222000033":"고려은단",
   "8802222000040":"뉴트리원", "8804444000055":"GNM 자연의품격", "8803333000044":"뉴트리디데이",
@@ -481,7 +481,7 @@ function renderProds(){
           ? '<span title="'+OFFTIP+'"><button class="btn sm danger" disabled>삭제</button></span>'
           : '<button class="btn sm danger" onclick="delP('+gi+')">삭제</button>';
         return '<div class="pitem'+(off?' ro':'')+'">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div>'+del+'</div>'; }).join('')
-    : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 서버 마스터 상품에서 검색해 추가하세요.')+'</div>';
+    : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다.'+(off?'':' 굿팜 보유 상품에서 검색해 추가하세요.')+'</div>';
   var atMax=store.length>=MAX_PRODS;
   // 추가 버튼: OFF → 비활성화+툴팁 / 최대 도달 → 숨김 / 그 외 → 정상. 우리약국 목록 바로 하단에 위치.
   var addHtml = off
@@ -538,7 +538,7 @@ function closeDetail(){
   document.body.style.background='';   // 목록 복귀 시 원래 배경(--g-0)
 }
 
-// 서버 마스터 상품 검색 모달
+// 굿팜 보유 상품 검색 모달
 function storeCount(){ return cur.prods.filter(function(p){return !p.def;}).length; }
 function openSearch(){
   if(storeCount()>=MAX_PRODS){ toast('우리약국 추천 상품은 최대 '+MAX_PRODS+'개까지 추가할 수 있습니다.'); return; }
