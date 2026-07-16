@@ -462,10 +462,12 @@ function dmRight(r){
 }
 // 시안 D 부족영양소 1개 = 좌우 2열. 좌=영양소명[카테고리]·근거(ⓘ), 우=우리약국|굿팜.
 function dmItem(r, hidden){
-  var ref = r.ref ? ' <span class="info" tabindex="0">ⓘ<span class="tip-pop">'+r.ref+'</span></span>' : '';
+  var ref = r.ref ? ' <span class="info" tabindex="0">ⓘ<span class="tip-pop">'+r.ref+'</span></span>' : '';   // 참고문헌 없으면 ⓘ 미표기(§7)
+  var catb = (r.cat && r.cat!=='-') ? '<span class="catb">'+r.cat+'</span>' : '';                              // 관련 카테고리 없으면 배지 미표기(§7)
+  var basis = r.info ? (r.info+ref) : '<span style="color:#9aa4af">부족해지는 근거 준비 중 · 검토 필요</span>'; // 이유 없으면 POS 노출 제외(아래 필터) — 안전용 폴백
   var left = '<div class="dm-left">'+
-    '<div class="dm-nut"><b>'+r.nut+'</b><span class="catb">'+r.cat+'</span></div>'+
-    '<div class="dm-basis"><span class="dm-bk">부족해지는 근거</span>'+r.info+ref+'</div>'+
+    '<div class="dm-nut"><b>'+r.nut+'</b>'+catb+'</div>'+
+    '<div class="dm-basis"><span class="dm-bk">부족해지는 근거</span>'+basis+'</div>'+
   '</div>';
   return '<div class="dm-item'+(hidden?' dm-extra more-hidden':'')+'">'+left+dmRight(r)+'</div>';
 }
@@ -489,7 +491,7 @@ function renderTableD(){
       '<td class="dose">'+d.dose+'</td><td class="warn">'+d.warn+'</td></tr>');
     // 노출 정책: 우리약국 또는 굿팜 추천 상품이 하나라도 있는 부족 영양소만 노출.
     //   둘 다 없으면 그 영양소 블록은 물론 '추천 상품이 없습니다'도 노출하지 않는다(행 자체 생략).
-    var dep=activeDepl(d).filter(function(x){ var m=nutMaster[x.nid]; return m && (((m.store||[]).length)||((m.gp||[]).length)); });
+    var dep=activeDepl(d).filter(function(x){ var m=nutMaster[x.nid]; return m && x.info && (((m.store||[]).length)||((m.gp||[]).length)); });  // 부족 이유 없으면 POS 노출 제외(검토 필요, §7)
     if(dep.length){
       var items=dep.map(function(x,i){ return dmItem(reco(x), i>=DM_MAX); }).join('');
       var extra=dep.length-DM_MAX;
@@ -518,6 +520,13 @@ function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt);
   else if(c==='off'){ drugs=[drugs[1]]; N["NUT-COQ10"].on=false; }         /* 노출 OFF → 영역 미노출 */
   else if(c==='more'){ drugs=[drugs[5]]; }                                  /* 11개 → 3개 + 더보기 */
   else if(c==='mixed'){ drugs=[drugs[4]]; }                                 /* 혼합(굿팜만/우리약국만/미노출) */
+  else if(c==='missing'){                                                    /* 결측: 관련 카테고리·참고문헌 없음 / 부족 이유 없음 → 노출 제외 */
+    N["NUT-CA"].cat=''; N["NUT-CA"].gp=[{nm:"○○ 칼슘 + 비타민D"}];
+    drugs=[{ name:"결측 예시 처방약", img:"💊", pill:true, comp:"(데모)", eff:"필드 결측 확인용", dose:"1정<br/>하루 1회",
+      warn:"· 관련 카테고리·부족 이유·근거 결측 노출 규칙 확인용 데모입니다.",
+      depl:[ {nid:"NUT-CA", info:"위산 감소로 칼슘의 이온화·흡수가 저하되어 부족해질 위험이 있습니다.", ref:""},
+             {nid:"NUT-MG", info:"", ref:""} ] }];
+  }
   setVariant(q.get('view')==='C'?'C':'D');
 })();
 </script>

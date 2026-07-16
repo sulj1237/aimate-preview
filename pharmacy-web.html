@@ -354,9 +354,16 @@ var MAX_PRODS = 3;
 function byLabel(b){ return b==='admin' ? '어드민' : '약국'; }
 function clone(r){ return JSON.parse(JSON.stringify(r)); }
 
+// 목록 정렬: 1)AI mate 노출 ON 우선 2)최종 수정일 최신('-'는 뒤로) 3)관련 약물 수 많은 순
+function _cmpMod(a,c){ var ma=(a&&a!=='-')?a:'', mb=(c&&c!=='-')?c:''; if(ma&&mb) return mb<ma?-1:(mb>ma?1:0); if(ma) return -1; if(mb) return 1; return 0; }
 function renderList(){
   var b=document.getElementById('listBody');b.innerHTML='';
-  rows.forEach(function(r){
+  var list=rows.slice().sort(function(a,c){
+    if(!!c.on!==!!a.on) return (c.on?1:0)-(a.on?1:0);
+    var m=_cmpMod(a.mod,c.mod); if(m) return m;
+    return ((c.drugs&&c.drugs.length)||0)-((a.drugs&&a.drugs.length)||0);
+  });
+  list.forEach(function(r){
     var gp=r.prods.filter(function(p){return p.def;});
     var store=r.prods.filter(function(p){return !p.def;});
     var gpTxt = gp.length ? gp.map(function(p){return p.nm;}).join('<br>') : '<span style="color:#9aa4af">-</span>';

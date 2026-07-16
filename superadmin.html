@@ -222,7 +222,6 @@
           <span class="total">전체 <b id="iTotal">0</b> 건</span>
           <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
           <span class="spacer"></span>
-          <button class="btn" onclick="openIngDelHist()">삭제 이력</button>
           <button class="btn primary" onclick="openDind()">＋ DIND 추가</button>
         </div>
         <div class="tbl"><table>
@@ -516,18 +515,23 @@ function pickDef(bc){
 function delDef(i){ curDefs.splice(i,1); renderDefProds(); }
 function srcBadge(s){ return s==='store'?'<span class="stt ok">약국 설정</span>':'<span class="stt hide">기본 추천</span>'; }
 
+// 목록 정렬 공통: 최종 수정일 내림차순(없거나 '-'는 뒤로). 'YYYY-MM-DD' 문자열 비교.
+function cmpMod(a,b){ var ma=(a&&a!=='-')?a:'', mb=(b&&b!=='-')?b:''; if(ma&&mb) return mb<ma?-1:(mb>ma?1:0); if(ma) return -1; if(mb) return 1; return 0; }
+// 추천 상품 관리 정렬: 1)노출 ON 우선 2)최종 수정일 최신 3)관련 약물 수 많은 순
+function masterSort(x,y){ var a=x.m,b=y.m; if(!!b.on!==!!a.on) return (b.on?1:0)-(a.on?1:0); var c=cmpMod(a.mod,b.mod); if(c) return c; return activeDrugCount(b)-activeDrugCount(a); }
 function renderMaster(){
-  document.getElementById('masterBody').innerHTML = master.map(function(m,idx){
-    if(m.deleted) return '';   // soft delete → 목록 미노출 (idx는 master 배열과 정렬 유지)
-    var ndrug=activeDrugCount(m);
-    return '<tr class="click" onclick="openMaster('+idx+')">'+
+  var list=master.map(function(m,idx){return {m:m,idx:idx};}).filter(function(o){return !o.m.deleted;});  // soft delete 제외, 원 index 보존
+  list.sort(masterSort);
+  document.getElementById('masterBody').innerHTML = list.map(function(o){
+    var m=o.m, ndrug=activeDrugCount(m);
+    return '<tr class="click" onclick="openMaster('+o.idx+')">'+
       '<td class="nut">'+m.nut+'</td>'+
       '<td>'+(m.cat||'-')+'</td>'+
       '<td class="num">'+ndrug+'</td>'+
       '<td class="c"><span class="stt '+(m.on?'ok':'hide')+'">'+(m.on?'ON':'OFF')+'</span></td>'+
       '<td>'+m.mod+'</td></tr>';
   }).join('');
-  document.getElementById('mTotal').textContent = master.filter(function(m){return !m.deleted;}).length.toLocaleString();
+  document.getElementById('mTotal').textContent = list.length.toLocaleString();
 }
 // 관련 약물 목록 — 조회 전용. 성분명 클릭 시 「AI mate 성분 관리」로 이동해 성분명·제형·이유·근거를 수정.
 function renderRelDrugs(drugs){
@@ -702,6 +706,8 @@ function renderIngredients(){
     if(q && g.code.toLowerCase().indexOf(q)<0 && g.comp.toLowerCase().indexOf(q)<0) return false;
     return true;
   });
+  // 정렬: 1)최종 수정일 최신 2)연결 부족 영양소 개수 많은 순 (성분코드에는 노출 ON/OFF 없음)
+  list.sort(function(a,b){ var c=cmpMod(a.mod,b.mod); if(c) return c; return ingredientLinks(b.code).length-ingredientLinks(a.code).length; });
   document.getElementById('ingrBody').innerHTML = list.map(function(g){
     var links=ingredientLinks(g.code);
     return '<tr class="click" onclick="openIngredient(\''+g.code+'\')">'+
