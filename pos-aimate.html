@@ -160,18 +160,20 @@
   .dmrow>td{padding:0;border:1px solid var(--line);border-top:none;background:#fff}
   .dminline{padding:8px 14px 12px}
   /* 부족 영양소 블록: 좌(근거) / 우(우리약국·굿팜 2열 비교) */
-  .dm-item{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:flex-start;padding:11px 0}
+  .dm-item{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-start;padding:11px 0}
   .dm-item + .dm-item{border-top:1px solid #eef1f0}
   .dm-item.more-hidden{display:none}
   .dm-left{flex:1 1 290px;min-width:230px}
-  .dm-right{flex:2 1 340px;min-width:250px;display:flex;gap:16px}
-  .dm-col{flex:1;min-width:0}
+  .dm-right{flex:2 1 340px;min-width:250px;display:flex;gap:0;border-left:1px solid #e6eae9;padding-left:18px}  /* 성분 섹션 뒤 구분선 */
+  .dm-col{flex:1;min-width:0;padding-left:16px;border-left:1px solid #e6eae9}                                    /* 우리약국 | 굿팜 사이 구분선 */
+  .dm-col:first-child{padding-left:0;border-left:none}
   .dm-nut{font-size:12.5px;color:#28323a}
   .dm-nut b{font-weight:800}
   .dm-basis{font-size:11.5px;color:#55606a;line-height:1.55;margin-top:4px}
   .dm-bk{font-weight:800;color:#8a9a96;font-size:10.5px;margin-right:3px}
-  .dm-cl{font-size:10px;font-weight:800;letter-spacing:.2px;margin-bottom:5px;color:#8a9a96}
-  .dm-col.store .dm-cl{color:var(--teal-d)}   /* 우리약국 우선 강조 */
+  .dm-cl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2px;margin-bottom:6px;padding:2px 8px;border-radius:6px;color:#8a9a96;background:#f1f4f3}
+  .dm-col.store .dm-cl{color:var(--teal-d);background:var(--teal-soft)}   /* 우리약국(주 강조) — 배경 최소 */
+  .dm-col.gp .dm-cl{color:#5b7a9d;background:#eef2f7}                      /* 굿팜(보조) — 배경 최소 */
   .dm-plist{display:flex;flex-direction:column;gap:5px}
   /* 상품 카드: 줄바꿈 허용·최대 2줄·초과 시 말줄임(hover=전체명 tooltip) */
   .pcard{font-size:12px;line-height:1.35;border-radius:7px;padding:6px 9px;background:#f1f3f5;color:#5c6671;
@@ -456,8 +458,8 @@ function dmRight(r){
   var store=(r.store||[]).slice(0,3), gp=(r.gp||[]).slice(0,2);
   var storeInner = store.length ? prodCards(store,'store', store.length>1)
     : '<button class="dm-cta" onclick="openSetting()">＋ 우리약국 추천 등록</button>';
-  var out = dmCol('우리약국 추천 상품 '+(store.length>1?'<span class="dm-cnt">'+store.length+'</span>':''), storeInner, 'store');
-  if(gp.length) out += dmCol('굿팜 추천 상품', prodCards(gp,'gp'));
+  var out = dmCol('우리약국 추천 '+(store.length>1?'<span class="dm-cnt">'+store.length+'</span>':''), storeInner, 'store');
+  if(gp.length) out += dmCol('굿팜 추천', prodCards(gp,'gp'), 'gp');
   return '<div class="dm-right">'+out+'</div>';
 }
 // 시안 D 부족영양소 1개 = 좌우 2열. 좌=영양소명[카테고리]·근거(ⓘ), 우=우리약국|굿팜.
