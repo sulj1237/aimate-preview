@@ -223,7 +223,7 @@
             <tr class="hlrow" data-hl=".dm-right"><td class="n">6</td><td class="area">굿팜 컬럼 (우측·보조)<span class="tag new">신규</span></td><td>굿팜 추천 제품(보조). 최대 2개. 우리약국과 나란히 2열 비교.</td><td>우리약국·굿팜 중 하나라도 있으면 블록 노출(§7,§10 hide-when-no-products).</td></tr>
             <tr class="hlrow" data-hl=".dm-cta"><td class="n">7</td><td class="area">우리약국 미등록 CTA<span class="tag new">신규</span></td><td>해당 영양소에 우리약국 제품이 없을 때 <code>＋ 우리약국 추천 등록</code> 노출(굿팜만 있는 경우).</td><td>클릭 → 약사웹 설정 새 창(약국ID·성분코드·영양소ID 전달). 실패 시 <code>설정 페이지를 열 수 없습니다. 잠시 후 다시 시도해 주세요.</code></td></tr>
             <tr class="hlrow" data-hl=".dm-basis"><td class="n">8</td><td class="area">복합제 통합 블록<span class="tag new">신규</span></td><td>§6: 동일 영양소가 복수 성분에서 중복 매칭되면 1블록으로 통합. 근거에 관련 성분 병기(성분 A, 성분 B / 근거 · 성분A기준 · 성분B기준).</td><td>제품 목록은 통합, 근거만 성분별로 구분 표기.</td></tr>
-            <tr class="hlrow" data-hl=".dm-more"><td class="n">9</td><td class="area">+N개 더보기<span class="tag new">신규</span></td><td>영양소가 10개 이상이면 상위 3개만 노출 + <code>+N개 더보기</code>.</td><td>클릭 → 나머지 영양소 블록 펼침.</td></tr>
+            <tr class="hlrow" data-hl=".dm-more"><td class="n">9</td><td class="area">+N개 더보기<span class="tag new">신규</span></td><td>영양소가 5개를 초과하면 상위 5개만 노출 + <code>+N개 더보기</code>.</td><td>클릭 → 나머지 영양소 블록 펼침.</td></tr>
             <tr class="hlrow" data-hl=".dm-plist"><td class="n">10</td><td class="area">긴 상품명 처리<span class="tag new">신규</span></td><td>상품명 2줄 말줄임(…). 전체명은 tooltip 제공.</td><td>상품명 hover → 전체명 tooltip.</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">11</td><td class="area">노출 제어 (OFF/삭제/결측)</td><td>§9 노출 OFF 영양소 POS 미노출 · §8 soft delete 성분 기준 미노출 · §7 이유無 상품有는 검토 필요로 POS 기본 노출 제외.</td><td>조건별 자동 필터링. 사용자 조작 없음.</td></tr>
           </tbody>
@@ -242,7 +242,7 @@
               <tr><td class="st">복합제 통합 (§6)</td><td><span class="yn y">해당</span></td><td>1블록 통합·관련 성분 병기·근거 성분별.</td></tr>
               <tr><td class="st">결측: 참고문헌만 없음 (§7)</td><td><span class="yn y">해당</span></td><td>이유·근거·상품 노출, 참고문헌 ⓘ만 미노출.</td></tr>
               <tr><td class="st">이유 없음 → 검토 필요 (§7)</td><td><span class="yn q">확인</span></td><td>이유無+상품有는 검토 필요로 POS 기본 노출 제외.</td></tr>
-              <tr><td class="st">10개↑ 더보기</td><td><span class="yn y">해당</span></td><td>상위 3개 + <code>+N개 더보기</code>.</td></tr>
+              <tr><td class="st">5개 초과 더보기</td><td><span class="yn y">해당</span></td><td>상위 5개 + <code>+N개 더보기</code>.</td></tr>
               <tr><td class="st">삭제 성분 포함 복합제 (§8)</td><td><span class="yn y">해당</span></td><td>삭제 성분 기준만 미노출, 남은 성분 기준 정상 노출(부분 노출).</td></tr>
               <tr><td class="st">로딩</td><td><span class="yn y">해당</span></td><td>추천 영역 스켈레톤/로딩 표시.</td></tr>
               <tr><td class="st">API 오류</td><td><span class="yn y">해당</span></td><td><code>추천 정보를 불러오지 못했습니다.</code> + 재시도.</td></tr>
@@ -311,12 +311,12 @@
   <div class="screen">
     <div class="sc-head"><span class="cbadge pos">Case 5</span><span class="sc-name">11개 영양소 · 더보기</span><span class="sp"></span><span class="badge new">더보기</span></div>
     <div class="screenview">
-      <div class="cap">▶ pos-aimate.html?case=more · 상위 3개 + [+8개 더보기]</div>
+      <div class="cap">▶ pos-aimate.html?case=more · 상위 5개 + [+6개 더보기]</div>
       <div class="framewrap"><iframe src="./pos-aimate.html?case=more" width="1040" height="2100" scrolling="auto" title="Case more"></iframe></div>
     </div>
     <ul class="cnote">
-      <li><span class="k">달라지는 점</span> 부족 영양소가 11개면 상위 3개만 우선 노출하고 나머지는 <code>+N개 더보기</code>로 접힌다.</li>
-      <li><span class="k">정책 근거</span> 10개↑ → 상위 3개 + <code>+N개 더보기</code>(§ 노출량 제어). 긴 상품명은 2줄 말줄임.</li>
+      <li><span class="k">달라지는 점</span> 부족 영양소가 11개면 상위 5개만 우선 노출하고 나머지는 <code>+N개 더보기</code>로 접힌다.</li>
+      <li><span class="k">정책 근거</span> 5개 초과 → 상위 5개 + <code>+N개 더보기</code>(§ 노출량 제어). 긴 상품명은 2줄 말줄임.</li>
       <li><span class="k">인터랙션</span> 더보기 클릭 → 나머지 블록 펼침 · 상품명 hover → 전체명 tooltip.</li>
     </ul>
   </div>
