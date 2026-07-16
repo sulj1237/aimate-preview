@@ -171,18 +171,19 @@
   .dm-nut b{font-weight:800}
   .dm-basis{font-size:11.5px;color:#55606a;line-height:1.55;margin-top:4px}
   .dm-bk{font-weight:800;color:#8a9a96;font-size:10.5px;margin-right:3px}
-  .dm-cl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2px;margin-bottom:6px;padding:2px 8px;border-radius:6px;color:#8a9a96;background:#f1f4f3}
-  .dm-col.store .dm-cl{color:var(--teal-d);background:var(--teal-soft)}   /* 우리약국(주 강조) — 배경 최소 */
-  .dm-col.gp .dm-cl{color:#5b7a9d;background:#eef2f7}                      /* 굿팜(보조) — 배경 최소 */
+  /* 라벨만 최소 컬러(텍스트) — 배경 없음. 그 외 추천 상품 영역은 중립 */
+  .dm-cl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2px;margin-bottom:6px;color:#8a9a96}
+  .dm-col.store .dm-cl{color:var(--teal-d)}   /* 우리약국(주) */
+  .dm-col.gp .dm-cl{color:#7a8794}            /* 굿팜(보조) */
   .dm-plist{display:flex;flex-direction:column;gap:5px}
-  /* 상품 카드: 줄바꿈 허용·최대 2줄·초과 시 말줄임(hover=전체명 tooltip) */
+  /* 상품 카드: 중립 톤 · 줄바꿈 허용·최대 2줄·초과 시 말줄임(hover=전체명 tooltip) */
   .pcard{font-size:12px;line-height:1.35;border-radius:7px;padding:6px 9px;background:#f1f3f5;color:#5c6671;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
-  .pcard.store{background:var(--teal-soft);color:var(--teal-d);font-weight:700;border:1px solid var(--teal-line)}
-  .pcard-n{display:inline-block;min-width:15px;height:15px;line-height:15px;text-align:center;font-size:9.5px;font-weight:800;background:var(--teal-d);color:#fff;border-radius:4px;margin-right:5px;vertical-align:1px}
-  .dm-cnt{display:inline-block;min-width:15px;height:15px;line-height:15px;text-align:center;font-size:9.5px;font-weight:800;background:var(--teal-d);color:#fff;border-radius:999px;padding:0 4px;margin-left:3px;vertical-align:1px}
-  .dm-cta{font-size:11px;font-weight:700;color:var(--teal-d);background:none;border:1px dashed var(--teal-line);border-radius:7px;padding:6px 9px;cursor:pointer;text-align:left;width:100%;font-family:inherit}
-  .dm-more{margin-top:10px;font-size:11.5px;font-weight:700;color:var(--teal-d);background:none;border:none;cursor:pointer;padding:2px 0;font-family:inherit}
+  .pcard.store{background:#eef1f3;color:#3f4750;font-weight:700}   /* 우리약국(약간 진한 중립 · 컬러 없음) */
+  .pcard-n{display:inline-block;min-width:15px;height:15px;line-height:15px;text-align:center;font-size:9.5px;font-weight:800;background:#aab4bd;color:#fff;border-radius:4px;margin-right:5px;vertical-align:1px}
+  .dm-cnt{display:inline-block;min-width:15px;height:15px;line-height:15px;text-align:center;font-size:9.5px;font-weight:800;background:#aab4bd;color:#fff;border-radius:999px;padding:0 4px;margin-left:3px;vertical-align:1px}
+  .dm-cta{font-size:11px;font-weight:700;color:#6a7580;background:none;border:1px dashed #d5dad8;border-radius:7px;padding:6px 8px;cursor:pointer;text-align:center;width:100%;white-space:nowrap;font-family:inherit}
+  .dm-more{margin-top:10px;font-size:11.5px;font-weight:700;color:#6a7580;background:none;border:none;cursor:pointer;padding:2px 0;font-family:inherit}
   .dm-more:hover{text-decoration:underline}
   /* 관련 카테고리 배지 — 색 최소화(중립 그레이) */
   .catb{display:inline-block;font-size:10px;font-weight:700;color:#6b7680;background:#eef1f0;border:1px solid #e2e7e5;border-radius:5px;padding:1px 7px;margin-left:7px;vertical-align:middle}
@@ -392,7 +393,7 @@ function prodGroups(r){
   var gp=(r.gp||[]).slice(0,2), store=(r.store||[]).slice(0,3);
   var storeHtml = store.length
     ? '<div class="pchips">'+store.map(function(p){return '<span class="pchip store">'+p.nm+'</span>';}).join('')+'</div>'
-    : '<button class="cta-reg" onclick="openSetting()">＋ 우리약국 추천 상품 등록하러 가기</button>';
+    : '<button class="cta-reg" onclick="openSetting()">＋ 추천 상품 등록</button>';
   var out = '<div class="pg store"><div class="pg-l">우리약국 추천 상품</div>'+storeHtml+'</div>';
   if(gp.length){
     out += '<div class="pg"><div class="pg-l">굿팜 추천 상품</div>'+
@@ -457,7 +458,7 @@ function dmCol(label, inner, cls){ return '<div class="dm-col'+(cls?' '+cls:'')+
 function dmRight(r){
   var store=(r.store||[]).slice(0,3), gp=(r.gp||[]).slice(0,2);
   var storeInner = store.length ? prodCards(store,'store', store.length>1)
-    : '<button class="dm-cta" onclick="openSetting()">＋ 우리약국 추천 등록</button>';
+    : '<button class="dm-cta" onclick="openSetting()">＋ 추천 상품 등록</button>';
   var out = dmCol('우리약국 추천 '+(store.length>1?'<span class="dm-cnt">'+store.length+'</span>':''), storeInner, 'store');
   if(gp.length) out += dmCol('굿팜 추천', prodCards(gp,'gp'), 'gp');
   return '<div class="dm-right">'+out+'</div>';
