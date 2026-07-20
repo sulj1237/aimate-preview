@@ -226,7 +226,7 @@
           <table>
             <thead><tr>
               <th>부족 영양소</th><th>관련 카테고리</th>
-              <th class="c">관련 약물 수</th><th>굿팜 추천 상품</th><th>우리약국 추천 상품</th>
+              <th class="c">관련 약물 수</th><th>우리약국 추천 상품</th><th>굿팜 추천 상품</th>
               <th class="c">AI mate 노출 상태 <span class="info" tabindex="0" style="text-transform:none">ⓘ<span class="tip-pop" style="left:auto;right:0">POS AI mate 추천 영역에 노출되는 상태입니다. 노출 중지 상태여도 약사웹에서는 기존 설정값을 조회할 수 있습니다.</span></span></th><th>최종 수정</th>
             </tr></thead>
             <tbody id="listBody"></tbody>
@@ -374,7 +374,7 @@ function renderList(){
       '<tr class="click" onclick="openDetail('+r.id+')"><td class="nut">'+r.nut+'</td>'+
       '<td>'+(r.cat||'-')+'</td>'+
       '<td class="c">'+ndrug+'</td>'+
-      '<td style="white-space:normal">'+gpTxt+'</td><td style="white-space:normal">'+stTxt+'</td>'+
+      '<td style="white-space:normal">'+stTxt+'</td><td style="white-space:normal">'+gpTxt+'</td>'+
       '<td class="c"><span class="onoff '+(r.on?'on':'stop')+'">'+(r.on?'AI mate 노출':'AI mate 노출 중지')+'</span></td>'+
       '<td>'+modtxt+'</td></tr>');
   });
