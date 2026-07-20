@@ -219,9 +219,9 @@
             <tr class="hlrow" data-hl="#viewD"><td class="n">2</td><td class="area">영양소 상담 추천 영역<span class="tag new">신규</span></td><td>약물표 하단 자동 노출. 처방 약물의 드럭머거 분석 결과(부족 영양소)만 대상. §4 정규화로 표준 영양소명만 표기.</td><td>노출/상품클릭/CTA클릭 로그 적재. 조회 전용(POS 편집 불가).</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">3</td><td class="area">노출 레이아웃<span class="tag new">시안 D 확정</span></td><td><b>시안 D(표 + 드럭머거 2열)로 확정</b>. 시안 C(약물 카드형)는 화면에서 숨김(코드는 보존).</td><td>탐색용 시안 토글 미노출 — 항상 시안 D로 렌더.</td></tr>
             <tr class="hlrow" data-hl=".dm-left"><td class="n">4</td><td class="area">부족 영양소 블록 (좌열)<span class="tag new">신규</span></td><td>부족영양소명 + 관련 카테고리 배지 + 부족해지는 근거 문구 + 참고문헌 ⓘ. §7 결측 시 ⓘ만 미노출.</td><td>ⓘ hover → 참고문헌 tooltip. 근거는 §3 override 최종 반영값만(원천/수정 구분 미노출).</td></tr>
-            <tr class="hlrow" data-hl=".dm-right"><td class="n">5</td><td class="area">우리약국 컬럼 (우측·우선강조)<span class="tag new">신규</span></td><td>우리약국 등록 제품을 우선 강조. 최대 3개. 2개 이상이면 우선순위 번호(1·2·3) 표기.</td><td>상품명 hover → 전체명 tooltip. 제품 클릭 로그.</td></tr>
+            <tr class="hlrow" data-hl=".dm-right"><td class="n">5</td><td class="area">우리약국 컬럼 (우측·우선강조)<span class="tag new">신규</span></td><td>우리약국 등록 제품을 우선 강조. 최대 3개. 2개 이상이면 우선순위 번호(1·2·3) 표기. <b>라벨 옆 총 개수 배지는 미표기</b>(번호로만 구분).</td><td>상품명 hover → 전체명 tooltip. 제품 클릭 로그.</td></tr>
             <tr class="hlrow" data-hl=".dm-right"><td class="n">6</td><td class="area">굿팜 컬럼 (우측·보조)<span class="tag new">신규</span></td><td>굿팜 추천 제품(보조). 최대 2개. 우리약국과 나란히 2열 비교.</td><td>우리약국·굿팜 중 하나라도 있으면 블록 노출(§7,§10 hide-when-no-products).</td></tr>
-            <tr class="hlrow" data-hl=".dm-cta"><td class="n">7</td><td class="area">우리약국 미등록 CTA<span class="tag new">신규</span></td><td>해당 영양소에 우리약국 제품이 없을 때 <code>＋ 우리약국 추천 등록</code> 노출(굿팜만 있는 경우).</td><td>클릭 → 약사웹 설정 새 창(약국ID·성분코드·영양소ID 전달). 실패 시 <code>설정 페이지를 열 수 없습니다. 잠시 후 다시 시도해 주세요.</code></td></tr>
+            <tr class="hlrow" data-hl=".dm-cta"><td class="n">7</td><td class="area">우리약국 미등록 CTA<span class="tag new">신규</span></td><td>해당 영양소에 우리약국 제품이 없을 때 <code>＋ 추천 상품 등록</code> 노출(굿팜만 있는 경우).</td><td>클릭 → 약사웹 설정 새 창(약국ID·성분코드·영양소ID 전달). 실패 시 <code>설정 페이지를 열 수 없습니다. 잠시 후 다시 시도해 주세요.</code></td></tr>
             <tr class="hlrow" data-hl=".dm-basis"><td class="n">8</td><td class="area">복합제 통합 블록<span class="tag new">신규</span></td><td>§6: 동일 영양소가 복수 성분에서 중복 매칭되면 1블록으로 통합. 근거에 관련 성분 병기(성분 A, 성분 B / 근거 · 성분A기준 · 성분B기준).</td><td>제품 목록은 통합, 근거만 성분별로 구분 표기.</td></tr>
             <tr class="hlrow" data-hl=".dm-more"><td class="n">9</td><td class="area">+N개 더보기<span class="tag new">신규</span></td><td>영양소가 5개를 초과하면 상위 5개만 노출 + <code>+N개 더보기</code>.</td><td>클릭 → 나머지 영양소 블록 펼침.</td></tr>
             <tr class="hlrow" data-hl=".dm-plist"><td class="n">10</td><td class="area">긴 상품명 처리<span class="tag new">신규</span></td><td>상품명 2줄 말줄임(…). 전체명은 tooltip 제공.</td><td>상품명 hover → 전체명 tooltip.</td></tr>
@@ -235,7 +235,7 @@
             <tbody>
               <tr><td class="st">정상 (우리약국+굿팜)</td><td><span class="yn y">해당</span></td><td>2열 비교 노출. 우리약국 우선강조 + 굿팜 보조.</td></tr>
               <tr><td class="st">우리약국만 있음</td><td><span class="yn y">해당</span></td><td>우리약국 컬럼만 노출(최대3·우선순위). 굿팜 컬럼 비움.</td></tr>
-              <tr><td class="st">굿팜만 있음</td><td><span class="yn y">해당</span></td><td>굿팜 컬럼(보조) + <code>＋ 우리약국 추천 등록</code> CTA 노출.</td></tr>
+              <tr><td class="st">굿팜만 있음</td><td><span class="yn y">해당</span></td><td>굿팜 컬럼(보조) + <code>＋ 추천 상품 등록</code> CTA 노출.</td></tr>
               <tr><td class="st">상품 0개 → 영역 미노출</td><td><span class="yn y">해당</span></td><td>우리약국·굿팜 모두 없으면 블록·문구 모두 미노출(문구 없음).</td></tr>
               <tr><td class="st">매칭 0 (추천 없음)</td><td><span class="yn y">해당</span></td><td>매칭 제품 전무 시 영역 미노출.</td></tr>
               <tr><td class="st">노출 OFF 영양소 (§9)</td><td><span class="yn y">해당</span></td><td>POS 미노출.</td></tr>
@@ -285,11 +285,11 @@
   <div class="screen">
     <div class="sc-head"><span class="cbadge pos">Case 3</span><span class="sc-name">굿팜만 + 등록 CTA</span><span class="sp"></span><span class="badge new">CTA</span></div>
     <div class="screenview">
-      <div class="cap">▶ pos-aimate.html?case=gp-only · 굿팜 제품 + [＋ 우리약국 추천 등록]</div>
+      <div class="cap">▶ pos-aimate.html?case=gp-only · 굿팜 제품 + [＋ 추천 상품 등록]</div>
       <div class="framewrap"><iframe src="./pos-aimate.html?case=gp-only" width="1040" height="1250" scrolling="auto" title="Case gp-only"></iframe></div>
     </div>
     <ul class="cnote">
-      <li><span class="k">달라지는 점</span> 굿팜 컬럼(보조·최대2)만 노출되고, 우리약국 컬럼 자리에 <code>＋ 우리약국 추천 등록</code> CTA가 뜬다.</li>
+      <li><span class="k">달라지는 점</span> 굿팜 컬럼(보조·최대2)만 노출되고, 우리약국 컬럼 자리에 <code>＋ 추천 상품 등록</code> CTA가 뜬다.</li>
       <li><span class="k">정책 근거</span> 굿팜만 있는 영양소도 노출(§7,§10). 우리약국 미등록 → 등록 유도 CTA.</li>
       <li><span class="k">인터랙션</span> CTA 클릭 → 약사웹 설정 새 창(약국ID·성분코드·영양소ID 전달). 실패 시 <code>설정 페이지를 열 수 없습니다. 잠시 후 다시 시도해 주세요.</code></li>
     </ul>
