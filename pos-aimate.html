@@ -183,7 +183,6 @@
   .pcard.store{color:#2f3841;font-weight:700}   /* 우리약국(글자만 약간 진하게) */
   /* 번호: 배지 없이 볼드 숫자 + 옅은 컬러만 */
   .pcard-n{display:inline-block;font-size:11px;font-weight:800;color:#6b9f96;margin-right:6px}
-  .dm-cnt{display:inline-block;font-size:10.5px;font-weight:800;color:#8a97a3;margin-left:4px}
   .dm-cta{font-size:11px;font-weight:700;color:#6a7580;background:none;border:1px dashed #d5dad8;border-radius:7px;padding:6px 8px;cursor:pointer;text-align:center;width:100%;white-space:nowrap;font-family:inherit}
   .dm-more{margin-top:10px;font-size:11.5px;font-weight:700;color:#6a7580;background:none;border:none;cursor:pointer;padding:2px 0;font-family:inherit}
   .dm-more:hover{text-decoration:underline}
@@ -462,7 +461,7 @@ function dmRight(r){
   var store=(r.store||[]).slice(0,3), gp=(r.gp||[]).slice(0,2);
   var storeInner = store.length ? prodCards(store,'store', store.length>1)
     : '<button class="dm-cta" onclick="openSetting()">＋ 추천 상품 등록</button>';
-  var out = dmCol('우리약국 추천 '+(store.length>1?'<span class="dm-cnt">'+store.length+'</span>':''), storeInner, 'store');
+  var out = dmCol('우리약국 추천', storeInner, 'store');   // 총 개수 배지는 미표기(번호로 충분)
   if(gp.length) out += dmCol('굿팜 추천', prodCards(gp,'gp'), 'gp');
   return '<div class="dm-right">'+out+'</div>';
 }
