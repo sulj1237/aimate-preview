@@ -535,6 +535,16 @@ function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt);
   else if(c==='off'){ drugs=[drugs[1]]; N["NUT-COQ10"].on=false; }         /* 노출 OFF → 영역 미노출 */
   else if(c==='more'){ drugs=[drugs[5]]; }                                  /* 11개 → 5개 + 더보기 */
   else if(c==='mixed'){ drugs=[drugs[4]]; }                                 /* 혼합(굿팜만/우리약국만/미노출) */
+  else if(c==='many-drugs'){                                                 /* 처방 약물 10개 이상(다약제) — 화면 길이·스크롤 확인용 */
+    var mk=function(src,nm){ var o={}; for(var k in src) o[k]=src[k]; o.name=nm; return o; };
+    drugs=drugs.concat([
+      mk(drugs[1],'아토렌정10밀리그램'),
+      mk(drugs[4],'라니티딘정150밀리그램'),
+      mk(drugs[0],'암로디핀베실산염정5밀리그램'),
+      mk(drugs[2],'칼디정500밀리그램'),
+      mk(drugs[4],'오메프라졸장용캡슐20밀리그램')
+    ]);
+  }
   else if(c==='missing'){                                                    /* 결측: 관련 카테고리·참고문헌 없음 / 부족 이유 없음 → 노출 제외 */
     N["NUT-CA"].cat=''; N["NUT-CA"].gp=[{nm:"○○ 칼슘 + 비타민D"}];
     drugs=[{ name:"결측 예시 처방약", img:"💊", pill:true, comp:"(데모)", eff:"필드 결측 확인용", dose:"1정<br/>하루 1회",

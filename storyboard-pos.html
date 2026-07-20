@@ -348,7 +348,20 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="cbadge pos">Case 8</span><span class="sc-name">복합제 통합</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
+    <div class="sc-head"><span class="cbadge pos">Case 8</span><span class="sc-name">처방 약물 10개 이상(다약제)</span><span class="sp"></span><span class="badge tbu">길이 검토</span></div>
+    <div class="screenview">
+      <div class="cap">▶ pos-aimate.html?case=many-drugs · 처방 약물 <b>11개</b> · 추천 블록 <b>6개</b> (프레임 안에서 스크롤)</div>
+      <div class="framewrap"><iframe src="./pos-aimate.html?case=many-drugs" width="1040" height="2400" scrolling="auto" title="Case many-drugs"></iframe></div>
+    </div>
+    <ul class="cnote">
+      <li><span class="k">달라지는 점</span> 처방 약물 행이 11개로 늘고, 추천이 있는 약물(6개) 아래마다 드럭머거 섹션이 붙어 화면이 길어진다. 각 섹션 헤더의 <b>Drug Mugger 로고 + 약물명</b>으로 어느 약 기준인지 구분된다.</li>
+      <li><span class="k">현재 동작</span> <b>처방 약물 수에 대한 제한·접기 규칙은 없다.</b> 약물별 부족 영양소만 5개 초과 시 <code>+N개 더보기</code>로 접힌다(§10). 추천 상품이 없는 약물은 섹션 자체가 생성되지 않아 그만큼 짧아진다.</li>
+      <li><span class="k warn">검토 필요</span> 다약제 처방에서 세로 길이가 크게 늘어남 — ①현행 유지(전체 나열) ②추천 섹션 기본 접기(약물 클릭 시 펼침) ③상위 N개 약물만 노출 + 더보기 중 정책 확정 필요.</li>
+    </ul>
+  </div>
+
+  <div class="screen">
+    <div class="sc-head"><span class="cbadge pos">Case 9</span><span class="sc-name">복합제 통합</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
     <ul class="cnote">
       <li><span class="k">상황</span> 한 처방의 복합제에서 성분 A·성분 B가 동일 영양소(예: 마그네슘)를 각각 소모 → 같은 영양소가 중복 매칭됨.</li>
       <li><span class="k">화면 처리</span> §6 통합: 영양소당 1블록으로 합치고 <code>관련 성분: 성분 A, 성분 B</code> 병기. 근거는 <code>· 성분A기준 · 성분B기준</code>으로 성분별 구분. 제품 목록은 통합해 한 번만 노출.</li>
@@ -357,7 +370,7 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="cbadge pos">Case 9</span><span class="sc-name">삭제 성분 포함 복합제</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
+    <div class="sc-head"><span class="cbadge pos">Case 10</span><span class="sc-name">삭제 성분 포함 복합제</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
     <ul class="cnote">
       <li><span class="k">상황</span> 복합제 성분 중 하나가 soft delete(§8)된 성분코드. 나머지 성분은 정상.</li>
       <li><span class="k">화면 처리</span> 삭제 성분 기준의 추천·근거만 미노출하고, 남은 성분 기준 추천·근거는 정상 노출(부분 노출). 통합 블록의 근거 목록에서 삭제 성분 항목만 빠진다.</li>
@@ -366,7 +379,7 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="cbadge pos">Case 10</span><span class="sc-name">결측 — 관련 카테고리·부족 이유·근거 없음</span><span class="sp"></span><span class="badge na">결측</span></div>
+    <div class="sc-head"><span class="cbadge pos">Case 11</span><span class="sc-name">결측 — 관련 카테고리·부족 이유·근거 없음</span><span class="sp"></span><span class="badge na">결측</span></div>
     <div class="screenview">
       <div class="cap">▶ pos-aimate.html?case=missing · 관련 카테고리·참고문헌·부족 이유가 없어도 추천 상품(필수 값)이 있으면 블록 노출(없는 항목만 생략)</div>
       <div class="framewrap"><iframe src="./pos-aimate.html?case=missing" width="1040" height="900" scrolling="auto" title="Case missing"></iframe></div>
@@ -380,7 +393,7 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="cbadge pos">Case 11</span><span class="sc-name">로딩 / 오류</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
+    <div class="sc-head"><span class="cbadge pos">Case 12</span><span class="sc-name">로딩 / 오류</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
     <ul class="cnote">
       <li><span class="k">상황</span> 추천 API 응답 지연(로딩) 또는 호출 실패(오류).</li>
       <li><span class="k">화면 처리</span> 로딩 시 추천 영역 스켈레톤 표시. 실패 시 <code>추천 정보를 불러오지 못했습니다.</code> 문구 + 재시도 버튼 노출.</li>
