@@ -364,12 +364,14 @@
     <div class="m-head"><div><div class="dt">DIND 추가</div><div class="ds">성분코드 × 부족 영양소 매칭을 하나 등록합니다.</div></div><button class="x" onclick="closeDind()">✕</button></div>
     <div class="m-body">
       <div class="block">
-        <div class="block-h">성분 (성분코드 기준)</div>
+        <div class="block-h">성분 (성분코드 전체 일치 기준)</div>
         <div class="kvs">
-          <div class="kv"><div class="k">성분코드 *</div><div class="v"><input class="fw" id="dCode" placeholder="예: A10BA02"></div></div>
+          <div class="kv"><div class="k">성분코드 *</div><div class="v"><input class="fw" id="dCode" placeholder="예: A10BA02" oninput="renderDindRef()"></div></div>
           <div class="kv"><div class="k">성분명 *</div><div class="v"><input class="fw" id="dComp" placeholder="예: 메트포르민 (기존 성분코드면 성분명 자동 사용)"></div></div>
         </div>
       </div>
+      <!-- 앞 4자리가 같은 기존 성분코드 참고(입력 도움) — 자동 복사·병합 아님 -->
+      <div class="block" id="dindRef" style="display:none"></div>
       <div class="block">
         <div class="block-h">부족 영양소 (굿팜 표준명)</div>
         <div class="kvs">
@@ -874,7 +876,30 @@ function renderIngDelHist(){
 var nutSeq=1;
 function openDind(){
   ['dCode','dComp','dNut','dCat','dReason','dRef'].forEach(function(id){ document.getElementById(id).value=''; });
+  renderDindRef();
   document.getElementById('dindModal').classList.add('open');
+}
+/* 입력한 성분코드의 앞 4자리가 같은 기존 성분코드를 참고로 노출.
+   매칭은 성분코드 '전체 일치'만 유효하므로 자동 복사·병합하지 않고 입력 참고용으로만 보여준다. */
+function renderDindRef(){
+  var box=document.getElementById('dindRef'); if(!box) return;
+  var code=((document.getElementById('dCode')||{}).value||'').trim().toUpperCase();
+  if(code.length<4){ box.style.display='none'; box.innerHTML=''; return; }
+  var pre=code.slice(0,4);
+  var sames=ingredients.filter(function(g){ return !g.deleted && (g.code||'').toUpperCase().slice(0,4)===pre; });
+  if(!sames.length){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='';
+  box.innerHTML='<div class="block-h">앞 4자리 <b>'+pre+'</b> 동일 성분 '+sames.length+'건 · 입력 참고</div>'+
+    '<div class="roinfo" style="margin:0 0 8px">매칭은 <b>성분코드 전체가 일치</b>할 때만 이뤄집니다. 앞 4자리가 같아도 함량·제형에 따라 이유·근거가 다를 수 있어, 아래는 <b>참고용</b>이며 자동 복사·병합되지 않습니다.</div>'+
+    '<div class="tbl" style="overflow:auto;max-height:200px"><table><thead><tr><th>성분코드</th><th>성분명</th><th>연결 부족 영양소 · 이유/근거</th></tr></thead><tbody>'+
+    sames.map(function(g){
+      var links=ingredientLinks(g.code);
+      var det = links.length ? links.map(function(l){
+          return '<div style="margin-bottom:3px"><b>'+l.nut+'</b> — '+(l.reason||'<span style="color:#98a2ad">이유 미등록</span>')+(l.ref?' <span style="color:#8a9099">('+l.ref+')</span>':'')+'</div>';
+        }).join('') : '<span style="color:#98a2ad">연결된 부족 영양소 없음</span>';
+      var same = (g.code||'').toUpperCase()===code ? ' <span class="stt need">전체 일치</span>' : '';
+      return '<tr><td class="mono" style="white-space:nowrap">'+g.code+same+'</td><td style="white-space:nowrap">'+g.comp+'</td><td style="min-width:210px">'+det+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
 }
 function closeDind(){ document.getElementById('dindModal').classList.remove('open'); }
 function saveDind(){
