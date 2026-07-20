@@ -157,8 +157,17 @@
   .norec-b{font-size:11.5px;color:#9aa4a0;font-weight:600}
   /* 시안 D: 약물 하단 추천 영역 — 화이트·최소 구분선(민트/좌측라인 제거) */
   .dtbl tr.drow{cursor:default}
-  .dmrow>td{padding:0;border:1px solid var(--line);border-top:none;background:#fff}
-  .dminline{padding:8px 14px 12px}
+  /* 추천 영역 = 위 처방 약물 행에 종속된 하위 섹션. 옅은 배경 + 좌측 액센트로 '해당 약물의 추천'임을 표현 */
+  .dmrow>td{padding:0;border:1px solid var(--line);border-top:none;background:#f7faf9}
+  .dminline{padding:10px 14px 12px;border-left:3px solid var(--teal)}
+  /* 섹션 헤더: Drug mugger 로고(시안 B) + 기준 약물명 */
+  .dm-head{display:flex;align-items:center;gap:9px;margin-bottom:9px;flex-wrap:wrap}
+  .dm-for{font-size:11.5px;color:#6a7580}
+  .dm-for b{color:#3a444e;font-weight:800}
+  .dm-logo{display:inline-flex;align-items:stretch;border:2px solid var(--teal-d);border-radius:999px;overflow:hidden;background:#fff;line-height:1;flex:none}
+  .dm-logo span{font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:11px;line-height:1;letter-spacing:-.02em}
+  .dm-logo .l{background:var(--teal-d);color:#fff;padding:4px 5px 4px 8px;border-right:1px solid var(--teal-d)}
+  .dm-logo .r{color:var(--teal-d);padding:4px 8px 4px 5px}
   /* 부족 영양소 블록: 좌(근거) / 우(우리약국·굿팜 2열 비교) */
   .dm-item{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-start;padding:11px 0}
   .dm-item + .dm-item{border-top:1px solid #eef1f0}
@@ -500,8 +509,12 @@ function renderTableD(){
       var more = extra>0
         ? '<button class="dm-more" data-open="0" onclick="toggleMore('+di+','+extra+')">＋ '+extra+'개 더보기</button>'
         : '';
+      // 섹션 헤더 — Drug mugger 로고(시안 B) + 어느 처방 약물 기준인지 명시
+      var head='<div class="dm-head">'+
+        '<span class="dm-logo"><span class="l">Drug</span><span class="r">Mugger</span></span>'+
+        '<span class="dm-for"><b>'+clean(d.name)+'</b> 복용 시 부족해질 수 있는 영양소</span></div>';
       b.insertAdjacentHTML('beforeend',
-        '<tr class="dmrow"><td colspan="6"><div class="dminline" data-di="'+di+'">'+items+more+'</div></td></tr>');
+        '<tr class="dmrow"><td colspan="6"><div class="dminline" data-di="'+di+'">'+head+items+more+'</div></td></tr>');
     }
   });
 }
