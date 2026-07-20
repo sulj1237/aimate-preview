@@ -217,7 +217,7 @@
           <tbody>
             <tr class="hlrow" data-hl=".drug"><td class="n">1</td><td class="area">처방 약물표 (as-is)</td><td>기존 처방 상세 분석의 약물 목록. 신규 범위 아님.</td><td>표 하단에 추천 영역이 자동으로 이어 붙어 노출된다.</td></tr>
             <tr class="hlrow" data-hl="#viewD"><td class="n">2</td><td class="area">영양소 상담 추천 영역<span class="tag new">신규</span></td><td>약물표 하단 자동 노출. 처방 약물의 드럭머거 분석 결과(부족 영양소)만 대상. §4 정규화로 표준 영양소명만 표기.</td><td>노출/상품클릭/CTA클릭 로그 적재. 조회 전용(POS 편집 불가).</td></tr>
-            <tr class="hlrow" data-hl=".vtoggle"><td class="n">3</td><td class="area">시안 C / D 토글<span class="tag new">신규</span></td><td>노출 레이아웃 전환(C=목록형 / D=2열 비교형). 기본 시안 D.</td><td>토글 클릭 즉시 동일 데이터로 레이아웃만 전환.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">3</td><td class="area">노출 레이아웃<span class="tag new">시안 D 확정</span></td><td><b>시안 D(표 + 드럭머거 2열)로 확정</b>. 시안 C(약물 카드형)는 화면에서 숨김(코드는 보존).</td><td>탐색용 시안 토글 미노출 — 항상 시안 D로 렌더.</td></tr>
             <tr class="hlrow" data-hl=".dm-left"><td class="n">4</td><td class="area">부족 영양소 블록 (좌열)<span class="tag new">신규</span></td><td>부족영양소명 + 관련 카테고리 배지 + 부족해지는 근거 문구 + 참고문헌 ⓘ. §7 결측 시 ⓘ만 미노출.</td><td>ⓘ hover → 참고문헌 tooltip. 근거는 §3 override 최종 반영값만(원천/수정 구분 미노출).</td></tr>
             <tr class="hlrow" data-hl=".dm-right"><td class="n">5</td><td class="area">우리약국 컬럼 (우측·우선강조)<span class="tag new">신규</span></td><td>우리약국 등록 제품을 우선 강조. 최대 3개. 2개 이상이면 우선순위 번호(1·2·3) 표기.</td><td>상품명 hover → 전체명 tooltip. 제품 클릭 로그.</td></tr>
             <tr class="hlrow" data-hl=".dm-right"><td class="n">6</td><td class="area">굿팜 컬럼 (우측·보조)<span class="tag new">신규</span></td><td>굿팜 추천 제품(보조). 최대 2개. 우리약국과 나란히 2열 비교.</td><td>우리약국·굿팜 중 하나라도 있으면 블록 노출(§7,§10 hide-when-no-products).</td></tr>

@@ -165,8 +165,9 @@
   .dm-item.more-hidden{display:none}
   .dm-left{flex:1 1 290px;min-width:230px}
   .dm-right{flex:2 1 340px;min-width:250px;display:flex;gap:0;border-left:1px solid #e6eae9;padding-left:18px}  /* 성분 섹션 뒤 구분선 */
-  .dm-col{flex:1;min-width:0;padding-left:16px;border-left:1px solid #e6eae9}                                    /* 우리약국 | 굿팜 사이 구분선 */
+  .dm-col{flex:1;min-width:0;padding:0 16px;border-left:1px solid #e6eae9}                                        /* 우리약국 | 굿팜 사이 구분선(양쪽 여백으로 겹침 방지) */
   .dm-col:first-child{padding-left:0;border-left:none}
+  .dm-col:last-child{padding-right:0}
   .dm-nut{font-size:12.5px;color:#28323a}
   .dm-nut b{font-weight:800}
   .dm-basis{font-size:11.5px;color:#55606a;line-height:1.55;margin-top:4px}
@@ -282,9 +283,10 @@
     <!-- ③ 처방 약물 정보표 (+ 우리가 작업한 추천 부분) -->
     <div class="sec-row" style="margin-top:30px">
       <h3 class="sec-h">처방 약물 정보</h3>
-      <span class="vtoggle">
-        <button class="vbtn on" id="vC" onclick="setVariant('C')">시안 C · 약물 카드</button>
-        <button class="vbtn" id="vD" onclick="setVariant('D')">시안 D · 표 + 드럭머거</button>
+      <!-- 시안 C는 숨김 — 시안 D로 확정·디벨롭 (토글 미노출, 코드는 보존) -->
+      <span class="vtoggle" style="display:none">
+        <button class="vbtn" id="vC" onclick="setVariant('C')">시안 C · 약물 카드</button>
+        <button class="vbtn on" id="vD" onclick="setVariant('D')">시안 D · 표 + 드럭머거</button>
       </span>
       <button class="cta" onclick="openSetting()">⚙ 추천 상품 설정</button>
     </div>
@@ -527,7 +529,7 @@ function toast(m){ te.textContent=m; te.classList.add('show'); clearTimeout(tt);
       depl:[ {nid:"NUT-CA", info:"위산 감소로 칼슘의 이온화·흡수가 저하되어 부족해질 위험이 있습니다.", ref:""},
              {nid:"NUT-MG", info:"", ref:""} ] }];
   }
-  setVariant(q.get('view')==='C'?'C':'D');
+  setVariant('D');   // 시안 D로 확정 — 시안 C는 숨김
 })();
 </script>
 </body>
