@@ -195,24 +195,6 @@
         <div class="note">행을 클릭하면 상세에서 수정합니다. <b>노출 OFF</b>는 AI mate·약사웹에 노출되지 않습니다.</div>
       </div>
 
-      <!-- 2. 부족 영양소별 통계 -->
-      <div id="tab1" class="hidden">
-        <div class="bar">
-          <input class="inp search" placeholder="영양소 검색" />
-          <button class="btn primary">검색</button>
-          <span class="spacer"></span>
-          <span class="total">기준 <b>최근 6개월</b> 조제건</span>
-        </div>
-        <div class="tbl"><table>
-          <thead><tr>
-            <th>부족 영양소</th><th class="num">관련 성분 수</th><th class="num">최근 6개월 조제건</th><th class="num">조제 약국 수</th>
-            <th class="num">기본 추천 / 약국 설정</th><th class="num">미매칭 성분</th><th class="c">보완 우선순위</th>
-          </tr></thead>
-          <tbody id="statBody"></tbody>
-        </table></div>
-        <div class="note">보완 우선순위 = 조제건 수 + 조제 약국 수 + 미매칭 여부 + 약국 수정 빈도 기준.</div>
-      </div>
-
       <!-- 약국별 매칭 현황: 별도 탭 없이 Master 레코드 클릭 시 상세 모달의 '약국별 제출 이력'으로 표시 -->
       </div><!-- /pageReco -->
 
@@ -387,7 +369,7 @@
         <div class="block-h">근거 (참고문헌)</div>
         <textarea class="fw" id="dRef"></textarea>
       </div>
-      <div class="roinfo">추가된 DIND는 <b>검토 필요</b> 상태·<b>기본 노출 OFF</b>로 등록되며, 추천 관리에서 검토 후 <b>노출 ON</b>으로 전환합니다.</div>
+      <div class="roinfo">추가된 DIND는 <b>기본 노출 OFF</b>로 등록되며, 부족 영양소 관리에서 확인 후 <b>노출 ON</b>으로 전환합니다.</div>
     </div>
     <div class="m-foot"><button class="btn" onclick="closeDind()">취소</button><button class="btn primary" onclick="saveDind()">추가</button></div>
   </div>
@@ -515,7 +497,6 @@ function pickDef(bc){
   renderDefProds();
 }
 function delDef(i){ curDefs.splice(i,1); renderDefProds(); }
-function srcBadge(s){ return s==='store'?'<span class="stt ok">약국 설정</span>':'<span class="stt hide">기본 추천</span>'; }
 
 // 목록 정렬 공통: 최종 수정일 내림차순(없거나 '-'는 뒤로). 'YYYY-MM-DD' 문자열 비교.
 function cmpMod(a,b){ var ma=(a&&a!=='-')?a:'', mb=(b&&b!=='-')?b:''; if(ma&&mb) return mb<ma?-1:(mb>ma?1:0); if(ma) return -1; if(mb) return 1; return 0; }
@@ -894,7 +875,7 @@ function renderDindRef(){
     sames.map(function(g){
       var links=ingredientLinks(g.code);
       var det = links.length ? links.map(function(l){
-          return '<div style="margin-bottom:3px"><b>'+l.nut+'</b> — '+(l.reason||'<span style="color:#98a2ad">이유 미등록</span>')+(l.ref?' <span style="color:#8a9099">('+l.ref+')</span>':'')+'</div>';
+          return '<div style="margin-bottom:3px"><b>'+l.nut+'</b> — '+(l.reason||'<span style="color:#98a2ad">데이터 없음</span>')+(l.ref?' <span style="color:#8a9099">('+l.ref+')</span>':'')+'</div>';
         }).join('') : '<span style="color:#98a2ad">연결된 부족 영양소 없음</span>';
       var same = (g.code||'').toUpperCase()===code ? ' <span class="stt need">전체 일치</span>' : '';
       return '<tr><td class="mono" style="white-space:nowrap">'+g.code+same+'</td><td style="white-space:nowrap">'+g.comp+'</td><td style="min-width:210px">'+det+'</td></tr>';
@@ -927,14 +908,14 @@ function saveDind(){
   if(!ingHist[code]) ingHist[code]=[];
   ingHist[code].unshift({at:today+' 10:00', by:'관리자 김OO', field:'DIND 추가 · '+nut, before:'-', after:finalComp+' → '+nut});
   renderMaster(); renderIngredients(); closeDind();
-  toast('DIND를 추가했습니다. (검토 필요 · 노출 OFF)');
+  toast('DIND를 추가했습니다. (노출 OFF)');
 }
 
 /* 스토리보드용 데모 케이스 (?case=, ?page=, ?master=idx, ?ing=code, ?modal=) */
 (function(){
   var q=new URLSearchParams(location.search), c=q.get('case');
   if(c==='deleted'){ var g=ingredients.find(function(x){return x.code==='A02BC01';}); if(g){ g.deleted=true; } }
-  renderMaster(); renderStats(); renderIngredients();
+  renderMaster(); renderIngredients();
   if(q.get('page')==='ingr') showPage('ingr');
   var mi=q.get('master'); if(mi!==null&&mi!=='') openMaster(+mi);
   var ic=q.get('ing'); if(ic){ showPage('ingr'); openIngredient(ic); }
