@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>굿팜 어드민 · AI mate 추천 관리</title>
+<title>굿팜 어드민 · AI mate 부족 영양소 관리</title>
 <style>
   :root{
     --teal:#16c0a4; --teal-d:#0ea58b; --teal-soft:#e6f8f4; --teal-line:#bfe9e1;
@@ -150,7 +150,7 @@
       </div>
       <a class="grp">AI Mate 추천 상품 관리 <span class="cv">▴</span></a>
       <div class="sub">
-        <a id="navReco" class="on" onclick="showPage('reco')">추천 상품 관리</a>
+        <a id="navReco" class="on" onclick="showPage('reco')">부족 영양소 관리</a>
         <a id="navIngr" onclick="showPage('ingr')">성분 관리</a>
       </div>
       <a class="grp">모바일 약국 관리 <span class="cv">▾</span></a>
@@ -165,8 +165,8 @@
 
   <!-- 메인 -->
   <div class="main">
-    <div class="top"><div class="pg" id="pgTitle">추천 상품 관리</div></div>
-    <div class="filterbar" id="pgFilter">부족 영양소 기준 추천 상품 관리</div>
+    <div class="top"><div class="pg" id="pgTitle">부족 영양소 관리</div></div>
+    <div class="filterbar" id="pgFilter">부족 영양소별 추천 상품·노출 관리</div>
     <div class="wrap">
       <div id="pageReco">
       <div class="tabs">
@@ -695,9 +695,9 @@ function showPage(p){
   document.getElementById('pageIngr').classList.toggle('hidden', reco);
   document.getElementById('navReco').classList.toggle('on', reco);
   document.getElementById('navIngr').classList.toggle('on', !reco);
-  document.getElementById('pgTitle').textContent = reco ? '추천 상품 관리' : '성분 관리';
+  document.getElementById('pgTitle').textContent = reco ? '부족 영양소 관리' : '성분 관리';
   document.getElementById('pgFilter').textContent = reco
-    ? '부족 영양소 기준 추천 상품 관리'
+    ? '부족 영양소별 추천 상품·노출 관리'
     : '성분코드 기준 성분 정보 관리';
   if(!reco) renderIngredients();
 }
@@ -795,9 +795,8 @@ function askSaveIngredient(){
   if(comp===curIng.comp){ applyIngredient(); return; }
   var links=ingredientLinks(curIng.code);
   var expo=links.filter(function(l){return l.on;}).length;
-  var storeSum=links.reduce(function(a,l){return a+(l.store||0);},0);
   document.getElementById('icNut').innerHTML='<b>'+links.length+'</b>개';
-  document.getElementById('icExp').innerHTML='노출 ON <b>'+expo+'</b>개 · 약국 설정 <b>'+storeSum+'</b>곳';
+  document.getElementById('icExp').innerHTML='노출 ON <b>'+expo+'</b>개';
   document.getElementById('iConfirm').classList.add('open');
 }
 function closeIConfirm(){ document.getElementById('iConfirm').classList.remove('open'); }

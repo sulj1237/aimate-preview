@@ -216,13 +216,13 @@
           <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
           <tbody>
             <tr class="hlrow" data-hl=".drug"><td class="n">1</td><td class="area">처방 약물표 (as-is)</td><td>기존 처방 상세 분석의 약물 목록. 신규 범위 아님.</td><td>표 하단에 추천 영역이 자동으로 이어 붙어 노출된다.</td></tr>
-            <tr class="hlrow" data-hl="#viewD"><td class="n">2</td><td class="area">영양소 상담 추천 영역<span class="tag new">신규</span></td><td>약물표 하단 자동 노출. 처방 약물의 드럭머거 분석 결과(부족 영양소)만 대상. §4 정규화로 표준 영양소명만 표기.<br><b>섹션 구분</b>: 옅은 배경(#f7faf9)과 좌측 민트 액센트로 처방 약물 행과 구분하되, 위쪽은 붙여(border-top 없음) <b>해당 약물에 종속</b>됨을 표현.</td><td>노출/상품클릭/CTA클릭 로그 적재. 조회 전용(POS 편집 불가).</td></tr><tr class="hlrow" data-hl=".dm-head"><td class="n">2-1</td><td class="area">섹션 헤더 — 로고·기준 약물<span class="tag new">신규</span></td><td>좌측 상단에 <b>Drug Mugger 로고(시안 B · 첫 글자만 대문자)</b> 배치. 옆에 <code>&lt;약물명&gt; 복용 시 부족해질 수 있는 영양소</code> 문구로 <b>어느 처방 약물 기준인지 명시</b>.</td><td>로고는 알약형 pill(좌 Drug=민트 배경/흰 글자, 우 Mugger=흰 배경/민트 글자, #0e9e8c). 다약제 처방에서 약물별 섹션을 구분하는 기준점이 된다.</td></tr>
+            <tr class="hlrow" data-hl="#viewD"><td class="n">2</td><td class="area">영양소 상담 추천 영역<span class="tag new">신규</span></td><td>약물표 하단 자동 노출. 처방 약물 성분코드를 <b>전체 일치</b>로 DIND 매칭해 부족 영양소·근거를 조회한다(앞자리 부분 매칭 없음). §4 정규화로 표준 영양소명만 표기.<br><b>섹션 구분</b>: 옅은 배경(#f7faf9)과 좌측 민트 액센트로 처방 약물 행과 구분하되, 위쪽은 붙여(border-top 없음) <b>해당 약물에 종속</b>됨을 표현.</td><td>노출/상품클릭/CTA클릭 로그 적재. 조회 전용(POS 편집 불가).</td></tr><tr class="hlrow" data-hl=".dm-head"><td class="n">2-1</td><td class="area">섹션 헤더 — 로고·기준 약물<span class="tag new">신규</span></td><td>좌측 상단에 <b>Drug Mugger 로고(시안 B · 첫 글자만 대문자)</b> 배치. 옆에 <code>&lt;약물명&gt; 복용 시 부족해질 수 있는 영양소</code> 문구로 <b>어느 처방 약물 기준인지 명시</b>.</td><td>로고는 알약형 pill(좌 Drug=민트 배경/흰 글자, 우 Mugger=흰 배경/민트 글자, #0e9e8c). 다약제 처방에서 약물별 섹션을 구분하는 기준점이 된다.</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">3</td><td class="area">노출 레이아웃<span class="tag new">시안 D 확정</span></td><td><b>시안 D(표 + 드럭머거 2열)로 확정</b>. 시안 C(약물 카드형)는 화면에서 숨김(코드는 보존).</td><td>탐색용 시안 토글 미노출 — 항상 시안 D로 렌더.</td></tr>
-            <tr class="hlrow" data-hl=".dm-left"><td class="n">4</td><td class="area">부족 영양소 블록 (좌열)<span class="tag new">신규</span></td><td>부족영양소명 + 관련 카테고리 배지 + 부족해지는 근거 문구 + 참고문헌 ⓘ. §7 결측 시 ⓘ만 미노출.</td><td>ⓘ hover → 참고문헌 tooltip. 근거는 §3 override 최종 반영값만(원천/수정 구분 미노출).</td></tr>
+            <tr class="hlrow" data-hl=".dm-left"><td class="n">4</td><td class="area">부족 영양소 블록 (좌열)<span class="tag new">신규</span></td><td>부족영양소명 + 관련 카테고리 배지 + 부족해지는 이유 문구 + 근거(참고문헌) ⓘ. §7 결측 시 ⓘ만 미노출.</td><td>ⓘ hover → 근거(참고문헌) tooltip. 근거는 §3 override 최종 반영값만(원천/수정 구분 미노출).</td></tr>
             <tr class="hlrow" data-hl=".dm-right"><td class="n">5</td><td class="area">우리약국 컬럼 (우측·우선강조)<span class="tag new">신규</span></td><td>우리약국 등록 제품을 우선 강조. 최대 3개. 2개 이상이면 우선순위 번호(1·2·3) 표기. <b>라벨 옆 총 개수 배지는 미표기</b>(번호로만 구분).</td><td>상품명 hover → 전체명 tooltip. 제품 클릭 로그.</td></tr>
             <tr class="hlrow" data-hl=".dm-right"><td class="n">6</td><td class="area">굿팜 컬럼 (우측·보조)<span class="tag new">신규</span></td><td>굿팜 추천 제품(보조). 최대 2개. 우리약국과 나란히 2열 비교.</td><td>우리약국·굿팜 중 하나라도 있으면 블록 노출(§7,§10 hide-when-no-products).</td></tr>
             <tr class="hlrow" data-hl=".dm-cta"><td class="n">7</td><td class="area">우리약국 미등록 CTA<span class="tag new">신규</span></td><td>해당 영양소에 우리약국 제품이 없을 때 <code>＋ 추천 상품 등록</code> 노출(굿팜만 있는 경우).</td><td>클릭 → 약사웹 설정 새 창(약국ID·성분코드·영양소ID 전달). 실패 시 <code>설정 페이지를 열 수 없습니다. 잠시 후 다시 시도해 주세요.</code></td></tr>
-            <tr class="hlrow" data-hl=".dm-basis"><td class="n">8</td><td class="area">복합제 통합 블록<span class="tag new">신규</span></td><td>§6: 동일 영양소가 복수 성분에서 중복 매칭되면 1블록으로 통합. 근거에 관련 성분 병기(성분 A, 성분 B / 근거 · 성분A기준 · 성분B기준).</td><td>제품 목록은 통합, 근거만 성분별로 구분 표기.</td></tr>
+            <tr class="hlrow" data-hl=".dm-basis"><td class="n">8</td><td class="area">복합제 통합 블록<span class="tag new">신규</span></td><td>완제품 성분코드로 매칭해 DIND가 제공하는 부족 영양소를 사용. 같은 영양소가 여러 원인 성분에서 겹치면 <b>1블록 통합 + 관련 성분 표시</b>.</td><td><span class="tag tbu">(확인 필요)</span> 합치기(중복 제거) 처리는 개발 논의 전.</td></tr>
             <tr class="hlrow" data-hl=".dm-more"><td class="n">9</td><td class="area">+N개 더보기<span class="tag new">신규</span></td><td>영양소가 5개를 초과하면 상위 5개만 노출 + <code>+N개 더보기</code>.</td><td>클릭 → 나머지 영양소 블록 펼침.</td></tr>
             <tr class="hlrow" data-hl=".dm-plist"><td class="n">10</td><td class="area">긴 상품명 처리<span class="tag new">신규</span></td><td>상품명 2줄 말줄임(…). 전체명은 tooltip 제공.</td><td>상품명 hover → 전체명 tooltip.</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">11</td><td class="area">노출 제어 (OFF/삭제/결측)</td><td>§9 노출 OFF 영양소 POS 미노출 · §8 soft delete 성분 기준 미노출 · §7 결측: 추천 상품(필수 값) 있으면 블록 노출(없는 이유·근거·카테고리만 생략), 추천 상품 부재 시에만 미노출.</td><td>조건별 자동 필터링. 사용자 조작 없음.</td></tr>
@@ -239,8 +239,8 @@
               <tr><td class="st">상품 0개 → 영역 미노출</td><td><span class="yn y">해당</span></td><td>우리약국·굿팜 모두 없으면 블록·문구 모두 미노출(문구 없음).</td></tr>
               <tr><td class="st">매칭 0 (추천 없음)</td><td><span class="yn y">해당</span></td><td>매칭 제품 전무 시 영역 미노출.</td></tr>
               <tr><td class="st">노출 OFF 영양소 (§9)</td><td><span class="yn y">해당</span></td><td>POS 미노출.</td></tr>
-              <tr><td class="st">복합제 통합 (§6)</td><td><span class="yn y">해당</span></td><td>1블록 통합·관련 성분 병기·근거 성분별.</td></tr>
-              <tr><td class="st">결측: 참고문헌만 없음 (§7)</td><td><span class="yn y">해당</span></td><td>이유·근거·상품 노출, 참고문헌 ⓘ만 미노출.</td></tr>
+              <tr><td class="st">복합제 통합 (§6)</td><td><span class="yn y">해당</span></td><td>1블록 통합·관련 성분 표시 <b>(확인 필요 — 개발 논의 전)</b>.</td></tr>
+              <tr><td class="st">결측: 근거(참고문헌)만 없음 (§7)</td><td><span class="yn y">해당</span></td><td>이유·근거·상품 노출, 근거(참고문헌) ⓘ만 미노출.</td></tr>
               <tr><td class="st">부족 이유 없음(상품 있음) (§7)</td><td><span class="yn y">해당</span></td><td>필수 값(추천 상품) 있으면 블록 노출, 부족해지는 근거 문구만 생략.</td></tr>
               <tr><td class="st">5개 초과 더보기</td><td><span class="yn y">해당</span></td><td>상위 5개 + <code>+N개 더보기</code>.</td></tr>
               <tr><td class="st">삭제 성분 포함 복합제 (§8)</td><td><span class="yn y">해당</span></td><td>삭제 성분 기준만 미노출, 남은 성분 기준 정상 노출(부분 노출).</td></tr>
@@ -264,8 +264,8 @@
     </div>
     <ul class="cnote">
       <li><span class="k">달라지는 점</span> 한 영양소(CoQ10) 블록에 우리약국 3개(우선강조·번호 1·2·3) + 굿팜 2개(보조)가 2열로 나란히 비교된다.</li>
-      <li><span class="k">정책 근거</span> 우리약국 우선강조/굿팜 보조(§ 우선순위), 최대 우리약국3·굿팜2. 근거·참고문헌 ⓘ 노출.</li>
-      <li><span class="k">인터랙션</span> ⓘ hover → 참고문헌 tooltip · 상품명 hover → 전체명 · 제품/노출 로그 적재.</li>
+      <li><span class="k">정책 근거</span> 우리약국 우선강조/굿팜 보조(§ 우선순위), 최대 우리약국3·굿팜2. 근거(참고문헌) ⓘ 노출.</li>
+      <li><span class="k">인터랙션</span> ⓘ hover → 근거(참고문헌) tooltip · 상품명 hover → 전체명 · 제품/노출 로그 적재.</li>
     </ul>
   </div>
 
@@ -361,10 +361,10 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="cbadge pos">Case 9</span><span class="sc-name">복합제 통합</span><span class="sp"></span><span class="badge na">데이터 케이스</span></div>
+    <div class="sc-head"><span class="cbadge pos">Case 9</span><span class="sc-name">복합제 통합</span><span class="sp"></span><span class="badge tbu">확인 필요</span></div>
     <ul class="cnote">
       <li><span class="k">상황</span> 한 처방의 복합제에서 성분 A·성분 B가 동일 영양소(예: 마그네슘)를 각각 소모 → 같은 영양소가 중복 매칭됨.</li>
-      <li><span class="k">화면 처리</span> §6 통합: 영양소당 1블록으로 합치고 <code>관련 성분: 성분 A, 성분 B</code> 병기. 근거는 <code>· 성분A기준 · 성분B기준</code>으로 성분별 구분. 제품 목록은 통합해 한 번만 노출.</li>
+      <li><span class="k">화면 처리</span> §6 통합: 영양소당 1블록으로 합치고 <code>관련 성분: 성분 A, 성분 B</code> 병기. 근거는 <code>· 성분A기준 · 성분B기준</code>으로 성분별 구분. 제품 목록은 통합해 한 번만 노출. <b>(확인 필요) 합치기 처리는 개발 논의 전 — 완제품 코드로 매칭 시 DIND가 이미 영양소를 제공.</b></li>
       <li><span class="k warn">주의</span> 블록을 성분 수만큼 중복 노출하지 말 것. 근거만 성분별로 나열, 영양소·제품은 1회.</li>
     </ul>
   </div>
@@ -381,14 +381,14 @@
   <div class="screen">
     <div class="sc-head"><span class="cbadge pos">Case 11</span><span class="sc-name">결측 — 관련 카테고리·부족 이유·근거 없음</span><span class="sp"></span><span class="badge na">결측</span></div>
     <div class="screenview">
-      <div class="cap">▶ pos-aimate.html?case=missing · 관련 카테고리·참고문헌·부족 이유가 없어도 추천 상품(필수 값)이 있으면 블록 노출(없는 항목만 생략)</div>
+      <div class="cap">▶ pos-aimate.html?case=missing · 관련 카테고리·근거(참고문헌)·부족 이유가 없어도 추천 상품(필수 값)이 있으면 블록 노출(없는 항목만 생략)</div>
       <div class="framewrap"><iframe src="./pos-aimate.html?case=missing" width="1040" height="900" scrolling="auto" title="Case missing"></iframe></div>
     </div>
     <ul class="cnote">
       <li><span class="k">관련 카테고리 없음</span> 카테고리 배지를 <b>미표기</b>(빈 배지·<code>-</code> 노출 안 함). 영양소명만 표시. (§7)</li>
-      <li><span class="k">참고문헌 없음</span> 부족 이유 문구·상품은 정상 노출, <b>참고문헌 ⓘ 아이콘만 미표기</b>. (§7)</li>
+      <li><span class="k">근거(참고문헌) 없음</span> 부족 이유 문구·상품은 정상 노출, <b>근거(참고문헌) ⓘ 아이콘만 미표기</b>. (§7)</li>
       <li><span class="k">부족 이유 없음</span> 부족 이유가 없어도 <b>추천 상품(필수 값)이 있으면 블록은 노출</b>되고, 부족해지는 근거 문구만 생략된다(데모의 마그네슘). (§7)</li>
-      <li><span class="k warn">주의</span> 블록은 <b>추천 상품(필수 값)이 없을 때만(데이터 부재) 미노출</b>. 카테고리 없음=배지만, 참고문헌 없음=ⓘ만, 이유 없음=근거 줄만 생략(블록은 노출).</li>
+      <li><span class="k warn">주의</span> 블록은 <b>추천 상품(필수 값)이 없을 때만(데이터 부재) 미노출</b>. 카테고리 없음=배지만, 근거(참고문헌) 없음=ⓘ만, 이유 없음=근거 줄만 생략(블록은 노출).</li>
     </ul>
   </div>
 

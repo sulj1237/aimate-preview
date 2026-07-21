@@ -159,7 +159,7 @@
   <div class="cover">
     <div class="eyebrow">SCREEN DESIGN · 약사 어드민웹 · CASE-BY-CASE</div>
     <h1>AI mate 영양소 상담 추천 — 약사 어드민웹 화면설계서</h1>
-    <div class="sub">굿팜 솔루션 · 부족 영양소별 우리약국 추천 상품 설정(목록·상세·굿팜 보유 상품 검색). 노출 상태·등록 상태에 따른 모든 케이스를 Case 1·2·3…으로 그린다.</div>
+    <div class="sub">굿팜 솔루션 · 부족 영양소별 우리약국 추천 상품 설정(목록·상세·굿팜 마스터 상품 검색). 노출 상태·등록 상태에 따른 모든 케이스를 Case 1·2·3…으로 그린다.</div>
     <div class="metagrid">
       <div class="m"><div class="k">플랫폼</div><div class="v">약사 어드민웹</div></div>
       <div class="m"><div class="k">공개 범위</div><div class="v">내부 전용(Internal)</div></div>
@@ -184,14 +184,14 @@
   <div class="screen">
     <div class="sc-head"><span class="sc-name">화면 인벤토리</span><span class="sp"></span><span class="badge new">v2</span></div>
     <table class="info">
-      <tr><td class="k">약사웹</td><td><b>AIM-P-01</b> 목록 · <b>AIM-P-02</b> 상세(페이지) · <b>AIM-P-03</b> 굿팜 보유 상품 검색 모달 <span class="badge new">신규</span> — Case 다수</td></tr>
+      <tr><td class="k">약사웹</td><td><b>AIM-P-01</b> 목록 · <b>AIM-P-02</b> 상세(페이지) · <b>AIM-P-03</b> 굿팜 마스터 상품 검색 모달 <span class="badge new">신규</span> — Case 다수</td></tr>
     </table>
   </div>
 
 <div class="platform web">
     <span class="pv">B · 약사 어드민 웹 (WEB · 굿팜 솔루션)</span>
     <h2>AI mate 추천 상품 설정</h2>
-    <p>부족 영양소별로 POS AI mate 상담 화면에 노출될 <b>우리약국 추천 상품</b>을 관리하는 약사웹 화면. 목록(AIM-P-01)에서 부족 영양소 행을 클릭하면 상세 페이지(AIM-P-02)로 전환되고, 상세 하단의 [＋ 상품 추가]로 굿팜 보유 상품 검색 모달(AIM-P-03)을 연다. 굿팜 추천 상품은 슈퍼어드민이 관리하므로 여기서는 조회만 가능하고, 우리약국 상품은 부족 영양소별 최대 3개까지 등록·정렬·삭제한다.</p>
+    <p>부족 영양소별로 POS AI mate 상담 화면에 노출될 <b>우리약국 추천 상품</b>을 관리하는 약사웹 화면. 목록(AIM-P-01)에서 부족 영양소 행을 클릭하면 상세 페이지(AIM-P-02)로 전환되고, 상세 하단의 [＋ 상품 추가]로 굿팜 마스터 상품 검색 모달(AIM-P-03)을 연다. 굿팜 추천 상품은 슈퍼어드민이 관리하므로 여기서는 조회만 가능하고, 우리약국 상품은 부족 영양소별 최대 3개까지 등록·정렬·삭제한다.</p>
   </div>
 
   <div class="screen">
@@ -199,7 +199,7 @@
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 약사웹(굿팜 솔루션)</td><td class="k">화면 ID</td><td>AIM-P-01</td></tr>
       <tr><td class="k">화면 경로</td><td>약사웹 &gt; AI mate &gt; 추천 상품 설정</td><td class="k">권한</td><td>약사웹 관리자 = 자약국 우리약국 상품만 수정/삭제</td></tr>
-      <tr><td class="k">화면 설명</td><td colspan="3">조제 성분코드→DIND 매칭으로 도출된 <b>부족 영양소</b>를 한 행씩 나열. 각 행은 부족 영양소·관련 카테고리·관련 약물 수·굿팜 추천 상품·우리약국 추천 상품·AI mate 노출 상태·최종 수정 컬럼으로 구성된다. 노출 중지(OFF) 행도 목록에서 숨기지 않고 <b>노출 중지</b> 배지로 표시한다. 행 클릭 시 상세 페이지로 전환(모달 아님).</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">조제 성분코드→DIND 매칭으로 도출된 <b>부족 영양소</b>를 한 행씩 나열. 각 행은 부족 영양소·관련 카테고리·관련 약물 수·우리약국 추천 상품·굿팜 추천 상품·AI mate 노출 상태·최종 수정 컬럼으로 구성된다. 노출 중지(OFF) 행도 목록에서 숨기지 않고 <b>노출 중지</b> 배지로 표시한다. 행 클릭 시 상세 페이지로 전환(모달 아님).</td></tr>
     </table>
     <div class="body2">
       <div class="screenview">
@@ -211,11 +211,11 @@
         <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
           <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
           <tbody>
-            <tr class="hlrow" data-hl="#listBody"><td class="n">1</td><td class="area">목록 컬럼</td><td>부족 영양소 · 관련 카테고리 · 관련 약물 수 · 굿팜 추천 상품 · 우리약국 추천 상품 · AI mate 노출 상태 · 최종 수정.</td><td>상품 표기는 바코드 대신 <b>제조사</b> 기준(매입처별 바코드 상이). 관련 약물 수는 해당 영양소를 부족하게 만드는 성분 개수.</td></tr>
+            <tr class="hlrow" data-hl="#listBody"><td class="n">1</td><td class="area">목록 컬럼</td><td>부족 영양소 · 관련 카테고리 · 관련 약물 수 · 우리약국 추천 상품 · 굿팜 추천 상품 · AI mate 노출 상태 · 최종 수정.</td><td>상품 표기는 <b>상품명(+제조사)</b>(매입처별 바코드 상이). 관련 약물 수는 해당 영양소를 부족하게 만드는 성분 개수.</td></tr>
             <tr class="hlrow" data-hl="#listBody"><td class="n">2</td><td class="area">AI mate 노출 상태</td><td>ON = <b>AI mate 노출</b>(그린 배지) / OFF = <b>AI mate 노출 중지</b>(옐로 배지). 상태 옆 ⓘ 툴팁으로 의미 안내.</td><td>OFF 행도 <b>목록에서 숨기지 않음</b>. 노출 여부는 굿팜 정책(슈퍼어드민)이 결정.</td></tr>
-            <tr class="hlrow" data-hl="#listBody"><td class="n">3</td><td class="area">우리약국 추천 상품 셀</td><td>등록된 우리약국 상품 요약(제조사·상품명). 미설정 시 <b>미설정</b>로 표기.</td><td>굿팜만 있고 우리약국 미설정이면 상담에서 굿팜 추천만 노출됨을 상세에서 안내.</td></tr>
+            <tr class="hlrow" data-hl="#listBody"><td class="n">3</td><td class="area">우리약국 추천 상품 셀</td><td>등록된 우리약국 상품 요약(상품명(+제조사)). 미설정 시 <b>미설정</b>로 표기.</td><td>굿팜만 있고 우리약국 미설정이면 상담에서 굿팜 추천만 노출됨을 상세에서 안내.</td></tr>
             <tr class="hlrow" data-hl="#listBody"><td class="n">4</td><td class="area">행 클릭</td><td>행 전체가 클릭 영역. 클릭 시 <b>상세 페이지로 전환</b>(AIM-P-02).</td><td>모달이 아닌 페이지 전환. 뒤로가기로 목록 복귀.</td></tr>
-            <tr class="hlrow" data-hl="#cntNum"><td class="n">5</td><td class="area">약국 설정 수(§8)</td><td>우리약국 추천 상품을 등록한 약국 수(<b>N곳</b>)는 주로 슈퍼어드민 참고지표.</td><td>약사웹 목록에서는 자약국 관점 요약 중심.</td></tr>
+            <tr class="hlrow" data-hl="#listBody"><td class="n">5</td><td class="area">목록 정렬</td><td>기본 정렬 ① AI mate 노출 ON 우선 → ② 최종 수정일 최신 → ③ 관련 약물 수 많은 순.</td><td>진입 시 자동 정렬. 컬럼 클릭 정렬 여부는 미정.</td></tr>
           </tbody></table>
         <div class="states"><div class="dh">필수 화면 상태</div>
           <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
@@ -224,6 +224,7 @@
               <tr><td class="st">노출 OFF 행</td><td><span class="yn y">해당</span></td><td><b>AI mate 노출 중지</b>(옐로). 숨기지 않음. 상세에서 <b>사전 등록·수정 가능</b>.</td></tr>
               <tr><td class="st">우리약국 미설정</td><td><span class="yn y">해당</span></td><td>우리약국 셀 <b>미설정</b>. 상세에서 추가 유도.</td></tr>
               <tr><td class="st">굿팜만 존재</td><td><span class="yn y">해당</span></td><td>굿팜 셀만 채워지고 우리약국 <b>미설정</b>.</td></tr>
+              <tr><td class="st">목록 0건</td><td><span class="yn y">해당</span></td><td><b>데이터가 없습니다.</b> 안내만 표기.</td></tr>
             </tbody></table></div>
       </div>
     </div>
@@ -248,9 +249,9 @@
           <tbody>
             <tr class="hlrow" data-hl="#detailView"><td class="n">1</td><td class="area">상단 헤더</td><td>← 뒤로가기 + 부족 영양소명. 노출 상태 배지 동반.</td><td>뒤로가기 → 목록(AIM-P-01) 복귀. OFF면 상단 안내 배너 노출.</td></tr>
             <tr class="hlrow" data-hl="#mBasic"><td class="n">2</td><td class="area">기본정보</td><td>부족 영양소 · 관련 카테고리 · 관련 약물 수 표기.</td><td>조회 전용(슈퍼어드민/성분 관리 산출값).</td></tr>
-            <tr class="hlrow" data-hl="#mInfoWrap"><td class="n">3</td><td class="area">관련 약물</td><td>이 영양소를 부족하게 만드는 <b>성분명 · 부족해지는 이유 · 근거</b> 리스트(조회 전용).</td><td>soft delete된 성분코드의 성분/약물 정보는 <b>미노출</b>(§8).</td></tr>
-            <tr class="hlrow" data-hl="#mProds"><td class="n">4</td><td class="area">우리약국 추천 상품</td><td>부족 영양소별 <b>최대 3개</b> 등록. 제조사·상품명 표기, 정렬(순서 조정)·삭제 가능.</td><td>3개 도달 시 [＋ 상품 추가] 차단·안내. 변경은 저장 시 확정.</td></tr>
-            <tr class="hlrow" data-hl="#mProds"><td class="n">5</td><td class="area">[＋ 상품 추가]</td><td>굿팜 보유 상품 검색 모달(AIM-P-03) 오픈.</td><td>최대 3개 도달 시에만 숨김. <b>노출 OFF 상태에서도 추가 가능</b>(사전 세팅).</td></tr>
+            <tr class="hlrow" data-hl="#mInfoWrap"><td class="n">3</td><td class="area">관련 약물</td><td>이 영양소를 부족하게 만드는 <b>성분명 · 부족해지는 이유 · 근거(참고문헌)</b> 리스트(조회 전용).</td><td>soft delete된 성분코드의 성분/약물 정보는 <b>미노출</b>.</td></tr>
+            <tr class="hlrow" data-hl="#mProds"><td class="n">4</td><td class="area">우리약국 추천 상품</td><td>부족 영양소별 <b>최대 3개</b> 등록. 상품명(+제조사) 표기, 정렬(순서 조정)·삭제 가능.</td><td>3개 도달 시 [＋ 상품 추가] 차단·안내. 변경은 저장 시 확정.</td></tr>
+            <tr class="hlrow" data-hl="#mProds"><td class="n">5</td><td class="area">[＋ 상품 추가]</td><td>굿팜 마스터 상품 검색 모달(AIM-P-03) 오픈.</td><td>최대 3개 도달 시에만 숨김. <b>노출 OFF 상태에서도 추가 가능</b>(사전 세팅).</td></tr>
             <tr class="hlrow" data-hl="#mProds"><td class="n">6</td><td class="area">굿팜 추천 상품</td><td>추가 버튼 아래에 굿팜 추천 상품 <b>조회</b> 영역.</td><td>편집 불가(슈퍼어드민 관리). 참고용 노출.</td></tr>
             <tr class="hlrow" data-hl="#mFoot"><td class="n">7</td><td class="area">저장</td><td>우측 하단 [저장]. 우리약국 상품 추가/수정/삭제/정렬 반영.</td><td>이력 기록: 수정일시·수정자·항목·전/후. 성공/실패 토스트.</td></tr>
           </tbody></table>
@@ -268,11 +269,11 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="sc-id">AIM-P-03</span><span class="sc-name">굿팜 보유 상품 검색 — 모달</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <div class="sc-head"><span class="sc-id">AIM-P-03</span><span class="sc-name">굿팜 마스터 상품 검색 — 모달</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 약사웹(굿팜 솔루션)</td><td class="k">화면 ID</td><td>AIM-P-03</td></tr>
-      <tr><td class="k">화면 경로</td><td>AIM-P-02 상세 &gt; [＋ 상품 추가]</td><td class="k">권한</td><td>굿팜 보유 상품만 검색(약국 로컬/POS 아님)</td></tr>
-      <tr><td class="k">화면 설명</td><td colspan="3">우리약국 추천 상품을 추가하기 위한 검색 모달. <b>굿팜 보유 상품</b>에서만 검색하며(약국 로컬 재고/POS 아님), 검색 결과에서 선택하면 상세의 우리약국 목록에 추가된다. 중복·결과 0·최대 3개 도달을 각각 안내한다.</td></tr>
+      <tr><td class="k">화면 경로</td><td>AIM-P-02 상세 &gt; [＋ 상품 추가]</td><td class="k">권한</td><td>굿팜 마스터 상품 DB만 검색(약국 로컬/POS 아님)</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">우리약국 추천 상품을 추가하기 위한 검색 모달. <b>굿팜 마스터 상품 DB</b>에서만 검색하며(약국 로컬 재고/POS 아님), 검색 결과에서 선택하면 상세의 우리약국 목록에 추가된다. 중복·결과 0·최대 3개 도달을 각각 안내한다.</td></tr>
     </table>
     <div class="body2">
       <div class="screenview">
@@ -284,8 +285,8 @@
         <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
           <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
           <tbody>
-            <tr class="hlrow" data-hl="#searchModal"><td class="n">1</td><td class="area">검색 입력</td><td>상품명/제조사 검색. <b>굿팜 보유 상품</b>만 대상.</td><td>약국 로컬/POS 상품은 검색되지 않음.</td></tr>
-            <tr class="hlrow" data-hl="#searchModal"><td class="n">2</td><td class="area">검색 결과</td><td>제조사·상품명 리스트. 선택 시 우리약국 목록에 추가.</td><td>결과 없음 → <b>검색 결과가 없습니다.</b></td></tr>
+            <tr class="hlrow" data-hl="#searchModal"><td class="n">1</td><td class="area">검색 입력</td><td><b>상품명 또는 바코드</b>로 검색. <b>굿팜 마스터 상품 DB</b>만 대상(결과 표기는 상품명(+제조사)).</td><td>약국 로컬/POS 재고는 검색되지 않음.</td></tr>
+            <tr class="hlrow" data-hl="#searchModal"><td class="n">2</td><td class="area">검색 결과</td><td>상품명(+제조사) 리스트. 선택 시 우리약국 목록에 추가.</td><td>결과 없음 → <b>검색 결과가 없습니다.</b></td></tr>
             <tr class="hlrow" data-hl="#searchModal"><td class="n">3</td><td class="area">중복 방지</td><td>이미 등록된 상품 재선택 차단.</td><td>안내 문구 <b>이미 추가된 상품입니다.</b></td></tr>
             <tr class="hlrow" data-hl="#searchModal"><td class="n">4</td><td class="area">최대 3개 제한</td><td>부족 영양소별 우리약국 최대 3개.</td><td>도달 시 추가 차단(버튼 비활성)·안내.</td></tr>
           </tbody></table>
@@ -309,7 +310,7 @@
       <div class="framewrap"><iframe src="./pharmacy-web.html?case=off-list" width="1180" height="880" scrolling="auto" title="Case 목록 OFF"></iframe></div></div>
     <ul class="cnote">
       <li><span class="k">달라지는 점</span> AI mate 노출 상태 컬럼에 <b>AI mate 노출 중지</b>(옐로) 배지. OFF여도 <b>목록에서 숨기지 않음</b>.</li>
-      <li><span class="k">정책 근거</span> §9 — OFF 상태는 목록에 <b>노출 중지</b>로 표시하고, 상세는 조회 전용으로 전환.</li>
+      <li><span class="k">정책 근거</span> §9 — OFF 상태는 목록에 <b>노출 중지</b>로 표시하고, 상세는 <b>OFF에서도 편집(사전 세팅) 허용</b>.</li>
       <li><span class="k">인터랙션</span> 행 클릭 시 OFF 상세(Case 6, open=4)로 전환 — 편집 가능.</li>
     </ul>
   </div>
@@ -341,7 +342,7 @@
     <div class="screenview"><div class="cap">▶ <code>pharmacy-web.html?case=store-set</code> · <b>코엔자임Q10(우리약국 2개 등록)</b> 행만 표시</div>
       <div class="framewrap"><iframe src="./pharmacy-web.html?case=store-set" width="1180" height="880" scrolling="auto" title="Case 목록 우리약국 등록"></iframe></div></div>
     <ul class="cnote">
-      <li><span class="k">달라지는 점</span> 우리약국 추천 상품 셀에 등록 상품(제조사·상품명) 요약. 노출 <b>ON</b> 상태.</li>
+      <li><span class="k">달라지는 점</span> 우리약국 추천 상품 셀에 등록 상품(상품명(+제조사)) 요약. 노출 <b>ON</b> 상태.</li>
       <li><span class="k">정책 근거</span> 부족 영양소별 우리약국 최대 3개. 상담에서 우리약국+굿팜 함께 노출.</li>
       <li><span class="k">인터랙션</span> 행 클릭 → 편집 정상 상세(AIM-P-02, open=2)로 전환.</li>
     </ul>
@@ -370,12 +371,12 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="cbadge web">Case 7</span><span class="sc-name">검색 모달 — 굿팜 보유 상품 검색</span><span class="sp"></span><span class="badge new">모달</span></div>
+    <div class="sc-head"><span class="cbadge web">Case 7</span><span class="sc-name">검색 모달 — 굿팜 마스터 상품 검색</span><span class="sp"></span><span class="badge new">모달</span></div>
     <div class="screenview"><div class="cap">▶ <code>pharmacy-web.html?open=2&amp;modal=search</code> · 상세 진입 후 <b>검색 모달 자동 오픈</b></div>
       <div class="framewrap"><iframe src="./pharmacy-web.html?open=2&amp;modal=search" width="1180" height="900" scrolling="auto" title="Case 검색 모달"></iframe></div></div>
     <ul class="cnote">
-      <li><span class="k">달라지는 점</span> 상세 위에 검색 모달 오버레이. <b>굿팜 보유 상품</b>에서만 검색(약국 로컬/POS 아님), 선택 시 우리약국 목록에 추가.</li>
-      <li><span class="k">정책 근거</span> AIM-P-03 — 검색 대상은 굿팜 보유 상품으로 한정. 중복·결과0·최대3 도달을 각각 안내.</li>
+      <li><span class="k">달라지는 점</span> 상세 위에 검색 모달 오버레이. <b>굿팜 마스터 상품 DB</b>에서만 검색(약국 로컬/POS 아님), 선택 시 우리약국 목록에 추가.</li>
+      <li><span class="k">정책 근거</span> AIM-P-03 — 검색 대상은 굿팜 마스터 상품 DB으로 한정. 중복·결과0·최대3 도달을 각각 안내.</li>
       <li><span class="k">인터랙션</span> 항목 선택 → 목록 추가 → 모달 닫힘 → 상세에서 저장으로 확정.</li>
     </ul>
   </div>
@@ -385,7 +386,7 @@
     <ul class="cnote">
       <li><span class="k">최대 3개 도달</span> 우리약국 추천 상품이 부족 영양소별 <b>3개</b>에 도달하면 [＋ 상품 추가] <b>비활성</b>·안내. 삭제로 자리를 비우면 재추가 가능.</li>
       <li><span class="k">중복 추가</span> 이미 등록된 상품을 다시 선택하면 <b>“이미 추가된 상품입니다.”</b> 안내, 추가되지 않음.</li>
-      <li><span class="k">검색 결과 0</span> 굿팜 보유 상품에서 일치 항목이 없으면 <b>“검색 결과가 없습니다.”</b> 표시.</li>
+      <li><span class="k">검색 결과 0</span> 굿팜 마스터 상품 DB에서 일치 항목이 없으면 <b>“검색 결과가 없습니다.”</b> 표시.</li>
       <li><span class="k">삭제된 성분 포함</span> soft delete(§8)된 성분코드의 <b>관련 성분/약물 정보는 약사웹에서 미노출</b>. 나머지 관련 약물은 정상 표시.</li>
       <li><span class="k">저장 성공/실패</span> 우리약국 상품 추가/수정/삭제/정렬 저장 시 성공/실패 토스트. 성공 시 <b>이력 기록</b>(수정일시·수정자·항목·전/후).</li>
       <li><span class="k warn">확인 필요</span> 최대 도달·중복·결과0의 정확한 토스트/배너 위치와 저장 실패 재시도 UX는 프로토타입 기준 문구를 인용하되 세부 확정은 TBU.</li>
