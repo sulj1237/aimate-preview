@@ -171,7 +171,6 @@
 
   <div class="legend">
     <span><b>표기</b></span>
-    <span class="badge new">신규</span> 이번 MVP 신규
     <span class="badge asis">as-is</span> 기존 화면
     <span class="badge tbu">확인 필요</span> 정책 미확정(TBU)
     <span class="badge na">미구현</span> 정책엔 있으나 화면 없음
@@ -184,7 +183,7 @@
   <div class="screen">
     <div class="sc-head"><span class="sc-name">화면 인벤토리</span><span class="sp"></span><span class="badge new">v2</span></div>
     <table class="info">
-      <tr><td class="k">슈퍼어드민</td><td><b>AIM-S-01</b> 부족 영양소 관리 목록 · <b>AIM-S-02</b> 부족 영양소 관리 상세 · <b>AIM-S-03</b> 성분 관리 · <b>DIND 추가</b> · <b>성분 soft delete</b> <span class="badge new">신규</span> — Case 다수</td></tr>
+      <tr><td class="k">슈퍼어드민</td><td><b>AIM-S-01</b> 부족 영양소 관리 목록 · <b>AIM-S-02</b> 부족 영양소 관리 상세 · <b>AIM-S-03</b> 성분 관리 · <b>DIND 추가</b> · <b>성분 soft delete</b>  — Case 다수</td></tr>
     </table>
   </div>
 
@@ -195,7 +194,7 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="sc-id">AIM-S-01</span><span class="sc-name">부족 영양소 관리 — 목록</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <div class="sc-head"><span class="sc-id">AIM-S-01</span><span class="sc-name">부족 영양소 관리 — 목록</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button></div>
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-01</td></tr>
       <tr><td class="k">화면 경로</td><td>AI Mate 추천 상품 관리 &gt; 부족 영양소 관리</td><td class="k">권한</td><td>운영자/관리자</td></tr>
@@ -219,19 +218,19 @@
             <tr class="hlrow" data-hl="#masterBody"><td class="n">9</td><td class="area">명칭 · 목록 구성</td><td>하위 메뉴명은 <b>부족 영양소 관리</b>(목록 기준 = 부족 영양소).</td><td><span class="tag tbu">(확인 필요)</span> 명칭을 <b>추천 상품 관리</b>로 둘 경우 목록에 <b>추천 상품 열 추가</b> + <b>추천 상품명 검색</b> 기능이 필요.</td></tr>
           </tbody></table>
         <div class="states"><div class="dh">필수 화면 상태</div>
-          <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
+          <table class="s"><thead><tr><th>상태</th><th>처리 / 화면 문구</th></tr></thead>
             <tbody>
-              <tr><td class="st">기본(데이터 있음)</td><td><span class="yn y">해당</span></td><td>ON/OFF 행이 함께 노출. 전체 건수 = 삭제되지 않은 Master 수.</td></tr>
-              <tr><td class="st">데이터 0건</td><td><span class="yn y">해당</span></td><td><code class="t">데이터가 없습니다.</code></td></tr>
-              <tr><td class="st">soft delete 반영</td><td><span class="yn y">해당</span></td><td>삭제된 부족 영양소는 목록에서 사라지고, 삭제된 성분은 관련 약물 수에서 빠짐.</td></tr>
-              <tr><td class="st">권한 없음</td><td><span class="yn n">미해당</span></td><td>운영자/관리자만 접근(메뉴 노출 제어).</td></tr>
+              <tr><td class="st">기본(데이터 있음)</td><td>ON/OFF 행이 함께 노출. 전체 건수 = 삭제되지 않은 Master 수.</td></tr>
+              <tr><td class="st">데이터 0건</td><td><code class="t">데이터가 없습니다.</code></td></tr>
+              <tr><td class="st">soft delete 반영</td><td>삭제된 부족 영양소는 목록에서 사라지고, 삭제된 성분은 관련 약물 수에서 빠짐.</td></tr>
+              <tr><td class="st">권한 없음</td><td>운영자/관리자만 접근(메뉴 노출 제어).</td></tr>
             </tbody></table></div>
       </div>
     </div>
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="sc-id">AIM-S-02</span><span class="sc-name">부족 영양소 관리 — 상세</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <div class="sc-head"><span class="sc-id">AIM-S-02</span><span class="sc-name">부족 영양소 관리 — 상세</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button></div>
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-02</td></tr>
       <tr><td class="k">화면 경로</td><td>부족 영양소 관리 &gt; 상세</td><td class="k">권한</td><td>운영자/관리자</td></tr>
@@ -248,18 +247,18 @@
             <tr class="hlrow" data-hl="#recoDetail"><td class="n">2</td><td class="area">기본정보</td><td>부족 영양소·관련 약물 수·관련 카테고리(영양소 종속 값) 조회.</td><td>부족 영양소명 자체는 조합 기준값 → 여기서는 참조.</td></tr>
             <tr class="hlrow" data-hl="#mDefProds"><td class="n">3</td><td class="area">굿팜 추천 상품(최대 2)</td><td>상담 참고용 추천 상품 <b>최대 2개</b> 등록. 굿팜 보유 상품 검색으로 추가·순서 조정·삭제.</td><td>2개 초과 추가 시 <code class="t">기본 추천 상품은 최대 2개까지 등록할 수 있습니다.</code> · 중복 시 <code class="t">이미 추가된 상품입니다.</code></td></tr>
             <tr class="hlrow" data-hl="#mRelDrugs"><td class="n">4</td><td class="area">관련 약물 목록</td><td>이 영양소를 고갈시키는 관련 약물(성분코드·성분명·이유·근거). <b>조회 전용</b>.</td><td>성분명 클릭 → <b>AI mate 성분 관리</b> 상세로 이동해 성분명·이유·근거 수정. 삭제된 성분은 미노출.</td></tr>
-            <tr class="hlrow" data-hl=""><td class="n">5</td><td class="area">override 상태(§3)</td><td>원천 대비 운영 수정 상태값: <code class="t">원천값 사용</code>/<code class="t">운영 수정값 사용</code>/<code class="t">원천 변경 있음</code>/<code class="t">검토 필요</code>.</td><td>운영 수정 중이면 <span class="tag na">운영 수정 적용 중</span> 배지, 원천 변경 시 <span class="tag tbu">원천 변경 있음</span> 알림.</td></tr>
-            <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">결측 표기(§7)</td><td>이유/근거 미입력 조합은 <code class="t">근거 미등록</code>/<code class="t">이유 미등록</code>/<code class="t">검토 필요</code>로 표기.</td><td>결측이면 노출 전 검토 유도.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">5</td><td class="area">override 상태</td><td>원천 대비 운영 수정 상태값: <code class="t">원천값 사용</code>/<code class="t">운영 수정값 사용</code>/<code class="t">원천 변경 있음</code>/<code class="t">검토 필요</code>.</td><td>운영 수정 중이면 <span class="tag na">운영 수정 적용 중</span> 배지, 원천 변경 시 <span class="tag tbu">원천 변경 있음</span> 알림.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">결측 표기</td><td>이유/근거 미입력 조합은 <code class="t">근거 미등록</code>/<code class="t">이유 미등록</code>/<code class="t">검토 필요</code>로 표기.</td><td>결측이면 노출 전 검토 유도.</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">7</td><td class="area">수정 이력</td><td>필드·전/후·수정일시·수정자 기록.</td><td>감사·롤백 근거.</td></tr>
             <tr class="hlrow" data-hl="#mmFoot"><td class="n">8</td><td class="area">저장 / 삭제</td><td>우측 하단. 삭제는 soft delete(전 서비스 미노출·원천 보존).</td><td>삭제 클릭 → 확인 모달(취소/확인) → Case(삭제 확인 모달) 참고.</td></tr>
           </tbody></table>
         <div class="states"><div class="dh">필수 화면 상태</div>
-          <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
+          <table class="s"><thead><tr><th>상태</th><th>처리 / 화면 문구</th></tr></thead>
             <tbody>
-              <tr><td class="st">노출 ON</td><td><span class="yn y">해당</span></td><td>POS·약사웹 노출. 굿팜 추천 상품·관련 약물 표시.</td></tr>
-              <tr><td class="st">노출 OFF</td><td><span class="yn y">해당</span></td><td>POS 미노출, 약사웹 <code class="t">노출 중지</code>.</td></tr>
-              <tr><td class="st">추천 상품 2 도달</td><td><span class="yn y">해당</span></td><td>추가 차단 토스트. 삭제 후 재추가 가능.</td></tr>
-              <tr><td class="st">override/결측</td><td><span class="yn y">해당</span></td><td>상태 배지·미등록 문구 표기.</td></tr>
+              <tr><td class="st">노출 ON</td><td>POS·약사웹 노출. 굿팜 추천 상품·관련 약물 표시.</td></tr>
+              <tr><td class="st">노출 OFF</td><td>POS 미노출, 약사웹 <code class="t">노출 중지</code>.</td></tr>
+              <tr><td class="st">추천 상품 2 도달</td><td>추가 차단 토스트. 삭제 후 재추가 가능.</td></tr>
+              <tr><td class="st">override/결측</td><td>상태 배지·미등록 문구 표기.</td></tr>
               <tr><td class="st">삭제 확인</td><td><span class="yn q">모달</span></td><td><code class="t">부족 영양소를 삭제하시겠습니까?</code>(취소/확인)</td></tr>
             </tbody></table></div>
       </div>
@@ -311,7 +310,7 @@
   </div>
 
   <div class="screen">
-    <div class="sc-head"><span class="sc-id">AIM-S-03</span><span class="sc-name">AI mate 성분 관리 — 목록(성분코드)</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button><span class="badge new">신규</span></div>
+    <div class="sc-head"><span class="sc-id">AIM-S-03</span><span class="sc-name">AI mate 성분 관리 — 목록(성분코드)</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button></div>
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-03</td></tr>
       <tr><td class="k">화면 경로</td><td>AI Mate 추천 상품 관리 &gt; 성분 관리</td><td class="k">권한</td><td>운영자/관리자</td></tr>
@@ -333,11 +332,11 @@
             <tr class="hlrow" data-hl="#ingrBody"><td class="n">7</td><td class="area">목록 정렬</td><td>기본 정렬 ① 최종 수정일 최신 → ② 연결 부족 영양소 수 많은 순.</td><td>진입 시 자동 정렬.</td></tr>
           </tbody></table>
         <div class="states"><div class="dh">필수 화면 상태</div>
-          <table class="s"><thead><tr><th>상태</th><th style="width:56px">적용</th><th>처리 / 화면 문구</th></tr></thead>
+          <table class="s"><thead><tr><th>상태</th><th>처리 / 화면 문구</th></tr></thead>
             <tbody>
-              <tr><td class="st">기본</td><td><span class="yn y">해당</span></td><td>성분코드별 행 노출(오메프라졸·아토르바스타틴·살부타몰·메토트렉세이트 등).</td></tr>
-              <tr><td class="st">목록 0건</td><td><span class="yn y">해당</span></td><td><code class="t">데이터가 없습니다.</code></td></tr>
-              <tr><td class="st">soft delete 반영</td><td><span class="yn y">해당</span></td><td>삭제 성분은 목록·관련 약물·약사웹·POS 미노출. 복합제는 나머지 성분 정상.</td></tr>
+              <tr><td class="st">기본</td><td>성분코드별 행 노출(오메프라졸·아토르바스타틴·살부타몰·메토트렉세이트 등).</td></tr>
+              <tr><td class="st">목록 0건</td><td><code class="t">데이터가 없습니다.</code></td></tr>
+              <tr><td class="st">soft delete 반영</td><td>삭제 성분은 목록·관련 약물·약사웹·POS 미노출. 복합제는 나머지 성분 정상.</td></tr>
             </tbody></table></div>
       </div>
     </div>
@@ -356,7 +355,7 @@
     <div class="sc-head"><span class="cbadge adm">Case 2</span><span class="sc-name">DIND 추가 모달</span><span class="sp"></span><span class="badge na">검토 필요·OFF</span></div>
     <div class="screenview"><div class="cap">▶ <code>superadmin.html?modal=dind</code> · 성분코드×부족영양소 매칭 단건 등록. 성분코드·성분명·부족 영양소·이유·근거 입력.</div>
       <div class="framewrap"><iframe src="./superadmin.html?modal=dind" width="1180" height="940" scrolling="auto" title="Case DIND 추가 모달"></iframe></div></div>
-    <ul class="cnote"><li><span class="k">달라지는 점</span> 새 DIND(약물-영양소 상호작용) 매칭을 수동 등록. 기존 성분코드면 성분명 자동 사용, 기존 조합이면 연결만 추가.</li><li><span class="k">입력 참고</span> 성분코드 입력 시 <b>앞부분이 같은 기존 성분코드</b>가 있으면 성분명·연결 부족 영양소·이유·근거를 참고 영역에 표시(전체 일치 코드는 <span class="stt need">전체 일치</span> 배지). 참고 표시일 뿐 값은 각 항목을 직접 입력하며, 매칭은 성분코드 <b>전체 일치</b>일 때만 유효(§2). <span class="tag tbu">(신규) 개발 확인 필요</span></li><li><span class="k">정책 근거</span> 등록 DIND는 <span class="tag na">검토 필요</span>·<b>기본 노출 OFF</b>(AI mate·약사웹 미노출)로 진입 → 검토 후 부족 영양소 관리에서 노출 ON. <span class="tag tbu">일괄 업로드·재업로드 병합 TBU</span></li><li><span class="k">인터랙션</span> [취소]/[추가]. 추가 후 성분·부족 영양소 관리 양쪽 연결 반영.</li></ul>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 새 DIND(약물-영양소 상호작용) 매칭을 수동 등록. 기존 성분코드면 성분명 자동 사용, 기존 조합이면 연결만 추가.</li><li><span class="k">입력 참고</span> 성분코드 입력 시 <b>앞부분이 같은 기존 성분코드</b>가 있으면 성분명·연결 부족 영양소·이유·근거를 참고 영역에 표시(전체 일치 코드는 <span class="stt need">전체 일치</span> 배지). 참고 표시일 뿐 값은 각 항목을 직접 입력하며, 매칭은 성분코드 <b>전체 일치</b>일 때만 유효. <span class="tag tbu">(신규) 개발 확인 필요</span></li><li><span class="k">정책 근거</span> 등록 DIND는 <span class="tag na">검토 필요</span>·<b>기본 노출 OFF</b>(AI mate·약사웹 미노출)로 진입 → 검토 후 부족 영양소 관리에서 노출 ON. <span class="tag tbu">일괄 업로드·재업로드 병합 TBU</span></li><li><span class="k">인터랙션</span> [취소]/[추가]. 추가 후 성분·부족 영양소 관리 양쪽 연결 반영.</li></ul>
   </div>
 
   <div class="screen">
