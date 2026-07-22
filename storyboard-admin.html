@@ -198,7 +198,7 @@
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-01</td></tr>
       <tr><td class="k">화면 경로</td><td>AI Mate 추천 상품 관리 &gt; 부족 영양소 관리</td><td class="k">권한</td><td>운영자/관리자</td></tr>
-      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소를 한 행으로 하는 추천 Master 목록. 부족 영양소·관련 카테고리·관련 약물 수·노출(ON/OFF)·최종 수정일을 보여주고, 행 클릭 시 상세(AIM-S-02)로 이동한다. 상단에서 <code class="t">＋ DIND 추가</code>(성분×부족영양소 매칭 단건 등록) 진입.</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소를 한 행으로 하는 추천 Master 목록. 부족 영양소·관련 카테고리·관련 성분 수·노출(ON/OFF)·최종 수정일을 보여주고, 행 클릭 시 상세(AIM-S-02)로 이동한다. 상단에서 <code class="t">＋ DIND 추가</code>(성분×부족영양소 매칭 단건 등록) 진입.</td></tr>
     </table>
     <div class="body2">
       <div class="screenview"><div class="cap">▶ 실제 프로토타입(<code>superadmin.html</code>) · <b>추천 Master 목록</b>(파라미터 없음). 행 클릭 → 상세 이동, 상단 <b>＋ DIND 추가</b>.</div>
@@ -211,10 +211,10 @@
             <tr class="hlrow" data-hl="#masterBody"><td class="n">2</td><td class="area">＋ DIND 추가</td><td>성분코드×부족영양소 매칭을 단건 수동 등록하는 모달 진입점. 성분/성분관리 양쪽에서 진입 가능.</td><td>등록 시 <b>노출 OFF</b>로 진입. 기존 성분코드/부족영양소면 연결만 추가. <span class="tag tbu">일괄 업로드 TBU</span></td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">3</td><td class="area">부족 영양소</td><td>추천 Master의 기준 값(굿팜 표준명). 목록의 1차 식별자.</td><td>행 전체 클릭 → 상세(AIM-S-02) 페이지 이동.</td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">4</td><td class="area">관련 카테고리</td><td>부족 영양소에 연결된 굿팜 카테고리(예: 비타민 B군, 종합비타민). 영양소 종속 값.</td><td>미등록 시 <code class="t">데이터 없음</code> 표기.</td></tr>
-            <tr class="hlrow" data-hl="#masterBody"><td class="n">5</td><td class="area">관련 약물 수</td><td>이 영양소를 고갈시키는 관련 약물(성분코드) 개수. <b>삭제(soft delete)된 성분은 집계에서 제외</b>.</td><td>성분 삭제 시 실시간 감소 → Case(soft-delete 반영) 참고.</td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">5</td><td class="area">관련 성분 수</td><td>이 영양소를 고갈시키는 관련 성분(성분코드) 개수. <b>삭제(soft delete)된 성분은 집계에서 제외</b>.</td><td>성분 삭제 시 실시간 감소 → Case(soft-delete 반영) 참고.</td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">6</td><td class="area">노출(ON/OFF)</td><td>AI mate 노출 상태 배지. ON=POS·약사웹 노출, OFF=미노출. 하나의 목록에 ON/OFF 행이 공존.</td><td>상태 변경은 상세에서 토글로 수행(목록은 조회).</td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">7</td><td class="area">최종 수정일</td><td>Master·연결 정보의 마지막 수정일.</td><td>정렬·이력 추적 기준.</td></tr>
-            <tr class="hlrow" data-hl="#masterBody"><td class="n">8</td><td class="area">목록 정렬</td><td>기본 정렬 ① 노출 ON 우선 → ② 최종 수정일 최신 → ③ 관련 약물 수 많은 순.</td><td>진입 시 자동 정렬.</td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">8</td><td class="area">목록 정렬</td><td>기본 정렬 ① 노출 ON 우선 → ② 최종 수정일 최신 → ③ 관련 성분 수 많은 순.</td><td>진입 시 자동 정렬.</td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">9</td><td class="area">명칭 · 목록 구성</td><td>하위 메뉴명은 <b>부족 영양소 관리</b>(목록 기준 = 부족 영양소).</td><td><span class="tag tbu">(확인 필요)</span> 명칭을 <b>추천 상품 관리</b>로 둘 경우 목록에 <b>추천 상품 열 추가</b> + <b>추천 상품명 검색</b> 기능이 필요.</td></tr>
           </tbody></table>
         <div class="states"><div class="dh">필수 화면 상태</div>
@@ -222,7 +222,7 @@
             <tbody>
               <tr><td class="st">기본(데이터 있음)</td><td>ON/OFF 행이 함께 노출. 전체 건수 = 삭제되지 않은 Master 수.</td></tr>
               <tr><td class="st">데이터 0건</td><td><code class="t">데이터가 없습니다.</code></td></tr>
-              <tr><td class="st">soft delete 반영</td><td>삭제된 부족 영양소는 목록에서 사라지고, 삭제된 성분은 관련 약물 수에서 빠짐.</td></tr>
+              <tr><td class="st">soft delete 반영</td><td>삭제된 부족 영양소는 목록에서 사라지고, 삭제된 성분은 관련 성분 수에서 빠짐.</td></tr>
               <tr><td class="st">권한 없음</td><td>운영자/관리자만 접근(메뉴 노출 제어).</td></tr>
             </tbody></table></div>
       </div>
@@ -234,19 +234,19 @@
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-02</td></tr>
       <tr><td class="k">화면 경로</td><td>부족 영양소 관리 &gt; 상세</td><td class="k">권한</td><td>운영자/관리자</td></tr>
-      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소 1건의 상세 페이지. 상단 <b>AI mate 노출 토글</b> / 기본정보(부족영양소·관련 약물 수·관련 카테고리) / <b>굿팜 추천 상품 최대 2</b>(검색 추가·순서·삭제) / 관련 약물 목록(성분명 클릭→성분 관리 이동) / 수정 이력. 저장·삭제는 우측 하단.</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소 1건의 상세 페이지. 상단 <b>AI mate 노출 토글</b> / 기본정보(부족영양소·관련 성분 수·관련 카테고리) / <b>굿팜 추천 상품 최대 2</b>(검색 추가·순서·삭제) / 관련 성분 목록(성분명 클릭→성분 관리 이동) / 수정 이력. 저장·삭제는 우측 하단.</td></tr>
     </table>
     <div class="body2">
-      <div class="screenview"><div class="cap">▶ <code>superadmin.html?master=0</code> · <b>비타민 B12(노출 ON)</b> 상세. 상단 토글·굿팜 추천 상품·관련 약물·수정 이력·우측 하단 저장/삭제.</div>
+      <div class="screenview"><div class="cap">▶ <code>superadmin.html?master=0</code> · <b>비타민 B12(노출 ON)</b> 상세. 상단 토글·굿팜 추천 상품·관련 성분·수정 이력·우측 하단 저장/삭제.</div>
         <div class="framewrap"><iframe src="./superadmin.html?master=0" width="1180" height="1350" scrolling="auto" title="슈퍼어드민 부족 영양소 관리 상세"></iframe></div></div>
       <div class="desc"><div class="dh">디스크립션 (영역·기능·인터랙션)</div>
         <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
           <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
           <tbody>
             <tr class="hlrow" data-hl="#fExpose"><td class="n">1</td><td class="area">AI mate 노출 토글</td><td>상단에서 이 부족 영양소의 노출 ON/OFF 제어. OFF=POS 미노출, 약사웹 <code class="t">노출 중지</code> 표시.</td><td>토글 즉시 반영, 저장 시 확정. 목록의 노출 배지와 연동.</td></tr>
-            <tr class="hlrow" data-hl="#recoDetail"><td class="n">2</td><td class="area">기본정보</td><td>부족 영양소·관련 약물 수·관련 카테고리(영양소 종속 값) 조회.</td><td>부족 영양소명 자체는 조합 기준값 → 여기서는 참조.</td></tr>
+            <tr class="hlrow" data-hl="#recoDetail"><td class="n">2</td><td class="area">기본정보</td><td>부족 영양소·관련 성분 수·관련 카테고리(영양소 종속 값) 조회.</td><td>부족 영양소명 자체는 조합 기준값 → 여기서는 참조.</td></tr>
             <tr class="hlrow" data-hl="#mDefProds"><td class="n">3</td><td class="area">굿팜 추천 상품(최대 2)</td><td>상담 참고용 추천 상품 <b>최대 2개</b> 등록. 굿팜 보유 상품 검색으로 추가·순서 조정·삭제.</td><td>2개 초과 추가 시 <code class="t">기본 추천 상품은 최대 2개까지 등록할 수 있습니다.</code> · 중복 시 <code class="t">이미 추가된 상품입니다.</code></td></tr>
-            <tr class="hlrow" data-hl="#mRelDrugs"><td class="n">4</td><td class="area">관련 약물 목록</td><td>이 영양소를 고갈시키는 관련 약물을 <b>주성분 단위로 그룹핑</b> 표시(연결 성분코드가 많을 때 대응 — 예: B12 <b>650코드/126주성분</b>). 상단 성분명 검색 · <b>한 페이지 10개 그룹</b> 페이지네이션. 그룹 헤더 = 주성분명 + 코드 수 + <b>공통 근거/일부 근거 상이</b> 배지(동일하면 공통 이유·근거 요약).</td><td>그룹 펼침 → 개별 성분코드(제형·함량·이유·근거)에서 <b>수정</b>(→ AI mate 성분 관리). <b>그룹핑은 표시용</b> — 매칭·수정·삭제는 9자리 전체 코드 기준. 삭제된 성분은 미노출.</td></tr>
+            <tr class="hlrow" data-hl="#mRelDrugs"><td class="n">4</td><td class="area">관련 성분 목록</td><td>이 영양소를 고갈시키는 관련 성분을 <b>원인 성분(주성분) 단위로 표시</b> 표시(연결 성분코드가 많을 때 대응 — 예: B12 <b>126 원인성분/650코드</b>). 상단 성분명 검색 · <b>한 페이지 10개 그룹</b> 페이지네이션. 그룹 헤더 = 주성분명 + 코드 수 + <b>공통 근거/일부 근거 상이</b> 배지(동일하면 공통 이유·근거 요약).</td><td>그룹 펼침 → 개별 성분코드(제형·함량·이유·근거)에서 <b>수정</b>(→ AI mate 성분 관리). <b>그룹핑은 표시용</b> — 매칭·수정·삭제는 9자리 전체 코드 기준. 삭제된 성분은 미노출.</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">5</td><td class="area">override 상태</td><td>원천 대비 운영 수정 상태값: <code class="t">원천값 사용</code>/<code class="t">운영 수정값 사용</code>/<code class="t">원천 변경 있음</code>.</td><td>상태 배지(운영 수정 적용 중)·원천 변경 알림은 <b>필요 시 고도화 개발에서 진행</b>(MVP 범위 밖).</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">결측 표기</td><td>이유·근거 미입력 항목은 <code class="t">데이터 없음</code>으로 표기.</td><td>미입력 항목은 노출 전 보완 권장.</td></tr>
             <tr class="hlrow" data-hl=""><td class="n">7</td><td class="area">수정 이력</td><td>필드·전/후·수정일시·수정자 기록.</td><td>감사·롤백 근거.</td></tr>
@@ -255,7 +255,7 @@
         <div class="states"><div class="dh">필수 화면 상태</div>
           <table class="s"><thead><tr><th>상태</th><th>처리 / 화면 문구</th></tr></thead>
             <tbody>
-              <tr><td class="st">노출 ON</td><td>POS·약사웹 노출. 굿팜 추천 상품·관련 약물 표시.</td></tr>
+              <tr><td class="st">노출 ON</td><td>POS·약사웹 노출. 굿팜 추천 상품·관련 성분 표시.</td></tr>
               <tr><td class="st">노출 OFF</td><td>POS 미노출, 약사웹 <code class="t">노출 중지</code>.</td></tr>
               <tr><td class="st">추천 상품 2 도달</td><td>추가 차단 토스트. 삭제 후 재추가 가능.</td></tr>
               <tr><td class="st">override/결측</td><td>데이터 없음 표기.</td></tr>
@@ -281,9 +281,9 @@
 
   <div class="screen">
     <div class="sc-head"><span class="cbadge adm">Case 3</span><span class="sc-name">목록 — soft delete 반영</span><span class="sp"></span><span class="badge tbu">삭제 반영</span></div>
-    <div class="screenview"><div class="cap">▶ <code>superadmin.html?case=deleted</code> · 오메프라졸(A02BC01) 성분 삭제 처리 → 관련 약물 수에서 빠지고 관련 약물 목록·매칭에서 사라짐.</div>
+    <div class="screenview"><div class="cap">▶ <code>superadmin.html?case=deleted</code> · 오메프라졸(A02BC01) 성분 삭제 처리 → 관련 성분 수에서 빠지고 관련 성분 목록·매칭에서 사라짐.</div>
       <div class="framewrap"><iframe src="./superadmin.html?case=deleted" width="1180" height="900" scrolling="auto" title="Case soft delete 반영 목록"></iframe></div></div>
-    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제된 성분과 매칭된 부족 영양소(비타민B12·칼슘·마그네슘)의 <b>관련 약물 수가 감소</b>. 부족 영양소 자체 삭제 시엔 목록 행이 사라짐.</li><li><span class="k">정책 근거</span> soft delete — 원천 보존, 전 서비스 미노출. 성분 삭제는 관련 약물 집계·목록에서 제외.</li><li><span class="k">인터랙션</span> 관련 약물 수 클릭 없이 즉시 반영. 삭제 이력은 성분 관리에서 확인.</li></ul>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제된 성분과 매칭된 부족 영양소(비타민B12·칼슘·마그네슘)의 <b>관련 성분 수가 감소</b>. 부족 영양소 자체 삭제 시엔 목록 행이 사라짐.</li><li><span class="k">정책 근거</span> soft delete — 원천 보존, 전 서비스 미노출. 성분 삭제는 관련 성분 집계·목록에서 제외.</li><li><span class="k">인터랙션</span> 관련 성분 수 클릭 없이 즉시 반영. 삭제 이력은 성분 관리에서 확인.</li></ul>
   </div>
 
   <div class="screen">
@@ -297,7 +297,7 @@
     <div class="sc-head"><span class="cbadge adm">Case 5</span><span class="sc-name">부족 영양소 삭제 확인 모달</span><span class="sp"></span><span class="badge tbu">soft delete</span></div>
     <div class="screenview"><div class="cap">▶ <code>superadmin.html?master=4&amp;modal=reco-del</code> · <b>부족 영양소를 삭제하시겠습니까?</b> 확인 모달(취소/확인).</div>
       <div class="framewrap"><iframe src="./superadmin.html?master=4&amp;modal=reco-del" width="1180" height="940" scrolling="auto" title="Case 부족 영양소 삭제 확인 모달"></iframe></div></div>
-    <ul class="cnote"><li><span class="k">달라지는 점</span> 상세 우측 하단 삭제 → 확인 모달. 안내: 슈퍼어드민·약사 어드민웹·POS AI mate 모두 미노출, 연결된 굿팜 추천 상품·관련 카테고리·관련 약물 매칭도 함께 미노출.</li><li><span class="k warn">정책 근거</span> soft delete — 원천 데이터 보존, 화면에서만 미노출. 삭제 후 목록·관련 약물에서 사라짐.</li><li><span class="k">인터랙션</span> [취소]=닫기 / [확인]=삭제 실행 후 목록 복귀.</li></ul>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 상세 우측 하단 삭제 → 확인 모달. 안내: 슈퍼어드민·약사 어드민웹·POS AI mate 모두 미노출, 연결된 굿팜 추천 상품·관련 카테고리·관련 성분 매칭도 함께 미노출.</li><li><span class="k warn">정책 근거</span> soft delete — 원천 데이터 보존, 화면에서만 미노출. 삭제 후 목록·관련 성분에서 사라짐.</li><li><span class="k">인터랙션</span> [취소]=닫기 / [확인]=삭제 실행 후 목록 복귀.</li></ul>
   </div>
 
   <div class="screen">
@@ -336,7 +336,7 @@
             <tbody>
               <tr><td class="st">기본</td><td>성분코드별 행 노출(오메프라졸·아토르바스타틴·살부타몰·메토트렉세이트 등).</td></tr>
               <tr><td class="st">목록 0건</td><td><code class="t">데이터가 없습니다.</code></td></tr>
-              <tr><td class="st">soft delete 반영</td><td>삭제한 원인 성분은 목록·관련 약물·약사웹·POS 미노출. 복합제는 나머지 성분 정상.</td></tr>
+              <tr><td class="st">soft delete 반영</td><td>삭제한 원인 성분은 목록·관련 성분·약사웹·POS 미노출. 복합제는 나머지 성분 정상.</td></tr>
             </tbody></table></div>
       </div>
     </div>
@@ -362,14 +362,14 @@
     <div class="sc-head"><span class="cbadge adm">Case 3</span><span class="sc-name">성분 삭제 확인 모달</span><span class="sp"></span><span class="badge tbu">soft delete</span></div>
     <div class="screenview"><div class="cap">▶ <code>superadmin.html?ing=A02BC01&amp;modal=ing-del</code> · <b>성분값을 삭제하시겠습니까?</b> 확인 모달(취소/확인).</div>
       <div class="framewrap"><iframe src="./superadmin.html?ing=A02BC01&amp;modal=ing-del" width="1180" height="940" scrolling="auto" title="Case 성분 삭제 확인 모달"></iframe></div></div>
-    <ul class="cnote"><li><span class="k">달라지는 점</span> 성분 상세 하단 삭제 → 확인 모달. 안내: 슈퍼어드민·약사 어드민웹·POS AI mate 모두 미노출, 연결된 부족 영양소·부족해지는 이유·근거도 함께 미노출.</li><li><span class="k warn">정책 근거</span> 성분 soft delete — 전 서비스 미노출·원천/이력 보존. POS는 삭제한 원인 성분 기준만 미노출(복합제 나머지 정상). 일시 제외는 삭제 아닌 노출 OFF.</li><li><span class="k">인터랙션</span> [취소]/[확인]. 확인 시 목록·관련 약물에서 제거, 삭제 이력에 기록.</li></ul>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 성분 상세 하단 삭제 → 확인 모달. 안내: 슈퍼어드민·약사 어드민웹·POS AI mate 모두 미노출, 연결된 부족 영양소·부족해지는 이유·근거도 함께 미노출.</li><li><span class="k warn">정책 근거</span> 성분 soft delete — 전 서비스 미노출·원천/이력 보존. POS는 삭제한 원인 성분 기준만 미노출(복합제 나머지 정상). 일시 제외는 삭제 아닌 노출 OFF.</li><li><span class="k">인터랙션</span> [취소]/[확인]. 확인 시 목록·관련 성분에서 제거, 삭제 이력에 기록.</li></ul>
   </div>
 
   <div class="screen">
     <div class="sc-head"><span class="cbadge adm">Case 4</span><span class="sc-name">성분 관리 — soft delete 반영</span><span class="sp"></span><span class="badge tbu">삭제 반영</span></div>
     <div class="screenview"><div class="cap">▶ <code>superadmin.html?page=ingr&amp;case=deleted</code> · 오메프라졸(A02BC01) 삭제 처리되어 성분 목록에서 사라짐.</div>
       <div class="framewrap"><iframe src="./superadmin.html?page=ingr&amp;case=deleted" width="1180" height="900" scrolling="auto" title="Case 성분 관리 soft delete 반영"></iframe></div></div>
-    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제한 원인 성분이 성분 목록에서 제거되고, 부족 영양소 관리 관련 약물·약사웹·POS에서도 공통 미노출. 삭제 이력에는 남음.</li><li><span class="k">정책 근거</span> 적용범위=슈퍼어드민 성분관리·추천관리 관련약물·약사웹·POS 모두 미노출. POS 복합제는 나머지 성분 정상 노출.</li><li><span class="k">인터랙션</span> 삭제 이력 모달에서 확인 가능.</li></ul>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 삭제한 원인 성분이 성분 목록에서 제거되고, 부족 영양소 관리 관련 성분·약사웹·POS에서도 공통 미노출. 삭제 이력에는 남음.</li><li><span class="k">정책 근거</span> 적용범위=슈퍼어드민 성분관리·추천관리 관련약물·약사웹·POS 모두 미노출. POS 복합제는 나머지 성분 정상 노출.</li><li><span class="k">인터랙션</span> 삭제 이력 모달에서 확인 가능.</li></ul>
   </div>
 
   <div class="screen">

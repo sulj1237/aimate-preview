@@ -154,6 +154,14 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
 .rg-pgb:hover:not(:disabled){background:#f4f7f6} .rg-pgb.on{background:#0b8f79;border-color:#0b8f79;color:#fff}
 .rg-pgb:disabled{color:#c3ccd3;cursor:default} .rg-pgd{color:#9aa4af;padding:0 2px}
 .rg-pgi{margin-left:8px;font-size:11.5px;color:#8a9099}
+table.reltbl{width:100%;border-collapse:collapse;font-size:12px}
+table.reltbl>thead>tr>th{background:#eef2f5;text-align:left;padding:8px 10px;border:1px solid var(--line);font-weight:700;color:#48525c;font-size:11px;white-space:nowrap}
+table.reltbl>tbody>tr>td{padding:8px 10px;border:1px solid var(--line);vertical-align:top;line-height:1.5}
+td.rel-nm{white-space:nowrap;font-weight:700} td.rel-rs{min-width:220px} td.rel-rf{min-width:150px;color:#8a9099}
+td.rel-c{text-align:center;white-space:nowrap;color:#0b8f79;font-weight:700}
+tr.rel-grp{cursor:pointer} tr.rel-grp:hover>td{background:#fbfcfd}
+.rel-exp{color:#0b8f79;font-weight:700;white-space:nowrap}
+tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.rel-body>td{padding:0;background:#fafbfc}
 </style>
 </head>
 <body>
@@ -217,7 +225,7 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
         <div class="tbl"><table>
           <thead><tr>
             <th>부족 영양소</th><th>관련 카테고리</th>
-            <th class="num">관련 약물 수</th>
+            <th class="num">관련 성분 수</th>
             <th class="c">노출</th><th>최종 수정일</th>
           </tr></thead>
           <tbody id="masterBody"></tbody>
@@ -267,7 +275,7 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
             <div class="block-h">기본 정보</div>
             <div class="kvs">
               <div class="kv"><div class="k">부족 영양소</div><div class="v"><input class="fw" id="fNut" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
-              <div class="kv"><div class="k">관련 약물 수</div><div class="v"><input class="fw" id="fRelCount" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
+              <div class="kv"><div class="k">관련 성분 수</div><div class="v"><input class="fw" id="fRelCount" readonly style="background:#f7f9fb;color:#5c6671"></div></div>
               <div class="kv"><div class="k">관련 카테고리</div><div class="v"><input class="fw" id="fCat" placeholder="쉼표(,)로 구분 · 예: 비타민 B군, 종합비타민"></div></div>
             </div>
           </div>
@@ -280,7 +288,7 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
             </div>
           </div>
           <div class="block">
-            <div class="block-h">관련 약물 목록 <span style="font-weight:600;color:var(--muted);font-size:11px">성분명 클릭 시 성분 관리로 이동</span></div>
+            <div class="block-h">관련 성분 <span style="font-weight:600;color:var(--muted);font-size:11px">성분명 클릭 시 성분 관리로 이동</span></div>
             <div id="mRelDrugs"></div>
           </div>
           <div class="block" id="mmMatchBlock">
@@ -558,11 +566,11 @@ function renderMaster(){
   var list=master.map(function(m,idx){return {m:m,idx:idx};}).filter(function(o){return !o.m.deleted;});  // soft delete 제외, 원 index 보존
   list.sort(masterSort);
   document.getElementById('masterBody').innerHTML = list.map(function(o){
-    var m=o.m, ndrug=activeDrugCount(m);
+    var m=o.m, nbase=activeBaseCount(m);
     return '<tr class="click" onclick="openMaster('+o.idx+')">'+
       '<td class="nut">'+m.nut+'</td>'+
       '<td>'+(m.cat||'-')+'</td>'+
-      '<td class="num">'+ndrug+'</td>'+
+      '<td class="num">'+nbase+'</td>'+
       '<td class="c"><span class="stt '+(m.on?'ok':'hide')+'">'+(m.on?'ON':'OFF')+'</span></td>'+
       '<td>'+m.mod+'</td></tr>';
   }).join('');
@@ -587,7 +595,7 @@ function renderRelDrugs(drugs){
   if(drugs) relDrugsRef=drugs;
   var c=document.getElementById('mRelDrugs');
   var all=(relDrugsRef||[]).filter(function(d){return !isDeletedCode(d.code);});
-  if(!all.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
+  if(!all.length){ c.innerHTML='<div class="readbox">연결된 성분 데이터가 없습니다.</div>'; return; }
   var groups={}, order=[];
   all.forEach(function(d){ var k=(d.base||d.comp); if(!groups[k]){groups[k]=[]; order.push(k);} groups[k].push(d); });
   var q=(relSearch||'').trim().toLowerCase();
@@ -595,28 +603,27 @@ function renderRelDrugs(drugs){
     if(k.toLowerCase().indexOf(q)>-1) return true;
     if(((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
     return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
-  var head='<div class="rg-top"><div class="rg-cnt"><b>'+all.length+'</b>개 성분코드 · <b>'+order.length+'</b> 주성분</div>'+
+  var head='<div class="rg-top"><div class="rg-cnt"><b>'+order.length+'</b> 원인 성분 · <b>'+all.length+'</b> 성분코드</div>'+
     '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearch.replace(/"/g,'&quot;')+'" oninput="relSearch=this.value; relPage=1; renderRelDrugs();"></div>';
   if(!shown.length){ c.innerHTML=head+'<div class="rg-none">검색 결과가 없습니다.</div>'; return; }
   var PER=10, totalP=Math.max(1,Math.ceil(shown.length/PER)); if(relPage>totalP)relPage=totalP; if(relPage<1)relPage=1;
   var pgHtml=relPager(relPage,totalP,'renderRelDrugs');
-  c.innerHTML=head+shown.slice((relPage-1)*PER,relPage*PER).map(function(k){
+  var rows=shown.slice((relPage-1)*PER,relPage*PER).map(function(k){
     var g=groups[k], n=g.length, gid='rg_'+k.replace(/[^a-zA-Z0-9]/g,'_');
     var sig={}; g.forEach(function(d){ sig[(d.reason||'')+'|'+(d.ref||'')]=1; });
     var common=Object.keys(sig).length===1;
     var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
-    var badge=common?'<span class="rg-b ok">공통 근거</span>':'<span class="rg-b warn">일부 근거 상이</span>';
-    var sum=common
-      ? '<div class="rg-common"><div><b>부족 이유</b>'+(g[0].reason||'-')+'</div><div class="rg-ref"><b>근거</b>'+(g[0].ref||'-')+'</div></div>'
-      : '<div class="rg-note">일부 성분코드의 이유/근거가 다릅니다. 펼쳐서 확인해 주세요.</div>';
-    var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족 이유</th><th>근거</th><th></th></tr></thead><tbody>'+
-      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td>'+
-        '<td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td>'+
-        '<td><a class="rg-edit" onclick="openIngredientByCode(\''+d.code+'\')" title="AI mate 성분 관리에서 수정">수정</a></td></tr>'; }).join('')+'</tbody></table>';
-    return '<div class="rg'+(q?' open':'')+'" id="'+gid+'">'+
-      '<div class="rg-h" onclick="toggleRG(\''+gid+'\')"><span class="rg-ar">▸</span><span class="rg-name">'+ko+eng+'</span><span class="rg-n">'+n+'개 코드</span>'+badge+'</div>'+
-      '<div class="rg-sum">'+sum+'</div><div class="rg-body">'+inner+'</div></div>';
-  }).join('')+pgHtml;
+    var nm='<a class="rg-edit" onclick="openIngredientByCode(\''+g[0].code+'\')" title="AI mate 성분 관리에서 수정">'+ko+'</a>'+eng;
+    if(common){
+      return '<tr><td class="rel-nm">'+nm+'</td><td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td><td class="rel-c">'+n+'개</td></tr>';
+    }
+    var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th></th></tr></thead><tbody>'+
+      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td><td><a class="rg-edit" onclick="openIngredientByCode(\''+d.code+'\')">수정</a></td></tr>'; }).join('')+'</tbody></table>';
+    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRG(\''+gid+'\')"><td class="rel-nm">'+nm+'</td>'+
+      '<td class="rel-rs"><span class="rg-b warn">일부 코드 상이</span> <span class="rel-exp">펼쳐서 확인 ▾</span></td><td class="rel-rf">-</td><td class="rel-c">'+n+'개</td></tr>'+
+      '<tr class="rel-body"><td colspan="4">'+inner+'</td></tr>';
+  }).join('');
+  c.innerHTML=head+'<table class="reltbl"><thead><tr><th>성분명(주성분)</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th class="rel-c">성분코드</th></tr></thead><tbody>'+rows+'</tbody></table>'+pgHtml;
 }
 
 /* 등록/수정 가운데 모달 */
@@ -628,11 +635,11 @@ function openMaster(idx){
   curDefs = (m.defs||[]).map(function(x){return {nm:x.nm,bc:x.bc}});
   renderDefProds();
   document.getElementById('fDefSearch').value=''; document.getElementById('fDefRes').style.display='none';
-  var ndrug=activeDrugCount(m);
+  var ndrug=activeDrugCount(m), nbase=activeBaseCount(m);
   document.getElementById('mmTitle').textContent = idx<0 ? '부족 영양소 추천 등록' : (m.nut || '(영양소 미지정)');
-  document.getElementById('mmSub').textContent = idx<0 ? '부족 영양소별 추천 상품을 등록합니다.' : ('관련 약물 '+ndrug+'개');
+  document.getElementById('mmSub').textContent = idx<0 ? '부족 영양소별 추천 상품을 등록합니다.' : ('관련 성분 '+nbase+'개 · 성분코드 '+ndrug+'개');
   document.getElementById('fNut').value = m.nut||'';
-  document.getElementById('fRelCount').value = ndrug+'개';
+  document.getElementById('fRelCount').value = nbase+'개 (성분코드 '+ndrug+')';
   document.getElementById('fCat').value = m.cat && m.cat!=='-' ? m.cat : '';
   renderRelDrugs(idx<0 ? [] : (m.drugs||[]));
   document.getElementById('mmMatchBlock').style.display = idx<0 ? 'none' : '';
@@ -747,6 +754,7 @@ var ingDelHist = [
 function isDeletedCode(code){ var g=ingredients.find(function(x){return x.code===code;}); return !!(g&&g.deleted); }
 // 삭제되지 않은 관련 약물(성분) 수 — 노출 대상 카운트
 function activeDrugCount(m){ return (m.drugs||[]).filter(function(d){return !isDeletedCode(d.code);}).length; }
+function activeBaseCount(m){ var s={}; (m.drugs||[]).forEach(function(d){ if(!isDeletedCode(d.code)) s[d.base||d.comp]=1; }); return Object.keys(s).length; }
 // 성분코드 → 연결된 부족 영양소(master의 drugs에서 code 매칭)
 function ingredientLinks(code){
   var out=[];

@@ -208,6 +208,15 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
 .rg-pgb:hover:not(:disabled){background:#f4f7f6} .rg-pgb.on{background:var(--mint-700);border-color:var(--mint-700);color:#fff}
 .rg-pgb:disabled{color:#c3ccd3;cursor:default} .rg-pgd{color:#9aa4af;padding:0 2px}
 .rg-pgi{margin-left:8px;font-size:11.5px;color:#8a9099}
+.rg-b{font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap} .rg-b.warn{background:#fbf1dd;color:#b8790c}
+table.reltbl{width:100%;border-collapse:collapse;font-size:12px}
+table.reltbl>thead>tr>th{background:#f4f7f6;text-align:left;padding:8px 10px;border:1px solid var(--g-2);font-weight:700;color:#48525c;font-size:11px;white-space:nowrap}
+table.reltbl>tbody>tr>td{padding:8px 10px;border:1px solid var(--g-2);vertical-align:top;line-height:1.5}
+td.rel-nm{white-space:nowrap;font-weight:700} td.rel-rs{min-width:220px} td.rel-rf{min-width:150px;color:#8a9099}
+td.rel-c{text-align:center;white-space:nowrap;color:var(--mint-700);font-weight:700}
+tr.rel-grp{cursor:pointer} tr.rel-grp:hover>td{background:#fafbfc}
+.rel-exp{color:var(--mint-700);font-weight:700;white-space:nowrap}
+tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.rel-body>td{padding:0;background:#fafbfc}
 </style>
 </head>
 <body>
@@ -250,7 +259,7 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
           <table>
             <thead><tr>
               <th>부족 영양소</th><th>관련 카테고리</th>
-              <th class="c">관련 약물 수</th><th>우리약국 추천 상품</th><th>굿팜 추천 상품</th>
+              <th class="c">관련 성분 수</th><th>우리약국 추천 상품</th><th>굿팜 추천 상품</th>
               <th class="c">AI mate 노출 상태 <span class="info" tabindex="0" style="text-transform:none">ⓘ<span class="tip-pop" style="left:auto;right:0">POS AI mate 추천 영역에 노출되는 상태입니다. 노출 중지 상태여도 약사웹에서는 기존 설정값을 조회할 수 있습니다.</span></span></th><th>최종 수정</th>
             </tr></thead>
             <tbody id="listBody"></tbody>
@@ -274,7 +283,7 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
         </section>
 
         <section class="sec">
-          <div class="sec-h" id="infoH">관련 약물</div>
+          <div class="sec-h" id="infoH">관련 성분</div>
           <div id="mInfoWrap"></div>
         </section>
 
@@ -399,6 +408,7 @@ var MAX_PRODS = 3;
 
 function byLabel(b){ return b==='admin' ? '어드민' : '약국'; }
 function clone(r){ return JSON.parse(JSON.stringify(r)); }
+function baseCnt(drugs){ var s={}; (drugs||[]).forEach(function(d){ s[d.base||d.comp]=1; }); return Object.keys(s).length; }
 
 // 목록 정렬: 1)AI mate 노출 ON 우선 2)최종 수정일 최신('-'는 뒤로) 3)관련 약물 수 많은 순
 function _cmpMod(a,c){ var ma=(a&&a!=='-')?a:'', mb=(c&&c!=='-')?c:''; if(ma&&mb) return mb<ma?-1:(mb>ma?1:0); if(ma) return -1; if(mb) return 1; return 0; }
@@ -414,12 +424,12 @@ function renderList(){
     var store=r.prods.filter(function(p){return !p.def;});
     var gpTxt = gp.length ? gp.map(function(p){return p.nm;}).join('<br>') : '<span style="color:#9aa4af">-</span>';
     var stTxt = store.length ? store.map(function(p){return p.nm;}).join('<br>') : '<span style="color:#9aa4af">미설정</span>';
-    var ndrug=(r.drugs&&r.drugs.length)||0;
+    var ndrug=(r.drugs&&r.drugs.length)||0, nbase=baseCnt(r.drugs);
     var modtxt = r.mod==='-' ? '<span style="color:#9aa4af">-</span>' : r.mod;
     b.insertAdjacentHTML('beforeend',
       '<tr class="click" onclick="openDetail('+r.id+')"><td class="nut">'+r.nut+'</td>'+
       '<td>'+(r.cat||'-')+'</td>'+
-      '<td class="c">'+ndrug+'</td>'+
+      '<td class="c">'+nbase+'</td>'+
       '<td style="white-space:normal">'+stTxt+'</td><td style="white-space:normal">'+gpTxt+'</td>'+
       '<td class="c"><span class="onoff '+(r.on?'on':'stop')+'">'+(r.on?'AI mate 노출':'AI mate 노출 중지')+'</span></td>'+
       '<td>'+modtxt+'</td></tr>');
@@ -439,13 +449,13 @@ function openDetail(id){
   var r=rows.find(function(x){return x.id===id}); cur=clone(r);
   var ndrug=(cur.drugs&&cur.drugs.length)||0;
   document.getElementById('mTitle').textContent=cur.nut;
-  document.getElementById('mSub').textContent='관련 약물 '+ndrug+'개';
+  document.getElementById('mSub').textContent='관련 성분 '+baseCnt(cur.drugs)+'개 · 성분코드 '+ndrug+'개';
   document.getElementById('basicH').innerHTML='기본 정보';
-  document.getElementById('infoH').innerHTML='관련 약물';
+  document.getElementById('infoH').innerHTML='관련 성분';
   document.getElementById('mBasic').innerHTML=
     '<div class="kv"><div class="k">부족 영양소</div><div class="v">'+cur.nut+'</div></div>'+
     '<div class="kv"><div class="k">관련 카테고리</div><div class="v">'+(cur.cat||'-')+'</div></div>'+
-    '<div class="kv"><div class="k">관련 약물 수</div><div class="v">'+ndrug+'개</div></div>';
+    '<div class="kv"><div class="k">관련 성분 수</div><div class="v">'+baseCnt(cur.drugs)+'개 (성분코드 '+ndrug+')</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
   relSearchW=''; relPageW=1;
   document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs);
@@ -480,28 +490,33 @@ function relPagerW(page,total){
 function relDrugsHtml(drugs){
   if(drugs) relRefW=drugs;
   var all=relRefW||[];
-  if(!all.length) return '<div class="readbox">연결된 약물 데이터가 없습니다.</div>';
+  if(!all.length) return '<div class="readbox">연결된 성분 데이터가 없습니다.</div>';
   var groups={}, order=[];
   all.forEach(function(d){ var k=(d.base||d.comp); if(!groups[k]){groups[k]=[]; order.push(k);} groups[k].push(d); });
   var q=(relSearchW||'').trim().toLowerCase();
   var shown=order.filter(function(k){ if(!q) return true; var g=groups[k];
     if(k.toLowerCase().indexOf(q)>-1||((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
     return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
-  var head='<div class="rg-top"><div class="rg-cnt"><b>'+all.length+'</b>개 성분코드 · <b>'+order.length+'</b> 주성분</div>'+
+  var head='<div class="rg-top"><div class="rg-cnt"><b>'+order.length+'</b> 원인 성분 · <b>'+all.length+'</b> 성분코드</div>'+
     '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearchW.replace(/"/g,'&quot;')+'" oninput="relSearchW=this.value; relPageW=1; renderRelW();"></div>';
   if(!shown.length) return head+'<div class="rg-none">검색 결과가 없습니다.</div>';
   var PER=10, totalP=Math.max(1,Math.ceil(shown.length/PER)); if(relPageW>totalP)relPageW=totalP; if(relPageW<1)relPageW=1;
   var pgHtml=relPagerW(relPageW,totalP);
-  return head+shown.slice((relPageW-1)*PER,relPageW*PER).map(function(k){
+  var rows=shown.slice((relPageW-1)*PER,relPageW*PER).map(function(k){
     var g=groups[k], n=g.length, gid='rgw_'+k.replace(/[^a-zA-Z0-9]/g,'_');
+    var sig={}; g.forEach(function(d){ sig[(d.reason||'')+'|'+(d.ref||'')]=1; });
+    var common=Object.keys(sig).length===1;
     var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
+    if(common){
+      return '<tr><td class="rel-nm">'+ko+eng+'</td><td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td><td class="rel-c">'+n+'개</td></tr>';
+    }
     var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
-      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td>'+
-        '<td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
-    return '<div class="rg'+(q?' open':'')+'" id="'+gid+'">'+
-      '<div class="rg-h" onclick="toggleRGW(\''+gid+'\')"><span class="rg-ar">▸</span><span class="rg-name">'+ko+eng+'</span><span class="rg-n">'+n+'개 코드</span></div>'+
-      '<div class="rg-body">'+inner+'</div></div>';
-  }).join('')+pgHtml;
+      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
+    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRGW(\''+gid+'\')"><td class="rel-nm">'+ko+eng+'</td>'+
+      '<td class="rel-rs"><span class="rg-b warn">일부 코드 상이</span> <span class="rel-exp">펼쳐서 확인 ▾</span></td><td class="rel-rf">-</td><td class="rel-c">'+n+'개</td></tr>'+
+      '<tr class="rel-body"><td colspan="4">'+inner+'</td></tr>';
+  }).join('');
+  return head+'<table class="reltbl"><thead><tr><th>성분명(주성분)</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th class="rel-c">성분코드</th></tr></thead><tbody>'+rows+'</tbody></table>'+pgHtml;
 }
 function openAdd(){
   mode='new';
@@ -509,10 +524,10 @@ function openAdd(){
   document.getElementById('mTitle').textContent='부족 영양소 항목 추가';
   document.getElementById('mSub').textContent='어드민에서 항목을 하나씩 등록합니다.';
   document.getElementById('basicH').innerHTML='기본 정보';
-  document.getElementById('infoH').innerHTML='관련 약물';
+  document.getElementById('infoH').innerHTML='관련 성분';
   document.getElementById('mBasic').innerHTML=
     '<div class="kv"><div class="k">부족 영양소</div><div class="v"><input class="inp fw" id="fNut" placeholder="예: 비타민 B12" oninput="cur.nut=this.value"></div></div>'+
-    '<div class="kv"><div class="k">관련 약물</div><div class="v"><input class="inp fw" id="fComp" placeholder="예: 메트포르민" oninput="cur.comp=this.value"></div></div>'+
+    '<div class="kv"><div class="k">관련 성분</div><div class="v"><input class="inp fw" id="fComp" placeholder="예: 메트포르민" oninput="cur.comp=this.value"></div></div>'+
     '<div class="kv"><div class="k">목록 요약</div><div class="v"><input class="inp fw" id="fSum" placeholder="목록에 표기할 한 줄 요약" oninput="cur.sum=this.value"></div></div>';
   document.getElementById('mInfoWrap').innerHTML=
     '<textarea class="inp" id="fInfo" placeholder="AI mate에 노출될 부족해지는 근거를 입력하세요." oninput="cur.info=this.value"></textarea>';
