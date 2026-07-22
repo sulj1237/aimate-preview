@@ -605,8 +605,8 @@ function renderRelDrugs(drugs){
   var q=(relSearch||'').trim().toLowerCase();
   var list=all.filter(function(d){ if(!q) return true;
     return d.code.toLowerCase().indexOf(q)>-1 || ((d.baseKo||d.comp||'')).toLowerCase().indexOf(q)>-1 || ((d.base||'')).toLowerCase().indexOf(q)>-1; });
-  var searchBox = all.length>10 ? '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearch.replace(/"/g,'&quot;')+'" oninput="relSearch=this.value; relPage=1; renderRelDrugs();">' : '';
-  var head='<div class="rg-top"><div class="rg-cnt">총 <b>'+all.length+'</b>개</div>'+searchBox+'</div>';
+  var head='<div class="rg-top"><div class="rg-cnt">총 <b>'+all.length+'</b>개</div>'+
+    '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearch.replace(/"/g,'&quot;')+'" oninput="relSearch=this.value; relPage=1; renderRelDrugs();"></div>';
   if(!list.length){ c.innerHTML=head+'<div class="rg-none">검색 결과가 없습니다.</div>'; return; }
   var PER=10, totalP=Math.max(1,Math.ceil(list.length/PER)); if(relPage>totalP)relPage=totalP; if(relPage<1)relPage=1;
   var rows=list.slice((relPage-1)*PER,relPage*PER).map(function(d){
