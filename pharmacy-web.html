@@ -221,6 +221,7 @@ tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.re
 .rel-toggle{display:inline-flex;align-items:center;gap:5px;background:var(--mint-100);color:var(--mint-700);font-weight:800;border-radius:999px;padding:5px 13px;font-size:12px;white-space:nowrap}
 tr.rel-grp:hover .rel-toggle{background:var(--mint-700);color:#fff} tr.rel-grp:hover .rel-caret{color:#fff}
 td.rel-c{text-align:right}
+td.rel-form{white-space:nowrap;color:var(--g-9)}
 </style>
 </head>
 <body>
@@ -334,10 +335,10 @@ function b12Drugs(){
     ["erythromycin","에리스로마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Macrolides and gut flora"],
     ["fosfomycin","포스포마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Antibiotics and gut microbiota"]
   ];
-  var forms=[["정제","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
+  var forms=[["정제, 저작정","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
   var doses=["250mg","500mg","750mg","1000mg","125mg","100mg"];
   var out=[], seq=410000;
-  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length], dose=doses[i%doses.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko+" "+dose+" "+f[0], form:f[0], dose:dose, reason:reason, ref:ref}); }
+  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length], dose=doses[i%doses.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko+" "+dose+" "+f[0], form:f[0], fcode:f[1], dose:dose, reason:reason, ref:ref}); }
   top.forEach(function(g){ for(var i=0;i<g[2];i++){ var reason=g[3],ref=g[4];
     if(g[0]==='amoxicillin'&&i<2){ reason=(i===0?'소아 반복 처방 맥락에서 흡수 영향 별도 검토 필요':'제형·투여경로 차이로 근거 상이 — 개별 확인'); ref='2) variant-specific note'; }
     push(g[0],g[1],i,reason,ref); } });
@@ -491,38 +492,19 @@ function relPagerW(page,total){
   b.push(btn(page+1,'›',page>=total,false));
   return '<div class="rg-pg">'+b.join('')+'<span class="rg-pgi">'+page+' / '+total+' 페이지</span></div>';
 }
+// 약사웹 관련 성분 = 성분코드 단위 플랫 리스트(조회 전용). 상단 총 개수 · 검색 없음.
 function relDrugsHtml(drugs){
   if(drugs) relRefW=drugs;
   var all=relRefW||[];
   if(!all.length) return '<div class="readbox">연결된 성분 데이터가 없습니다.</div>';
-  var groups={}, order=[];
-  all.forEach(function(d){ var k=(d.base||d.comp); if(!groups[k]){groups[k]=[]; order.push(k);} groups[k].push(d); });
-  var q=(relSearchW||'').trim().toLowerCase();
-  var shown=order.filter(function(k){ if(!q) return true; var g=groups[k];
-    if(k.toLowerCase().indexOf(q)>-1||((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
-    return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
-  var head='<div class="rg-top"><div class="rg-cnt"><b>'+order.length+'</b> 원인 성분 · <b>'+all.length+'</b> 성분코드</div>'+
-    '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearchW.replace(/"/g,'&quot;')+'" oninput="relSearchW=this.value; relPageW=1; renderRelW();"></div>';
-  if(!shown.length) return head+'<div class="rg-none">검색 결과가 없습니다.</div>';
-  var PER=10, totalP=Math.max(1,Math.ceil(shown.length/PER)); if(relPageW>totalP)relPageW=totalP; if(relPageW<1)relPageW=1;
-  var pgHtml=relPagerW(relPageW,totalP);
-  var rows=shown.slice((relPageW-1)*PER,relPageW*PER).map(function(k){
-    var g=groups[k], n=g.length, gid='rgw_'+k.replace(/[^a-zA-Z0-9]/g,'_');
-    var sig={}; g.forEach(function(d){ sig[(d.reason||'')+'|'+(d.ref||'')]=1; });
-    var common=Object.keys(sig).length===1;
-    var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
-    var inner= common
-      ? '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th></tr></thead><tbody>'+
-          g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td></tr>'; }).join('')+'</tbody></table>'
-      : '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
-          g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
-    var rsCell= common
-      ? '<td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td>'
-      : '<td class="rel-rs"><span class="rg-b warn">관련 정보 상이</span></td><td class="rel-rf">-</td>';
-    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRGW(\''+gid+'\')"><td class="rel-nm">'+ko+eng+'</td>'+rsCell+'<td class="rel-c"><span class="rel-toggle">'+n+'개 <span class="rel-caret">▾</span></span></td></tr>'+
-      '<tr class="rel-body"><td colspan="4">'+inner+'</td></tr>';
+  var PER=10, totalP=Math.max(1,Math.ceil(all.length/PER)); if(relPageW>totalP)relPageW=totalP; if(relPageW<1)relPageW=1;
+  var head='<div class="rg-top"><div class="rg-cnt">관련 성분 <b>'+all.length+'</b>개</div></div>';
+  var rows=all.slice((relPageW-1)*PER,relPageW*PER).map(function(d){
+    var nm=(d.baseKo||d.comp||'-')+(d.dose?' '+d.dose:'');
+    var form=(d.form||'-')+(d.fcode?'('+d.fcode+')':'');
+    return '<tr><td class="rel-nm">'+nm+'</td><td class="rel-form">'+form+'</td><td class="rel-rs">'+(d.reason||'-')+'</td><td class="rel-rf">'+(d.ref||'-')+'</td></tr>';
   }).join('');
-  return head+'<table class="reltbl"><thead><tr><th>성분명(주성분)</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th class="rel-c">성분코드</th></tr></thead><tbody>'+rows+'</tbody></table>'+pgHtml;
+  return head+'<table class="reltbl"><thead><tr><th>성분명</th><th>제형</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+rows+'</tbody></table>'+relPagerW(relPageW,totalP);
 }
 function openAdd(){
   mode='new';

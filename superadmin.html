@@ -435,10 +435,10 @@ function b12Drugs(){
     ["erythromycin","에리스로마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Macrolides and gut flora"],
     ["fosfomycin","포스포마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Antibiotics and gut microbiota"]
   ];
-  var forms=[["정제","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
+  var forms=[["정제, 저작정","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
   var doses=["250mg","500mg","750mg","1000mg","125mg","100mg"];
   var out=[], seq=410000;
-  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length], dose=doses[i%doses.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko+" "+dose+" "+f[0], form:f[0], dose:dose, reason:reason, ref:ref}); }
+  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length], dose=doses[i%doses.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko+" "+dose+" "+f[0], form:f[0], fcode:f[1], dose:dose, reason:reason, ref:ref}); }
   top.forEach(function(g){ for(var i=0;i<g[2];i++){ var reason=g[3],ref=g[4];
     if(g[0]==='amoxicillin'&&i<2){ reason=(i===0?'소아 반복 처방 맥락에서 흡수 영향 별도 검토 필요':'제형·투여경로 차이로 근거 상이 — 개별 확인'); ref='2) variant-specific note'; }
     push(g[0],g[1],i,reason,ref); } });
