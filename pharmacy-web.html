@@ -497,7 +497,7 @@ function relDrugsHtml(drugs){
   var all=relRefW||[];
   if(!all.length) return '<div class="readbox">연결된 성분 데이터가 없습니다.</div>';
   var PER=10, totalP=Math.max(1,Math.ceil(all.length/PER)); if(relPageW>totalP)relPageW=totalP; if(relPageW<1)relPageW=1;
-  var head='<div class="rg-top"><div class="rg-cnt">관련 성분 <b>'+all.length+'</b>개</div></div>';
+  var head='<div class="rg-top"><div class="rg-cnt">총 <b>'+all.length+'</b>개</div></div>';
   var rows=all.slice((relPageW-1)*PER,relPageW*PER).map(function(d){
     var nm=(d.baseKo||d.comp||'-')+(d.dose?' '+d.dose:'');
     var form=(d.form||'-')+(d.fcode?'('+d.fcode+')':'');
