@@ -217,6 +217,7 @@ td.rel-c{text-align:center;white-space:nowrap;color:var(--mint-700);font-weight:
 tr.rel-grp{cursor:pointer} tr.rel-grp:hover>td{background:#fafbfc}
 .rel-exp{color:var(--mint-700);font-weight:700;white-space:nowrap}
 tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.rel-body>td{padding:0;background:#fafbfc}
+.rel-caret{color:#9aa4af;font-size:9px;margin-left:2px;display:inline-block;transition:transform .15s} tr.rel-grp.open .rel-caret{transform:rotate(180deg)}
 </style>
 </head>
 <body>
@@ -283,14 +284,14 @@ tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.re
         </section>
 
         <section class="sec">
-          <div class="sec-h" id="infoH">관련 성분</div>
-          <div id="mInfoWrap"></div>
-        </section>
-
-        <section class="sec">
           <div class="sec-h">추천 상품 설정<span class="secmeta" id="mProdMeta">최종 수정일 -</span></div>
           <div class="prod-list" id="mProds"></div>
           <div class="hint" id="mHint"></div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h" id="infoH">관련 성분</div>
+          <div id="mInfoWrap"></div>
         </section>
         <div class="dpg-foot" id="mFoot"></div>
       </div>
@@ -333,7 +334,7 @@ function b12Drugs(){
   var forms=[["정제","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
   var doses=["250mg","500mg","750mg","1000mg","125mg","100mg"];
   var out=[], seq=410000;
-  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko, form:f[0], dose:doses[i%doses.length], reason:reason, ref:ref}); }
+  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length], dose=doses[i%doses.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko+" "+dose+" "+f[0], form:f[0], dose:dose, reason:reason, ref:ref}); }
   top.forEach(function(g){ for(var i=0;i<g[2];i++){ var reason=g[3],ref=g[4];
     if(g[0]==='amoxicillin'&&i<2){ reason=(i===0?'소아 반복 처방 맥락에서 흡수 영향 별도 검토 필요':'제형·투여경로 차이로 근거 상이 — 개별 확인'); ref='2) variant-specific note'; }
     push(g[0],g[1],i,reason,ref); } });
@@ -507,13 +508,15 @@ function relDrugsHtml(drugs){
     var sig={}; g.forEach(function(d){ sig[(d.reason||'')+'|'+(d.ref||'')]=1; });
     var common=Object.keys(sig).length===1;
     var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
-    if(common){
-      return '<tr><td class="rel-nm">'+ko+eng+'</td><td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td><td class="rel-c">'+n+'개</td></tr>';
-    }
-    var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
-      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
-    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRGW(\''+gid+'\')"><td class="rel-nm">'+ko+eng+'</td>'+
-      '<td class="rel-rs"><span class="rg-b warn">일부 코드 상이</span> <span class="rel-exp">펼쳐서 확인 ▾</span></td><td class="rel-rf">-</td><td class="rel-c">'+n+'개</td></tr>'+
+    var inner= common
+      ? '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th></tr></thead><tbody>'+
+          g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td></tr>'; }).join('')+'</tbody></table>'
+      : '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
+          g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
+    var rsCell= common
+      ? '<td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td>'
+      : '<td class="rel-rs"><span class="rg-b warn">관련 정보 상이</span></td><td class="rel-rf"><span class="rel-exp">상이 목록 펼쳐보기 ▾</span></td>';
+    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRGW(\''+gid+'\')"><td class="rel-nm">'+ko+eng+'</td>'+rsCell+'<td class="rel-c">'+n+'개 <span class="rel-caret">▾</span></td></tr>'+
       '<tr class="rel-body"><td colspan="4">'+inner+'</td></tr>';
   }).join('');
   return head+'<table class="reltbl"><thead><tr><th>성분명(주성분)</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th class="rel-c">성분코드</th></tr></thead><tbody>'+rows+'</tbody></table>'+pgHtml;
