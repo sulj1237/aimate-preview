@@ -429,12 +429,12 @@ function renderList(){
     var store=r.prods.filter(function(p){return !p.def;});
     var gpTxt = gp.length ? gp.map(function(p){return p.nm;}).join('<br>') : '<span style="color:#9aa4af">-</span>';
     var stTxt = store.length ? store.map(function(p){return p.nm;}).join('<br>') : '<span style="color:#9aa4af">미설정</span>';
-    var ndrug=(r.drugs&&r.drugs.length)||0, nbase=baseCnt(r.drugs);
+    var ndrug=(r.drugs&&r.drugs.length)||0;
     var modtxt = r.mod==='-' ? '<span style="color:#9aa4af">-</span>' : r.mod;
     b.insertAdjacentHTML('beforeend',
       '<tr class="click" onclick="openDetail('+r.id+')"><td class="nut">'+r.nut+'</td>'+
       '<td>'+(r.cat||'-')+'</td>'+
-      '<td class="c">'+nbase+'</td>'+
+      '<td class="c">'+ndrug+'</td>'+
       '<td style="white-space:normal">'+stTxt+'</td><td style="white-space:normal">'+gpTxt+'</td>'+
       '<td class="c"><span class="onoff '+(r.on?'on':'stop')+'">'+(r.on?'AI mate 노출':'AI mate 노출 중지')+'</span></td>'+
       '<td>'+modtxt+'</td></tr>');
@@ -454,13 +454,13 @@ function openDetail(id){
   var r=rows.find(function(x){return x.id===id}); cur=clone(r);
   var ndrug=(cur.drugs&&cur.drugs.length)||0;
   document.getElementById('mTitle').textContent=cur.nut;
-  document.getElementById('mSub').textContent='관련 성분 '+baseCnt(cur.drugs)+'개 · 성분코드 '+ndrug+'개';
+  document.getElementById('mSub').textContent='관련 성분 '+ndrug+'개';
   document.getElementById('basicH').innerHTML='기본 정보';
   document.getElementById('infoH').innerHTML='관련 성분';
   document.getElementById('mBasic').innerHTML=
     '<div class="kv"><div class="k">부족 영양소</div><div class="v">'+cur.nut+'</div></div>'+
     '<div class="kv"><div class="k">관련 카테고리</div><div class="v">'+(cur.cat||'-')+'</div></div>'+
-    '<div class="kv"><div class="k">관련 성분 수</div><div class="v">'+baseCnt(cur.drugs)+'개 (성분코드 '+ndrug+')</div></div>';
+    '<div class="kv"><div class="k">관련 성분 수</div><div class="v">'+ndrug+'개</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
   relSearchW=''; relPageW=1;
   document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs);
@@ -482,7 +482,6 @@ var relRefW=[], relSearchW='', relPageW=1;
 function toggleRGW(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 function renderRelW(){ document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(); }
 function relPagerW(page,total){
-  if(total<=1) return '';
   function btn(p,lbl,dis,on){ return '<button class="rg-pgb'+(on?' on':'')+'"'+(dis?' disabled':' onclick="relPageW='+p+'; renderRelW()"')+'>'+lbl+'</button>'; }
   var b=[btn(page-1,'‹',page<=1,false)];
   var e=Math.min(total,Math.max(5,page+2)), s=Math.max(1,e-4); e=Math.min(total,s+4);

@@ -164,6 +164,8 @@ tr.rel-grp{cursor:pointer} tr.rel-grp:hover>td{background:#fbfcfd}
 tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.rel-body>td{padding:0;background:#fafbfc}
 .rel-caret{color:#9aa4af;font-size:9px;margin-left:2px;display:inline-block;transition:transform .15s} tr.rel-grp.open .rel-caret{transform:rotate(180deg)}
 .rg-inner tbody tr.rel-row{cursor:pointer} .rg-inner tbody tr.rel-row:hover td{background:#eef4f2}
+table.reltbl tbody tr.rel-row{cursor:pointer} table.reltbl tbody tr.rel-row:hover td{background:#f4f7f6}
+td.rel-form{white-space:nowrap;color:#48525c}
 .rel-toggle{display:inline-flex;align-items:center;gap:5px;background:#e6f7f4;color:#0b8f79;font-weight:800;border-radius:999px;padding:5px 13px;font-size:12px;white-space:nowrap}
 tr.rel-grp:hover .rel-toggle{background:#0b8f79;color:#fff} tr.rel-grp:hover .rel-caret{color:#fff}
 td.rel-c{text-align:right}
@@ -571,11 +573,11 @@ function renderMaster(){
   var list=master.map(function(m,idx){return {m:m,idx:idx};}).filter(function(o){return !o.m.deleted;});  // soft delete 제외, 원 index 보존
   list.sort(masterSort);
   document.getElementById('masterBody').innerHTML = list.map(function(o){
-    var m=o.m, nbase=activeBaseCount(m);
+    var m=o.m, ndrug=activeDrugCount(m);
     return '<tr class="click" onclick="openMaster('+o.idx+')">'+
       '<td class="nut">'+m.nut+'</td>'+
       '<td>'+(m.cat||'-')+'</td>'+
-      '<td class="num">'+nbase+'</td>'+
+      '<td class="num">'+ndrug+'</td>'+
       '<td class="c"><span class="stt '+(m.on?'ok':'hide')+'">'+(m.on?'ON':'OFF')+'</span></td>'+
       '<td>'+m.mod+'</td></tr>';
   }).join('');
@@ -586,7 +588,6 @@ function renderMaster(){
 var relDrugsRef=[], relSearch='', relPage=1;
 function toggleRG(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 function relPager(page,total,fn){
-  if(total<=1) return '';
   function btn(p,lbl,dis,on){ return '<button class="rg-pgb'+(on?' on':'')+'"'+(dis?' disabled':' onclick="relPage='+p+'; '+fn+'()"')+'>'+lbl+'</button>'; }
   var b=[btn(page-1,'‹',page<=1,false)];
   var e=Math.min(total,Math.max(5,page+2)), s=Math.max(1,e-4); e=Math.min(total,s+4);
@@ -601,36 +602,19 @@ function renderRelDrugs(drugs){
   var c=document.getElementById('mRelDrugs');
   var all=(relDrugsRef||[]).filter(function(d){return !isDeletedCode(d.code);});
   if(!all.length){ c.innerHTML='<div class="readbox">연결된 성분 데이터가 없습니다.</div>'; return; }
-  var groups={}, order=[];
-  all.forEach(function(d){ var k=(d.base||d.comp); if(!groups[k]){groups[k]=[]; order.push(k);} groups[k].push(d); });
   var q=(relSearch||'').trim().toLowerCase();
-  var shown=order.filter(function(k){ if(!q) return true; var g=groups[k];
-    if(k.toLowerCase().indexOf(q)>-1) return true;
-    if(((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
-    return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
-  var head='<div class="rg-top"><div class="rg-cnt"><b>'+order.length+'</b> 원인 성분 · <b>'+all.length+'</b> 성분코드</div>'+
+  var list=all.filter(function(d){ if(!q) return true;
+    return d.code.toLowerCase().indexOf(q)>-1 || ((d.baseKo||d.comp||'')).toLowerCase().indexOf(q)>-1 || ((d.base||'')).toLowerCase().indexOf(q)>-1; });
+  var head='<div class="rg-top"><div class="rg-cnt">관련 성분 <b>'+all.length+'</b>개</div>'+
     '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearch.replace(/"/g,'&quot;')+'" oninput="relSearch=this.value; relPage=1; renderRelDrugs();"></div>';
-  if(!shown.length){ c.innerHTML=head+'<div class="rg-none">검색 결과가 없습니다.</div>'; return; }
-  var PER=10, totalP=Math.max(1,Math.ceil(shown.length/PER)); if(relPage>totalP)relPage=totalP; if(relPage<1)relPage=1;
-  var pgHtml=relPager(relPage,totalP,'renderRelDrugs');
-  var rows=shown.slice((relPage-1)*PER,relPage*PER).map(function(k){
-    var g=groups[k], n=g.length, gid='rg_'+k.replace(/[^a-zA-Z0-9]/g,'_');
-    var sig={}; g.forEach(function(d){ sig[(d.reason||'')+'|'+(d.ref||'')]=1; });
-    var common=Object.keys(sig).length===1;
-    var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
-    var nm='<a class="rg-edit" onclick="event.stopPropagation();openIngredientByCode(\''+g[0].code+'\')" title="AI mate 성분 관리에서 수정">'+ko+'</a>'+eng;
-    var inner= common
-      ? '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th></tr></thead><tbody>'+
-          g.map(function(d){ return '<tr class="rel-row" onclick="openIngredientByCode(\''+d.code+'\')" title="성분 관리로 이동"><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td></tr>'; }).join('')+'</tbody></table>'
-      : '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
-          g.map(function(d){ return '<tr class="rel-row" onclick="openIngredientByCode(\''+d.code+'\')" title="성분 관리로 이동"><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
-    var rsCell= common
-      ? '<td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td>'
-      : '<td class="rel-rs"><span class="rg-b warn">관련 정보 상이</span></td><td class="rel-rf">-</td>';
-    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRG(\''+gid+'\')"><td class="rel-nm">'+nm+'</td>'+rsCell+'<td class="rel-c"><span class="rel-toggle">'+n+'개 <span class="rel-caret">▾</span></span></td></tr>'+
-      '<tr class="rel-body"><td colspan="4">'+inner+'</td></tr>';
+  if(!list.length){ c.innerHTML=head+'<div class="rg-none">검색 결과가 없습니다.</div>'; return; }
+  var PER=10, totalP=Math.max(1,Math.ceil(list.length/PER)); if(relPage>totalP)relPage=totalP; if(relPage<1)relPage=1;
+  var rows=list.slice((relPage-1)*PER,relPage*PER).map(function(d){
+    var nm=(d.baseKo||d.comp||'-')+(d.dose?' '+d.dose:'');
+    var form=(d.form||'-')+(d.fcode?'('+d.fcode+')':'');
+    return '<tr class="rel-row" onclick="openIngredientByCode(\''+d.code+'\')" title="성분 관리로 이동"><td class="mono">'+d.code+'</td><td class="rel-nm">'+nm+'</td><td class="rel-form">'+form+'</td><td class="rel-rs">'+(d.reason||'-')+'</td><td class="rel-rf">'+(d.ref||'-')+'</td></tr>';
   }).join('');
-  c.innerHTML=head+'<table class="reltbl"><thead><tr><th>성분명(주성분)</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th class="rel-c">성분코드</th></tr></thead><tbody>'+rows+'</tbody></table>'+pgHtml;
+  c.innerHTML=head+'<table class="reltbl"><thead><tr><th>성분코드</th><th>성분명</th><th>제형</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+rows+'</tbody></table>'+relPager(relPage,totalP,'renderRelDrugs');
 }
 
 /* 등록/수정 가운데 모달 */
@@ -644,9 +628,9 @@ function openMaster(idx){
   document.getElementById('fDefSearch').value=''; document.getElementById('fDefRes').style.display='none';
   var ndrug=activeDrugCount(m), nbase=activeBaseCount(m);
   document.getElementById('mmTitle').textContent = idx<0 ? '부족 영양소 추천 등록' : (m.nut || '(영양소 미지정)');
-  document.getElementById('mmSub').textContent = idx<0 ? '부족 영양소별 추천 상품을 등록합니다.' : ('관련 성분 '+nbase+'개 · 성분코드 '+ndrug+'개');
+  document.getElementById('mmSub').textContent = idx<0 ? '부족 영양소별 추천 상품을 등록합니다.' : ('관련 성분 '+ndrug+'개');
   document.getElementById('fNut').value = m.nut||'';
-  document.getElementById('fRelCount').value = nbase+'개 (성분코드 '+ndrug+')';
+  document.getElementById('fRelCount').value = ndrug+'개';
   document.getElementById('fCat').value = m.cat && m.cat!=='-' ? m.cat : '';
   renderRelDrugs(idx<0 ? [] : (m.drugs||[]));
   document.getElementById('mmMatchBlock').style.display = idx<0 ? 'none' : '';
