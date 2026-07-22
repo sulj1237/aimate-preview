@@ -124,6 +124,31 @@
   .mli .dt2{color:var(--muted);white-space:nowrap;font-size:11px}
   .mli .src{font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap;flex:none}
   .mli .src.store{background:var(--teal-soft);color:var(--teal-d)}.mli .src.base{background:#eef2f6;color:#5c6671}
+/* 관련 약물 — 주성분 그룹핑 목록 */
+.rg-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0 10px;flex-wrap:wrap}
+.rg-cnt{font-size:12.5px;color:var(--muted)} .rg-cnt b{color:var(--ink)}
+.rg-search{border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12.5px;min-width:220px;font-family:inherit}
+.rg-none{color:var(--muted);font-size:12.5px;padding:10px 2px}
+.rg{border:1px solid var(--line);border-radius:9px;margin-bottom:7px;overflow:hidden;background:#fff}
+.rg-h{display:flex;align-items:center;gap:10px;padding:10px 13px;cursor:pointer;background:#fbfcfd}
+.rg-h:hover{background:#f4f7f6}
+.rg-ar{transition:transform .15s;color:#98a2ad;font-size:11px}
+.rg.open .rg-ar{transform:rotate(90deg)}
+.rg-name{font-weight:700;font-size:13px} .rg-eng{color:#98a2ad;font-weight:600;font-size:11.5px}
+.rg-n{margin-left:auto;font-size:11.5px;font-weight:700;color:#0b8f79;background:#e6f7f4;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.rg-b{font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.rg-b.ok{background:#e6f7f4;color:#0b8f79} .rg-b.warn{background:#fbf1dd;color:#b8790c}
+.rg-sum{padding:0 13px 11px;font-size:12px;color:#3a4650;line-height:1.6}
+.rg-common b{color:#8a9099;font-weight:700;margin-right:4px} .rg-ref{color:#8a9099;margin-top:2px}
+.rg-note{color:#b8790c;background:#fdf8ee;border-radius:7px;padding:7px 10px}
+.rg-body{display:none;border-top:1px solid var(--line);overflow:auto}
+.rg.open .rg-body{display:block}
+table.rg-inner{width:100%;border-collapse:collapse;font-size:11.5px}
+table.rg-inner th{background:#f4f7f6;text-align:left;padding:6px 9px;color:#5c6671;font-weight:700;white-space:nowrap}
+table.rg-inner td{padding:6px 9px;border-top:1px solid var(--line);vertical-align:top}
+table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;white-space:nowrap}
+.rg-inner td.rg-r{min-width:170px;white-space:normal} .rg-inner td.muted{color:#8a9099}
+.rg-edit{color:#0b8f79;font-weight:700;cursor:pointer;text-decoration:underline;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -379,14 +404,36 @@
 <script>
 // 데이터 기준 = 부족 영양소(nid = 부족 영양소 매칭 키). 추천 상품·카테고리·효능군은 영양소 종속.
 // drugs[] = 이 영양소를 고갈시키는 관련 약물(성분코드·성분명·제형·이유·근거) — 조회 전용 참고 정보.
+// 데모: 9자리 전체 성분코드 기준 매칭 시 비타민 B12에 650개 성분코드가 연결됨(제형·함량 variant 포함).
+// 관리 UI에서는 주성분 단위로 그룹핑해 표시(표시용) — 매칭·수정·삭제·이유/근거는 개별 성분코드 기준 유지.
+function b12Drugs(){
+  var top=[
+    ["metformin","메트포르민",91,"메트포르민 장기 복용 시 소장 내 B12-내인자 복합체 흡수가 저하되어 부족 위험","1) Metformin-associated vitamin B12 deficiency, Diabetes Care"],
+    ["amoxicillin","아목시실린",66,"광범위 항생제의 장내 세균총 변화로 B12 합성·흡수에 영향","1) Antibiotics and gut microbiota, B12"],
+    ["sodium bicarbonate","탄산수소나트륨",21,"제산 작용으로 위산이 감소하면 B12 유리·흡수가 저하","1) Antacids and B12 absorption"],
+    ["ciprofloxacin","시프로플록사신",18,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Fluoroquinolones and gut flora"],
+    ["gentamicin","겐타마이신",15,"항생제 장기 사용 시 흡수 관련 영향 가능","1) Aminoglycosides, review"],
+    ["ampicillin","암피실린",14,"광범위 항생제의 장내 세균총 변화로 B12 합성·흡수에 영향","1) Antibiotics and gut microbiota, B12"],
+    ["erythromycin","에리스로마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Macrolides and gut flora"],
+    ["fosfomycin","포스포마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Antibiotics and gut microbiota"]
+  ];
+  var forms=[["정제","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
+  var doses=["250mg","500mg","750mg","1000mg","125mg","100mg"];
+  var out=[], seq=410000;
+  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, form:f[0], dose:doses[i%doses.length], reason:reason, ref:ref}); }
+  top.forEach(function(g){ for(var i=0;i<g[2];i++){ var reason=g[3],ref=g[4];
+    if(g[0]==='amoxicillin'&&i<2){ reason=(i===0?'소아 반복 처방 맥락에서 흡수 영향 별도 검토 필요':'제형·투여경로 차이로 근거 상이 — 개별 확인'); ref='2) variant-specific note'; }
+    push(g[0],g[1],i,reason,ref); } });
+  var tk=["세팔렉신","독시사이클린","리팜피신","클래리스로마이신","레보플록사신","메트로니다졸","반코마이신","클린다마이신","테트라사이클린","니트로푸란토인","트리메토프림","설파메톡사졸","세프트리악손","아지트로마이신","목시플록사신","리네졸리드","이미페넴","메로페넴","피페라실린","세프타지딤"];
+  var te=["cephalexin","doxycycline","rifampicin","clarithromycin","levofloxacin","metronidazole","vancomycin","clindamycin","tetracycline","nitrofurantoin","trimethoprim","sulfamethoxazole","ceftriaxone","azithromycin","moxifloxacin","linezolid","imipenem","meropenem","piperacillin","ceftazidime"];
+  for(var t=0;t<118;t++){ var cnt=(t<43)?4:3; var ko=(t<tk.length)?tk[t]:('주성분 '+(t+1)); var eng=(t<te.length)?te[t]:('ingredient-'+(t+1));
+    for(var i=0;i<cnt;i++) push(eng,ko,i,'항생제/약물 사용에 따른 장내 세균총 변화로 B12 흡수·합성에 영향 가능','1) Drug-induced B12 depletion, review'); }
+  return out; // 650 성분코드 · 126 주성분
+}
 var master = [
   {nut:"비타민 B12", nid:"NUT-B12", cat:"비타민 B군, 종합비타민", eff:"대사케어",
    defs:[{nm:"○○ 비타민B 컴플렉스",bc:"8801111000022"},{nm:"△△ 비타민B12 1000mcg",bc:"8809001112223"}], store:128, on:true, mod:"2026-06-20",
-   drugs:[
-     {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12-내인자 복합체 흡수가 저하되어 부족해질 위험", ref:"1) Metformin-associated vitamin B12 deficiency, Diabetes Care"},
-     {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12의 유리가 감소해 흡수가 저하", ref:"1) Acid suppression and B12 malabsorption, review"},
-     {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 장기 복용 시 부족 위험", ref:"1) PPI use and vitamin B12, JAMA"}
-   ]},
+   drugs: b12Drugs()},
   {nut:"코엔자임Q10", nid:"NUT-COQ10", cat:"항산화 작용", eff:"항산화&염증케어",
    defs:[{nm:"○○ 코엔자임Q10 100mg",bc:"8802222000033"},{nm:"△△ 코큐텐 이지 200mg",bc:"8802222000040"}], store:96, on:true, mod:"2026-06-24",
    drugs:[
@@ -517,25 +564,47 @@ function renderMaster(){
   document.getElementById('mTotal').textContent = list.length.toLocaleString();
 }
 // 관련 약물 목록 — 조회 전용. 성분명 클릭 시 「AI mate 성분 관리」로 이동해 성분명·제형·이유·근거를 수정.
+// 관련 약물 = 주성분 단위 그룹핑 표시(표시용). 매칭·수정·삭제·이유/근거는 개별 성분코드(9자리 전체) 기준.
+var relDrugsRef=[], relSearch='';
+function toggleRG(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 function renderRelDrugs(drugs){
+  if(drugs) relDrugsRef=drugs;
   var c=document.getElementById('mRelDrugs');
-  drugs=(drugs||[]).filter(function(d){return !isDeletedCode(d.code);});   // 삭제된 성분은 미노출
-  if(!drugs.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
-  c.innerHTML='<div class="tbl" style="overflow:auto"><table><thead><tr>'+
-    '<th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거/참고문헌</th></tr></thead><tbody>'+
-    drugs.map(function(d){
-      return '<tr>'+
-        '<td class="mono" style="white-space:nowrap;color:#8a9099">'+d.code+'</td>'+
-        '<td style="white-space:nowrap"><a onclick="openIngredientByCode(\''+d.code+'\')" style="color:var(--teal-d);font-weight:700;cursor:pointer;text-decoration:underline" title="AI mate 성분 관리에서 수정">'+d.comp+'</a></td>'+
-        '<td style="white-space:normal;min-width:210px">'+(d.reason||'-')+'</td>'+
-        '<td style="white-space:normal;min-width:160px;color:#8a9099">'+(d.ref||'-')+'</td></tr>';
-    }).join('')+'</tbody></table></div>';
+  var all=(relDrugsRef||[]).filter(function(d){return !isDeletedCode(d.code);});
+  if(!all.length){ c.innerHTML='<div class="readbox">연결된 약물 데이터가 없습니다.</div>'; return; }
+  var groups={}, order=[];
+  all.forEach(function(d){ var k=(d.base||d.comp); if(!groups[k]){groups[k]=[]; order.push(k);} groups[k].push(d); });
+  var q=(relSearch||'').trim().toLowerCase();
+  var shown=order.filter(function(k){ if(!q) return true; var g=groups[k];
+    if(k.toLowerCase().indexOf(q)>-1) return true;
+    if(((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
+    return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
+  var head='<div class="rg-top"><div class="rg-cnt"><b>'+all.length+'</b>개 성분코드 · <b>'+order.length+'</b> 주성분</div>'+
+    '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearch.replace(/"/g,'&quot;')+'" oninput="relSearch=this.value; renderRelDrugs();"></div>';
+  if(!shown.length){ c.innerHTML=head+'<div class="rg-none">검색 결과가 없습니다.</div>'; return; }
+  c.innerHTML=head+shown.map(function(k){
+    var g=groups[k], n=g.length, gid='rg_'+k.replace(/[^a-zA-Z0-9]/g,'_');
+    var sig={}; g.forEach(function(d){ sig[(d.reason||'')+'|'+(d.ref||'')]=1; });
+    var common=Object.keys(sig).length===1;
+    var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
+    var badge=common?'<span class="rg-b ok">공통 근거</span>':'<span class="rg-b warn">일부 근거 상이</span>';
+    var sum=common
+      ? '<div class="rg-common"><div><b>부족 이유</b>'+(g[0].reason||'-')+'</div><div class="rg-ref"><b>근거</b>'+(g[0].ref||'-')+'</div></div>'
+      : '<div class="rg-note">일부 성분코드의 이유/근거가 다릅니다. 펼쳐서 확인해 주세요.</div>';
+    var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족 이유</th><th>근거</th><th></th></tr></thead><tbody>'+
+      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td>'+
+        '<td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td>'+
+        '<td><a class="rg-edit" onclick="openIngredientByCode(\''+d.code+'\')" title="AI mate 성분 관리에서 수정">수정</a></td></tr>'; }).join('')+'</tbody></table>';
+    return '<div class="rg'+(q?' open':'')+'" id="'+gid+'">'+
+      '<div class="rg-h" onclick="toggleRG(\''+gid+'\')"><span class="rg-ar">▸</span><span class="rg-name">'+ko+eng+'</span><span class="rg-n">'+n+'개 코드</span>'+badge+'</div>'+
+      '<div class="rg-sum">'+sum+'</div><div class="rg-body">'+inner+'</div></div>';
+  }).join('');
 }
 
 /* 등록/수정 가운데 모달 */
 var curIdx=-1, curOn=true;
 function openMaster(idx){
-  curIdx=idx;
+  curIdx=idx; relSearch='';
   var m = idx<0 ? {nut:'',nid:'',cat:'',eff:'',on:true,defs:[],drugs:[]} : master[idx];
   curOn = !!m.on;
   curDefs = (m.defs||[]).map(function(x){return {nm:x.nm,bc:x.bc}});

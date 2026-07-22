@@ -184,6 +184,25 @@
   .sec-h .secmeta{margin-left:auto;font-size:11px;font-weight:500;color:var(--g-7)}
   .sec-h .act .btn{height:32px}
   .dpg-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-top:20px;border-top:1px solid var(--g-2)}
+/* 관련 약물 — 주성분 그룹핑(조회용) */
+.rg-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0 10px;flex-wrap:wrap}
+.rg-cnt{font-size:12.5px;color:var(--g-7)} .rg-cnt b{color:var(--g-9)}
+.rg-search{border:1px solid var(--g-3);border-radius:8px;padding:7px 11px;font-size:12.5px;min-width:220px;font-family:inherit}
+.rg-none{color:var(--g-7);font-size:12.5px;padding:10px 2px}
+.rg{border:1px solid var(--g-2);border-radius:9px;margin-bottom:7px;overflow:hidden;background:#fff}
+.rg-h{display:flex;align-items:center;gap:10px;padding:10px 13px;cursor:pointer;background:#fafbfc}
+.rg-h:hover{background:#f4f7f6}
+.rg-ar{transition:transform .15s;color:#9aa4af;font-size:11px}
+.rg.open .rg-ar{transform:rotate(90deg)}
+.rg-name{font-weight:700;font-size:13px} .rg-eng{color:#9aa4af;font-weight:600;font-size:11.5px}
+.rg-n{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--mint-700);background:var(--mint-100);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.rg-body{display:none;border-top:1px solid var(--g-2);overflow:auto}
+.rg.open .rg-body{display:block}
+table.rg-inner{width:100%;border-collapse:collapse;font-size:11.5px}
+table.rg-inner th{background:#f4f7f6;text-align:left;padding:6px 9px;color:#5c6671;font-weight:700;white-space:nowrap}
+table.rg-inner td{padding:6px 9px;border-top:1px solid var(--g-2);vertical-align:top}
+table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;white-space:nowrap}
+.rg-inner td.rg-r{min-width:170px;white-space:normal} .rg-inner td.muted{color:#8a9099}
 </style>
 </head>
 <body>
@@ -286,12 +305,35 @@
 // 약사웹 추천 상품 설정 데이터 (부족 영양소 단위) — 추천 상품은 부족 영양소에 종속.
 //   nid=부족 영양소 ID(저장 Key는 nid + 약국 ID), eff=추천 효능군, on=노출(슈퍼어드민 제어·조회),
 //   drugs[]=관련 약물(조회 전용 참고 정보). 수정자(by): 'admin'=슈퍼어드민, 'store'=약국
+// 데모: 비타민 B12 = 650개 성분코드(제형·함량 variant 포함) → 관리 UI는 주성분 단위로 그룹핑(표시용).
+function b12Drugs(){
+  var top=[
+    ["metformin","메트포르민",91,"메트포르민 장기 복용 시 소장 내 B12 흡수가 저하되어 부족 위험","1) Metformin-associated vitamin B12 deficiency, Diabetes Care"],
+    ["amoxicillin","아목시실린",66,"광범위 항생제의 장내 세균총 변화로 B12 합성·흡수에 영향","1) Antibiotics and gut microbiota, B12"],
+    ["sodium bicarbonate","탄산수소나트륨",21,"제산 작용으로 위산이 감소하면 B12 유리·흡수가 저하","1) Antacids and B12 absorption"],
+    ["ciprofloxacin","시프로플록사신",18,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Fluoroquinolones and gut flora"],
+    ["gentamicin","겐타마이신",15,"항생제 장기 사용 시 흡수 관련 영향 가능","1) Aminoglycosides, review"],
+    ["ampicillin","암피실린",14,"광범위 항생제의 장내 세균총 변화로 B12 합성·흡수에 영향","1) Antibiotics and gut microbiota, B12"],
+    ["erythromycin","에리스로마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Macrolides and gut flora"],
+    ["fosfomycin","포스포마이신",14,"항생제 사용에 따른 장내 세균총 변화로 B12에 영향","1) Antibiotics and gut microbiota"]
+  ];
+  var forms=[["정제","TB"],["서방정","SR"],["경질캡슐","CH"],["연질캡슐","CS"],["시럽","SY"],["주사","IJ"]];
+  var doses=["250mg","500mg","750mg","1000mg","125mg","100mg"];
+  var out=[], seq=410000;
+  function push(eng,ko,i,reason,ref){ var f=forms[seq%forms.length]; out.push({code:String(seq++)+f[1], base:eng, baseKo:ko, comp:ko, form:f[0], dose:doses[i%doses.length], reason:reason, ref:ref}); }
+  top.forEach(function(g){ for(var i=0;i<g[2];i++){ var reason=g[3],ref=g[4];
+    if(g[0]==='amoxicillin'&&i<2){ reason=(i===0?'소아 반복 처방 맥락에서 흡수 영향 별도 검토 필요':'제형·투여경로 차이로 근거 상이 — 개별 확인'); ref='2) variant-specific note'; }
+    push(g[0],g[1],i,reason,ref); } });
+  var tk=["세팔렉신","독시사이클린","리팜피신","클래리스로마이신","레보플록사신","메트로니다졸","반코마이신","클린다마이신","테트라사이클린","니트로푸란토인","트리메토프림","설파메톡사졸","세프트리악손","아지트로마이신","목시플록사신","리네졸리드","이미페넴","메로페넴","피페라실린","세프타지딤"];
+  var te=["cephalexin","doxycycline","rifampicin","clarithromycin","levofloxacin","metronidazole","vancomycin","clindamycin","tetracycline","nitrofurantoin","trimethoprim","sulfamethoxazole","ceftriaxone","azithromycin","moxifloxacin","linezolid","imipenem","meropenem","piperacillin","ceftazidime"];
+  for(var t=0;t<118;t++){ var cnt=(t<43)?4:3; var ko=(t<tk.length)?tk[t]:('주성분 '+(t+1)); var eng=(t<te.length)?te[t]:('ingredient-'+(t+1));
+    for(var i=0;i<cnt;i++) push(eng,ko,i,'항생제/약물 사용에 따른 장내 세균총 변화로 B12 흡수·합성에 영향 가능','1) Drug-induced B12 depletion, review'); }
+  return out;
+}
 var rows = [
   { id:1, nut:"비타민 B12", nid:"NUT-B12", cat:"비타민 B군, 종합비타민", eff:"대사케어", on:true,
     mod:"2026-06-20", modBy:"admin",
-    drugs:[ {code:"A10BA02", comp:"메트포르민", form:"정제(TB)", reason:"메트포르민 장기 복용 시 소장 내 B12 흡수가 저하되어 부족해질 위험", ref:"1) Metformin-associated vitamin B12 deficiency, Diabetes Care"},
-            {code:"A02BA03", comp:"파모티딘", form:"정제(TB)", reason:"위산분비억제제 장기 복용 시 단백결합 B12 유리가 감소해 흡수 저하", ref:"1) Acid suppression and B12 malabsorption, review"},
-            {code:"A02BC01", comp:"오메프라졸", form:"장용캡슐(CE)", reason:"PPI로 위산이 감소하면 B12 흡수가 저하되어 부족 위험", ref:"1) PPI use and vitamin B12, JAMA"} ],
+    drugs: b12Drugs(),
     prods:[ {nm:"○○ 비타민B 컴플렉스", bc:"8801111000022", kind:"건기식", on:true, def:true} ],
     history:[ {date:"2026-06-20", by:"admin", note:"기본 추천 상품 등록"} ] },
   { id:2, nut:"코엔자임Q10", nid:"NUT-COQ10", cat:"항산화 작용", eff:"항산화&염증케어", on:true,
@@ -401,6 +443,7 @@ function openDetail(id){
     '<div class="kv"><div class="k">관련 카테고리</div><div class="v">'+(cur.cat||'-')+'</div></div>'+
     '<div class="kv"><div class="k">관련 약물 수</div><div class="v">'+ndrug+'개</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
+  relSearchW='';
   document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs);
   // 노출 중지(OFF): 안내 배너. 편집은 허용 — 노출 재개 전 '사전 등록·수정' 가능(Q13 확정)
   var off = cur.on===false;
@@ -415,16 +458,33 @@ function openDetail(id){
   document.body.style.background='#fff';   // 상세 화면 배경 흰색
   if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
-// 관련 약물(조회 전용) — 성분명·부족해지는 이유·근거(참고문헌)
+// 관련 약물(조회 전용) — 주성분 단위 그룹핑 표시(표시용). 약사웹은 조회/참고용만(편집은 슈퍼어드민).
+var relRefW=[], relSearchW='';
+function toggleRGW(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
+function renderRelW(){ document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(); }
 function relDrugsHtml(drugs){
-  if(!drugs || !drugs.length) return '<div class="readbox">연결된 약물 데이터가 없습니다.</div>';
-  return '<div class="tbl" style="border:1px solid var(--g-2);border-radius:6px;overflow:auto"><table><thead><tr>'+
-    '<th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
-    drugs.map(function(d){
-      return '<tr><td style="white-space:nowrap">'+d.comp+'</td>'+
-        '<td style="white-space:normal;min-width:200px">'+(d.reason||'-')+'</td>'+
-        '<td style="white-space:normal;min-width:160px;color:var(--g-7)">'+(d.ref||'-')+'</td></tr>';
-    }).join('')+'</tbody></table></div>';
+  if(drugs) relRefW=drugs;
+  var all=relRefW||[];
+  if(!all.length) return '<div class="readbox">연결된 약물 데이터가 없습니다.</div>';
+  var groups={}, order=[];
+  all.forEach(function(d){ var k=(d.base||d.comp); if(!groups[k]){groups[k]=[]; order.push(k);} groups[k].push(d); });
+  var q=(relSearchW||'').trim().toLowerCase();
+  var shown=order.filter(function(k){ if(!q) return true; var g=groups[k];
+    if(k.toLowerCase().indexOf(q)>-1||((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
+    return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
+  var head='<div class="rg-top"><div class="rg-cnt"><b>'+all.length+'</b>개 성분코드 · <b>'+order.length+'</b> 주성분</div>'+
+    '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearchW.replace(/"/g,'&quot;')+'" oninput="relSearchW=this.value; renderRelW();"></div>';
+  if(!shown.length) return head+'<div class="rg-none">검색 결과가 없습니다.</div>';
+  return head+shown.map(function(k){
+    var g=groups[k], n=g.length, gid='rgw_'+k.replace(/[^a-zA-Z0-9]/g,'_');
+    var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
+    var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
+      g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.form||'-')+'</td><td>'+(d.dose||'-')+'</td>'+
+        '<td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
+    return '<div class="rg'+(q?' open':'')+'" id="'+gid+'">'+
+      '<div class="rg-h" onclick="toggleRGW(\''+gid+'\')"><span class="rg-ar">▸</span><span class="rg-name">'+ko+eng+'</span><span class="rg-n">'+n+'개 코드</span></div>'+
+      '<div class="rg-body">'+inner+'</div></div>';
+  }).join('');
 }
 function openAdd(){
   mode='new';
