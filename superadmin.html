@@ -163,6 +163,7 @@ tr.rel-grp{cursor:pointer} tr.rel-grp:hover>td{background:#fbfcfd}
 .rel-exp{color:#0b8f79;font-weight:700;white-space:nowrap}
 tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.rel-body>td{padding:0;background:#fafbfc}
 .rel-caret{color:#9aa4af;font-size:9px;margin-left:2px;display:inline-block;transition:transform .15s} tr.rel-grp.open .rel-caret{transform:rotate(180deg)}
+.rg-inner tbody tr.rel-row{cursor:pointer} .rg-inner tbody tr.rel-row:hover td{background:#eef4f2}
 </style>
 </head>
 <body>
@@ -616,10 +617,10 @@ function renderRelDrugs(drugs){
     var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
     var nm='<a class="rg-edit" onclick="event.stopPropagation();openIngredientByCode(\''+g[0].code+'\')" title="AI mate 성분 관리에서 수정">'+ko+'</a>'+eng;
     var inner= common
-      ? '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th><th></th></tr></thead><tbody>'+
-          g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td><a class="rg-edit" onclick="openIngredientByCode(\''+d.code+'\')">수정</a></td></tr>'; }).join('')+'</tbody></table>'
-      : '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th></th></tr></thead><tbody>'+
-          g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td><td><a class="rg-edit" onclick="openIngredientByCode(\''+d.code+'\')">수정</a></td></tr>'; }).join('')+'</tbody></table>';
+      ? '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th></tr></thead><tbody>'+
+          g.map(function(d){ return '<tr class="rel-row" onclick="openIngredientByCode(\''+d.code+'\')" title="성분 관리로 이동"><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td></tr>'; }).join('')+'</tbody></table>'
+      : '<table class="rg-inner"><thead><tr><th>성분코드</th><th>성분명</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
+          g.map(function(d){ return '<tr class="rel-row" onclick="openIngredientByCode(\''+d.code+'\')" title="성분 관리로 이동"><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
     var rsCell= common
       ? '<td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td>'
       : '<td class="rel-rs"><span class="rg-b warn">관련 정보 상이</span></td><td class="rel-rf"><span class="rel-exp">상이 목록 펼쳐보기 ▾</span></td>';
