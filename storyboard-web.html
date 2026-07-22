@@ -248,7 +248,7 @@
           <tbody>
             <tr class="hlrow" data-hl="#detailView"><td class="n">1</td><td class="area">상단 헤더</td><td>← 뒤로가기 + 부족 영양소명. 노출 상태 배지 동반.</td><td>뒤로가기 → 목록(AIM-P-01) 복귀. OFF면 상단 안내 배너 노출.</td></tr>
             <tr class="hlrow" data-hl="#mBasic"><td class="n">2</td><td class="area">기본정보</td><td>부족 영양소 · 관련 카테고리 · 관련 약물 수 표기.</td><td>조회 전용(슈퍼어드민/성분 관리 산출값).</td></tr>
-            <tr class="hlrow" data-hl="#mInfoWrap"><td class="n">3</td><td class="area">관련 약물</td><td>이 영양소를 부족하게 만드는 관련 약물을 <b>주성분 단위로 그룹핑</b> 조회(연결 성분코드가 많을 때 대응 — 예: B12 <b>650코드/126주성분</b>). 성분명·코드 검색. 그룹 펼침 → 개별 성분코드(제형·함량·이유·근거) 조회.</td><td><b>조회/참고용만</b>(편집은 슈퍼어드민). soft delete된 성분은 미노출.</td></tr>
+            <tr class="hlrow" data-hl="#mInfoWrap"><td class="n">3</td><td class="area">관련 약물</td><td>이 영양소를 부족하게 만드는 관련 약물을 <b>주성분 단위로 그룹핑</b> 조회(연결 성분코드가 많을 때 대응 — 예: B12 <b>650코드/126주성분</b>). 성분명 검색 · <b>한 페이지 10개 그룹</b> 페이지네이션. 그룹 펼침 → 개별 성분코드(제형·함량·이유·근거) 조회.</td><td><b>조회/참고용만</b>(편집은 슈퍼어드민). soft delete된 성분은 미노출.</td></tr>
             <tr class="hlrow" data-hl="#mProds"><td class="n">4</td><td class="area">우리약국 추천 상품</td><td>부족 영양소별 <b>최대 3개</b> 등록. 각 항목 = <b>순위 번호(1·2·3)</b> + 상품명 + 제조사 표기(2개 이상이면 ▲▼ 순서 조정), 삭제 가능.</td><td>3개 도달 시 [＋ 상품 추가] 차단·안내. 변경은 저장 시 확정.</td></tr>
             <tr class="hlrow" data-hl="#mProds"><td class="n">5</td><td class="area">[＋ 상품 추가]</td><td>굿팜 마스터 상품 검색 모달(AIM-P-03) 오픈.</td><td>최대 3개 도달 시에만 숨김. <b>노출 OFF 상태에서도 추가 가능</b>(사전 세팅).</td></tr>
             <tr class="hlrow" data-hl="#mProds"><td class="n">6</td><td class="area">굿팜 추천 상품</td><td>추가 버튼 아래에 굿팜 추천 상품 <b>조회</b> 영역(편집 불가 · 슈퍼어드민 관리).</td><td>하단 안내: <b>우리약국 설정 상품이 굿팜(기본) 추천보다 우선 노출</b>. 우리약국 미설정 시 POS 상담에는 <b>굿팜 추천만 노출</b>.</td></tr>
@@ -284,7 +284,7 @@
         <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
           <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
           <tbody>
-            <tr class="hlrow" data-hl="#searchModal"><td class="n">1</td><td class="area">검색 입력</td><td><b>상품명 또는 바코드</b>로 검색. <b>굿팜 마스터 상품 DB</b>만 대상(결과 표기는 상품명(+제조사)).</td><td>약국 로컬/POS 재고는 검색되지 않음.</td></tr>
+            <tr class="hlrow" data-hl="#searchModal"><td class="n">1</td><td class="area">검색 입력</td><td><b>상품명</b>으로 검색. <b>굿팜 마스터 상품 DB</b>만 대상(결과 표기는 상품명(+제조사)). 바코드는 매입처별 상이로 검색·표기 미사용.</td><td>약국 로컬/POS 재고는 검색되지 않음.</td></tr>
             <tr class="hlrow" data-hl="#searchModal"><td class="n">2</td><td class="area">검색 결과</td><td>상품명(+제조사) 리스트. 선택 시 우리약국 목록에 추가.</td><td>결과 없음 → <b>검색 결과가 없습니다.</b></td></tr>
             <tr class="hlrow" data-hl="#searchModal"><td class="n">3</td><td class="area">중복 방지</td><td>이미 등록된 상품 재선택 차단.</td><td>안내 문구 <b>이미 추가된 상품입니다.</b></td></tr>
             <tr class="hlrow" data-hl="#searchModal"><td class="n">4</td><td class="area">최대 3개 제한</td><td>부족 영양소별 우리약국 최대 3개.</td><td>도달 시 추가 차단(버튼 비활성)·안내.</td></tr>

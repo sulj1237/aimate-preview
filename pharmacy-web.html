@@ -203,6 +203,11 @@ table.rg-inner th{background:#f4f7f6;text-align:left;padding:6px 9px;color:#5c66
 table.rg-inner td{padding:6px 9px;border-top:1px solid var(--g-2);vertical-align:top}
 table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;white-space:nowrap}
 .rg-inner td.rg-r{min-width:170px;white-space:normal} .rg-inner td.muted{color:#8a9099}
+.rg-pg{display:flex;align-items:center;gap:4px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.rg-pgb{min-width:30px;height:30px;border:1px solid var(--g-2);background:#fff;border-radius:7px;font-size:12px;font-weight:700;color:#3a4650;cursor:pointer;font-family:inherit;padding:0 8px}
+.rg-pgb:hover:not(:disabled){background:#f4f7f6} .rg-pgb.on{background:var(--mint-700);border-color:var(--mint-700);color:#fff}
+.rg-pgb:disabled{color:#c3ccd3;cursor:default} .rg-pgd{color:#9aa4af;padding:0 2px}
+.rg-pgi{margin-left:8px;font-size:11.5px;color:#8a9099}
 </style>
 </head>
 <body>
@@ -284,17 +289,16 @@ table.rg-inner td.mono{font-family:ui-monospace,Menlo,monospace;color:#8a9099;wh
   </div>
 </div>
 
-<!-- 굿팜 보유 상품 검색 모달 -->
+<!-- 굿팜 마스터 상품 DB 검색 모달 -->
 <div class="modal-bg" id="searchModal">
   <div class="modal sm">
-    <div class="m-head" style="padding-bottom:16px"><div class="dt">상품 검색 <span style="font-size:12px;font-weight:600;color:var(--muted)">굿팜 보유 상품 기준</span></div><button class="x" onclick="closeSearch()">✕</button></div>
+    <div class="m-head" style="padding-bottom:16px"><div class="dt">상품 검색 <span style="font-size:12px;font-weight:600;color:var(--muted)">굿팜 마스터 상품 DB 기준</span></div><button class="x" onclick="closeSearch()">✕</button></div>
     <div class="m-body">
       <div class="bar" style="margin:0">
-        <select class="sel"><option>바코드</option><option>상품명</option></select>
-        <input class="inp search" id="searchInp" placeholder="바코드 또는 상품명 입력" oninput="renderRes()" />
+        <input class="inp search" id="searchInp" placeholder="상품명 입력" oninput="renderRes()" />
         <button class="btn primary sm">검색</button>
       </div>
-      <div class="hint" style="margin:8px 2px 0">약국 로컬(POS) 재고가 아닌 <b>굿팜 보유 상품</b>에서 검색합니다.</div>
+      <div class="hint" style="margin:8px 2px 0">약국 로컬(POS) 재고가 아닌 <b>굿팜 마스터 상품 DB</b>에서 검색합니다.</div>
       <div class="res" id="searchRes"></div>
     </div>
   </div>
@@ -368,7 +372,7 @@ var rows = [
     prods:[ {nm:"○○ 엽산 400mcg", bc:"8805555000066", kind:"건기식", on:true, def:true} ],
     history:[ {date:"2026-06-14", by:"admin", note:"기본 추천 상품 등록"} ] }
 ];
-// 굿팜 보유 상품(굿팜이 보유한 전체 상품) — 약국 로컬/POS 재고가 아니라 굿팜 보유 상품에서 검색·등록.
+// 굿팜 마스터 상품 DB(굿팜이 보유한 전체 상품) — 약국 로컬/POS 재고가 아니라 굿팜 마스터 상품 DB에서 검색·등록.
 // 표시 기준은 제조사(mfr): 바코드는 약국 매입처마다 다를 수 있어 제조사 표기가 더 정확.
 var DB = [
   {nm:"○○ 비타민B 컴플렉스", bc:"8801111000022", kind:"건기식", mfr:"대웅제약"},
@@ -378,7 +382,7 @@ var DB = [
   {nm:"□□ 락토페린 이뮨", bc:"8807777000088", kind:"건기식", mfr:"일동제약"},
   {nm:"△△ 오메가3 알티지", bc:"8808888000099", kind:"건기식", mfr:"종근당건강"}
 ];
-// 상품 제조사 조회(굿팜 보유 상품 기준) — 목록/상세에 바코드 대신 제조사 표기
+// 상품 제조사 조회(굿팜 마스터 상품 DB 기준) — 목록/상세에 바코드 대신 제조사 표기
 var MFR_MAP = {
   "8801111000022":"대웅제약", "8809001112223":"종근당건강", "8802222000033":"고려은단",
   "8802222000040":"뉴트리원", "8804444000055":"GNM 자연의품격", "8803333000044":"뉴트리디데이",
@@ -443,7 +447,7 @@ function openDetail(id){
     '<div class="kv"><div class="k">관련 카테고리</div><div class="v">'+(cur.cat||'-')+'</div></div>'+
     '<div class="kv"><div class="k">관련 약물 수</div><div class="v">'+ndrug+'개</div></div>';
   document.getElementById('mProdMeta').innerHTML='최종 수정일 '+(cur.mod==='-'?'-':cur.mod);
-  relSearchW='';
+  relSearchW=''; relPageW=1;
   document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(cur.drugs);
   // 노출 중지(OFF): 안내 배너. 편집은 허용 — 노출 재개 전 '사전 등록·수정' 가능(Q13 확정)
   var off = cur.on===false;
@@ -459,9 +463,20 @@ function openDetail(id){
   if(typeof window!=='undefined'&&window.scrollTo) window.scrollTo(0,0);
 }
 // 관련 약물(조회 전용) — 주성분 단위 그룹핑 표시(표시용). 약사웹은 조회/참고용만(편집은 슈퍼어드민).
-var relRefW=[], relSearchW='';
+var relRefW=[], relSearchW='', relPageW=1;
 function toggleRGW(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 function renderRelW(){ document.getElementById('mInfoWrap').innerHTML=relDrugsHtml(); }
+function relPagerW(page,total){
+  if(total<=1) return '';
+  function btn(p,lbl,dis,on){ return '<button class="rg-pgb'+(on?' on':'')+'"'+(dis?' disabled':' onclick="relPageW='+p+'; renderRelW()"')+'>'+lbl+'</button>'; }
+  var b=[btn(page-1,'‹',page<=1,false)];
+  var e=Math.min(total,Math.max(5,page+2)), s=Math.max(1,e-4); e=Math.min(total,s+4);
+  if(s>1){ b.push(btn(1,'1',false,page===1)); if(s>2)b.push('<span class="rg-pgd">…</span>'); }
+  for(var i=s;i<=e;i++) b.push(btn(i,String(i),false,i===page));
+  if(e<total){ if(e<total-1)b.push('<span class="rg-pgd">…</span>'); b.push(btn(total,String(total),false,page===total)); }
+  b.push(btn(page+1,'›',page>=total,false));
+  return '<div class="rg-pg">'+b.join('')+'<span class="rg-pgi">'+page+' / '+total+' 페이지</span></div>';
+}
 function relDrugsHtml(drugs){
   if(drugs) relRefW=drugs;
   var all=relRefW||[];
@@ -473,9 +488,11 @@ function relDrugsHtml(drugs){
     if(k.toLowerCase().indexOf(q)>-1||((g[0].baseKo||g[0].comp||'')).toLowerCase().indexOf(q)>-1) return true;
     return g.some(function(d){ return d.code.toLowerCase().indexOf(q)>-1; }); });
   var head='<div class="rg-top"><div class="rg-cnt"><b>'+all.length+'</b>개 성분코드 · <b>'+order.length+'</b> 주성분</div>'+
-    '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearchW.replace(/"/g,'&quot;')+'" oninput="relSearchW=this.value; renderRelW();"></div>';
+    '<input class="rg-search" placeholder="성분명·코드 검색" value="'+relSearchW.replace(/"/g,'&quot;')+'" oninput="relSearchW=this.value; relPageW=1; renderRelW();"></div>';
   if(!shown.length) return head+'<div class="rg-none">검색 결과가 없습니다.</div>';
-  return head+shown.map(function(k){
+  var PER=10, totalP=Math.max(1,Math.ceil(shown.length/PER)); if(relPageW>totalP)relPageW=totalP; if(relPageW<1)relPageW=1;
+  var pgHtml=relPagerW(relPageW,totalP);
+  return head+shown.slice((relPageW-1)*PER,relPageW*PER).map(function(k){
     var g=groups[k], n=g.length, gid='rgw_'+k.replace(/[^a-zA-Z0-9]/g,'_');
     var ko=g[0].baseKo||g[0].comp, eng=(g[0].base&&g[0].base!==ko)?' <span class="rg-eng">('+g[0].base+')</span>':'';
     var inner='<table class="rg-inner"><thead><tr><th>성분코드</th><th>제형</th><th>함량</th><th>부족해지는 이유</th><th>근거(참고문헌)</th></tr></thead><tbody>'+
@@ -484,7 +501,7 @@ function relDrugsHtml(drugs){
     return '<div class="rg'+(q?' open':'')+'" id="'+gid+'">'+
       '<div class="rg-h" onclick="toggleRGW(\''+gid+'\')"><span class="rg-ar">▸</span><span class="rg-name">'+ko+eng+'</span><span class="rg-n">'+n+'개 코드</span></div>'+
       '<div class="rg-body">'+inner+'</div></div>';
-  }).join('');
+  }).join('')+pgHtml;
 }
 function openAdd(){
   mode='new';
@@ -534,7 +551,7 @@ function renderProds(){
           : '';
         var del = '<button class="btn sm danger" onclick="delP('+gi+')">삭제</button>';
         return '<div class="pitem">'+ord+'<div class="pn"><div class="nm">'+p.nm+'</div><div class="bc" style="font-family:inherit">제조사 · '+mfrOf(p)+'</div></div>'+del+'</div>'; }).join('')
-    : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다. 굿팜 보유 상품에서 검색해 추가하세요.</div>';
+    : '<div class="pempty">등록한 우리약국 추천 상품이 없습니다. 굿팜 마스터 상품 DB에서 검색해 추가하세요.</div>';
   var atMax=store.length>=MAX_PRODS;
   // 추가 버튼: 최대 도달 시에만 숨김(OFF 상태에서도 추가 가능)
   var addHtml = atMax ? '' : '<button class="btn sm" onclick="openSearch()">＋ 우리약국 추천 상품 추가</button>';
@@ -589,7 +606,7 @@ function closeDetail(){
   document.body.style.background='';   // 목록 복귀 시 원래 배경(--g-0)
 }
 
-// 굿팜 보유 상품 검색 모달
+// 굿팜 마스터 상품 DB 검색 모달
 function storeCount(){ return cur.prods.filter(function(p){return !p.def;}).length; }
 function openSearch(){
   if(storeCount()>=MAX_PRODS){ toast('우리약국 추천 상품은 최대 '+MAX_PRODS+'개까지 추가할 수 있습니다.'); return; }
@@ -598,7 +615,7 @@ function openSearch(){
 function closeSearch(){ document.getElementById('searchModal').classList.remove('open'); }
 function renderRes(){
   var q=document.getElementById('searchInp').value.trim();
-  var list=DB.filter(function(d){ return !q || d.bc.indexOf(q)>-1 || d.nm.indexOf(q)>-1; });
+  var list=DB.filter(function(d){ return !q || d.nm.indexOf(q)>-1; });
   var c=document.getElementById('searchRes');
   if(!list.length){ c.innerHTML='<div class="r" style="color:#9aa4af;cursor:default">검색 결과가 없습니다.</div>'; return; }
   c.innerHTML=list.map(function(d){
