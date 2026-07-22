@@ -218,6 +218,9 @@ tr.rel-grp{cursor:pointer} tr.rel-grp:hover>td{background:#fafbfc}
 .rel-exp{color:var(--mint-700);font-weight:700;white-space:nowrap}
 tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.rel-body>td{padding:0;background:#fafbfc}
 .rel-caret{color:#9aa4af;font-size:9px;margin-left:2px;display:inline-block;transition:transform .15s} tr.rel-grp.open .rel-caret{transform:rotate(180deg)}
+.rel-toggle{display:inline-flex;align-items:center;gap:5px;background:var(--mint-100);color:var(--mint-700);font-weight:800;border-radius:999px;padding:5px 13px;font-size:12px;white-space:nowrap}
+tr.rel-grp:hover .rel-toggle{background:var(--mint-700);color:#fff} tr.rel-grp:hover .rel-caret{color:#fff}
+td.rel-c{text-align:right}
 </style>
 </head>
 <body>
@@ -515,8 +518,8 @@ function relDrugsHtml(drugs){
           g.map(function(d){ return '<tr><td class="mono">'+d.code+'</td><td>'+(d.comp||d.baseKo||'-')+'</td><td class="rg-r">'+(d.reason||'-')+'</td><td class="rg-r muted">'+(d.ref||'-')+'</td></tr>'; }).join('')+'</tbody></table>';
     var rsCell= common
       ? '<td class="rel-rs">'+(g[0].reason||'-')+'</td><td class="rel-rf">'+(g[0].ref||'-')+'</td>'
-      : '<td class="rel-rs"><span class="rg-b warn">관련 정보 상이</span></td><td class="rel-rf"><span class="rel-exp">상이 목록 펼쳐보기 ▾</span></td>';
-    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRGW(\''+gid+'\')"><td class="rel-nm">'+ko+eng+'</td>'+rsCell+'<td class="rel-c">'+n+'개 <span class="rel-caret">▾</span></td></tr>'+
+      : '<td class="rel-rs"><span class="rg-b warn">관련 정보 상이</span></td><td class="rel-rf">-</td>';
+    return '<tr class="rel-grp'+(q?' open':'')+'" id="'+gid+'" onclick="toggleRGW(\''+gid+'\')"><td class="rel-nm">'+ko+eng+'</td>'+rsCell+'<td class="rel-c"><span class="rel-toggle">'+n+'개 <span class="rel-caret">▾</span></span></td></tr>'+
       '<tr class="rel-body"><td colspan="4">'+inner+'</td></tr>';
   }).join('');
   return head+'<table class="reltbl"><thead><tr><th>성분명(주성분)</th><th>부족해지는 이유</th><th>근거(참고문헌)</th><th class="rel-c">성분코드</th></tr></thead><tbody>'+rows+'</tbody></table>'+pgHtml;
