@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>굿팜 어드민 · AI mate 부족 영양소 관리</title>
+<title>굿팜 어드민 · AI mate 영양소 관리</title>
 <style>
   :root{
     --teal:#16c0a4; --teal-d:#0ea58b; --teal-soft:#e6f8f4; --teal-line:#bfe9e1;
@@ -166,6 +166,12 @@ tr.rel-body{display:none} tr.rel-grp.open + tr.rel-body{display:table-row} tr.re
 .rg-inner tbody tr.rel-row{cursor:pointer} .rg-inner tbody tr.rel-row:hover td{background:#eef4f2}
 table.reltbl tbody tr.rel-row{cursor:pointer} table.reltbl tbody tr.rel-row:hover td{background:#f4f7f6}
 td.rel-form{white-space:nowrap;color:#48525c}
+#nutPicker input{width:100%}
+.nut-res{margin-top:6px;max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:9px;background:#fff}
+.nutopt{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-size:13px}
+.nutopt:last-child{border-bottom:none} .nutopt:hover{background:#eef7f4}
+.nutopt b{font-weight:700} .nutopt .np-cat{margin-left:auto;color:#8a9099;font-size:11.5px}
+.np-empty{padding:12px;color:#8a9099;font-size:12.5px;text-align:center}
 .rel-toggle{display:inline-flex;align-items:center;gap:5px;background:#e6f7f4;color:#0b8f79;font-weight:800;border-radius:999px;padding:5px 13px;font-size:12px;white-space:nowrap}
 tr.rel-grp:hover .rel-toggle{background:#0b8f79;color:#fff} tr.rel-grp:hover .rel-caret{color:#fff}
 td.rel-c{text-align:right}
@@ -195,7 +201,7 @@ td.rel-c{text-align:right}
       </div>
       <a class="grp">AI Mate 추천 상품 관리 <span class="cv">▴</span></a>
       <div class="sub">
-        <a id="navReco" class="on" onclick="showPage('reco')">부족 영양소 관리</a>
+        <a id="navReco" class="on" onclick="showPage('reco')">영양소 관리</a>
         <a id="navIngr" onclick="showPage('ingr')">성분 관리</a>
       </div>
       <a class="grp">모바일 약국 관리 <span class="cv">▾</span></a>
@@ -210,7 +216,7 @@ td.rel-c{text-align:right}
 
   <!-- 메인 -->
   <div class="main">
-    <div class="top"><div class="pg" id="pgTitle">부족 영양소 관리</div></div>
+    <div class="top"><div class="pg" id="pgTitle">영양소 관리</div></div>
     <div class="filterbar" id="pgFilter">부족 영양소별 추천 상품·노출 관리</div>
     <div class="wrap">
       <div id="pageReco">
@@ -325,9 +331,12 @@ td.rel-c{text-align:right}
           <div class="block">
             <div class="block-h">부족 영양소</div>
             <div id="iLinks"></div>
-            <div id="iLinkAdd" style="margin-top:8px;display:flex;gap:8px;align-items:center">
-              <select class="sel" id="fLinkNut" style="flex:1"></select>
-              <button class="btn" onclick="addLink()">＋ 부족 영양소 추가</button>
+            <div id="iLinkAdd" style="margin-top:8px">
+              <button class="btn" onclick="openNutPicker()">＋ 부족 영양소 추가</button>
+              <div id="nutPicker" style="display:none;margin-top:8px">
+                <input class="fw" id="nutSearch" placeholder="영양소명 검색 (전체 영양소에서)" oninput="renderNutResults()" autocomplete="off">
+                <div id="nutResults" class="nut-res"></div>
+              </div>
             </div>
           </div>
           <div class="block">
@@ -414,7 +423,7 @@ td.rel-c{text-align:right}
         <div class="block-h">근거 (참고문헌)</div>
         <textarea class="fw" id="dRef"></textarea>
       </div>
-      <div class="roinfo">추가된 DIND는 <b>기본 노출 OFF</b>로 등록되며, 부족 영양소 관리에서 확인 후 <b>노출 ON</b>으로 전환합니다.</div>
+      <div class="roinfo">추가된 DIND는 <b>기본 노출 OFF</b>로 등록되며, 영양소 관리에서 확인 후 <b>노출 ON</b>으로 전환합니다.</div>
     </div>
     <div class="m-foot"><button class="btn" onclick="closeDind()">취소</button><button class="btn primary" onclick="saveDind()">추가</button></div>
   </div>
@@ -762,7 +771,7 @@ function showPage(p){
   document.getElementById('pageIngr').classList.toggle('hidden', reco);
   document.getElementById('navReco').classList.toggle('on', reco);
   document.getElementById('navIngr').classList.toggle('on', !reco);
-  document.getElementById('pgTitle').textContent = reco ? '부족 영양소 관리' : '성분 관리';
+  document.getElementById('pgTitle').textContent = reco ? '영양소 관리' : '성분 관리';
   document.getElementById('pgFilter').textContent = reco
     ? '부족 영양소별 추천 상품·노출 관리'
     : '성분코드 기준 성분 정보 관리';
@@ -821,23 +830,37 @@ function renderILinks(){
         '<td class="c"><button class="btn sm danger" onclick="delLink('+i+')">삭제</button></td></tr>';
     }).join('')+'</tbody></table></div>';
 }
-// 연결 추가 — 아직 연결 안 된 부족 영양소 드롭다운 + 「＋ 부족 영양소 추가」 버튼
-function refreshLinkAdd(){
-  var sel=document.getElementById('fLinkNut');
-  var avail=master.filter(function(m){ return !m.deleted && !curLinks.some(function(l){return l.nid===m.nid;}); });
-  sel.innerHTML = avail.length
-    ? avail.map(function(m){return '<option value="'+m.nid+'">'+m.nut+' · '+(m.cat||'-')+'</option>';}).join('')
-    : '<option value="">추가할 수 있는 부족 영양소가 없습니다</option>';
-  document.getElementById('iLinkAdd').style.display = avail.length ? 'flex' : 'none';
+// 전체 영양소 마스터 — '부족 영양소 추가' 검색형 선택 소스(굿팜 표준 영양소)
+var NUT_MASTER=[
+  {nid:"NUT-B12",nut:"비타민 B12",cat:"비타민 B군, 종합비타민"},{nid:"NUT-FOL",nut:"엽산(비타민 B9)",cat:"비타민 B군, 종합비타민"},
+  {nid:"NUT-B1",nut:"비타민 B1(티아민)",cat:"비타민 B군"},{nid:"NUT-B2",nut:"비타민 B2(리보플라빈)",cat:"비타민 B군"},
+  {nid:"NUT-B3",nut:"나이아신(비타민 B3)",cat:"비타민 B군"},{nid:"NUT-B5",nut:"판토텐산(비타민 B5)",cat:"비타민 B군"},
+  {nid:"NUT-B6",nut:"비타민 B6",cat:"비타민 B군"},{nid:"NUT-B7",nut:"비오틴(비타민 B7)",cat:"비타민 B군"},
+  {nid:"NUT-VC",nut:"비타민 C",cat:"비타민 C"},{nid:"NUT-VA",nut:"비타민 A",cat:"비타민 A"},
+  {nid:"NUT-VD",nut:"비타민 D",cat:"비타민 D"},{nid:"NUT-VE",nut:"비타민 E",cat:"비타민 E"},{nid:"NUT-VK",nut:"비타민 K",cat:"비타민 K"},
+  {nid:"NUT-CA",nut:"칼슘",cat:"칼슘 및 미네랄제품"},{nid:"NUT-MG",nut:"마그네슘",cat:"마그네슘 및 미네랄제품"},
+  {nid:"NUT-K",nut:"칼륨",cat:"칼륨"},{nid:"NUT-NA",nut:"나트륨",cat:"전해질"},{nid:"NUT-P",nut:"인",cat:"미네랄제품"},
+  {nid:"NUT-FE",nut:"철분",cat:"철분제"},{nid:"NUT-ZN",nut:"아연",cat:"아연 및 미네랄제품"},
+  {nid:"NUT-SE",nut:"셀레늄",cat:"미네랄제품"},{nid:"NUT-CU",nut:"구리",cat:"미네랄제품"},{nid:"NUT-MN",nut:"망간",cat:"미네랄제품"},
+  {nid:"NUT-CR",nut:"크롬",cat:"미네랄제품"},{nid:"NUT-IOD",nut:"요오드",cat:"미네랄제품"},
+  {nid:"NUT-COQ10",nut:"코엔자임Q10",cat:"항산화 작용"},{nid:"NUT-GSH",nut:"글루타티온",cat:"항산화 작용"},
+  {nid:"NUT-OMEGA3",nut:"오메가3(EPA/DHA)",cat:"오메가3"},{nid:"NUT-CARNI",nut:"카르니틴",cat:"대사"},{nid:"NUT-MEL",nut:"멜라토닌",cat:"수면케어"}
+];
+// 연결 추가 — 전체 영양소에서 검색해 선택
+function openNutPicker(){ var p=document.getElementById('nutPicker'); p.style.display='block'; var i=document.getElementById('nutSearch'); i.value=''; renderNutResults(); i.focus(); }
+function renderNutResults(){
+  var q=(document.getElementById('nutSearch').value||'').trim().toLowerCase();
+  var linked={}; curLinks.forEach(function(l){ linked[l.nid]=1; linked[l.nut]=1; });
+  var res=NUT_MASTER.filter(function(n){ if(linked[n.nid]||linked[n.nut]) return false; return !q || n.nut.toLowerCase().indexOf(q)>-1 || (n.cat||'').toLowerCase().indexOf(q)>-1; });
+  document.getElementById('nutResults').innerHTML = res.length
+    ? res.map(function(n){ return '<div class="nutopt" onclick="addLinkByNid(\''+n.nid+'\')"><b>'+n.nut+'</b><span class="np-cat">'+(n.cat||'')+'</span></div>'; }).join('')
+    : '<div class="np-empty">검색 결과가 없습니다.</div>';
 }
-function addLink(){
-  var nid=document.getElementById('fLinkNut').value; if(!nid) return;
-  var m=master.find(function(x){return x.nid===nid;}); if(!m) return;
-  if(curLinks.some(function(l){return l.nid===nid;})) return;
-  curLinks.push({nid:m.nid, nut:m.nut, cat:m.cat, reason:'', ref:''});
-  renderILinks(); refreshLinkAdd();
-}
-function delLink(i){ curLinks.splice(i,1); renderILinks(); refreshLinkAdd(); }
+function addLinkByNid(nid){ var n=NUT_MASTER.find(function(x){return x.nid===nid;}); if(!n) return;
+  if(curLinks.some(function(l){return l.nid===nid||l.nut===n.nut;})) return;
+  curLinks.push({nid:n.nid, nut:n.nut, cat:n.cat, reason:'', ref:''}); renderILinks(); renderNutResults(); document.getElementById('nutSearch').focus(); }
+function refreshLinkAdd(){ var p=document.getElementById('nutPicker'); if(p) p.style.display='none'; }  // 상세 열릴 때 picker 초기 닫힘
+function delLink(i){ curLinks.splice(i,1); renderILinks(); var p=document.getElementById('nutPicker'); if(p&&p.style.display!=='none') renderNutResults(); }
 function renderIngHist(code){
   var c=document.getElementById('iHist'); var list=ingHist[code]||[];
   if(!list.length){ c.innerHTML='<div class="readbox">데이터가 존재하지 않습니다.</div>'; return; }
