@@ -233,7 +233,7 @@ td.rel-c{text-align:right}
           <input class="inp search" placeholder="검색어를 입력하세요" />
           <button class="btn primary">검색</button>
           <span class="spacer"></span>
-          <button class="btn primary" onclick="openDind()">＋ DIND 추가</button>
+          <button class="btn primary" onclick="openNutAdd()">＋ 영양소 추가</button>
         </div>
         <div class="tbl"><table>
           <thead><tr>
@@ -255,7 +255,7 @@ td.rel-c{text-align:right}
           <span class="total">전체 <b id="iTotal">0</b> 건</span>
           <input class="inp search" id="iSearch" placeholder="성분코드·성분명 검색" oninput="renderIngredients()">
           <span class="spacer"></span>
-          <button class="btn primary" onclick="openDind()">＋ DIND 추가</button>
+          <button class="btn primary" onclick="openDind()">＋ 성분 추가</button>
         </div>
         <div class="tbl"><table>
           <thead><tr>
@@ -397,7 +397,7 @@ td.rel-c{text-align:right}
 <!-- DIND 단건 추가 모달 (성분 × 부족 영양소 매칭 수동 등록) -->
 <div class="modal-bg" id="dindModal" onclick="if(event.target===this)closeDind()" style="z-index:76">
   <div class="modal" style="max-width:560px">
-    <div class="m-head"><div><div class="dt">DIND 추가</div><div class="ds">성분코드 × 부족 영양소 매칭을 하나 등록합니다.</div></div><button class="x" onclick="closeDind()">✕</button></div>
+    <div class="m-head"><div><div class="dt">성분 추가</div><div class="ds">성분코드·성분명과 연결할 부족 영양소를 등록합니다.</div></div><button class="x" onclick="closeDind()">✕</button></div>
     <div class="m-body">
       <div class="block">
         <div class="block-h">성분 (성분코드 전체 일치 기준)</div>
@@ -409,11 +409,10 @@ td.rel-c{text-align:right}
       <!-- 앞 4자리가 같은 기존 성분코드 참고(입력 도움) — 자동 복사·병합 아님 -->
       <div class="block" id="dindRef" style="display:none"></div>
       <div class="block">
-        <div class="block-h">부족 영양소 (굿팜 표준명)</div>
-        <div class="kvs">
-          <div class="kv"><div class="k">부족 영양소 *</div><div class="v"><input class="fw" id="dNut" placeholder="예: 비타민 B12"></div></div>
-          <div class="kv"><div class="k">관련 카테고리</div><div class="v"><input class="fw" id="dCat" placeholder="예: 비타민 B군, 종합비타민"></div></div>
-        </div>
+        <div class="block-h">연결 부족 영양소 * <span style="font-weight:600;color:var(--muted);font-size:11px">영양소 관리에서 추가한 항목을 연동</span></div>
+        <input class="fw" id="dNutSearch" placeholder="부족 영양소 검색" oninput="renderDNutResults()" autocomplete="off">
+        <div id="dNutResults" class="nut-res" style="display:none"></div>
+        <div id="dNutPicked" style="margin-top:6px;color:#8a9099;font-size:12.5px">선택된 부족 영양소가 없습니다.</div>
       </div>
       <div class="block">
         <div class="block-h">부족해지는 이유 <span style="font-weight:600;color:var(--muted);font-size:11px">성분 × 이 영양소 조합</span></div>
@@ -423,9 +422,26 @@ td.rel-c{text-align:right}
         <div class="block-h">근거 (참고문헌)</div>
         <textarea class="fw" id="dRef"></textarea>
       </div>
-      <div class="roinfo">추가된 DIND는 <b>기본 노출 OFF</b>로 등록되며, 영양소 관리에서 확인 후 <b>노출 ON</b>으로 전환합니다.</div>
+      <div class="roinfo">성분은 <b>성분코드 전체 일치</b> 기준으로 관리됩니다. 연결한 부족 영양소에 이 성분(이유·근거)이 추가됩니다.</div>
     </div>
     <div class="m-foot"><button class="btn" onclick="closeDind()">취소</button><button class="btn primary" onclick="saveDind()">추가</button></div>
+  </div>
+</div>
+
+<!-- 영양소 추가 모달 (부족 영양소 단건 등록) -->
+<div class="modal-bg" id="nutAddModal" onclick="if(event.target===this)closeNutAdd()" style="z-index:76">
+  <div class="modal" style="max-width:480px">
+    <div class="m-head"><div><div class="dt">영양소 추가</div><div class="ds">부족 영양소를 하나 등록합니다.</div></div><button class="x" onclick="closeNutAdd()">✕</button></div>
+    <div class="m-body">
+      <div class="block">
+        <div class="kvs">
+          <div class="kv"><div class="k">부족 영양소 *</div><div class="v"><input class="fw" id="naNut" placeholder="예: 비타민 B12 (굿팜 표준명)"></div></div>
+          <div class="kv"><div class="k">관련 카테고리</div><div class="v"><input class="fw" id="naCat" placeholder="예: 비타민 B군, 종합비타민"></div></div>
+        </div>
+      </div>
+      <div class="roinfo">추가한 부족 영양소는 <b>기본 노출 OFF</b>로 등록되며, 확인 후 <b>노출 ON</b>으로 전환합니다. 성분(이유·근거)은 <b>성분 관리 &gt; 성분 추가</b>에서 연결합니다.</div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeNutAdd()">취소</button><button class="btn primary" onclick="saveNutAdd()">추가</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -964,11 +980,36 @@ function renderIngDelHist(){
 
 /* ===== DIND 단건 추가 (성분 × 부족 영양소 매칭 수동 등록) ===== */
 var nutSeq=1;
+// 영양소 추가 (부족 영양소 단건 등록) — 영양소 관리 페이지
+function openNutAdd(){ ['naNut','naCat'].forEach(function(id){document.getElementById(id).value='';}); document.getElementById('nutAddModal').classList.add('open'); }
+function closeNutAdd(){ document.getElementById('nutAddModal').classList.remove('open'); }
+function saveNutAdd(){
+  var nut=document.getElementById('naNut').value.trim(), cat=document.getElementById('naCat').value.trim();
+  if(!nut){ toast('부족 영양소명은 필수입니다.'); return; }
+  if(master.some(function(x){return x.nut===nut && !x.deleted;})){ toast('이미 등록된 부족 영양소입니다.'); return; }
+  master.push({nut:nut, nid:'NUT-NEW'+(nutSeq++), cat:cat, eff:'', defs:[], store:0, on:false, mod:'2026-07-15', drugs:[]});
+  renderMaster(); closeNutAdd(); toast('부족 영양소를 추가했습니다. (노출 OFF)');
+}
+// 성분 추가 — 성분코드·성분명 + 기존 부족 영양소 연동
+var dPickedNut=null;
 function openDind(){
-  ['dCode','dComp','dNut','dCat','dReason','dRef'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['dCode','dComp','dReason','dRef','dNutSearch'].forEach(function(id){ document.getElementById(id).value=''; });
+  dPickedNut=null; renderDNutPicked();
+  var r=document.getElementById('dNutResults'); r.style.display='none'; r.innerHTML='';
   renderDindRef();
   document.getElementById('dindModal').classList.add('open');
 }
+function renderDNutResults(){
+  var q=(document.getElementById('dNutSearch').value||'').trim().toLowerCase();
+  var res=master.filter(function(m){ return !m.deleted && (!q || m.nut.toLowerCase().indexOf(q)>-1 || (m.cat||'').toLowerCase().indexOf(q)>-1); });
+  var c=document.getElementById('dNutResults'); c.style.display='block';
+  c.innerHTML = res.length ? res.map(function(m){ return '<div class="nutopt" onclick="pickDNut(\''+m.nid+'\')"><b>'+m.nut+'</b><span class="np-cat">'+(m.cat||'')+'</span></div>'; }).join('')
+    : '<div class="np-empty">검색 결과가 없습니다. (영양소 관리에서 먼저 추가)</div>';
+}
+function pickDNut(nid){ var m=master.find(function(x){return x.nid===nid;}); if(!m) return; dPickedNut={nid:m.nid,nut:m.nut,cat:m.cat}; document.getElementById('dNutSearch').value=''; var r=document.getElementById('dNutResults'); r.style.display='none'; r.innerHTML=''; renderDNutPicked(); }
+function renderDNutPicked(){ document.getElementById('dNutPicked').innerHTML = dPickedNut
+  ? '연결: <b style="color:#0b8f79">'+dPickedNut.nut+'</b>'+(dPickedNut.cat?' <span style="color:#8a9099">· '+dPickedNut.cat+'</span>':'')+' <a onclick="dPickedNut=null;renderDNutPicked()" style="color:#c0392b;cursor:pointer;margin-left:6px">해제</a>'
+  : '선택된 부족 영양소가 없습니다.'; }
 /* 입력한 성분코드의 앞 4자리가 같은 기존 성분코드를 참고로 노출.
    매칭은 성분코드 '전체 일치'만 유효하므로 자동 복사·병합하지 않고 입력 참고용으로만 보여준다. */
 function renderDindRef(){
@@ -995,20 +1036,18 @@ function closeDind(){ document.getElementById('dindModal').classList.remove('ope
 function saveDind(){
   var code=document.getElementById('dCode').value.trim();
   var comp=document.getElementById('dComp').value.trim();
-  var nut=document.getElementById('dNut').value.trim();
-  var cat=document.getElementById('dCat').value.trim();
   var reason=document.getElementById('dReason').value.trim();
   var ref=document.getElementById('dRef').value.trim();
-  if(!code || !comp || !nut){ toast('성분코드·성분명·부족 영양소는 필수입니다.'); return; }
+  if(!code || !comp){ toast('성분코드·성분명은 필수입니다.'); return; }
+  if(!dPickedNut){ toast('연결할 부족 영양소를 선택하세요. (영양소 관리에서 먼저 추가)'); return; }
   var today='2026-07-15';
-  // 1) 성분 마스터 확보(신규면 검토 상태로 추가, 기존이면 공통 성분명 사용)
+  // 1) 성분 마스터 확보(신규면 추가, 기존이면 공통 성분명 사용)
   var ing=ingredients.find(function(x){return x.code===code;});
-  if(!ing){ ing={code:code, comp:comp, form:'', status:'검토', mod:today, modBy:'관리자 김OO'}; ingredients.push(ing); }
+  if(!ing){ ing={code:code, comp:comp, form:'', status:'사용', mod:today, modBy:'관리자 김OO'}; ingredients.push(ing); }
   var finalComp=ing.comp;   // 성분명은 성분코드 기준 공통값
-  // 2) 부족 영양소 마스터 확보(표준명 기준, 신규면 노출 OFF)
-  var m=master.find(function(x){return x.nut===nut && !x.deleted;});
-  if(!m){ m={nut:nut, nid:'NUT-NEW'+(nutSeq++), cat:cat, eff:'', defs:[], store:0, on:false, mod:today, drugs:[]}; master.push(m); }
-  else if(cat && (!m.cat || m.cat==='-')){ m.cat=cat; }
+  // 2) 연동한 부족 영양소(영양소 관리에서 추가된 것)
+  var m=master.find(function(x){return x.nid===dPickedNut.nid && !x.deleted;}) || master.find(function(x){return x.nut===dPickedNut.nut && !x.deleted;});
+  if(!m){ m={nut:dPickedNut.nut, nid:dPickedNut.nid||('NUT-NEW'+(nutSeq++)), cat:dPickedNut.cat, eff:'', defs:[], store:0, on:false, mod:today, drugs:[]}; master.push(m); }
   // 3) 매칭(성분 × 영양소) 링크 — 있으면 갱신, 없으면 추가
   var d=(m.drugs||[]).find(function(x){return x.code===code;});
   if(d){ d.comp=finalComp; d.reason=reason; d.ref=ref; }
@@ -1016,9 +1055,9 @@ function saveDind(){
   m.mod=today;
   // 4) 이력
   if(!ingHist[code]) ingHist[code]=[];
-  ingHist[code].unshift({at:today+' 10:00', by:'관리자 김OO', field:'DIND 추가 · '+nut, before:'-', after:finalComp+' → '+nut});
+  ingHist[code].unshift({at:today+' 10:00', by:'관리자 김OO', field:'성분 추가 · '+m.nut, before:'-', after:finalComp+' → '+m.nut});
   renderMaster(); renderIngredients(); closeDind();
-  toast('DIND를 추가했습니다. (노출 OFF)');
+  toast('성분을 추가해 「'+m.nut+'」에 연결했습니다.');
 }
 
 /* 스토리보드용 데모 케이스 (?case=, ?page=, ?master=idx, ?ing=code, ?modal=) */

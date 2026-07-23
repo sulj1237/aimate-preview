@@ -198,17 +198,17 @@
     <table class="info">
       <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>AIM-S-01</td></tr>
       <tr><td class="k">화면 경로</td><td>AI Mate 추천 상품 관리 &gt; 영양소 관리</td><td class="k">권한</td><td>운영자/관리자</td></tr>
-      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소를 한 행으로 하는 추천 Master 목록. 부족 영양소·관련 카테고리·관련 성분 수·노출(ON/OFF)·최종 수정일을 보여주고, 행 클릭 시 상세(AIM-S-02)로 이동한다. 상단에서 <code class="t">＋ DIND 추가</code>(성분×부족영양소 매칭 단건 등록) 진입.</td></tr>
+      <tr><td class="k">화면 설명</td><td colspan="3">부족 영양소를 한 행으로 하는 추천 Master 목록. 부족 영양소·관련 카테고리·관련 성분 수·노출(ON/OFF)·최종 수정일을 보여주고, 행 클릭 시 상세(AIM-S-02)로 이동한다. 상단에서 <code class="t">＋ 성분/영양소 추가</code>(성분×부족영양소 매칭 단건 등록) 진입.</td></tr>
     </table>
     <div class="body2">
-      <div class="screenview"><div class="cap">▶ 실제 프로토타입(<code>superadmin.html</code>) · <b>추천 Master 목록</b>(파라미터 없음). 행 클릭 → 상세 이동, 상단 <b>＋ DIND 추가</b>.</div>
+      <div class="screenview"><div class="cap">▶ 실제 프로토타입(<code>superadmin.html</code>) · <b>추천 Master 목록</b>(파라미터 없음). 행 클릭 → 상세 이동, 상단 <b>＋ 성분/영양소 추가</b>.</div>
         <div class="framewrap"><iframe src="./superadmin.html" width="1180" height="900" scrolling="auto" title="슈퍼어드민 영양소 관리 목록"></iframe></div></div>
       <div class="desc"><div class="dh">디스크립션 (영역·기능·인터랙션)</div>
         <table class="d"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
           <thead><tr><th>#</th><th>영역/항목</th><th>기능 및 정책</th><th>인터랙션 / 처리·예외</th></tr></thead>
           <tbody>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">1</td><td class="area">상단 바 · 건수/검색</td><td>전체 건수 표기, 검색 대상 선택(부족 영양소·관련 카테고리) + 검색어 입력.</td><td>검색 실행 시 조건 매칭 행만 노출. 결과 0 → <code class="t">데이터가 없습니다.</code></td></tr>
-            <tr class="hlrow" data-hl="#masterBody"><td class="n">2</td><td class="area">＋ DIND 추가</td><td>성분코드×부족영양소 매칭을 단건 수동 등록하는 모달 진입점. 성분/성분관리 양쪽에서 진입 가능.</td><td>등록 시 <b>노출 OFF</b>로 진입. 기존 성분코드/부족영양소면 연결만 추가. <span class="tag tbu">일괄 업로드 TBU</span></td></tr>
+            <tr class="hlrow" data-hl="#masterBody"><td class="n">2</td><td class="area">＋ 성분/영양소 추가</td><td>영양소 관리는 <b>＋ 영양소 추가</b>(부족 영양소 등록), 성분 관리는 <b>＋ 성분 추가</b>(성분코드·성분명 + 기존 부족 영양소 연동).</td><td>등록 시 <b>노출 OFF</b>로 진입. 기존 성분코드/부족영양소면 연결만 추가. <span class="tag tbu">일괄 업로드 TBU</span></td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">3</td><td class="area">부족 영양소</td><td>추천 Master의 기준 값(굿팜 표준명). 목록의 1차 식별자.</td><td>행 전체 클릭 → 상세(AIM-S-02) 페이지 이동.</td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">4</td><td class="area">관련 카테고리</td><td>부족 영양소에 연결된 굿팜 카테고리(예: 비타민 B군, 종합비타민). 영양소 종속 값.</td><td>미등록 시 <code class="t">데이터 없음</code> 표기.</td></tr>
             <tr class="hlrow" data-hl="#masterBody"><td class="n">5</td><td class="area">관련 성분 수</td><td>이 영양소를 고갈시키는 관련 성분(성분코드) 개수. <b>삭제(soft delete)된 성분은 집계에서 제외</b>.</td><td>성분 삭제 시 실시간 감소 → Case(soft-delete 반영) 참고.</td></tr>
@@ -276,7 +276,7 @@
 
   <div class="screen">
     <div class="sc-head"><span class="cbadge adm">Case 2</span><span class="sc-name">목록 — 데이터 0건</span><span class="sp"></span><span class="badge na">빈 상태</span></div>
-    <ul class="cnote"><li><span class="k">달라지는 점</span> 검색 결과나 등록 Master가 없을 때 표 본문에 <code class="t">데이터가 없습니다.</code> 한 줄만 노출.</li><li><span class="k">정책 근거</span> 목록0 표준 문구(영양소 관리). 성분 관리 이력0은 <code class="t">데이터가 존재하지 않습니다.</code>로 구분.</li><li><span class="k">인터랙션</span> 검색 조건 해제 또는 ＋ DIND 추가로 데이터 생성.</li></ul>
+    <ul class="cnote"><li><span class="k">달라지는 점</span> 검색 결과나 등록 Master가 없을 때 표 본문에 <code class="t">데이터가 없습니다.</code> 한 줄만 노출.</li><li><span class="k">정책 근거</span> 목록0 표준 문구(영양소 관리). 성분 관리 이력0은 <code class="t">데이터가 존재하지 않습니다.</code>로 구분.</li><li><span class="k">인터랙션</span> 검색 조건 해제 또는 ＋ 성분/영양소 추가로 데이터 생성.</li></ul>
   </div>
 
   <div class="screen">
@@ -328,7 +328,7 @@
             <tr class="hlrow" data-hl="#ingrBody"><td class="n">3</td><td class="area">성분명</td><td>성분코드 <b>공통값</b>. 상세에서 수정 시 전 화면 공통 반영.</td><td>수정은 상세 → 확인 모달 경유.</td></tr>
             <tr class="hlrow" data-hl="#ingrBody"><td class="n">4</td><td class="area">연결 부족 영양소 수</td><td>이 성분코드와 매칭된 부족 영양소 개수(조합 수). 삭제된 부족 영양소 제외.</td><td>0이면 연결 없음.</td></tr>
             <tr class="hlrow" data-hl="#ingrBody"><td class="n">5</td><td class="area">최종 수정일</td><td>공통값/조합값 마지막 수정일.</td><td>정렬·추적 기준.</td></tr>
-            <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">＋ DIND 추가</td><td>성분×부족영양소 매칭 단건 등록 진입점.</td><td>모달로 진입 → Case(DIND 추가) 참고.</td></tr>
+            <tr class="hlrow" data-hl=""><td class="n">6</td><td class="area">＋ 성분/영양소 추가</td><td>성분×부족영양소 매칭 단건 등록 진입점.</td><td>모달로 진입 → Case(DIND 추가) 참고.</td></tr>
             <tr class="hlrow" data-hl="#ingrBody"><td class="n">7</td><td class="area">목록 정렬</td><td>기본 정렬 ① 최종 수정일 최신 → ② 연결 부족 영양소 수 많은 순.</td><td>진입 시 자동 정렬.</td></tr>
           </tbody></table>
         <div class="states"><div class="dh">필수 화면 상태</div>
