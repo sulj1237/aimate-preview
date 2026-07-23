@@ -858,7 +858,8 @@ function renderNutResults(){
 }
 function addLinkByNid(nid){ var n=NUT_MASTER.find(function(x){return x.nid===nid;}); if(!n) return;
   if(curLinks.some(function(l){return l.nid===nid||l.nut===n.nut;})) return;
-  curLinks.push({nid:n.nid, nut:n.nut, cat:n.cat, reason:'', ref:''}); renderILinks(); renderNutResults(); document.getElementById('nutSearch').focus(); }
+  curLinks.push({nid:n.nid, nut:n.nut, cat:n.cat, reason:'', ref:''}); renderILinks();
+  document.getElementById('nutPicker').style.display='none'; }  // 선택 시 부족 영양소 리스트에 추가 + 검색 드롭다운 닫힘
 function refreshLinkAdd(){ var p=document.getElementById('nutPicker'); if(p) p.style.display='none'; }  // 상세 열릴 때 picker 초기 닫힘
 function delLink(i){ curLinks.splice(i,1); renderILinks(); var p=document.getElementById('nutPicker'); if(p&&p.style.display!=='none') renderNutResults(); }
 function renderIngHist(code){

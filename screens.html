@@ -49,14 +49,14 @@ td code{white-space:nowrap}
 <div class="note">표기 — 미확정 항목은 <span style="color:#d8453a,font-weight:700">TBU</span>(빨강). 본문은 <strong>02 정책(v2)</strong> 을 화면 단위로 풀어 쓴 것이다. 이 문서는 기획자 계정에서 상단 <code>✏ 수정</code>으로 직접 편집할 수 있다.</div>
 <h2 id="sec-0">0. 프로토타입 (플랫폼별 · 인터랙티브)</h2>
 <p>각 링크는 새 탭에서 <strong>해당 플랫폼 화면</strong>이 열린다.</p>
-<ul><li><strong>P1. POS 굿팜 AI MATE</strong> — <a href="./pos-aimate.html" target="_blank" rel="noopener">▶ pos-aimate.html</a> · 처방 상세 분석 하단 <code>드럭머거 &amp; 추천제품</code>(<strong>시안 D 2열 확정</strong> · 시안 C 카드형은 숨김).</li><li><strong>P2. 약국 어드민 · 약사웹</strong> — <a href="./pharmacy-web.html" target="_blank" rel="noopener">▶ pharmacy-web.html</a> · 부족 영양소별 우리약국 추천 상품 설정(GP 디자인 시스템 · 상세 페이지 형식).</li><li><strong>P3. 슈퍼어드민</strong> — <a href="./superadmin.html" target="_blank" rel="noopener">▶ superadmin.html</a> · <code>AI mate 추천 관리</code>(부족 영양소) + <code>AI mate 성분 관리</code>(성분코드).</li></ul>
+<ul><li><strong>P1. POS 굿팜 AI MATE</strong> — <a href="./pos-aimate.html" target="_blank" rel="noopener">▶ pos-aimate.html</a> · 처방 상세 분석 하단 <code>드럭머거 &amp; 추천제품</code>(<strong>시안 D 2열 확정</strong> · 시안 C 카드형은 숨김).</li><li><strong>P2. 약국 어드민 · 약사웹</strong> — <a href="./pharmacy-web.html" target="_blank" rel="noopener">▶ pharmacy-web.html</a> · 부족 영양소별 우리약국 추천 상품 설정(GP 디자인 시스템 · 상세 페이지 형식).</li><li><strong>P3. 슈퍼어드민</strong> — <a href="./superadmin.html" target="_blank" rel="noopener">▶ superadmin.html</a> · <code>영양소 관리</code>(부족 영양소) + <code>성분 관리</code>(성분코드).</li></ul>
 <div class="tw"><table>
 <thead><tr><th>화면번호</th><th>플랫폼</th><th>화면</th></tr></thead>
 <tbody>
 <tr><td>AIM-C-01</td><td>POS</td><td>처방 상세 분석 · 드럭머거 & 추천제품(시안 D · 2열)</td></tr>
 <tr><td>AIM-P-01</td><td>약사웹</td><td>추천 상품 설정 — 목록</td></tr>
 <tr><td>AIM-P-02</td><td>약사웹</td><td>추천 상품 설정 — 상세(페이지)</td></tr>
-<tr><td>AIM-P-03</td><td>약사웹</td><td>굿팜 보유 상품 검색 모달</td></tr>
+<tr><td>AIM-P-03</td><td>약사웹</td><td>굿팜 마스터 상품 검색 모달</td></tr>
 <tr><td>AIM-S-01</td><td>슈퍼어드민</td><td>영양소 관리 — 목록</td></tr>
 <tr><td>AIM-S-02</td><td>슈퍼어드민</td><td>영양소 관리 — 상세(페이지)</td></tr>
 <tr><td>AIM-S-03</td><td>슈퍼어드민</td><td>AI mate 성분 관리 — 목록/상세(모달)</td></tr>
@@ -83,11 +83,11 @@ td code{white-space:nowrap}
 <h1>P2. 약국 어드민 · 약사웹</h1>
 <blockquote><a href="./pharmacy-web.html" target="_blank" rel="noopener">▶ pharmacy-web.html</a> · <strong>GP 디자인 시스템</strong>(라이트·민트·Pretendard).</blockquote>
 <h2>AIM-P-01 · 추천 상품 설정 — 목록</h2>
-<ul><li><strong>컬럼(8열)</strong>: 부족 영양소 · 관련 카테고리 · 관련 성분 수 · 우리약국 추천 상품 · 굿팜 추천 상품 · <strong>AI mate 노출 상태</strong>(ⓘ 툴팁) · 최종 수정.</li><li><strong>노출 상태</strong>: ON <code>AI mate 노출</code>(그린) / OFF <code>AI mate 노출 중지</code>(옐로) — OFF도 숨기지 않는다(정책 <a class="xref" href="#sec-9">§9</a>).</li><li>행 클릭 → 상세 <strong>페이지</strong>로 전환(모달 아님).</li></ul>
+<ul><li><strong>컬럼(8열)</strong>: 부족 영양소 · 관련 카테고리 · 관련 성분 수 · 우리약국 추천 상품 · 굿팜 추천 상품 · <strong>AI mate 노출 상태</strong>(ⓘ 툴팁) · 최종 수정.</li><li><strong>노출 상태</strong>: ON <code>AI mate 노출</code>(그린) / OFF <code>AI mate 노출 중지</code>(옐로) — OFF도 목록에 노출 중지 상태로 표시(정책 <a class="xref" href="#sec-9">§9</a>).</li><li>행 클릭 → 상세 <strong>페이지</strong>로 전환.</li></ul>
 <h2>AIM-P-02 · 추천 상품 설정 — 상세(페이지)</h2>
-<ul><li>상단: <code>‹</code> 뒤로가기 + 부족 영양소명. <strong>저장은 우측 하단</strong>.</li><li><strong>기본 정보</strong>: 부족 영양소 · 관련 카테고리 · 관련 성분 수.</li><li><strong>추천 상품 설정</strong>(상단): <strong>우리약국 추천 상품(최대 3 · 등록/정렬/삭제 · 목록 하단에 추가 버튼)</strong> → 아래 <strong>굿팜 추천 상품(조회)</strong>. 상품 표기는 <strong>상품명(+제조사)</strong>.</li><li><strong>관련 성분</strong>(조회 전용 · 하단): <strong>성분코드 단위 플랫 리스트</strong> — 컬럼 <strong>성분명 · 제형(예: <code>정제, 저작정(TB)</code>) · 부족해지는 이유 · 근거(참고문헌)</strong>. 상단 <strong>총 개수</strong> · <strong>성분명 검색</strong>, 페이지네이션(10개/페이지). 편집은 슈퍼어드민.</li><li><strong>OFF 시</strong>: 상단 안내 배너 노출. <strong>편집은 허용</strong>(사전 등록·수정·삭제·정렬·저장 모두 가능) — 저장값은 POS에 즉시 노출되지 않고 <strong>노출 재개 시 그대로 사용</strong>. 하단 안내 <code>AI mate 노출 중지 상태 — 지금 등록·수정한 설정값은 노출이 재개되면 그대로 사용됩니다. (POS에는 아직 노출되지 않음)</code>.</li></ul>
-<h2>AIM-P-03 · 굿팜 보유 상품 검색 모달</h2>
-<ul><li><strong>굿팜 마스터 상품 DB</strong>에서 검색·선택만 허용(약국 로컬/POS 아님 — POS 미사용 약국 대응). <strong>검색 키는 상품명</strong>(바코드는 매입처별 상이로 미사용), 결과 표기는 <strong>상품명(+제조사)</strong>. 결과 없음/중복/최대 도달 안내.</li></ul>
+<ul><li>상단: <code>‹</code> 뒤로가기 + 부족 영양소명. <strong>저장은 우측 하단</strong>.</li><li><strong>기본 정보</strong>: 부족 영양소 · 관련 카테고리 · 관련 성분 수.</li><li><strong>추천 상품 설정</strong>(상단): <strong>우리약국 추천 상품(최대 3 · 등록/정렬/삭제 · 목록 하단에 추가 버튼)</strong> → 아래 <strong>굿팜 추천 상품(조회)</strong>. 상품 표기는 <strong>상품명(+제조사)</strong>.</li><li><strong>관련 성분</strong>(조회 전용 · 하단): <strong>성분코드 단위 플랫 리스트</strong> — 컬럼 <strong>성분명 · 제형(예: <code>정제, 저작정(TB)</code>) · 부족해지는 이유 · 근거(참고문헌)</strong>. 상단 <strong>총 개수</strong> · <strong>성분명 검색</strong>, 페이지네이션(10개/페이지). 편집은 슈퍼어드민.</li><li><strong>OFF 시</strong>: 상단 안내 배너 노출. <strong>편집은 허용</strong>(사전 등록·수정·삭제·정렬·저장 모두 가능) — 저장값은 <strong>노출 재개 시 그대로 사용</strong>. 하단 안내 <code>AI mate 노출 중지 상태 — 지금 등록·수정한 설정값은 노출이 재개되면 그대로 사용됩니다. (POS에는 아직 노출되지 않음)</code>.</li></ul>
+<h2>AIM-P-03 · 굿팜 마스터 상품 검색 모달</h2>
+<ul><li><strong>굿팜 마스터 상품 DB</strong>에서만 검색·선택한다(굿팜 마스터 기준 · POS 미사용 약국도 사용). <strong>검색 키는 상품명</strong>(바코드는 매입처별 상이로 미사용), 결과 표기는 <strong>상품명(+제조사)</strong>. 결과 없음/중복/최대 도달 안내.</li></ul>
 <hr>
 <h1>P3. 슈퍼어드민</h1>
 <blockquote><a href="./superadmin.html" target="_blank" rel="noopener">▶ superadmin.html</a> · 메뉴 <strong><code>AI Mate 추천 상품 관리</code></strong> 하위에 <strong>영양소 관리 / 성분 관리</strong> 2개.</blockquote>
