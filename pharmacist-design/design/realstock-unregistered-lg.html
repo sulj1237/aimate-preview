@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>미등록 상품 · 굿팜 약사님용앱</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<style>
+  /* GP Design System — User APP 토큰 · 확인 다이얼로그 포맷 · 큰 글씨 */
+  :root{
+    --brand-50:#E7FBFA; --brand-100:#C2F2EF; --brand-200:#78E1DC; --brand-300:#49D4CE;
+    --brand-400:#23C5BE; --brand-500:#0AB4AD; --brand-600:#16A59F; --brand-700:#08837E;
+    --g-0:#FFFFFF; --g-50:#F8F9FA; --g-100:#F1F3F5; --g-200:#E9ECEF; --g-300:#DEE2E6;
+    --g-400:#CED4DA; --g-500:#ADB5BD; --g-600:#868E96; --g-700:#495057; --g-800:#343A40; --g-900:#212529;
+    --sys-orange:#F57600; --sys-orange-bg:#FFF1E0;
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;padding:0;font-family:"Pretendard",-apple-system,system-ui,sans-serif;
+    letter-spacing:-0.01em;color:var(--g-900);background:#0a0a0a}
+  .num{font-feature-settings:"tnum" 1,"lnum" 1}
+
+  .stage{min-height:100dvh;display:flex;justify-content:center;background:linear-gradient(180deg,#F1F3F5 0%,#E9ECEF 100%)}
+  .device{width:100%;max-width:100%;position:relative;display:flex;flex-direction:column;min-height:100dvh;overflow:hidden;background:#10151A}
+  @media (min-width:480px){
+    .stage{padding:40px 0;background:#1A1F23}
+    .device{max-width:390px;height:844px;min-height:auto;border-radius:44px;
+      box-shadow:0 32px 80px -16px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+  }
+
+  .bg-scan{position:absolute;inset:0;z-index:0;display:flex;flex-direction:column;background:#10151A}
+  .bg-statusbar{height:44px;padding:0 24px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+    font-size:14px;font-weight:600;color:#FFFFFF}
+  .bg-statusbar .sb-right{display:flex;align-items:center;gap:5px}
+  .scan-wrap{flex:1;position:relative}
+  .scan-frame{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:200px;height:128px}
+  .scan-frame span{position:absolute;width:26px;height:26px;border:3px solid rgba(255,255,255,.9)}
+  .scan-frame .tl{top:0;left:0;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
+  .scan-frame .tr{top:0;right:0;border-left:0;border-bottom:0;border-radius:0 8px 0 0}
+  .scan-frame .bl{bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 8px}
+  .scan-frame .br{bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 8px 0}
+  .scan-hint{position:absolute;top:calc(30% + 92px);left:0;right:0;text-align:center;color:rgba(255,255,255,.82);font-size:18px;font-weight:500}
+  .scrim{position:absolute;inset:0;z-index:5;background:rgba(10,14,18,.62)}
+
+  /* 확인 다이얼로그 — 큰 글씨 */
+  .modal{position:absolute;left:22px;right:22px;top:50%;transform:translateY(-50%);z-index:10;
+    background:#FFFFFF;border-radius:22px;box-shadow:0 4px 40px rgba(0,0,0,.22);
+    padding:30px 26px 24px;display:flex;flex-direction:column}
+  .m-title{margin:0 0 14px;font-size:28px;font-weight:700;color:var(--g-900);letter-spacing:-0.02em;line-height:1.32}
+  .m-body{margin:0;font-size:20px;font-weight:500;color:var(--g-600);line-height:1.55;letter-spacing:-0.01em}
+
+  .m-bc{margin:22px 0 0;display:flex;align-items:center;gap:12px;background:var(--brand-50);border-radius:14px;padding:16px 18px}
+  .m-bc .ic{color:var(--brand-600);display:grid;place-items:center;flex-shrink:0}
+  .m-bc .ic svg{width:23px;height:23px}
+  .m-bc .lb{font-size:16px;font-weight:600;color:var(--brand-700);flex-shrink:0}
+  .m-bc .no{margin-left:auto;font-size:22px;font-weight:800;color:var(--g-900);letter-spacing:.02em;
+    font-feature-settings:"tnum" 1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .m-acts{display:flex;gap:12px;margin-top:26px}
+  .m-acts .btn{flex:1;height:64px;border-radius:14px;border:0;cursor:pointer;font-family:inherit;
+    font-size:21px;font-weight:700;letter-spacing:-0.01em}
+  .m-acts .ghost{background:var(--g-100);color:var(--g-700)}
+  .m-acts .ghost:active{background:var(--g-200)}
+  .m-acts .primary{background:var(--brand-500);color:#FFFFFF}
+  .m-acts .primary:active{background:var(--brand-600)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="미등록 상품 안내(모달)">
+
+    <div class="bg-scan" aria-hidden="true">
+      <div class="bg-statusbar">
+        <span class="num">9:41</span>
+        <div class="sb-right">
+          <svg width="18" height="11" viewBox="0 0 18 11" fill="none"><path d="M1 8.5h2v1.5H1zM5 6h2v4H5zM9 3.5h2V10H9zM13 1h2v9h-2z" fill="currentColor"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2.5C5.6 2.5 3.4 3.4 1.7 4.9.6 3.6.0 2.2.0 2.2A12 12 0 0 1 8 -.5 12 12 0 0 1 16 2.2s-.6 1.4-1.7 2.7C12.6 3.4 10.4 2.5 8 2.5z" fill="currentColor"/></svg>
+          <svg width="25" height="11" viewBox="0 0 25 11" fill="none"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1" fill="currentColor"/><rect x="22.5" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="scan-wrap">
+        <div class="scan-frame"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+        <div class="scan-hint">바코드를 비추면 자동으로 인식해요</div>
+      </div>
+    </div>
+
+    <div class="scrim"></div>
+
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="u-title">
+      <h2 class="m-title" id="u-title">상품을 먼저 등록해 주세요</h2>
+      <p class="m-body">스캔한 상품이 아직 등록되어 있지 않아<br/>실재고를 입력할 수 없어요.<br/>상품을 등록하면 바로 입력할 수 있어요.</p>
+
+      <div class="m-bc">
+        <span class="lb">스캔한 바코드</span>
+        <span class="no num">8809999999999</span>
+      </div>
+
+      <div class="m-acts">
+        <button class="btn ghost" type="button">계속 스캔</button>
+        <button class="btn primary" type="button">상품 등록</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

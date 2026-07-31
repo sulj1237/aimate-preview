@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>굿팜 약사님용앱 · 클라이언트 3.0 — 디자인 시안(최신)</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<style>
+  :root{ --bg:#eef1f2; --card:#fff; --ink:#1c2b2a; --muted:#68767a; --line:#e2e7e8; --brand:#0AB4AD; --brand-d:#08837E; --brand-soft:#e6f7f4; }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#0e1413; --card:#161e1d; --ink:#e8efee; --muted:#94a2a3; --line:#243130; --brand-soft:#123330; } }
+  :root[data-theme="dark"]{ --bg:#0e1413; --card:#161e1d; --ink:#e8efee; --muted:#94a2a3; --line:#243130; --brand-soft:#123330; }
+  :root[data-theme="light"]{ --bg:#eef1f2; --card:#fff; --ink:#1c2b2a; --muted:#68767a; --line:#e2e7e8; --brand-soft:#e6f7f4; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-system,system-ui,sans-serif;letter-spacing:-0.01em;line-height:1.5}
+  .wrap{max-width:1280px;margin:0 auto;padding:36px 20px 60px}
+  header.top{margin-bottom:26px}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-d);background:var(--brand-soft);padding:6px 12px;border-radius:999px}
+  h1{font-size:clamp(22px,3.5vw,30px);font-weight:800;margin:14px 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14px;margin:0;max-width:70ch}
+  .sec{margin-top:34px}
+  .sec h2{font-size:17px;font-weight:800;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--brand-soft)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+  .card{margin:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .card.wide{grid-column:1/-1}
+  figcaption{font-size:13px;font-weight:700;color:var(--ink);padding:12px 14px;border-bottom:1px solid var(--line)}
+  .frame{width:100%;background:#f4f6f7;overflow:hidden}
+  @media (prefers-color-scheme:dark){ .frame{background:#1a1f23} }
+  iframe{width:100%;height:100%;border:0;display:block}
+  footer{margin-top:40px;text-align:center;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Design Preview · 최신</span>
+    <h1>굿팜 약사님용앱 · 클라이언트 3.0 — 디자인 시안</h1>
+    <p class="sub">상품 등록·수정 및 실재고 입력 기능의 최신 화면(앱 + 굿팜 클라이언트 3.0). 각 화면은 실제 동작하는 프로토타입입니다(클릭·입력 가능). 큰글씨(접근성)는 <b>·큰글씨</b> 로 표시.</p>
+  </header>
+    <section class="sec">
+      <h2>홈 · 공통</h2>
+      <div class="grid">
+      <figure class="card">
+        <figcaption>홈</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/home.html" title="홈"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>홈 · 큰글씨</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/home-lg.html" title="홈 · 큰글씨"></iframe></div>
+      </figure>
+      </div>
+    </section>
+    <section class="sec">
+      <h2>약사님용앱 · 실재고 관리 (R-01 ~ R-07)</h2>
+      <div class="grid">
+      <figure class="card">
+        <figcaption>R-01 실재고 스캔</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-scan.html" title="R-01 실재고 스캔"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-02 실재고 입력</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-input.html" title="R-02 실재고 입력"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-02 · 큰글씨</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-input-lg.html" title="R-02 · 큰글씨"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-03 미등록 상품(모달)</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-unregistered.html" title="R-03 미등록 상품(모달)"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-03 · 큰글씨</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-unregistered-lg.html" title="R-03 · 큰글씨"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-04 제출 목록</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-list.html" title="R-04 제출 목록"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-04 · 큰글씨</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-list-lg.html" title="R-04 · 큰글씨"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-05 제출 결과</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-result.html" title="R-05 제출 결과"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-06 제출 이력</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-history.html" title="R-06 제출 이력"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-06 · 큰글씨</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-history-lg.html" title="R-06 · 큰글씨"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-07 제출 상세</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-detail.html" title="R-07 제출 상세"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>R-07 · 큰글씨 200%</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-detail-lg.html" title="R-07 · 큰글씨 200%"></iframe></div>
+      </figure>
+      </div>
+    </section>
+    <section class="sec">
+      <h2>약사님용앱 · 상품 관리 (P) · 공통</h2>
+      <div class="grid">
+      <figure class="card">
+        <figcaption>P-01 진입(스캔)</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-entry.html" title="P-01 진입(스캔)"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>P-02 검색 결과</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-search.html" title="P-02 검색 결과"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>P-04 상품 정보(수정/신규)</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-form.html" title="P-04 상품 정보(수정/신규)"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>P-04 · 큰글씨</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-form-lg.html" title="P-04 · 큰글씨"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>P-04 · 신규 등록</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-form-new.html" title="P-04 · 신규 등록"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>P-04 · 검증 오류(분류·판매가 필수)</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-form-error.html" title="P-04 · 검증 오류(분류·판매가 필수)"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>P-05 저장 결과</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-result.html" title="P-05 저장 결과"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>C-01 제조사 선택</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/maker-select.html" title="C-01 제조사 선택"></iframe></div>
+      </figure>
+      </div>
+    </section>
+    <section class="sec">
+      <h2>상태 · 예외 케이스</h2>
+      <div class="grid">
+      <figure class="card">
+        <figcaption>실재고 스캔 · 0건</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-scan-empty.html" title="실재고 스캔 · 0건"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>실재고 스캔 · 인식 실패</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-scan-fail.html" title="실재고 스캔 · 인식 실패"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>제출 목록 · 6건</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-list-6.html" title="제출 목록 · 6건"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>제출 결과 · 전송 실패</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/realstock-result-fail.html" title="제출 결과 · 전송 실패"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>검색 결과 · 결과 없음</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-search-empty.html" title="검색 결과 · 결과 없음"></iframe></div>
+      </figure>
+      <figure class="card">
+        <figcaption>저장 결과 · 전송 실패</figcaption>
+        <div class="frame" style="height:900px"><iframe loading="lazy" src="design/product-result-fail.html" title="저장 결과 · 전송 실패"></iframe></div>
+      </figure>
+      </div>
+    </section>
+    <section class="sec">
+      <h2>굿팜 클라이언트 3.0 (관리자 · Windows)</h2>
+      <div class="grid">
+      <figure class="card wide">
+        <figcaption>상품 관리 — 동기화 · 수정 기록</figcaption>
+        <div class="frame" style="height:1300px"><iframe loading="lazy" src="client-product-manage.html" title="상품 관리 — 동기화 · 수정 기록"></iframe></div>
+      </figure>
+      <figure class="card wide">
+        <figcaption>실재고 관리 — 재고 반영 · 변경 내용 보기</figcaption>
+        <div class="frame" style="height:780px"><iframe loading="lazy" src="client-stock.html" title="실재고 관리 — 재고 반영 · 변경 내용 보기"></iframe></div>
+      </figure>
+      </div>
+    </section>
+  <footer>내부 검토용 · 프로토타입 미리보기 (로그인 불필요)</footer>
+</div>
+</body>
+</html>

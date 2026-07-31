@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>제출 목록 · 굿팜 약사님용앱</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<link href="ds.css" rel="stylesheet" />
+<style>
+  /* 제출 건 카드 (건별 편집·삭제 인라인) */
+  .sitem{border:1px solid var(--g-200);border-radius:12px;background:#fff;padding:14px;margin-bottom:10px}
+  .si-top{display:flex;align-items:flex-start;gap:12px}
+  .si-nm{flex:1;min-width:0;font-size:15px;font-weight:600;color:var(--g-900);line-height:1.4;letter-spacing:var(--tracking);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .si-qy{font-size:17px;font-weight:700;color:var(--g-900);flex-shrink:0;white-space:nowrap}
+  .si-qy small{font-size:12px;color:var(--g-500);font-weight:600;margin-left:1px}
+  .si-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+  .si-bc{font-size:12.5px;color:var(--g-500);font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .si-acts{display:flex;gap:8px;flex-shrink:0}
+  .si-btn{height:34px;padding:0 12px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--g-300);color:var(--g-600)}
+  .si-btn svg{width:14px;height:14px}
+  .si-btn:active{background:var(--g-50)}
+  /* 삭제 확인 모달 */
+  .scrim{position:absolute;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;padding:28px;z-index:50}
+  .scrim.show{display:flex}
+  .modal{width:100%;max-width:300px;background:#fff;border-radius:16px;padding:24px 20px 18px;text-align:center;box-shadow:0 20px 50px -12px rgba(0,0,0,.35)}
+  .modal h4{font-size:18px;font-weight:700;color:var(--g-900);margin:0 0 10px;letter-spacing:var(--tracking-title)}
+  .modal p{font-size:14px;color:var(--g-600);line-height:1.5;margin:0}
+  .modal-acts{display:flex;gap:8px;margin-top:20px}
+  .modal-acts button{flex:1;height:48px;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;border:0}
+  .m-cancel{background:var(--g-100);color:var(--g-700)}
+  .m-cancel:active{background:var(--g-200)}
+  .m-ok{background:var(--brand-500);color:#fff}
+  .m-ok:active{background:var(--brand-600)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="제출 목록">
+    <div class="statusbar">
+      <span class="num">9:41</span>
+      <div class="sb-right">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none"><path d="M1 8.5h2v1.5H1zM5 6h2v4H5zM9 3.5h2V10H9zM13 1h2v9h-2z" fill="currentColor"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2.5C5.6 2.5 3.4 3.4 1.7 4.9.6 3.6.0 2.2.0 2.2A12 12 0 0 1 8 -.5 12 12 0 0 1 16 2.2s-.6 1.4-1.7 2.7C12.6 3.4 10.4 2.5 8 2.5z" fill="currentColor"/></svg>
+        <svg width="25" height="11" viewBox="0 0 25 11" fill="none"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1" fill="currentColor"/><rect x="22.5" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <div class="appbar">
+      <button class="ico-btn" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h1>제출 목록</h1>
+    </div>
+
+    <div class="scroll pad" id="list"></div>
+
+    <div class="bottom row">
+      <button class="btn btn-line">상품 더 추가</button>
+      <button class="btn btn-primary" id="submitBtn">제출하기 (3건)</button>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div class="scrim" id="delScrim">
+      <div class="modal">
+        <h4>제출 상품 삭제</h4>
+        <p>해당 항목을 삭제하시겠습니까?</p>
+        <div class="modal-acts">
+          <button class="m-cancel" onclick="closeDel()">취소</button>
+          <button class="m-ok" onclick="confirmDel()">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const ITEMS = [
+    { nm:"타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)", bc:"8801234567890", qy:24 },
+    { nm:"판콜에이내복액 30ml", bc:"8806789012345", qy:60 },
+    { nm:"겔포스엠현탁액", bc:"8803333000044", qy:40 },
+  ];
+  const EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+
+  function render(){
+    document.getElementById('list').innerHTML = ITEMS.map(function(it){
+      return '<div class="sitem">'+
+        '<div class="si-top"><div class="si-nm">'+it.nm+'</div><span class="si-qy num">'+it.qy+'<small>개</small></span></div>'+
+        '<div class="si-sub"><span class="si-bc">'+it.bc+'</span>'+
+        '<span class="si-acts">'+
+        '<button class="si-btn" onclick="location.href=\'realstock-input.html\'">'+EDIT+'편집</button>'+
+        '<button class="si-btn" onclick="askDelete(this)">'+TRASH+'삭제</button>'+
+        '</span></div></div>';
+    }).join('');
+    document.getElementById('submitBtn').textContent = '제출하기 (' + ITEMS.length + '건)';
+  }
+
+  // 편집 → 실재고 입력(이전 제출 수량 프리필) 재입력·재제출 / 삭제 → 확인 모달
+  let delTarget = null;
+  function askDelete(btn){ delTarget = btn.closest('.sitem'); document.getElementById('delScrim').classList.add('show'); }
+  function closeDel(){ delTarget = null; document.getElementById('delScrim').classList.remove('show'); }
+  function confirmDel(){
+    if(delTarget){
+      const idx = [...document.querySelectorAll('.sitem')].indexOf(delTarget);
+      ITEMS.splice(idx, 1); render();
+    }
+    closeDel();
+  }
+  render();
+</script>
+</body>
+</html>

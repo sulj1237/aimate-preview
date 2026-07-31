@@ -1,0 +1,108 @@
+/* ───────────────────────────────────────────────────────────
+   ds-large.css — 큰 글씨(접근성 동적 타입) 오버레이
+   ds.css / 화면별 인라인 스타일 위에 링크해 폰트·터치타깃을 키운다.
+   반드시 각 화면 <style> 뒤(</head> 직전)에 링크할 것.
+   기준 스케일 ≈ 1.22x (본문/라벨), 터치타깃 +6~8px.
+─────────────────────────────────────────────────────────── */
+
+/* ── 앱바 / 상태바 ── */
+.appbar{min-height:62px}
+.appbar h1{font-size:21px}
+.appbar .r-txt{font-size:14px}
+.ico-btn{width:48px;height:48px}
+.bc-head{font-size:15px !important}
+.dt-head{font-size:15px !important}
+
+/* ── KV / 캡션 / 힌트 / 바코드 ── */
+.kv .k{font-size:16px}
+.kv .v{font-size:18px}
+.kv .v small{font-size:14px}
+.caption{font-size:14px}
+.hint{font-size:15px}
+.barcode{padding:14px 16px}
+.barcode .bc{font-size:16px}
+.barcode .k{font-size:14px}
+
+/* ── 섹션 타이틀 ── */
+.section-title{font-size:20px}
+
+/* ── 버튼 / 하단바 ── */
+.btn{height:58px;font-size:18px}
+.btn-lg{height:60px;font-size:18px}
+
+/* ── 결과 화면 ── */
+.result .badge-ic{width:80px;height:80px}
+.result h4{font-size:24px}
+.result p{font-size:17px}
+.result .note-must{font-size:16px}
+
+/* ── 리스트 ── */
+.lrow .nm{font-size:18px}
+.lrow .sub{font-size:14.5px}
+.lrow .invq{font-size:14.5px}
+.lrow .qy{font-size:20px}
+.lrow .qy small{font-size:14px}
+
+/* ── 검색 / 빈 상태 ── */
+.searchbox{height:56px}
+.searchbox input{font-size:18px}
+.empty .et{font-size:18px}
+.empty .es{font-size:15px}
+.empty .eic{width:64px;height:64px}
+
+/* ── 상태 라벨(배지/색표기 공통 — 크기만) ── */
+.status{font-size:15px !important}
+
+/* ── 폼 필드 ── */
+.field label{font-size:15px}
+.field input,.field select,.field .sel{height:56px;font-size:17.5px}
+.field .err{font-size:14px}
+
+/* ============================================================
+   화면별 인라인 컴포넌트
+   ============================================================ */
+
+/* 홈 */
+.logo{font-size:23px}
+.quick .q .ql{font-size:14.5px}
+.sect-t{font-size:18px}
+.tile .nm{font-size:16.5px}
+.tab{font-size:13px}
+
+/* 실재고 입력 */
+.invcell .il{font-size:14.5px}
+.invcell .iv{font-size:26px}
+.invcell .iv small{font-size:15px}
+.invcell .iv .ph{font-size:19px}
+.totbox .tl{font-size:16px}
+.totbox .tv{font-size:30px}
+.keypad button{height:56px;font-size:23px}
+.keypad button.ctl{font-size:16px}
+.kp-confirm{height:58px;font-size:18px}
+
+/* 실재고 스캔 / 상품관리 진입(카메라) */
+.cam .h{font-size:15px}
+
+/* 제출 이력 */
+.info{font-size:15px}
+.hc-date{font-size:19px}
+.hc-total{font-size:15px}
+.hc-counts{font-size:14px}
+.more{font-size:15px}
+
+/* 제출 상세 */
+.dchip{font-size:14.5px}
+.dnm{font-size:17px}
+.dbc{font-size:14px}
+.dchg{font-size:15.5px}
+.dmeta{font-size:13.5px}
+
+/* 제출 목록(건별 카드) */
+.si-nm{font-size:18px}
+.si-bc{font-size:14.5px}
+.si-qy{font-size:20px}
+.si-qy small{font-size:14px}
+.si-btn{height:40px;font-size:15px}
+
+/* 상품 정보 신규 태그 */
+.tag-new{font-size:13px}
