@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>제출 이력 · 굿팜 약사님용앱</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<link href="ds.css" rel="stylesheet" />
+<style>
+  .info{font-size:12.5px;color:var(--g-600);font-weight:500;margin:0 2px 14px;line-height:1.5}
+  .info b{color:var(--g-800);font-weight:700}
+  .hcard{background:#fff;border:1px solid var(--g-200);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .12s ease}
+  .hcard:active{box-shadow:0 6px 18px -10px rgba(16,24,40,.2)}
+  .hc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .hc-date{font-size:16px;font-weight:700;color:var(--g-900);letter-spacing:-0.01em}
+  .hc-bot{display:flex;align-items:center;gap:8px}
+  .hc-total{font-size:13px;font-weight:700;color:var(--g-800)}
+  .hc-counts{font-size:12px;color:var(--g-500);font-weight:500}
+  .hc-bot .chev{margin-left:auto;color:var(--g-400);display:grid;place-items:center}
+  .hc-bot .chev svg{width:18px;height:18px}
+  /* 더보기 — 텍스트 + 오른쪽 화살표 */
+  .more{width:100%;margin-top:6px;background:none;border:0;cursor:pointer;padding:8px 0;
+    display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--g-500)}
+  .more:active{color:var(--g-700)}
+  .more svg{width:16px;height:16px}
+  /* 반영 상태 — 배지 UI 대신 색으로만 표기 */
+  /* 반영 상태 — Chip(배지) 형태 */
+  .stb{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;white-space:nowrap}
+  .stb.wait{background:var(--g-100);color:var(--g-600)}
+  .stb.mid{background:#fdf0e0;color:var(--sys-orange)}
+  .stb.done{background:#e2f3ee;color:#1d8a76}
+  .stb.rej{background:#fbe3e0;color:var(--sys-red)}
+</style>
+<link href="ds-large.css" rel="stylesheet" />
+</head>
+<body>
+<div class="stage">
+  <div class="device" data-screen-label="제출 이력">
+    <div class="statusbar">
+      <span class="num">9:41</span>
+      <div class="sb-right">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none"><path d="M1 8.5h2v1.5H1zM5 6h2v4H5zM9 3.5h2V10H9zM13 1h2v9h-2z" fill="currentColor"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2.5C5.6 2.5 3.4 3.4 1.7 4.9.6 3.6.0 2.2.0 2.2A12 12 0 0 1 8 -.5 12 12 0 0 1 16 2.2s-.6 1.4-1.7 2.7C12.6 3.4 10.4 2.5 8 2.5z" fill="currentColor"/></svg>
+        <svg width="25" height="11" viewBox="0 0 25 11" fill="none"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1" fill="currentColor"/><rect x="22.5" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <div class="appbar">
+      <button class="ico-btn" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h1>제출 이력</h1>
+    </div>
+
+    <div class="scroll pad">
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+<script>
+  // 제출일자 단위 이력 (최신순)
+  const DAYS = [
+    { date:"2026-07-02", total:17, done:14, rej:2, wait:1 },
+    { date:"2026-07-01", total:3,  done:0,  rej:0, wait:3 },
+    { date:"2026-06-28", total:9,  done:9,  rej:0, wait:0 },
+    { date:"2026-06-25", total:12, done:12, rej:0, wait:0 },
+    { date:"2026-06-20", total:5,  done:3,  rej:1, wait:1 },
+    { date:"2026-06-17", total:8,  done:8,  rej:0, wait:0 },
+    { date:"2026-06-13", total:6,  done:5,  rej:1, wait:0 },
+    { date:"2026-06-10", total:4,  done:0,  rej:0, wait:4 },
+    { date:"2026-06-05", total:11, done:11, rej:0, wait:0 },
+  ];
+  const CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+  function statOf(d){
+    if(d.wait === d.total) return ['wait','반영전'];
+    if(d.done + d.rej === d.total) return ['done','반영완료'];
+    return ['mid','반영중'];
+  }
+  function render(){
+    // 무한 스크롤 — 전체 이력을 렌더(스크롤로 이전 이력 확인, 더보기 버튼 없음)
+    document.getElementById('list').innerHTML = DAYS.map(function(d){
+      const s = statOf(d);
+      return '<div class="hcard">'+
+        '<div class="hc-top"><span class="hc-date">'+d.date+'</span><span class="stb '+s[0]+'">'+s[1]+'</span></div>'+
+        '<div class="hc-bot"><span class="hc-total">전체 '+d.total+'건</span>'+
+        '<span class="hc-counts">완료 '+d.done+' · 반려 '+d.rej+' · 반영전 '+d.wait+'</span>'+
+        '<span class="chev">'+CHEV+'</span></div>'+
+      '</div>';
+    }).join('');
+  }
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>실재고 입력 · 굿팜 약사님용앱</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<link href="ds.css" rel="stylesheet" />
+<style>
+  /* 헤더 바코드 — 제목 옆 표기 */
+  .bc-head{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;font-weight:600;color:var(--g-500);
+    letter-spacing:.02em;margin-left:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .invrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+  .invcell{border:1.5px solid var(--g-300);border-radius:12px;padding:14px;text-align:left;cursor:pointer;background:#FFFFFF;transition:all .12s ease}
+  .invcell:active{background:var(--g-50)}
+  .invcell.on{border-color:var(--brand-500);background:var(--brand-50);box-shadow:0 0 0 3px rgba(10,180,173,.12)}
+  .invcell .il{font-size:12.5px;font-weight:600;color:var(--g-600)}
+  .invcell.on .il{color:var(--brand-700)}
+  .invcell .iv{font-size:22px;font-weight:700;color:var(--g-900);margin-top:6px;letter-spacing:var(--tracking-title)}
+  .invcell .iv small{font-size:13px;font-weight:600;color:var(--g-500);margin-left:2px}
+  .invcell .iv .ph{font-size:16px;font-weight:600;color:var(--g-400)}
+
+  /* 상품명 최대 2줄(초과 말줄임) */
+  .v.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  /* 재고 차이 사유 — 총 수량 ≠ 전산상 재고일 때만 노출(선택 입력) */
+  .reason{margin-top:16px}
+  .reason .rl{display:block;font-size:13px;font-weight:600;color:var(--g-700);margin-bottom:7px}
+  .reason .opt{font-size:11px;font-weight:500;color:var(--g-400);margin-left:5px}
+  .reason .rin{width:100%;height:44px;border:1.5px solid var(--g-300);border-radius:12px;padding:0 13px;
+    font-family:inherit;font-size:14.5px;color:var(--g-900);background:#fff;outline:none;letter-spacing:var(--tracking)}
+  .reason .rin::placeholder{color:var(--g-400);font-weight:400}
+  .reason .rin:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(10,180,173,.12)}
+  .reason .rcount{margin-top:5px;text-align:right;font-size:11.5px;color:var(--g-400);font-variant-numeric:tabular-nums}
+  /* 총 수량 — 입력 중 상시 확인(키패드 위 별도 노출) */
+  .kp-total{display:flex;align-items:baseline;gap:7px;padding:0 4px 9px;border-bottom:1px dashed var(--g-200);margin-bottom:9px}
+  .kp-total .lb{font-size:13px;font-weight:700;color:var(--g-700)}
+  .kp-total .vv{font-size:20px;font-weight:800;color:var(--brand-700);letter-spacing:var(--tracking-title);margin-left:auto}
+  .kp-total .vv small{font-size:12.5px;font-weight:600;color:var(--g-500);margin-left:2px}
+
+  /* 도킹 키패드 — 테마 매칭(흰 버튼) + 재배열 컴포넌트 */
+  .kp{flex-shrink:0;background:var(--g-50);border-top:1px solid var(--g-200);padding:10px 12px max(10px,env(safe-area-inset-bottom))}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .keypad button{height:48px;border-radius:12px;border:1px solid var(--g-200);background:#fff;color:var(--g-900);
+    font-family:inherit;font-size:20px;font-weight:600;cursor:pointer;transition:background .1s ease;
+    display:flex;align-items:center;justify-content:center}
+  .keypad button:active{background:var(--g-100)}
+  .keypad button.ctl{font-size:14px;font-weight:700;color:var(--brand-700)}
+  .keypad button.ctl.del{color:var(--g-600)}
+  .kp-confirm{width:100%;height:50px;margin-top:8px;border-radius:12px;border:0;background:var(--brand-500);color:#fff;
+    font-family:inherit;font-size:16px;font-weight:700;letter-spacing:var(--tracking);cursor:pointer;transition:background .12s ease}
+  .kp-confirm:active{background:var(--brand-600)}
+  .kp-confirm:disabled{background:var(--g-200);color:var(--g-500);cursor:not-allowed}
+</style>
+<link href="ds-large.css" rel="stylesheet" />
+<style>
+  /* ── 큰 글씨 최대(200% · 기본 글자 대비 2배) — 실재고 입력 전용 ──
+     ds-large.css(≈1.22×) 뒤에 링크해 이 화면만 글자를 2배로 키운다. */
+  /* 200%에서도 상품명·바코드·총수량·버튼이 잘리지 않도록 상단은 키우되 하단 도킹부는 컴팩트하게 */
+  .appbar{min-height:72px}
+  .appbar h1{font-size:32px}
+  .ico-btn{width:52px;height:52px}
+  .bc-head{font-size:19px !important}
+  .kv{align-items:flex-start}
+  .kv .k{font-size:21px}
+  .kv .v{font-size:24px;line-height:1.32}
+  .kv .v small{font-size:20px}
+  .caption{font-size:17px}
+  .invrow{gap:10px;margin-top:12px}
+  .invcell{padding:13px}
+  .invcell .il{font-size:21px}
+  .invcell .iv{font-size:34px}
+  .invcell .iv small{font-size:21px}
+  .invcell .iv .ph{font-size:26px}
+  .hint{font-size:19px;line-height:1.4;margin-top:10px}
+  /* 도킹 총수량·키패드·버튼 — 세로 공간 절약(잘림 방지) */
+  .kp{padding:9px 12px max(9px,env(safe-area-inset-bottom))}
+  .kp-total{padding:0 4px 7px;margin-bottom:7px}
+  .kp-total .lb{font-size:20px}
+  .kp-total .vv{font-size:30px}
+  .kp-total .vv small{font-size:19px}
+  .keypad{gap:8px}
+  .keypad button{height:50px;font-size:28px}
+  .keypad button.ctl{font-size:20px}
+  .kp-confirm{height:54px;font-size:25px;margin-top:8px}
+  .reason{margin-top:14px}
+  .reason .rl{font-size:22px;margin-bottom:8px}
+  .reason .opt{font-size:17px}
+  .reason .rin{height:56px;font-size:22px;padding:0 16px}
+  .reason .rcount{font-size:17px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="device" id="device" data-screen-label="실재고 입력">
+    <div class="statusbar">
+      <span class="num">9:41</span>
+      <div class="sb-right">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none"><path d="M1 8.5h2v1.5H1zM5 6h2v4H5zM9 3.5h2V10H9zM13 1h2v9h-2z" fill="currentColor"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2.5C5.6 2.5 3.4 3.4 1.7 4.9.6 3.6.0 2.2.0 2.2A12 12 0 0 1 8 -.5 12 12 0 0 1 16 2.2s-.6 1.4-1.7 2.7C12.6 3.4 10.4 2.5 8 2.5z" fill="currentColor"/></svg>
+        <svg width="25" height="11" viewBox="0 0 25 11" fill="none"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1" fill="currentColor"/><rect x="22.5" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <div class="appbar">
+      <button class="ico-btn" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h1>실재고 입력</h1>
+      <span class="bc-head num">8801234567890</span>
+    </div>
+
+    <div class="scroll pad">
+      <div class="kv"><span class="k">상품명</span><span class="v clamp2">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</span></div>
+      <div class="kv"><span class="k">전산상 재고</span><span class="v">48<small> 개</small></span></div>
+      <div class="caption">마지막 동기화 · 2026-06-26 09:10</div>
+
+      <div class="invrow">
+        <div class="invcell" id="cell-disp" onclick="pick('disp')">
+          <div class="il">진열 수량</div>
+          <div class="iv num" id="v-disp"><span class="ph">입력</span></div>
+        </div>
+        <div class="invcell" id="cell-wh" onclick="pick('wh')">
+          <div class="il">창고 수량</div>
+          <div class="iv num" id="v-wh"><span class="ph">입력</span></div>
+        </div>
+      </div>
+
+      <div class="hint" id="autosum-hint" style="margin-top:12px">진열·창고 수량을 더한 값이 총 수량으로 저장됩니다.</div>
+
+      <!-- 재고 차이 사유 — 총 수량 ≠ 전산상 재고일 때만 노출(#reasonBox). 값은 세션 유지 -->
+      <div class="reason" id="reasonBox">
+        <label class="rl" for="reasonInp">재고 차이 사유 <span class="opt">선택</span></label>
+        <input class="rin" id="reasonInp" type="text" maxlength="30"
+          placeholder="전산상 재고와 차이가 발생한 사유를 입력해 주세요." />
+        <div class="rcount"><span id="rcnt">0</span>/30</div>
+      </div>
+    </div>
+
+    <!-- 도킹 키패드 (상시 노출) — 확인 시 바로 제출하고 제출 목록으로 -->
+    <div class="kp" id="kp">
+      <div class="kp-total"><span class="lb">총 수량</span><span class="vv num"><b id="kpTot">0</b><small>개</small></span></div>
+      <div class="keypad" id="keypad"></div>
+      <button class="kp-confirm" id="confirm" onclick="location.href='realstock-list.html'">목록에 담기</button>
+    </div>
+  </div>
+</div>
+<script>
+  const BASE = 48;                      // 전산상 재고(데모) — 총 수량과 비교해 사유 노출 결정
+  const inv = { disp:"86", wh:"63" };   // 데모: 진열 포커스 + 키패드 열림 기본 상태
+  let active = 'disp';
+  const DEL = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>';
+  const cellHtml = v => v==="" ? '<span class="ph">입력</span>' : (v+'<small>개</small>');
+  const reasonInp = document.getElementById('reasonInp');
+  function setKeypadNumeric(on){ document.getElementById('keypad').style.display = on ? '' : 'none'; }
+
+  function paintPad(){
+    const nums = [1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="press('${n}')">${n}</button>`).join('');
+    document.getElementById('keypad').innerHTML =
+      nums +
+      `<button onclick="press('00')">00</button>` +
+      `<button onclick="press('0')">0</button>` +
+      `<button class="ctl del" aria-label="한 자리 지우기" onclick="press('del')">${DEL}</button>`;
+  }
+
+  function render(){
+    document.getElementById('v-disp').innerHTML = cellHtml(inv.disp);
+    document.getElementById('v-wh').innerHTML   = cellHtml(inv.wh);
+    const tot = (+inv.disp||0)+(+inv.wh||0);
+    document.getElementById('cell-disp').classList.toggle('on', active==='disp');
+    document.getElementById('cell-wh').classList.toggle('on', active==='wh');
+    // 총 수량은 키패드 위 별도 영역에 상시 노출
+    document.getElementById('kpTot').textContent = tot;
+    // 재고 차이 사유: 총 수량 ≠ 전산상 재고일 때만 노출(값 보존 → 다시 차이나면 복원)
+    document.getElementById('reasonBox').style.display = (tot !== BASE) ? '' : 'none';
+  }
+  function pick(f){ active = f; reasonInp.blur(); setKeypadNumeric(true); render(); }
+  function press(k){
+    if(!active) return;
+    let cur = inv[active];
+    if(k==='del') cur = cur.slice(0,-1);
+    else cur = (cur==="0"?"":cur) + k;
+    if(cur.length>5) return;
+    inv[active] = cur; render();
+  }
+
+  reasonInp.addEventListener('input', function(){ document.getElementById('rcnt').textContent = reasonInp.value.length; });
+  reasonInp.addEventListener('focus', function(){ active = null; setKeypadNumeric(false); render(); });
+  const _q = new URLSearchParams(location.search);
+  if(_q.has('rs')){ reasonInp.value = (_q.get('rs')||'').slice(0,30); }
+  document.getElementById('rcnt').textContent = reasonInp.value.length;
+
+  paintPad(); render();
+</script>
+</body>
+</html>

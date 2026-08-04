@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>슈퍼어드민 · 바코드 상세 정보 (마스터 상품 · 약국별 제출로그 · 수정 이력)</title>
+<style>
+  :root{
+    --teal:#22b8a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e6e9ee; --bg:#eef1f5; --field:#f5f7fa;
+    --blue:#2a6fc0; --red:#d64a3a; --amber:#c98a12; --sideblue:#2b3550;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  .admin{display:flex;min-height:100%}
+  /* 좌측 슬림 사이드바(맥락용) */
+  .side{width:150px;flex:none;background:var(--sideblue);color:#c8cfe0;padding:14px 0}
+  .side .brand{display:flex;align-items:center;gap:6px;font-weight:800;color:#fff;font-size:14px;padding:0 14px 12px}
+  .side .brand .dot{width:14px;height:14px;border-radius:5px 5px 5px 1px;background:var(--teal);transform:rotate(8deg)}
+  .side .grp{font-size:10px;color:#7f89a8;font-weight:800;letter-spacing:.04em;padding:12px 14px 4px}
+  .side .it{padding:7px 14px;font-size:12px;color:#c8cfe0;display:flex;justify-content:space-between}
+  .side .it.on{background:rgba(255,255,255,.08);color:#fff;font-weight:700;border-left:3px solid var(--teal);padding-left:11px}
+  .side .it .ca{color:#6f7aa0;font-size:10px}
+
+  .main{flex:1;min-width:0;padding:16px 20px 30px;max-width:1500px}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .top .back{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer;font-size:15px}
+  .top h1{font-size:18px;font-weight:800;margin:0}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;box-shadow:0 6px 20px -16px rgba(20,40,60,.3)}
+  .card > h2{font-size:14px;font-weight:800;margin:0 0 13px}
+  .sub-h{font-size:12px;font-weight:800;color:var(--teal-d);margin:2px 0 9px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--field)}
+  .stat .l{font-size:11.5px;color:var(--muted);font-weight:600}
+  .stat .v{font-size:20px;font-weight:800;margin-top:3px}
+
+  .master{display:grid;grid-template-columns:1fr 1fr 220px;gap:20px}
+  @media(max-width:1100px){.master{grid-template-columns:1fr 1fr}.master .bc-col{grid-column:1/-1}}
+  .fld{margin-bottom:11px}
+  .fld label{display:block;font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .fld label .req{color:var(--red)}
+  .fld .in{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--field);
+    padding:0 11px;font-size:13px;color:var(--ink);display:flex;align-items:center}
+  .fld .in.ph{color:#b0b6bd}
+  .fld .in.sel{justify-content:space-between;cursor:pointer}
+  .fld .in.sel .ar{color:var(--muted);font-size:11px}
+  .fld .grp-row{display:flex;gap:8px}
+  .fld .grp-row .in{flex:1}
+  .fld .grp-btn{height:36px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer}
+  .bc-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    border:1px solid var(--line);border-radius:10px;padding:16px;background:#fff}
+  .bc-cap{font-size:9px;color:#b0b6bd;letter-spacing:.2em;margin-bottom:6px}
+  .bc-img{display:flex;gap:2px;align-items:flex-end;height:66px}
+  .bc-img i{display:block;width:2px;background:#2b2f33}
+  .bc-no{font-family:ui-monospace,Menlo,monospace;font-size:12px;margin-top:8px;letter-spacing:.06em}
+  .master-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+  .btn{height:34px;padding:0 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:#4b5158}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.primary:hover{background:var(--teal-d)}
+  .btn.danger{border-color:#ecc7c2;color:var(--red)}
+  .btn.danger:hover{background:#fbeeec}
+  .btn.sm{height:28px;padding:0 11px;font-size:11.5px;border-radius:6px}
+
+  .logbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .pill{font-size:11.5px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border:1px solid #cdeee8;border-radius:999px;padding:3px 10px}
+  .chk-all{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .spacer{flex:1}
+  .sizes{display:flex;gap:4px}
+  .sizes button{height:26px;padding:0 9px;border-radius:6px;border:1px solid var(--line);background:#fff;color:#5a6066;font-size:11.5px;font-weight:700;cursor:pointer}
+  .sizes button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .tablewrap{border:1px solid var(--line);border-radius:10px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+  thead th{background:#f6f7f9;color:#5a6066;font-weight:700;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+  th.c,td.c{text-align:center}th.r,td.r{text-align:right}
+  td{padding:11px 12px;border-bottom:1px solid #eef0f2;color:#3a3f44}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fafbfc}
+  .phm{font-weight:600}
+  .phm .region{font-size:11px;color:var(--muted);display:block}
+  .prodlink{color:var(--teal-d);font-weight:700;cursor:pointer}
+  .prodlink:hover{text-decoration:underline}
+  .pageinfo{display:flex;align-items:center;justify-content:space-between;padding:10px 4px 2px;color:var(--muted);font-size:12px}
+  .pager{display:flex;gap:4px;align-items:center}
+  .pager button{width:26px;height:26px;border-radius:6px;border:1px solid var(--line);background:#fff;color:#5a6066;cursor:pointer}
+  .pager button.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:800}
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.45);z-index:50;align-items:center;justify-content:center;padding:24px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:12px;width:100%;max-width:860px;max-height:86vh;overflow:auto;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  .modal-h{display:flex;align-items:center;gap:8px;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .modal-h .mt{font-size:14px;font-weight:800}
+  .modal-h .mslash{color:#c3c8ce}
+  .modal-h .msub{font-size:13px;color:var(--muted);font-weight:600}
+  .modal-h .x{margin-left:auto;border:none;background:none;font-size:19px;color:var(--muted);cursor:pointer}
+  .modal-b{padding:6px 20px 20px}
+  .chg{font-size:11.5px;font-weight:800}.chg .k{color:#5a6066}
+  .before{color:var(--muted);text-decoration:line-through}
+  .after{color:var(--teal-d);font-weight:800}
+  .empty{padding:48px 0;text-align:center;color:#9aa0a6;font-size:13px}
+</style>
+</head>
+<body>
+<div class="admin">
+  <aside class="side">
+    <div class="brand"><span class="dot"></span>굿팜</div>
+    <div class="grp">굿팜 약국 솔루션</div>
+    <div class="it">바코드 프리 <span class="ca">▾</span></div>
+    <div class="it on">바코드 관리</div>
+    <div class="it">전자입고 관리 <span class="ca">▾</span></div>
+    <div class="grp">모바일 약국</div>
+    <div class="it">모바일 약국 관리 <span class="ca">▾</span></div>
+    <div class="it">포인트/쿠폰 관리 <span class="ca">▾</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="top"><button class="back">‹</button><h1>바코드 상세 정보</h1></div>
+
+    <!-- 상품 통계 정보 -->
+    <div class="card">
+      <h2>상품 통계 정보</h2>
+      <div class="stats">
+        <div class="stat"><div class="l">평균가</div><div class="v">0원</div></div>
+        <div class="stat"><div class="l">최저가</div><div class="v">0원</div></div>
+        <div class="stat"><div class="l">최대가</div><div class="v">0원</div></div>
+        <div class="stat"><div class="l">최빈가</div><div class="v">0원</div></div>
+      </div>
+    </div>
+
+    <!-- 마스터 상품 정보 -->
+    <div class="card">
+      <h2>마스터 상품 정보</h2>
+      <div class="master">
+        <div>
+          <div class="sub-h">기본 정보</div>
+          <div class="fld"><label>그룹</label>
+            <div class="grp-row"><span class="in">-</span><button class="grp-btn">그룹 편집</button></div>
+          </div>
+          <div class="fld"><label>상품명 <span class="req">*</span></label><span class="in">(2매)(KF94)아에르황사마스크</span></div>
+          <div class="fld"><label>제조사 <span class="req">*</span></label><span class="in ph">제조사를 입력하세요</span></div>
+          <div class="sub-h" style="margin-top:14px">가격 정보</div>
+          <div class="fld"><label>최소가</label><span class="in">0</span></div>
+          <div class="fld"><label>최대가</label><span class="in">0</span></div>
+          <div class="fld"><label>최빈가</label><span class="in">0</span></div>
+        </div>
+        <div>
+          <div class="sub-h">포장 정보</div>
+          <div class="fld"><label>포장 수량 <span class="req">*</span></label><span class="in">0</span></div>
+          <div class="fld"><label>포장 단위 <span class="req">*</span></label><span class="in sel">개<span class="ar">▾</span></span></div>
+          <div class="fld"><label>포장 정보</label><span class="in ph">&nbsp;</span></div>
+        </div>
+        <div class="bc-col">
+          <div class="bc-cap">BARCODE</div>
+          <div class="bc-img" id="bc"></div>
+          <div class="bc-no">8809493472989</div>
+        </div>
+      </div>
+      <div class="master-foot">
+        <button class="btn primary">수정</button>
+        <button class="btn danger">삭제</button>
+      </div>
+    </div>
+
+    <!-- 약국별 제출로그 -->
+    <div class="card">
+      <h2>약국별 제출로그</h2>
+      <div class="logbar">
+        <span class="pill">전체 <b id="logCnt">1</b>건</span>
+        <label class="chk-all"><input type="checkbox" id="allChk" /> 전체선택</label>
+        <span class="spacer"></span>
+        <div class="sizes">
+          <button class="on" data-s="10">10개</button><button data-s="30">30개</button>
+          <button data-s="50">50개</button><button data-s="100">100개</button>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th class="c" style="width:44px">선택</th><th>약국명</th><th>제품명</th>
+            <th class="r">패키징</th><th>제조사</th><th class="r">판매가</th><th class="r">구매가</th>
+            <th>등록일</th><th class="c">삭제</th>
+          </tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+      <div class="pageinfo">
+        <span>10개 씩 · 1 / 1 페이지</span>
+        <div class="pager"><button>«</button><button>‹</button><button class="on">1</button><button>›</button><button>»</button></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- 상품 정보 수정 이력 모달 -->
+<div class="modal-bg" id="histModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-h">
+      <span class="mt" id="mPh">굿헬스포트</span><span class="mslash">/</span><span class="msub" id="mProd">(2매)(KF94)아에르황사마스크</span>
+      <button class="x" id="mClose">✕</button>
+    </div>
+    <div class="modal-b">
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>수정일시</th><th>변경항목</th><th>이전 값</th><th>변경 값</th><th>수정자</th>
+          </tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  // 바코드 막대(장식)
+  var bars='';for(var i=0;i<44;i++){var w=(i%4===0)?3:(i%3===0?2:1);var h=40+((i*7)%26);bars+='<i style="width:'+w+'px;height:'+h+'px"></i>';}
+  $('bc').innerHTML=bars;
+
+  // 약국별 제출로그 — 굿팜 약사님용앱에서 제출된 상품 정보(약국 단위). 제품명 클릭 → 수정 이력.
+  var logs=[
+    {ph:'굿헬스포트', region:'서울특별시 강남구', prod:'(2매)(KF94)아에르황사마스크', pack:0, maker:'-', sale:'0원', buy:'0원', at:'2025. 8. 25.',
+      hist:[
+        // 굿팜 약사님용앱 상품 수정 제출이 반영될 때마다 쌓이는 이력(수정일시·변경항목·이전 값·변경 값·수정자)
+        {at:'2026-07-01 10:20', field:'판매가', before:'0원', after:'3,500원', by:'김약사(A21)'},
+        {at:'2026-07-01 10:20', field:'제조사', before:'(없음)', after:'내추럴션', by:'김약사(A21)'},
+        {at:'2026-06-18 14:11', field:'상품명', before:'KF94마스크', after:'(2매)(KF94)아에르황사마스크', by:'김약사(A21)'}
+      ]}
+  ];
+
+  function renderLog(){
+    var b=$('logBody');b.innerHTML='';
+    logs.forEach(function(r,i){
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td class="c"><input type="checkbox" class="rowChk"></td>'+
+        '<td class="phm">'+r.ph+'<span class="region">('+r.region+')</span></td>'+
+        '<td><span class="prodlink" data-i="'+i+'">'+r.prod+'</span></td>'+
+        '<td class="r">'+r.pack+'</td><td>'+r.maker+'</td>'+
+        '<td class="r">'+r.sale+'</td><td class="r">'+r.buy+'</td>'+
+        '<td>'+r.at+'</td><td class="c"><button class="btn danger sm">삭제</button></td>';
+      b.appendChild(tr);
+    });
+    document.querySelectorAll('.prodlink').forEach(function(el){el.onclick=function(){openHist(+el.getAttribute('data-i'));};});
+    $('logCnt').textContent=logs.length;
+  }
+
+  function openHist(i){
+    var r=logs[i];if(!r)return;
+    $('mPh').textContent=r.ph;$('mProd').textContent=r.prod;
+    var body=$('histBody');
+    if(!r.hist||!r.hist.length){
+      body.innerHTML='<tr><td colspan="5"><div class="empty">데이터가 존재하지 않습니다.</div></td></tr>';
+    }else{
+      body.innerHTML=r.hist.map(function(h){
+        return '<tr><td>'+h.at+'</td><td class="chg"><span class="k">'+h.field+'</span></td>'+
+          '<td class="before">'+h.before+'</td><td class="after">'+h.after+'</td><td>'+h.by+'</td></tr>';
+      }).join('');
+    }
+    $('histModal').classList.add('open');
+  }
+  $('mClose').onclick=function(){$('histModal').classList.remove('open');};
+  $('histModal').onclick=function(e){if(e.target===$('histModal'))$('histModal').classList.remove('open');};
+
+  // 페이지 크기 토글(시각)
+  document.querySelectorAll('.sizes button').forEach(function(btn){
+    btn.onclick=function(){document.querySelectorAll('.sizes button').forEach(function(o){o.classList.remove('on')});btn.classList.add('on');};
+  });
+  // 전체선택
+  $('allChk').onchange=function(){var c=$('allChk').checked;document.querySelectorAll('.rowChk').forEach(function(x){x.checked=c;});};
+
+  renderLog();
+})();
+</script>
+</body>
+</html>

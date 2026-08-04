@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>실재고 입력 재설계 · 재고 차이 사유 복원 — 프로토타입</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<style>
+  :root{
+    --brand:#0AB4AD; --brand-600:#089a94; --brand-50:#e6f7f6;
+    --ink:#11201f; --sub:#5b6b6a; --line:#e5eae9; --bg:#f4f6f6; --card:#ffffff;
+    --chip:#eef2f1; --chip-ink:#3f4f4e;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --ink:#e8efee; --sub:#9fb0ae; --line:#22302f; --bg:#0e1615; --card:#131e1d; --chip:#1c2a29; --chip-ink:#bcccca; --brand-50:#0f2422; }
+  }
+  :root[data-theme="light"]{ --ink:#11201f; --sub:#5b6b6a; --line:#e5eae9; --bg:#f4f6f6; --card:#fff; --chip:#eef2f1; --chip-ink:#3f4f4e; --brand-50:#e6f7f6; }
+  :root[data-theme="dark"]{ --ink:#e8efee; --sub:#9fb0ae; --line:#22302f; --bg:#0e1615; --card:#131e1d; --chip:#1c2a29; --chip-ink:#bcccca; --brand-50:#0f2422; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:Pretendard,-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+    letter-spacing:-.01em;line-height:1.5;-webkit-font-smoothing:antialiased}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;background:var(--chip);padding:1px 5px;border-radius:5px}
+
+  header{max-width:1200px;margin:0 auto;padding:56px 24px 28px}
+  .eyebrow{display:inline-block;font-size:12.5px;font-weight:700;color:var(--brand);letter-spacing:.04em;
+    background:var(--brand-50);padding:5px 11px;border-radius:999px;margin-bottom:16px}
+  h1{font-size:clamp(26px,4.4vw,38px);font-weight:800;margin:0 0 12px;letter-spacing:-.03em;text-wrap:balance}
+  .desc{font-size:15.5px;color:var(--sub);max-width:680px;margin:0}
+  .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:12.5px;font-weight:600;color:var(--chip-ink);background:var(--chip);border:1px solid var(--line);
+    padding:5px 11px;border-radius:8px}
+
+  main{max-width:1200px;margin:0 auto;padding:8px 24px 80px}
+  .sec{margin-top:44px}
+  .sec-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .sec-h h2{font-size:20px;font-weight:800;margin:0;letter-spacing:-.02em}
+  .sec-h .pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .pill.rec{background:var(--brand);color:#fff}
+  .pill.alt{background:var(--chip);color:var(--chip-ink);border:1px solid var(--line)}
+  .pill.rst{background:#fdf0e0;color:#b5651a}
+  @media (prefers-color-scheme: dark){ .pill.rst{background:#2c2113;color:#e0a758} }
+  .sec-sub{font-size:13.5px;color:var(--sub);margin:0 0 18px;max-width:760px}
+
+  .grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .grid.wide{grid-template-columns:1fr}
+  figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  figcaption{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px}
+  figcaption .nm{font-size:14px;font-weight:700}
+  figcaption .sm{font-size:12px;color:var(--sub);font-weight:500}
+  figcaption .star{margin-left:auto;font-size:11px;font-weight:700;color:#fff;background:var(--brand);padding:3px 8px;border-radius:6px}
+  .frame{background:#fff;overflow:auto}
+  .frame.phone{height:880px}
+  .frame.win{height:800px}
+  iframe{border:0;display:block;background:#fff}
+  .frame.phone iframe{width:100%;height:100%}
+  .frame.win iframe{width:1360px;height:100%}
+
+  footer{max-width:1200px;margin:0 auto;padding:0 24px 60px;color:var(--sub);font-size:12.5px}
+  .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;line-height:1.8}
+  .note b{color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <span class="eyebrow">굿팜 약사님용앱 · 프로토타입 리뷰</span>
+  <h1>실재고 입력 재설계 &amp; 재고 차이 사유 복원</h1>
+  <p class="desc">약사가 수백 개 상품의 실재고를 빠르게 입력하는 화면의 전면 재설계 시안(B)과, 되살린 ‘재고 차이 사유’ 화면을 한곳에 모았습니다. 각 화면은 실제 동작하는 프로토타입이라 숫자 키패드로 직접 입력해 볼 수 있어요.</p>
+  <div class="meta">
+    <span class="tag">Mint-teal #0AB4AD</span>
+    <span class="tag">Pretendard · 해요체</span>
+    <span class="tag">iOS 390×844 · Windows 관리자</span>
+  </div>
+</header>
+
+<main>
+  <!-- 실재고 입력 재설계 시안 B -->
+  <section class="sec">
+    <div class="sec-h"><h2>실재고 입력 — 재설계 시안 B</h2><span class="pill rec">추천</span></div>
+    <p class="sec-sub">세그먼트로 진열/창고를 전환하며 한 번에 한 필드만 큰 숫자로 입력 · 총 수량 상시 강조 · 재고 차이 사유는 Bottom Sheet(선택). 큰 글씨(200%)에서도 스크롤 없이 모든 요소가 보입니다.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">실재고 입력 · 시안 B</span><span class="sm">기본</span><span class="star">확정안</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-input-b.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">실재고 입력 · 시안 B</span><span class="sm">큰글씨 200%</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-input-b-lg.html"></iframe></div></figure>
+    </div>
+  </section>
+
+  <!-- 비교 탐색안 -->
+  <section class="sec">
+    <div class="sec-h"><h2>실재고 입력 — 비교 탐색안</h2><span class="pill alt">참고</span></div>
+    <p class="sec-sub">확정안(시안 B) 도출 과정에서 검토한 3가지 입력 패러다임입니다.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">시안 1 · 트리플 셀 고정형</span><span class="sm">진열·창고·총 병렬</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-input-b1.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">시안 2 · 계산기 디스플레이형</span><span class="sm">총 수량 대형</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-input-b2.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">시안 3 · 세그먼트 포커스형</span><span class="sm">시안 B의 원형</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-input-b3.html"></iframe></div></figure>
+    </div>
+  </section>
+
+  <!-- 재고 차이 사유 복원 -->
+  <section class="sec">
+    <div class="sec-h"><h2>재고 차이 사유 — 복원 화면</h2><span class="pill rst">복원</span></div>
+    <p class="sec-sub">앱(실재고 입력·제출 목록·제출 상세)과 클라이언트(실재고 관리·변경 내용 보기)에 ‘재고 차이 사유’를 되살렸습니다. 입력된 건만 표기하고, 미입력 시 생략(클라이언트는 <code>-</code>)합니다.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">실재고 입력 (복원본)</span><span class="sm">하단 선택 인풋</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-input.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">제출 목록 · 6건</span><span class="sm">카드별 사유 1줄</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-list-6.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">제출 상세</span><span class="sm">사유 별도 행</span></figcaption><div class="frame phone"><iframe loading="lazy" src="design/realstock-detail.html"></iframe></div></figure>
+    </div>
+    <div class="grid wide" style="margin-top:22px">
+      <figure><figcaption><span class="nm">굿팜 클라이언트 3.0 · 실재고 관리</span><span class="sm">Windows 관리자 · 입력자↔입력일시 사이 사유 컬럼 · ‘변경 내용 보기’ 모달</span></figcaption><div class="frame win"><iframe loading="lazy" src="client-stock.html"></iframe></div></figure>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="note">
+    <b>안내</b> · 시안 B의 실재고 입력값(진열 86 · 창고 63)과 재고 차이 사유는 <b>데모 데이터</b>입니다. · ‘앱 기준 반영 전 N개’ 표기는 대표·팀장 확정 대기 중이라 화면 수치에는 아직 미반영입니다. · 문의는 기획팀으로 주세요.
+  </div>
+</footer>
+</body>
+</html>

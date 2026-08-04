@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>굿팜 클라이언트 3.0 · 상품 관리 (동기화 · 상품 정보 수정 기록)</title>
+<style>
+  :root{
+    --teal:#22b8a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e5e8ec; --bg:#eef1f5; --field:#f6f7fa;
+    --blue:#2a6fc0; --red:#d64a3a; --amber:#c98a12; --sel:#d8f0ec;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#dfe2e6;font-size:12.5px;line-height:1.5;padding:12px}
+  .win{max-width:1120px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px -16px rgba(0,0,0,.3);border:1px solid #d5d9df}
+  .titlebar{height:40px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);background:#fbfcfd}
+  .tb-mark{width:16px;height:16px;border-radius:6px 6px 6px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .tb-mark::after{content:"";position:absolute;left:-3px;bottom:-2px;width:7px;height:7px;border-radius:50%;background:#f4de3f}
+  .tb-title{font-size:14px;font-weight:800}
+  .tb-actions{margin-left:auto;display:flex;gap:12px;color:#9aa0a6}
+  .subhead{padding:9px 14px 0;font-size:13px;font-weight:800}
+  .tabs{display:flex;gap:2px;padding:6px 12px 0;border-bottom:1px solid var(--line)}
+  .tab{padding:8px 12px;font-size:12.5px;font-weight:600;color:#7a818a;cursor:pointer;border-bottom:2px solid transparent}
+  .tab.on{color:var(--teal-d);font-weight:800;border-bottom-color:var(--teal)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .left{border-right:1px solid var(--line);padding:12px 14px;min-width:0}
+  .right{padding:12px 16px;min-width:0}
+
+  /* 검색/액션 바 */
+  .bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .sel-in,.inp{height:30px;border:1px solid var(--line);border-radius:6px;padding:0 9px;font-size:12px;background:#fff;color:var(--ink)}
+  .inp{flex:1;min-width:120px}
+  .btn{height:30px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:#4b5158;display:inline-flex;align-items:center;gap:6px}
+  .btn.teal{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.teal:hover{background:var(--teal-d)}
+  .btn.line{background:#fff}
+  .btn.sm{height:26px;padding:0 9px;font-size:11.5px}
+  .btn.red{border-color:#ecc7c2;color:var(--red)}
+  .btn .spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:none;animation:sp .7s linear infinite}
+  .btn.loading .spin{display:inline-block}
+  /* 동기화 — 실재고 관리와 버튼 디자인 통일(teal 아웃라인·배경 없음) */
+  .btn.sync{background:#fff;border-color:var(--teal);color:var(--teal-d);display:inline-flex;align-items:center;gap:6px}
+  .btn.sync:hover{background:var(--teal-soft)}
+  .btn.sync .spin{border-color:#cdeee8;border-top-color:var(--teal-d)}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* 도움말 ⓘ 툴팁 */
+  .help{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+    border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11px;font-weight:800;cursor:help;position:relative}
+  .help:hover,.help.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .help .tip{display:none;position:absolute;z-index:60;top:calc(100% + 8px);left:0;width:250px;background:#2b2f33;color:#fff;
+    font-size:11px;font-weight:400;line-height:1.6;padding:9px 11px;border-radius:7px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+  .help .tip::before{content:"";position:absolute;top:-5px;left:12px;width:10px;height:10px;background:#2b2f33;transform:rotate(45deg)}
+  .help:hover .tip,.help.on .tip{display:block}
+  .help.right .tip{left:auto;right:0}
+  .help.right .tip::before{left:auto;right:12px}
+
+  .cnt-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .cnt{font-size:12px;font-weight:800}.cnt b{color:var(--teal-d)}
+  .spacer{flex:1}
+  .synced{font-size:11px;color:var(--muted)}.synced b{color:var(--ink);font-weight:700;margin-left:2px}
+  .sync-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .chks{display:flex;gap:14px;margin-bottom:10px;font-size:11.5px;color:var(--muted)}
+  .chks label{display:flex;align-items:center;gap:5px}
+
+  .tablewrap{border:1px solid var(--line);border-radius:7px;overflow:auto;max-height:520px}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap}
+  thead th{position:sticky;top:0;background:#f4f6f8;color:#5a6066;font-weight:700;text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);z-index:2}
+  td{padding:7px 9px;border-bottom:1px solid #eef0f2;color:#3a3f44}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#fafbfc}
+  tbody tr.on{background:var(--sel)}
+  th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .nm{font-weight:600}
+  .newrow td{background:#fff8ec}
+  .newtag{font-size:9px;font-weight:800;color:var(--amber);background:#fbeecb;border-radius:4px;padding:1px 5px;margin-left:5px}
+
+  /* 상세 */
+  .sec-h{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+  .sec-h h3{font-size:13.5px;font-weight:800;margin:0}
+  .sec-h .acts{margin-left:auto;display:flex;gap:6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-bottom:14px}
+  .fld{display:flex;flex-direction:column;gap:4px}
+  .fld.full{grid-column:1/-1}
+  .fld label{font-size:11px;color:var(--muted);font-weight:700}
+  .fld label .req{color:var(--red)}
+  .fld .in{height:30px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:0 9px;display:flex;align-items:center;font-size:12px}
+  .fld .in.ro{background:var(--field);color:#6b7178}
+  .price3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .sub-sec{margin-top:12px}
+  .sub-sec .sec-h h3{font-size:12.5px}
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.45);z-index:80;align-items:center;justify-content:center;padding:24px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:12px;width:100%;max-width:1000px;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  /* 헤더: 가운데 정렬 제목(디자인 시스템 — '주문 등록' 모달 참고) */
+  .modal-h{display:flex;align-items:center;justify-content:center;position:relative;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .modal-h .mtitle{font-size:16px;font-weight:800;color:#28303a}
+  .modal-h .x{position:absolute;right:16px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;color:var(--muted);cursor:pointer}
+  .modal-b{padding:16px 20px;overflow:auto}
+  /* 상품 정보 카드(헤더 아래 · label-value) */
+  .pcard{border:1px solid #e3e6ea;border-radius:8px;background:#fafbfc;padding:14px 16px;margin-bottom:14px}
+  .pcgrid{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:9px 20px;align-items:center;font-size:12.5px}
+  .pcgrid .k{color:#8a9099;font-weight:600;white-space:nowrap}
+  .pcgrid .v{color:#28303a;font-weight:600}
+  .pcgrid .v.mono{font-family:ui-monospace,Menlo,monospace}
+  /* 상품 정보 수정 기록 — 클라이언트 기본 디자인 시스템 정합(첨부 '다빈도 상품 등록' 모달 참고) */
+  .histbox{border:1px solid #e3e6ea;border-radius:8px;overflow:hidden;background:#fff}
+  .histbox table{width:100%;border-collapse:collapse;font-size:12px}
+  .histbox thead th{position:static;background:#f7f8fa;color:#8a9099;font-weight:600;text-align:left;padding:14px 14px;border-bottom:1px solid #e3e6ea;border-right:1px solid #edeff2;white-space:nowrap}
+  .histbox thead th:last-child{border-right:none}
+  .histbox thead th.sorth{position:relative}
+  .histbox thead th .so{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#aab0b8;font-size:12px;line-height:1}
+  #histBody td{padding:16px 14px;border-bottom:1px solid #eef0f3;border-right:1px solid #f4f5f7;white-space:normal;color:#3d444c;vertical-align:top;line-height:1.5}
+  #histBody td:last-child{border-right:none}
+  #histBody td.vt{vertical-align:middle;color:#3a3f44}
+  #histBody tr.gend td{border-bottom:1px solid #e3e6ea}
+  #histBody tr:last-child td{border-bottom:none}
+  .modal-f{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid #edeff2;background:#fbfbfc}
+  .mbtn{height:38px;border-radius:8px;font-size:13px;font-weight:700;padding:0 26px;cursor:pointer}
+  .mbtn.ghost{background:#fff;border:1px solid #d7dbe0;color:#5c6671}
+  .mbtn.primary{background:var(--teal);color:#fff;border:1px solid var(--teal)}
+  .before{color:var(--muted);text-decoration:line-through}
+  .after{color:var(--teal-d);font-weight:700}
+  .src{font-size:9.5px;font-weight:800;border-radius:4px;padding:1px 6px;margin-left:6px}
+  .src.app{color:#0a6a63;background:#d6f2ee}
+  .src.pos{color:#2a6fc0;background:#e4eefb}
+  .devtype{font-size:9.5px;font-weight:800;border-radius:4px;padding:1px 6px;margin-right:5px}
+  .devtype.app{color:#0a6a63;background:#d6f2ee}
+  .devtype.pos{color:#2a6fc0;background:#e4eefb}
+  .devn{color:#6b7178;font-size:11px}
+  .empty{padding:44px 0;text-align:center;color:#9aa0a6}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#2b2f33;color:#fff;font-size:12.5px;padding:10px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:90}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="titlebar"><span class="tb-mark"></span><span class="tb-title">상품 관리</span>
+    <span class="tb-actions"><span>↻</span><span>⚙</span><span>—</span><span>✕</span></span>
+  </div>
+  <div class="subhead">상품 목록</div>
+  <nav class="tabs">
+    <span class="tab on">상품 목록</span><span class="tab">다빈도/세트 상품</span><span class="tab">가격태그</span><span class="tab">ESL</span>
+  </nav>
+
+  <div class="cols">
+    <!-- 좌: 상품 목록 -->
+    <div class="left">
+      <div class="bar">
+        <select class="sel-in"><option>상품명</option><option>바코드</option></select>
+        <input class="inp" placeholder="검색 기준 선택 후 검색어를 입력해 주세요." />
+        <button class="btn teal sm">검색</button>
+      </div>
+      <!-- 검색창 바로 밑: 조회 체크박스 -->
+      <div class="chks">
+        <label><input type="checkbox" checked /> 사용 약품만 조회</label>
+        <label><input type="checkbox" checked /> 재고 0이상 조회</label>
+      </div>
+      <!-- 그 밑: (왼쪽) 마지막 동기화 일시 · (오른쪽) 앱 데이터 동기화 버튼 -->
+      <div class="sync-row">
+        <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
+        <span class="spacer"></span>
+        <button class="btn sync sm" id="syncBtn"><span class="spin"></span>앱 데이터 동기화</button>
+        <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 등록/수정한 상품 정보 데이터를 동기화합니다.</span></span>
+      </div>
+      <!-- 목록 리스트 바로 위: 전체·판매 드롭다운·신규·내보내기 -->
+      <div class="cnt-row">
+        <span class="cnt">전체 <b id="cnt">2131</b> 개</span>
+        <select class="sel-in"><option>판매</option></select>
+        <span class="spacer"></span>
+        <button class="btn line sm">＋ 신규</button>
+        <button class="btn line sm">⭳ 내보내기</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>상품명</th><th>바코드</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th></tr></thead>
+          <tbody id="listBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 우: 상품 상세 정보 -->
+    <div class="right">
+      <div class="sec-h">
+        <h3>상품 상세 정보</h3>
+        <div class="acts">
+          <!-- ② 상품 정보 수정 기록 버튼 -->
+          <button class="btn teal sm" id="histBtn">🕘 상품 정보 수정 기록</button>
+          <button class="btn red sm">🗑 삭제</button>
+          <button class="btn line sm">💾 저장</button>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="fld"><label>상품명 <span class="req">*</span></label><span class="in" id="dNm">[2+1]비타리움 프로폴리스…</span></div>
+        <div class="fld"><label>제조업체</label><span class="in">헥사곤</span></div>
+        <div class="fld"><label>대분류</label><span class="in ro">판매</span></div>
+        <div class="fld"><label>중분류</label><span class="in">의약외품</span></div>
+        <div class="fld"><label>단위</label><span class="in">회</span></div>
+        <div class="fld"><label>바코드</label><span class="in ro" id="dBc">9343202002627</span></div>
+        <div class="fld"><label>대응코드</label><span class="in ro">-</span></div>
+        <div class="fld"><label>약품코드</label><span class="in ro">GA00020594</span></div>
+        <div class="fld"><label>사입가</label><span class="in">6,750</span></div>
+        <div class="fld"><label>판매가</label><span class="in">26,500</span></div>
+        <div class="fld full"><label>위치</label><span class="in"></span></div>
+        <div class="fld"><label>재고</label><span class="in ro">6</span></div>
+        <div class="price3" style="grid-column:1/-1">
+          <div class="fld"><label>안전재고</label><span class="in">0</span></div>
+          <div class="fld"><label>재고금액</label><span class="in ro">40,500</span></div>
+          <div class="fld"><label>단위(포장)</label><span class="in">회</span></div>
+        </div>
+      </div>
+      <div class="sub-sec">
+        <div class="sec-h"><h3>적수 관리</h3><div class="acts"><button class="btn line sm">바코드 인쇄</button><button class="btn line sm">수정</button><button class="btn line sm">추가</button></div></div>
+        <div class="tablewrap" style="max-height:120px">
+          <table><thead><tr><th>바코드</th><th>단위</th><th class="num">적수</th><th class="num">사입가</th><th class="num">판매가</th></tr></thead>
+          <tbody><tr><td>9343202002627</td><td>회</td><td class="num">1</td><td class="num">6,750</td><td class="num">26,500</td></tr></tbody></table>
+        </div>
+      </div>
+      <div class="sub-sec">
+        <div class="sec-h"><h3>입고 내역</h3></div>
+        <div class="tablewrap" style="max-height:120px">
+          <table><thead><tr><th>입고일자</th><th class="num">사입가</th><th class="num">적수</th><th class="num">수량</th><th class="num">금액</th><th>거래처명</th></tr></thead>
+          <tbody><tr><td>25-05-16</td><td class="num">6,750</td><td class="num">1</td><td class="num">6</td><td class="num">40,500</td><td>헥사곤무…</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ②③ 상품 정보 수정 기록 모달 (클라이언트+앱 전체 이력, 수정자 앱/클라이언트 구분) -->
+<div class="modal-bg" id="histModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-h">
+      <div class="mtitle">상품 정보 수정 기록</div>
+      <button class="x" id="mClose">✕</button>
+    </div>
+    <div class="modal-b">
+      <div class="pcard">
+        <div class="pcgrid">
+          <span class="k">상품명</span><span class="v" id="mProd">상품명</span>
+          <span class="k">바코드</span><span class="v mono" id="mBc"></span>
+          <span class="k">총 수정</span><span class="v" id="mCnt">0건</span>
+        </div>
+      </div>
+      <div class="histbox">
+        <table>
+          <thead><tr><th class="sorth" style="width:160px">수정일시<span class="so">⇅</span></th><th style="width:90px">변경항목</th><th>변경 전</th><th>변경 후</th><th style="width:80px">수정자</th><th style="width:190px">기기</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="mbtn ghost" id="mCloseF2">취소</button>
+      <button class="mbtn primary" id="mCloseF">닫기</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  // 상품 목록 — 클라이언트 보유분. 동기화 시 앱 등록/수정분(newFromApp)이 추가·갱신되어 올라옴.
+  var products=[
+    {nm:'[2+1]비타리움 프로폴리스…', bc:'9343202002627', unit:'회', buy:'6,750', sale:'26,500', stock:6, on:true},
+    {nm:'365마스크(베이지)10매', bc:'8809897…', unit:'개', buy:'1,800', sale:'3,000', stock:7},
+    {nm:'365마스크50매', bc:'8809897…', unit:'개', buy:'6,000', sale:'10,000', stock:5},
+    {nm:'3M 스테리스트립…', bc:'0707388…', unit:'개', buy:'1,145', sale:'3,500', stock:4},
+    {nm:'베아제정', bc:'8802223…', unit:'개', buy:'1,200', sale:'1,300', stock:13}
+  ];
+  var appNew=[
+    {nm:'폴리캅외용액(2.5~7.5kg,고양이)', bc:'8809000111', unit:'병', buy:'-', sale:'40,000', stock:0, isNew:true},
+    {nm:'판콜에이 30ml', bc:'8806789012345', unit:'개', buy:'800', sale:'1,100', stock:12, isNew:true}
+  ];
+  var synced=false;
+
+  function renderList(){
+    var rows=products.concat(synced?appNew:[]);
+    var b=$('listBody');b.innerHTML='';
+    rows.forEach(function(p,i){
+      var tr=document.createElement('tr');
+      if(p.on)tr.className='on';
+      // 상품 목록에는 앱 제출 여부를 별도 표기하지 않음(동기화로 합쳐진 최신 목록)
+      tr.innerHTML='<td class="nm">'+p.nm+'</td><td>'+p.bc+'</td><td>'+p.unit+'</td>'+
+        '<td class="num">'+p.buy+'</td><td class="num">'+p.sale+'</td><td class="num">'+p.stock+'</td>';
+      tr.onclick=function(){document.querySelectorAll('#listBody tr').forEach(function(x){x.classList.remove('on')});tr.classList.add('on');
+        $('dNm').textContent=p.nm;$('dBc').textContent=p.bc;};
+      b.appendChild(tr);
+    });
+    $('cnt').textContent=(2131+(synced?appNew.length:0));
+  }
+
+  // ① 동기화 — 앱 등록/수정 기록을 상품 목록으로 올림
+  var syncing=false;
+  $('syncBtn').onclick=function(){
+    if(syncing)return;syncing=true;var btn=$('syncBtn');btn.classList.add('loading');btn.disabled=true;
+    setTimeout(function(){synced=true;renderList();btn.classList.remove('loading');btn.disabled=false;syncing=false;
+      $('synced').innerHTML='마지막 동기화 <b>2026-07-03 09:12</b>';toast('앱 데이터 동기화 완료 · '+appNew.length+'건 반영');},800);
+  };
+  // 도움말 클릭 토글
+  $('syncHelp').addEventListener('click',function(e){e.stopPropagation();$('syncHelp').classList.toggle('on');});
+  document.addEventListener('click',function(){$('syncHelp').classList.remove('on');});
+
+  // ②③ 상품 정보 수정 기록 — 클라이언트+앱 전체 이력. 수정자에 앱/클라이언트 구분.
+  // 수정자 = 이름만 / 기기 = APP(단말명) 또는 PC(PC명) 별도 컬럼
+  var history=[
+    {at:'2026-07-02 10:20', field:'판매가', before:'25,000', after:'26,500', by:'김약사', dev:'A21', src:'app'},
+    {at:'2026-07-02 10:20', field:'중분류', before:'(없음)', after:'의약외품', by:'김약사', dev:'A21', src:'app'},
+    {at:'2026-06-30 14:05', field:'제조업체', before:'-', after:'헥사곤', by:'정OO', dev:'POS-01', src:'pos'},
+    {at:'2026-06-18 09:41', field:'상품명', before:'비타리움 프로폴리스', after:'[2+1]비타리움 프로폴리스…', by:'이약사', dev:'B07', src:'app'},
+    {at:'2026-06-16 11:03', field:'판매가', before:'26,500', after:'25,000', by:'박직원', dev:'C15', src:'app'},
+    {at:'2026-05-30 15:47', field:'위치', before:'-', after:'A-3', by:'김OO', dev:'POS-02', src:'pos'},
+    {at:'2026-05-16 16:22', field:'사입가', before:'7,000', after:'6,750', by:'박OO', dev:'POS-03', src:'pos'}
+  ];
+  function openHist(){
+    var nm=$('dNm').textContent, bc=$('dBc').textContent;
+    // 헤더에 상품명·바코드 강조(테이블 컬럼에서는 제거)
+    $('mProd').textContent=nm; $('mBc').textContent=bc; $('mCnt').textContent=history.length+'건';
+    // 동일 수정건(수정일시+수정자) 묶기 → 한 row에 변경항목 여러 줄
+    var groups=[], map={};
+    history.forEach(function(h){
+      var k=h.at+'|'+h.by+'|'+h.dev+'|'+h.src;
+      if(!map[k]){map[k]={at:h.at,by:h.by,dev:h.dev,src:h.src,changes:[]};groups.push(map[k]);}
+      map[k].changes.push(h);
+    });
+    var body=$('histBody');
+    if(!groups.length){body.innerHTML='<tr><td colspan="6"><div class="empty">데이터가 존재하지 않습니다.</div></td></tr>';}
+    else{
+      // 변경항목/전/후는 항목별 행, 수정일시·수정자·기기는 rowspan으로 묶음
+      body.innerHTML=groups.map(function(g){
+        var devCell='<span class="devtype '+(g.src==='app'?'app':'pos')+'">'+(g.src==='app'?'굿팜 약사님용앱':'PC')+'</span> <span class="devn">'+g.dev+'</span>';
+        var n=g.changes.length;
+        return g.changes.map(function(h,i){
+          var first=i===0, last=i===n-1;
+          return '<tr class="'+(last?'gend':'')+'">'+
+            (first?'<td rowspan="'+n+'" class="vt">'+g.at+'</td>':'')+
+            '<td><b>'+h.field+'</b></td><td class="before">'+h.before+'</td><td class="after">'+h.after+'</td>'+
+            (first?'<td rowspan="'+n+'" class="vt">'+g.by+'</td>':'')+
+            (first?'<td rowspan="'+n+'" class="vt">'+devCell+'</td>':'')+
+          '</tr>';
+        }).join('');
+      }).join('');
+    }
+    $('histModal').classList.add('open');
+  }
+  $('histBtn').onclick=openHist;
+  function closeHist(){$('histModal').classList.remove('open');}
+  $('mClose').onclick=closeHist;
+  $('mCloseF').onclick=closeHist;
+  $('mCloseF2').onclick=closeHist;
+  $('histModal').onclick=function(e){if(e.target===$('histModal'))closeHist();};
+
+  var toastEl=$('toast'),tt;
+  function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('show')},2000);}
+
+  renderList();
+})();
+</script>
+</body>
+</html>

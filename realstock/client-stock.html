@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>굿팜 클라이언트 3.0 · 재고운영 › 실재고 반영</title>
+<style>
+  :root{
+    --teal:#22b8a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e3e6ea; --bg:#f4f5f7;
+    --mint-row:#e9f8f5; --red:#d64a3a; --blue:#2a6fc0; --amber:#b9821a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#dfe2e6;font-size:13px;line-height:1.5;padding:14px}
+  .win{max-width:1240px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 10px 40px -16px rgba(0,0,0,.3)}
+  .titlebar{height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line)}
+  .tb-mark{width:18px;height:18px;border-radius:7px 7px 7px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .tb-mark::after{content:"";position:absolute;left:-4px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:#f4de3f}
+  .tb-title{font-size:15px;font-weight:800}
+  .crumb{margin-left:6px;font-size:12px;color:var(--muted)}.crumb b{color:var(--ink)}
+  .tb-actions{margin-left:auto;display:flex;gap:14px;color:#9aa0a6}
+  .tabs{display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--line);overflow-x:auto}
+  .tab{padding:11px 13px;font-size:13px;font-weight:600;color:#7a818a;white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--teal-d);font-weight:800;border-bottom-color:var(--teal)}
+  .body{padding:18px 20px 24px}
+  .head{display:flex;align-items:flex-start;gap:16px;margin-bottom:14px}
+  .head .ht{flex:1;min-width:0}
+  .h1{font-size:18px;font-weight:800;margin:0 0 4px}
+  .lead{font-size:12.5px;color:var(--muted);margin:0;max-width:760px}
+  .sync-box{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px;
+    background:var(--teal-soft);border:1px solid #cdeee8;border-radius:10px;padding:10px 12px}
+  .sync-row{display:flex;align-items:center;gap:8px}
+
+  /* 도움말 아이콘 + 툴팁 */
+  .help{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+    border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11px;font-weight:800;line-height:1;
+    cursor:help;position:relative;vertical-align:middle}
+  .help:hover,.help:focus,.help.on{background:var(--ink);color:#fff;border-color:var(--ink);outline:none}
+  .help .tip{display:none;position:absolute;z-index:70;top:calc(100% + 9px);right:0;width:340px;
+    background:#2b2f33;color:#fff;font-size:11.5px;font-weight:400;line-height:1.65;text-align:left;
+    padding:11px 13px;border-radius:8px;box-shadow:0 14px 36px -12px rgba(0,0,0,.55);white-space:normal;cursor:default}
+  .help .tip::before{content:"";position:absolute;top:-5px;right:13px;width:10px;height:10px;background:#2b2f33;transform:rotate(45deg)}
+  .help .tip.left{left:0;right:auto}
+  .help .tip.left::before{left:13px;right:auto}
+  .help:hover .tip,.help:focus .tip,.help.on .tip{display:block}
+  .tip b{color:#ffe9a8;font-weight:700}
+
+  .bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .bar2{border-top:1px solid var(--line);padding-top:12px}
+  .inp,.sel{height:32px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px;color:var(--ink);background:#fff;outline:none}
+  .sel{appearance:none;-webkit-appearance:none;padding-right:26px;cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,#9aa0a6 50%),linear-gradient(135deg,#9aa0a6 50%,transparent 50%);
+    background-position:calc(100% - 14px) 14px,calc(100% - 9px) 14px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  .search-inp{width:230px}
+  .btn{height:32px;padding:0 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:#4b5158}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.primary:hover{background:var(--teal-d)}
+  .btn.primary:disabled,.btn.warnb:disabled{opacity:.5;cursor:not-allowed}
+  .btn.warnb{background:#fff;border-color:#e0c389;color:var(--amber)}
+  .btn.warnb:hover:not(:disabled){background:#fcf6e9}
+  /* 동기화 — 검색(teal 채움)과 구분되게 teal 아웃라인(배경 없음) */
+  .btn.sync{display:inline-flex;align-items:center;gap:7px;background:#fff;border-color:var(--teal);color:var(--teal-d)}
+  .btn.sync:hover:not(:disabled){background:var(--teal-soft)}
+  .btn.sync .spin{border-color:#cdeee8;border-top-color:var(--teal-d)}
+  .spin{width:13px;height:13px;border:2px solid #cdeee8;border-top-color:var(--teal-d);border-radius:50%;display:none;animation:sp .7s linear infinite}
+  .btn.sync.loading .spin{display:inline-block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .spacer{flex:1}
+  .synced{font-size:12px;color:var(--muted)}.synced b{color:var(--ink);font-weight:700;margin-left:3px}
+  .selinfo{font-size:12.5px;color:var(--muted)}.selinfo b{color:var(--ink)}
+  /* 변경 내용 보기 — 링크형(버튼 아님) */
+  .linkbtn{background:none;border:none;padding:0 2px;font-family:inherit;font-size:12.5px;font-weight:700;
+    color:var(--teal-d);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .linkbtn:hover{color:var(--teal)}
+  .linkbtn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:3px}
+
+  .tablewrap{border:1px solid var(--line);border-radius:8px;overflow:auto}
+  .tablewrap.scroll{max-height:432px}      /* 약 10행 노출 후 세로 스크롤 */
+  .rec .tablewrap.scroll{max-height:374px}  /* 반영 기록 약 8행 */
+  table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+  thead th{position:sticky;top:0;z-index:2;background:#f6f7f9;color:#5a6066;font-weight:700;text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid #eef0f2;color:#3a3f44}
+  tbody tr:hover{background:#fafbfc}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.c,th.c{text-align:center}
+  .name{font-weight:600}
+  .sub td{background:#fbfcfd}
+  .sub .name{font-weight:400;color:#5a6066}
+  .caret{display:inline-block;width:14px;cursor:pointer;color:#8a9099;user-select:none}
+  .nbadge{display:inline-block;font-size:10px;font-weight:800;background:var(--teal-soft);color:var(--teal-d);border:1px solid #cdeee8;border-radius:999px;padding:1px 7px;margin-left:6px}
+  .diff-pos{color:var(--blue);font-weight:700}.diff-neg{color:var(--red);font-weight:700}.diff-zero{color:var(--muted)}
+  .stb{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .st-done{background:#e2f3ee;color:#1d8a76}.st-rej{background:#f0eef6;color:#6f5fae}.st-fail{background:#fbe3e0;color:var(--red)}
+  .failrow td{background:#fef7f5}
+  .failreason{margin-top:3px;font-size:10.5px;color:var(--red);white-space:normal;max-width:200px}
+  .dim{color:#b3b8bd}
+  /* 재고 차이 사유 — 앱 제출 시 입력값(선택, 최대 30자). 미입력은 '-'. 안쪽 .rs-clamp에서 2줄 clamp */
+  .rs-cell{width:210px;vertical-align:middle}
+  .rs-clamp{color:#5a6066;line-height:1.4;white-space:normal;word-break:break-word;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  input[type=checkbox]{width:15px;height:15px;accent-color:var(--teal);cursor:pointer}
+
+  .rec{margin-top:0}
+  .rec-head{display:flex;align-items:baseline;gap:8px;margin:0 0 4px}
+  .rec h3{font-size:15px;font-weight:800;margin:0}
+  .rec .note{font-size:11.5px;color:var(--muted);margin:0 0 10px}
+  .rec .bar{margin-bottom:8px}
+  .date{height:32px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-size:12.5px;color:var(--ink);background:#fff;font-family:inherit}
+  .qbtn{height:32px;padding:0 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:#fff;color:#5a6066}
+  .qbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .dash{color:var(--muted)}
+  .cnt-b{font-size:12.5px;color:var(--muted)}.cnt-b b{color:var(--ink)}
+  .listhead{margin:0 0 6px}
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,19,13,.45);z-index:50;align-items:center;justify-content:center;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:12px;width:100%;max-width:460px;padding:24px;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  .modal.wide{max-width:960px;max-height:88vh;overflow:auto}
+  .modal h3{margin:0 0 10px;font-size:16.5px;font-weight:800}
+  .modal p{margin:0;font-size:13.5px;line-height:1.6;color:#5a6066}
+  .modal .cnt{margin-top:10px;font-size:13px;font-weight:700;color:var(--teal-d)}
+  .modal .err-ic{width:42px;height:42px;border-radius:50%;background:#fbe3e0;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;margin:0 0 12px}
+  .modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;font-size:13px;padding:11px 18px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="titlebar">
+    <span class="tb-mark"></span><span class="tb-title">재고운영</span>
+    <span class="tb-actions"><span>⚙</span><span>—</span><span>✕</span></span>
+  </div>
+  <nav class="tabs">
+    <span class="tab">재고현황</span><span class="tab on">실재고 관리</span><span class="tab">사용/판매 조회</span>
+    <span class="tab">거래관리</span><span class="tab">자동입고</span><span class="tab">입출고현황</span><span class="tab">거래처 관리</span>
+  </nav>
+  <div class="body">
+    <!-- 툴바: (좌) 전체 N건 중 선택 N건 · (우) 마지막 동기화 · 앱 데이터 동기화 · 재고 반영 · 변경 내용 보기 -->
+    <div class="bar">
+      <span class="cnt-b">전체 <b id="mainCnt">0</b>건 중 선택 <b id="selCnt">0</b>건</span>
+      <span class="spacer"></span>
+      <span class="synced" id="synced">마지막 동기화 <b>—</b></span>
+      <button class="btn sync" id="syncBtn"><span class="spin"></span>앱 데이터 동기화</button>
+      <span class="help" id="syncHelp" tabindex="0" role="button" aria-label="데이터 동기화 도움말">?<span class="tip left">
+        <b>재고운영 › 실재고 관리</b> 탭 진입 시 자동 동기화되며, <b>앱 데이터 동기화</b> 버튼으로 다시 불러올 수 있습니다. 다른 화면에 갔다 <b>1분 이내</b> 돌아오면 자동 동기화 없이 데이터를 유지합니다.<br>
+        동일 바코드로 여러 건이 제출된 경우 <b>바코드 기준으로 묶어</b> 표시되며, 묶음 안에서 <b>한 건만 선택</b>해 반영합니다.<br>
+        <b>0개</b>는 재고 없음, <b>-</b>는 수량 미입력을 의미합니다.<br>
+        반영/실패 결과는 <b>변경 내용 보기</b>에서 확인할 수 있습니다.
+      </span></span>
+      <button class="btn primary" id="applyBtn" disabled>재고 반영</button>
+      <button class="linkbtn" id="histBtn">변경 내용 보기</button>
+    </div>
+
+    <div class="tablewrap scroll">
+      <table>
+        <thead><tr>
+          <th class="c" style="width:34px"></th>
+          <th>상품명</th><th>바코드</th>
+          <th class="num">전산</th><th class="num">창고</th><th class="num">진열</th><th class="num">총 수량</th><th class="num">차이</th>
+          <th>입력자</th><th>재고 차이 사유</th><th>입력일시</th>
+        </tr></thead>
+        <tbody id="mainBody"></tbody>
+      </table>
+    </div>
+
+    <!-- 반영 기록은 '변경 내용 보기' 버튼 → 모달(#histModal)에서 확인 -->
+  </div>
+</div>
+
+<!-- 재고 반영 확인 모달 -->
+<div class="modal-bg" id="modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="mTitle"></h3>
+    <p id="mDesc"></p>
+    <p class="cnt">선택 <span id="mCnt">0</span>건</p>
+    <div class="modal-foot">
+      <button class="btn" id="mCancel">취소</button>
+      <button class="btn primary" id="mOk"></button>
+    </div>
+  </div>
+</div>
+
+<!-- 반영 실패(네트워크/서버 에러) 모달 -->
+<div class="modal-bg" id="errModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="err-ic">!</div>
+    <h3>재고 반영 실패</h3>
+    <p id="errDesc">에러로 인하여 반영 처리에 실패하였습니다. 다시 시도해 주세요.</p>
+    <div class="modal-foot">
+      <button class="btn primary" id="errOk">확인</button>
+    </div>
+  </div>
+</div>
+<!-- 변경 내용 보기(반영 기록) 모달 -->
+<div class="modal-bg" id="histModal">
+  <div class="modal wide" role="dialog" aria-modal="true">
+    <div class="rec">
+      <div class="rec-head">
+        <h3>변경 내용 보기</h3>
+        <span class="help" tabindex="0" role="button" aria-label="반영 기록 도움말">?<span class="tip left">
+          수량은 제출 당시 기준으로, 현재 재고와 다를 수 있습니다.<br>
+          <b>0개</b>는 재고 없음, <b>-</b>는 수량 미입력을 의미합니다.<br>
+          반영에 실패한 상품은 사유를 확인한 후 다시 반영해 주세요.
+        </span></span>
+      </div>
+      <p class="note">제출 시점 기준 값이라 현재 재고와 다를 수 있습니다.</p>
+      <div class="bar">
+        <input type="date" class="date" id="recFrom" />
+        <span class="dash">~</span>
+        <input type="date" class="date" id="recTo" />
+        <button class="qbtn on" data-m="1">1개월</button>
+        <button class="qbtn" data-m="3">3개월</button>
+        <button class="qbtn" data-m="6">6개월</button>
+        <button class="qbtn" data-m="0">전체</button>
+      </div>
+      <div class="bar">
+        <select class="sel" id="recKey"><option>상품명</option><option>바코드</option></select>
+        <input class="inp search-inp" id="recInp" placeholder="검색어를 입력해주세요" />
+        <select class="sel" id="recStatus">
+          <option value="all">처리결과 전체</option>
+          <option value="done">반영완료</option>
+          <option value="fail">반영실패</option>
+          <option value="rejected">반영반려</option>
+        </select>
+        <span class="cnt-b">조회 <b id="recCnt">0</b>건</span>
+      </div>
+      <div class="tablewrap scroll">
+        <table>
+          <thead><tr>
+            <th>처리일시</th><th>상품명</th><th>바코드</th>
+            <th class="num">전산</th><th class="num">창고</th><th class="num">진열</th><th class="num">총 수량</th><th class="num">차이</th>
+            <th>입력자</th><th>재고 차이 사유</th><th class="c">처리결과</th><th>처리자</th>
+          </tr></thead>
+          <tbody id="recBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn primary" id="histClose">확인</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var STM={done:['반영완료','st-done'],rejected:['반영반려','st-rej'],fail:['반영실패','st-fail']};
+  // 굿팜 약사님용앱 제출 실재고(서버 저장분) — 동기화로 불러온 데이터. 모두 '반영전' 상태(반영 대기 큐).
+  // kind: full=창고+진열, wh=창고만, disp=진열만, total=총 수량만 제출
+  var subs=[
+    {id:1,name:'한올트리메정',bc:'8806358',base:71,kind:'full', wh:40,  disp:18,  total:58, by:'김약사(A21)',rs:'정기 실사 중 진열·창고 실물 수량 차이 확인 후 정정', at:'2026-04-29 09:14'},
+    {id:2,name:'가나정 10mg',bc:'8801234',base:72,kind:'full', wh:50,  disp:40,  total:90, by:'김약사(A21)',rs:'',                 at:'2026-04-29 09:15'},
+    {id:3,name:'가나정 10mg',bc:'8801234',base:72,kind:'full', wh:55,  disp:38,  total:93, by:'김약사(A21)',rs:'파손 2개 폐기 처리',   at:'2026-04-29 10:02'},
+    {id:4,name:'다라캡슐',  bc:'8809876',base:0, kind:'wh',   wh:30,  disp:null,total:30, by:'김약사(A21)',rs:'입고 검수 중 수량 오차', at:'2026-04-29 09:20'},
+    {id:5,name:'바라정',    bc:'8802222',base:20,kind:'disp', wh:null,disp:25,  total:25, by:'김약사(A21)',rs:'',                 at:'2026-04-29 09:22'},
+    {id:6,name:'사아연고',  bc:'8807777',base:71,kind:'total',wh:null,disp:null,total:75, by:'김약사(A21)',rs:'유통기한 임박분 폐기', at:'2026-04-29 09:25',willFail:true}
+  ];
+  // 반영 기록 — 반영완료 / 반영실패 / 반영반려 3종. 수량은 모두 제출 시점 스냅샷. 실패 건은 reason 표시.
+  var records=[
+    {at:'2026-04-28 18:30',name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:55,by:'김약사(A21)',rs:'정기 실사 중 차이 확인', appBy:'정OO',st:'done'},
+    {at:'2026-04-28 17:11',name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',rs:'',                 appBy:'정OO',st:'rejected'},
+    {at:'2026-04-28 16:40',name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',rs:'파손 2개 폐기 처리',   appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'}
+  ];
+  var sel={};      // bc -> subId (그룹 내 1건만)
+  var expanded={}; // bc -> bool
+
+  var $=function(id){return document.getElementById(id)};
+  function n2(v){return (v===null||v===undefined)?'<span class="dim">-</span>':v}
+  function rsn(v){return (v&&(''+v).trim())?v:'<span class="dim">-</span>';}   // 재고 차이 사유 미입력은 '-'
+  function fmtNow(){var d=new Date();function p(n){return(n<10?'0':'')+n}
+    return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
+  function diffHtml(t,b){var d=t-b;return '<span class="diff-'+(d>0?'pos':d<0?'neg':'zero')+'">'+(d>0?'+':'')+d+'</span>'}
+
+  // 반영전(반영 대기) 건만 메인 목록에 노출
+  function groups(){
+    var byBc={};   // 검색 필드 제거 — 반영전 전체를 바코드로 묶어 노출
+    subs.forEach(function(s){
+      (byBc[s.bc]=byBc[s.bc]||[]).push(s);
+    });
+    // 묶음(다수 제출)은 최신 제출이 가장 위로 오도록 정렬(입력일시 desc)
+    Object.keys(byBc).forEach(function(bc){
+      byBc[bc].sort(function(a,b){return a.at<b.at?1:a.at>b.at?-1:b.id-a.id;});
+    });
+    return byBc;
+  }
+
+  function rowCells(s,isSub){
+    var sel1=(sel[s.bc]===s.id);
+    var chk='<input type="checkbox" class="pick" data-bc="'+s.bc+'" data-id="'+s.id+'" '+(sel1?'checked':'')+'>';
+    var nameCell=isSub
+      ? '<td class="name">└ 제출</td>'
+      : '<td class="name">'+s.name+'</td>';
+    return '<td class="c">'+chk+'</td>'+nameCell+'<td>'+s.bc+'</td>'+
+      '<td class="num">'+s.base+'</td><td class="num">'+n2(s.wh)+'</td><td class="num">'+n2(s.disp)+'</td>'+
+      '<td class="num">'+s.total+'</td><td class="num">'+diffHtml(s.total,s.base)+'</td>'+
+      '<td>'+s.by+'</td><td class="rs-cell" title="'+(s.rs||'')+'"><div class="rs-clamp">'+rsn(s.rs)+'</div></td><td>'+s.at+'</td>';
+  }
+
+  function renderMain(){
+    var g=groups(), body=$('mainBody'); body.innerHTML='';
+    var bcs=Object.keys(g);
+    if(!bcs.length){body.innerHTML='<tr><td colspan="11" style="text-align:center;color:#9aa0a6;padding:26px">반영할 제출 건이 없습니다.</td></tr>';updateBar();return;}
+    bcs.forEach(function(bc){
+      var arr=g[bc];
+      if(arr.length===1){
+        var s=arr[0],tr=document.createElement('tr');
+        tr.innerHTML=rowCells(s,false);body.appendChild(tr);
+      }else{
+        var open=!!expanded[bc],head=document.createElement('tr');
+        head.innerHTML='<td class="c"></td>'+
+          '<td class="name"><span class="caret" data-bc="'+bc+'">'+(open?'▾':'▸')+'</span>'+arr[0].name+'<span class="nbadge">제출 '+arr.length+'건</span></td>'+
+          '<td>'+bc+'</td><td class="num">'+arr[0].base+'</td>'+
+          '<td class="num dim" colspan="7">기본: 최신 제출 선택 · 묶음 내 1건만</td>';
+        body.appendChild(head);
+        if(open)arr.forEach(function(s){var tr=document.createElement('tr');tr.className='sub';tr.innerHTML=rowCells(s,true);body.appendChild(tr);});
+      }
+    });
+    bindRows();updateBar();
+  }
+
+  function bindRows(){
+    document.querySelectorAll('.caret').forEach(function(c){c.onclick=function(){var bc=c.getAttribute('data-bc');expanded[bc]=!expanded[bc];renderMain();};});
+    document.querySelectorAll('.pick').forEach(function(c){
+      c.onchange=function(){
+        var bc=c.getAttribute('data-bc'),id=+c.getAttribute('data-id');
+        if(c.checked){sel[bc]=id;}else{delete sel[bc];}
+        document.querySelectorAll('.pick[data-bc="'+bc+'"]').forEach(function(o){if(+o.getAttribute('data-id')!==id)o.checked=false;}); // 그룹 내 1건만
+        updateBar();
+      };
+    });
+  }
+  function find(id){for(var i=0;i<subs.length;i++)if(subs[i].id===id)return subs[i];}
+  function removeSub(id){for(var i=0;i<subs.length;i++)if(subs[i].id===id){subs.splice(i,1);return;}}
+  function selectedIds(){return Object.keys(sel).map(function(bc){return sel[bc]}).filter(function(id){return !!find(id)});}
+  function updateBar(){var n=selectedIds().length;$('selCnt').textContent=n;$('applyBtn').disabled=n===0;$('mainCnt').textContent=subs.length;}
+
+  // 동기화
+  var syncing=false;
+  function doSync(auto){
+    if(syncing)return;syncing=true;
+    var b=$('syncBtn');b.classList.add('loading');b.disabled=true;
+    setTimeout(function(){$('synced').innerHTML='마지막 동기화 <b>'+fmtNow()+'</b>';b.classList.remove('loading');b.disabled=false;syncing=false;if(!auto)toast('동기화 완료');},800);
+  }
+  $('syncBtn').onclick=function(){doSync(false)};
+
+  // 재고 반영 확인 모달
+  var modal=$('modal');
+  function openModal(){
+    var ids=selectedIds();
+    if(!ids.length){toast('선택한 제출 건이 없습니다.');return;}
+    $('mTitle').textContent='선택한 실재고를 전산상 재고에 반영하시겠습니까?';
+    $('mDesc').textContent='선택한 상품의 전산상 재고가 굿팜 약사님용앱 입력 총 수량으로 변경됩니다.';
+    $('mOk').textContent='재고 반영';$('mOk').className='btn primary';
+    $('mCnt').textContent=ids.length;modal.classList.add('open');
+  }
+  $('applyBtn').onclick=function(){openModal()};
+  $('mCancel').onclick=function(){modal.classList.remove('open')};
+  modal.onclick=function(e){if(e.target===modal)modal.classList.remove('open')};
+
+  $('mOk').onclick=function(){
+    var ids=selectedIds(),now=fmtNow(),admin='정OO',ok=0,failed=0;
+    ids.forEach(function(id){
+      var s=find(id),before=s.base;
+      if(s.willFail){
+        // 반영 실패 → 기록에는 '반영실패'로만 남고, 건은 반영전으로 유지(재고 반영부터 재시도)
+        records.unshift({at:now,name:s.name,bc:s.bc,wh:s.wh,disp:s.disp,total:s.total,before:before,by:s.by,rs:s.rs,appBy:admin,st:'fail',reason:'네트워크/서버 오류로 반영 실패'});
+        s.willFail=false;delete sel[s.bc];failed++;
+      }else{
+        // 반영완료(덮어쓰기) → 전산상 재고 = 총 수량, 메인에서 제거
+        s.base=s.total;
+        records.unshift({at:now,name:s.name,bc:s.bc,wh:s.wh,disp:s.disp,total:s.total,before:before,by:s.by,rs:s.rs,appBy:admin,st:'done'});
+        delete sel[s.bc];removeSub(id);ok++;
+      }
+    });
+    modal.classList.remove('open');renderMain();renderRec();
+    if(failed){ $('errModal').classList.add('open'); if(ok)toast(ok+'건 재고 반영 완료'); }
+    else { toast(ok+'건 재고 반영 완료'); }
+  };
+  $('errOk').onclick=function(){$('errModal').classList.remove('open');};
+  $('errModal').onclick=function(e){if(e.target===$('errModal'))$('errModal').classList.remove('open')};
+
+  // 변경 내용 보기(반영 기록) 모달
+  $('histBtn').onclick=function(){$('histModal').classList.add('open');renderRec();};
+  $('histClose').onclick=function(){$('histModal').classList.remove('open');};
+  $('histModal').onclick=function(e){if(e.target===$('histModal'))$('histModal').classList.remove('open')};
+
+  // 반영 기록 — 기간(데이터 피커) + 검색 + 처리결과 필터. 기본 최근 1개월(최근 확인 중심·로딩/스크롤 절감).
+  // 컬럼: 처리일시·상품명·바코드·전산(반영 전)·창고·진열·총 수량·차이(총-전산)·입력자·처리결과·처리자. 실패 건은 사유 표시.
+  function renderRec(){
+    var q=$('recInp').value.trim(),key=$('recKey').value,fs=$('recStatus').value,body=$('recBody');body.innerHTML='';
+    var from=$('recFrom').value,to=$('recTo').value;  // 'YYYY-MM-DD' (없으면 전체)
+    var rows=records.filter(function(r){
+      var d=r.at.slice(0,10);
+      if(from && d<from)return false;
+      if(to && d>to)return false;
+      if(fs!=='all' && r.st!==fs)return false;
+      if(!q)return true;var hay=key==='바코드'?r.bc:r.name;return hay.indexOf(q)>-1;});
+    $('recCnt').textContent=rows.length;
+    if(!rows.length){body.innerHTML='<tr><td colspan="12" style="text-align:center;color:#9aa0a6;padding:20px">조회 조건에 해당하는 기록이 없습니다. 기간을 넓혀 조회해 보세요.</td></tr>';return;}
+    rows.forEach(function(r){var st=STM[r.st];
+      var result='<span class="stb '+st[1]+'">'+st[0]+'</span>';   // 실패 사유(reason)는 화면에 노출하지 않음
+      body.insertAdjacentHTML('beforeend','<tr'+(r.st==='fail'?' class="failrow"':'')+'><td>'+r.at+'</td><td class="name">'+r.name+'</td><td>'+r.bc+'</td>'+
+        '<td class="num">'+r.before+'</td><td class="num">'+n2(r.wh)+'</td><td class="num">'+n2(r.disp)+'</td>'+
+        '<td class="num">'+r.total+'</td><td class="num">'+diffHtml(r.total,r.before)+'</td>'+
+        '<td>'+r.by+'</td><td class="rs-cell" title="'+(r.rs||'')+'"><div class="rs-clamp">'+rsn(r.rs)+'</div></td><td class="c">'+result+'</td><td>'+r.appBy+'</td></tr>');
+    });
+  }
+  // 날짜 유틸 + 빠른 기간 버튼
+  function ymd(d){function p(n){return(n<10?'0':'')+n}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+  function setRange(months){
+    var to=new Date();
+    if(months===0){$('recFrom').value='';$('recTo').value='';}     // 전체
+    else{var from=new Date();from.setMonth(from.getMonth()-months);$('recFrom').value=ymd(from);$('recTo').value=ymd(to);}
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.qbtn'),function(b){
+    b.onclick=function(){
+      document.querySelectorAll('.qbtn').forEach(function(o){o.classList.remove('on')});b.classList.add('on');
+      setRange(+b.getAttribute('data-m'));renderRec();
+    };
+  });
+  setRange(1);  // 기본 최근 1개월(최근 확인 중심·로딩/스크롤 절감)
+
+  $('recInp').oninput=renderRec;$('recKey').onchange=renderRec;$('recStatus').onchange=renderRec;
+  $('recFrom').onchange=function(){clearQ();renderRec()};$('recTo').onchange=function(){clearQ();renderRec()};
+  function clearQ(){document.querySelectorAll('.qbtn').forEach(function(o){o.classList.remove('on')});}
+
+  // 도움말 아이콘: hover(CSS) + 클릭 토글(터치/접근성). 바깥 클릭 시 닫힘.
+  document.querySelectorAll('.help').forEach(function(h){
+    h.addEventListener('click',function(e){e.stopPropagation();var on=h.classList.contains('on');
+      document.querySelectorAll('.help.on').forEach(function(o){o.classList.remove('on')});if(!on)h.classList.add('on');});
+    h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();h.classList.toggle('on');}});
+  });
+  document.addEventListener('click',function(){document.querySelectorAll('.help.on').forEach(function(h){h.classList.remove('on')});});
+
+  var toastEl=$('toast'),tt;
+  function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('show')},1800);}
+
+  function initSelection(){
+    var g=groups();
+    Object.keys(g).forEach(function(bc){
+      var arr=g[bc];
+      sel[bc]=arr[0].id;                 // 진입 시 기본: 최신 제출(상단) 선택(반영전 큐 기본 체크)
+      if(arr.length>1)expanded[bc]=true; // 묶음은 펼쳐서 선택 표시
+    });
+  }
+  doSync(true);initSelection();renderMain();renderRec();   // 탭 진입 시 자동 동기화 + 기본 선택
+})();
+</script>
+</body>
+</html>
