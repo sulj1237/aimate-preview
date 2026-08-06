@@ -96,6 +96,10 @@
   .failrow td{background:#fef7f5}
   .failreason{margin-top:3px;font-size:10.5px;color:var(--red);white-space:normal;max-width:200px}
   .dim{color:#b3b8bd}
+  /* 재고 차이 사유 — 앱 제출 시 입력값(선택, 최대 30자). 미입력은 '-'. 안쪽 .rs-clamp에서 2줄 clamp */
+  .rs-cell{width:210px;vertical-align:middle}
+  .rs-clamp{color:#5a6066;line-height:1.4;white-space:normal;word-break:break-word;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   input[type=checkbox]{width:15px;height:15px;accent-color:var(--teal);cursor:pointer}
 
   .rec{margin-top:0}
@@ -143,6 +147,7 @@
       <span class="help" id="syncHelp" tabindex="0" role="button" aria-label="데이터 동기화 도움말">?<span class="tip left">
         <b>재고운영 › 실재고 관리</b> 탭 진입 시 자동 동기화되며, <b>앱 데이터 동기화</b> 버튼으로 다시 불러올 수 있습니다. 다른 화면에 갔다 <b>1분 이내</b> 돌아오면 자동 동기화 없이 데이터를 유지합니다.<br>
         동일 바코드로 여러 건이 제출된 경우 <b>바코드 기준으로 묶어</b> 표시되며, 묶음 안에서 <b>한 건만 선택</b>해 반영합니다.<br>
+        <b>전산</b>(반영 전 재고)은 <b>앱 기준</b>(앱 제출 시점의 전산 재고)이라, 현재 재고와 다를 수 있습니다.<br>
         <b>0개</b>는 재고 없음, <b>-</b>는 수량 미입력을 의미합니다.<br>
         반영/실패 결과는 <b>변경 내용 보기</b>에서 확인할 수 있습니다.
       </span></span>
@@ -156,7 +161,7 @@
           <th class="c" style="width:34px"></th>
           <th>상품명</th><th>바코드</th>
           <th class="num">전산</th><th class="num">창고</th><th class="num">진열</th><th class="num">총 수량</th><th class="num">차이</th>
-          <th>입력자</th><th>입력일시</th>
+          <th>입력자</th><th>재고 차이 사유</th><th>입력일시</th>
         </tr></thead>
         <tbody id="mainBody"></tbody>
       </table>
@@ -197,12 +202,12 @@
       <div class="rec-head">
         <h3>변경 내용 보기</h3>
         <span class="help" tabindex="0" role="button" aria-label="반영 기록 도움말">?<span class="tip left">
-          수량은 제출 당시 기준으로, 현재 재고와 다를 수 있습니다.<br>
+          수량은 <b>앱 기준</b>(앱 제출 시점의 전산 재고) 값이라, 현재 재고와 다를 수 있습니다.<br>
           <b>0개</b>는 재고 없음, <b>-</b>는 수량 미입력을 의미합니다.<br>
           반영에 실패한 상품은 사유를 확인한 후 다시 반영해 주세요.
         </span></span>
       </div>
-      <p class="note">제출 시점 기준 값이라 현재 재고와 다를 수 있습니다.</p>
+      <p class="note">앱 기준(앱 제출 시점의 전산 재고) 값이라, 현재 재고와 다를 수 있습니다.</p>
       <div class="bar">
         <input type="date" class="date" id="recFrom" />
         <span class="dash">~</span>
@@ -228,7 +233,7 @@
           <thead><tr>
             <th>처리일시</th><th>상품명</th><th>바코드</th>
             <th class="num">전산</th><th class="num">창고</th><th class="num">진열</th><th class="num">총 수량</th><th class="num">차이</th>
-            <th>입력자</th><th class="c">처리결과</th><th>처리자</th>
+            <th>입력자</th><th>재고 차이 사유</th><th class="c">처리결과</th><th>처리자</th>
           </tr></thead>
           <tbody id="recBody"></tbody>
         </table>
@@ -247,24 +252,25 @@
   // 굿팜 약사님용앱 제출 실재고(서버 저장분) — 동기화로 불러온 데이터. 모두 '반영전' 상태(반영 대기 큐).
   // kind: full=창고+진열, wh=창고만, disp=진열만, total=총 수량만 제출
   var subs=[
-    {id:1,name:'한올트리메정',bc:'8806358',base:71,kind:'full', wh:40,  disp:18,  total:58, by:'김약사(A21)',at:'2026-04-29 09:14'},
-    {id:2,name:'가나정 10mg',bc:'8801234',base:72,kind:'full', wh:50,  disp:40,  total:90, by:'김약사(A21)',at:'2026-04-29 09:15'},
-    {id:3,name:'가나정 10mg',bc:'8801234',base:72,kind:'full', wh:55,  disp:38,  total:93, by:'김약사(A21)',at:'2026-04-29 10:02'},
-    {id:4,name:'다라캡슐',  bc:'8809876',base:0, kind:'wh',   wh:30,  disp:null,total:30, by:'김약사(A21)',at:'2026-04-29 09:20'},
-    {id:5,name:'바라정',    bc:'8802222',base:20,kind:'disp', wh:null,disp:25,  total:25, by:'김약사(A21)',at:'2026-04-29 09:22'},
-    {id:6,name:'사아연고',  bc:'8807777',base:71,kind:'total',wh:null,disp:null,total:75, by:'김약사(A21)',at:'2026-04-29 09:25',willFail:true}
+    {id:1,name:'한올트리메정',bc:'8806358',base:71,kind:'full', wh:40,  disp:18,  total:58, by:'김약사(A21)',rs:'정기 실사 중 진열·창고 실물 수량 차이 확인 후 정정', at:'2026-04-29 09:14'},
+    {id:2,name:'가나정 10mg',bc:'8801234',base:72,kind:'full', wh:50,  disp:40,  total:90, by:'김약사(A21)',rs:'',                 at:'2026-04-29 09:15'},
+    {id:3,name:'가나정 10mg',bc:'8801234',base:72,kind:'full', wh:55,  disp:38,  total:93, by:'김약사(A21)',rs:'파손 2개 폐기 처리',   at:'2026-04-29 10:02'},
+    {id:4,name:'다라캡슐',  bc:'8809876',base:0, kind:'wh',   wh:30,  disp:null,total:30, by:'김약사(A21)',rs:'입고 검수 중 수량 오차', at:'2026-04-29 09:20'},
+    {id:5,name:'바라정',    bc:'8802222',base:20,kind:'disp', wh:null,disp:25,  total:25, by:'김약사(A21)',rs:'',                 at:'2026-04-29 09:22'},
+    {id:6,name:'사아연고',  bc:'8807777',base:71,kind:'total',wh:null,disp:null,total:75, by:'김약사(A21)',rs:'유통기한 임박분 폐기', at:'2026-04-29 09:25',willFail:true}
   ];
   // 반영 기록 — 반영완료 / 반영실패 / 반영반려 3종. 수량은 모두 제출 시점 스냅샷. 실패 건은 reason 표시.
   var records=[
-    {at:'2026-04-28 18:30',name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:60,by:'김약사(A21)',appBy:'정OO',st:'done'},
-    {at:'2026-04-28 17:11',name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',appBy:'정OO',st:'rejected'},
-    {at:'2026-04-28 16:40',name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'}
+    {at:'2026-04-28 18:30',name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:55,by:'김약사(A21)',rs:'정기 실사 중 차이 확인', appBy:'정OO',st:'done'},
+    {at:'2026-04-28 17:11',name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',rs:'',                 appBy:'정OO',st:'rejected'},
+    {at:'2026-04-28 16:40',name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',rs:'파손 2개 폐기 처리',   appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'}
   ];
   var sel={};      // bc -> subId (그룹 내 1건만)
   var expanded={}; // bc -> bool
 
   var $=function(id){return document.getElementById(id)};
   function n2(v){return (v===null||v===undefined)?'<span class="dim">-</span>':v}
+  function rsn(v){return (v&&(''+v).trim())?v:'<span class="dim">-</span>';}   // 재고 차이 사유 미입력은 '-'
   function fmtNow(){var d=new Date();function p(n){return(n<10?'0':'')+n}
     return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
   function diffHtml(t,b){var d=t-b;return '<span class="diff-'+(d>0?'pos':d<0?'neg':'zero')+'">'+(d>0?'+':'')+d+'</span>'}
@@ -291,13 +297,13 @@
     return '<td class="c">'+chk+'</td>'+nameCell+'<td>'+s.bc+'</td>'+
       '<td class="num">'+s.base+'</td><td class="num">'+n2(s.wh)+'</td><td class="num">'+n2(s.disp)+'</td>'+
       '<td class="num">'+s.total+'</td><td class="num">'+diffHtml(s.total,s.base)+'</td>'+
-      '<td>'+s.by+'</td><td>'+s.at+'</td>';
+      '<td>'+s.by+'</td><td class="rs-cell" title="'+(s.rs||'')+'"><div class="rs-clamp">'+rsn(s.rs)+'</div></td><td>'+s.at+'</td>';
   }
 
   function renderMain(){
     var g=groups(), body=$('mainBody'); body.innerHTML='';
     var bcs=Object.keys(g);
-    if(!bcs.length){body.innerHTML='<tr><td colspan="10" style="text-align:center;color:#9aa0a6;padding:26px">반영할 제출 건이 없습니다.</td></tr>';updateBar();return;}
+    if(!bcs.length){body.innerHTML='<tr><td colspan="11" style="text-align:center;color:#9aa0a6;padding:26px">반영할 제출 건이 없습니다.</td></tr>';updateBar();return;}
     bcs.forEach(function(bc){
       var arr=g[bc];
       if(arr.length===1){
@@ -308,7 +314,7 @@
         head.innerHTML='<td class="c"></td>'+
           '<td class="name"><span class="caret" data-bc="'+bc+'">'+(open?'▾':'▸')+'</span>'+arr[0].name+'<span class="nbadge">제출 '+arr.length+'건</span></td>'+
           '<td>'+bc+'</td><td class="num">'+arr[0].base+'</td>'+
-          '<td class="num dim" colspan="6">기본: 최신 제출 선택 · 묶음 내 1건만</td>';
+          '<td class="num dim" colspan="7">기본: 최신 제출 선택 · 묶음 내 1건만</td>';
         body.appendChild(head);
         if(open)arr.forEach(function(s){var tr=document.createElement('tr');tr.className='sub';tr.innerHTML=rowCells(s,true);body.appendChild(tr);});
       }
@@ -361,12 +367,12 @@
       var s=find(id),before=s.base;
       if(s.willFail){
         // 반영 실패 → 기록에는 '반영실패'로만 남고, 건은 반영전으로 유지(재고 반영부터 재시도)
-        records.unshift({at:now,name:s.name,bc:s.bc,wh:s.wh,disp:s.disp,total:s.total,before:before,by:s.by,appBy:admin,st:'fail',reason:'네트워크/서버 오류로 반영 실패'});
+        records.unshift({at:now,name:s.name,bc:s.bc,wh:s.wh,disp:s.disp,total:s.total,before:before,by:s.by,rs:s.rs,appBy:admin,st:'fail',reason:'네트워크/서버 오류로 반영 실패'});
         s.willFail=false;delete sel[s.bc];failed++;
       }else{
         // 반영완료(덮어쓰기) → 전산상 재고 = 총 수량, 메인에서 제거
         s.base=s.total;
-        records.unshift({at:now,name:s.name,bc:s.bc,wh:s.wh,disp:s.disp,total:s.total,before:before,by:s.by,appBy:admin,st:'done'});
+        records.unshift({at:now,name:s.name,bc:s.bc,wh:s.wh,disp:s.disp,total:s.total,before:before,by:s.by,rs:s.rs,appBy:admin,st:'done'});
         delete sel[s.bc];removeSub(id);ok++;
       }
     });
@@ -394,13 +400,13 @@
       if(fs!=='all' && r.st!==fs)return false;
       if(!q)return true;var hay=key==='바코드'?r.bc:r.name;return hay.indexOf(q)>-1;});
     $('recCnt').textContent=rows.length;
-    if(!rows.length){body.innerHTML='<tr><td colspan="11" style="text-align:center;color:#9aa0a6;padding:20px">조회 조건에 해당하는 기록이 없습니다. 기간을 넓혀 조회해 보세요.</td></tr>';return;}
+    if(!rows.length){body.innerHTML='<tr><td colspan="12" style="text-align:center;color:#9aa0a6;padding:20px">조회 조건에 해당하는 기록이 없습니다. 기간을 넓혀 조회해 보세요.</td></tr>';return;}
     rows.forEach(function(r){var st=STM[r.st];
       var result='<span class="stb '+st[1]+'">'+st[0]+'</span>';   // 실패 사유(reason)는 화면에 노출하지 않음
       body.insertAdjacentHTML('beforeend','<tr'+(r.st==='fail'?' class="failrow"':'')+'><td>'+r.at+'</td><td class="name">'+r.name+'</td><td>'+r.bc+'</td>'+
         '<td class="num">'+r.before+'</td><td class="num">'+n2(r.wh)+'</td><td class="num">'+n2(r.disp)+'</td>'+
         '<td class="num">'+r.total+'</td><td class="num">'+diffHtml(r.total,r.before)+'</td>'+
-        '<td>'+r.by+'</td><td class="c">'+result+'</td><td>'+r.appBy+'</td></tr>');
+        '<td>'+r.by+'</td><td class="rs-cell" title="'+(r.rs||'')+'"><div class="rs-clamp">'+rsn(r.rs)+'</div></td><td class="c">'+result+'</td><td>'+r.appBy+'</td></tr>');
     });
   }
   // 날짜 유틸 + 빠른 기간 버튼

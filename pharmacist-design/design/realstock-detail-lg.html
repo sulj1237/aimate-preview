@@ -13,6 +13,8 @@
   .dchip{flex-shrink:0;padding:7px 12px;border-radius:99px;border:1px solid var(--g-300);background:#fff;
     font-family:inherit;font-size:12.5px;font-weight:600;color:var(--g-700);cursor:pointer;white-space:nowrap}
   .dchip.on{background:var(--g-900);border-color:var(--g-900);color:#fff}
+  /* 앱 기준 안내(한 줄) */
+  .dnote{margin:8px 2px 2px;font-size:12px;color:var(--g-500);line-height:1.5;letter-spacing:var(--tracking)}
   .drow{padding:14px 2px;border-bottom:1px solid var(--g-100);display:flex;gap:12px;align-items:flex-start}
   .drow .dl{flex:1;min-width:0}
   .dnm{font-size:14.5px;font-weight:600;color:var(--g-900);line-height:1.35;
@@ -22,6 +24,10 @@
   .dchg b{color:var(--brand-700);font-weight:700}
   .dchg .gray{color:var(--g-400)}
   .dmeta{font-size:11.5px;color:var(--g-500);margin-top:5px;line-height:1.45}
+  /* 재고 차이 사유 — 별도 행, 전체 노출(줄바꿈·자동 확장). 조회 전용 */
+  .drs{margin-top:6px;font-size:12px;line-height:1.5;color:var(--g-700)}
+  .drs .lb{font-weight:600;color:var(--g-500);margin-right:6px}
+  .drs .vv{white-space:normal;word-break:break-word}
   /* 반영 상태 — 배지 UI 대신 색으로만 표기 */
   .status{background:none;padding:0;border-radius:0;font-size:13px;font-weight:700}
   .status.wait{background:none;color:var(--g-500)}
@@ -41,11 +47,13 @@
   .searchbox input{font-size:29px}
   .dfilter{gap:8px;margin:16px 0 8px}
   .dchip{font-size:25px;padding:10px 16px}
+  .dnote{font-size:22px;margin:12px 2px 4px}
   .drow{padding:18px 2px;gap:14px}
   .dnm{font-size:29px;line-height:1.35}
   .dbc{font-size:24px;margin-top:4px}
   .dchg{font-size:26px;margin-top:9px}
   .dmeta{font-size:23px;margin-top:8px;line-height:1.5}
+  .drs{font-size:24px;margin-top:9px;line-height:1.5}
   .status{font-size:26px !important}
   .btn{height:66px;font-size:29px}
 </style>
@@ -75,13 +83,15 @@
         <button class="dchip">반영반려 1</button>
         <button class="dchip">반영전 1</button>
       </div>
+      <p class="dnote">반영 전·전산상 재고는 앱 조회 시점 기준(앱 기준)이에요.</p>
 
       <div class="drow">
         <div class="dl">
           <div class="dnm">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</div>
           <div class="dbc">8801234567890</div>
-          <div class="dchg">반영 전 48개 → <b>반영 후 24개</b></div>
+          <div class="dchg">반영 전(앱 기준) 48개 → <b>반영 후 24개</b></div>
           <div class="dmeta">A21 · 제출 10:31 · 처리 정OO</div>
+          <div class="drs"><span class="lb">재고 차이 사유</span><span class="vv">정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정</span></div>
         </div>
         <span class="status done">반영완료</span>
       </div>
@@ -89,7 +99,7 @@
         <div class="dl">
           <div class="dnm">판콜에이내복액 30ml</div>
           <div class="dbc">8806789012345</div>
-          <div class="dchg">반영 전 52개 → <b>반영 후 60개</b></div>
+          <div class="dchg">반영 전(앱 기준) 52개 → <b>반영 후 60개</b></div>
           <div class="dmeta">A21 · 제출 10:31 · 처리 정OO</div>
         </div>
         <span class="status done">반영완료</span>
@@ -98,8 +108,9 @@
         <div class="dl">
           <div class="dnm">겔포스엠현탁액</div>
           <div class="dbc">8803333000044</div>
-          <div class="dchg">전산상 재고 38개 <span class="gray">· 제출 40개</span></div>
+          <div class="dchg">전산상(앱 기준) 재고 38개 <span class="gray">· 제출 40개</span></div>
           <div class="dmeta">B07 · 제출 09:22 · 처리 정OO</div>
+          <div class="drs"><span class="lb">재고 차이 사유</span><span class="vv">입고 검수 중 수량 오차 발견</span></div>
         </div>
         <span class="status rej">반영반려</span>
       </div>
@@ -107,7 +118,7 @@
         <div class="dl">
           <div class="dnm">훼스탈플러스정</div>
           <div class="dbc">8801111000022</div>
-          <div class="dchg">전산상 재고 30개 <span class="gray">· 제출 30개</span></div>
+          <div class="dchg">전산상(앱 기준) 재고 30개 <span class="gray">· 제출 30개</span></div>
           <div class="dmeta">A21 · 제출 09:22</div>
         </div>
         <span class="status wait">반영전</span>

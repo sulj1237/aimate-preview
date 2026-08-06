@@ -20,6 +20,9 @@
     display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--g-300);color:var(--g-600)}
   .si-btn svg{width:14px;height:14px}
   .si-btn:active{background:var(--g-50)}
+  .si-rs{margin-top:7px;font-size:12.5px;line-height:1.45;display:flex;gap:7px;align-items:baseline;min-width:0}
+  .si-rs .lb{flex-shrink:0;font-weight:600;color:var(--g-500)}
+  .si-rs .vv{color:var(--g-700);font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .scrim{position:absolute;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;padding:28px;z-index:50}
   .scrim.show{display:flex}
   .modal{width:100%;max-width:300px;background:#fff;border-radius:16px;padding:24px 20px 18px;text-align:center;box-shadow:0 20px 50px -12px rgba(0,0,0,.35)}
@@ -71,12 +74,12 @@
 </div>
 <script>
   const ITEMS = [
-    { nm:"타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)", bc:"8801234567890", qy:24 },
-    { nm:"판콜에이내복액 30ml", bc:"8806789012345", qy:60 },
-    { nm:"겔포스엠현탁액", bc:"8803333000044", qy:40 },
-    { nm:"훼스탈플러스정", bc:"8801111000022", qy:30 },
-    { nm:"베아제정", bc:"8802222000033", qy:18 },
-    { nm:"우루사정", bc:"8808888000099", qy:25 },
+    { nm:"타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)", bc:"8801234567890", qy:24, rs:"정기 실사 중 차이 확인" },
+    { nm:"판콜에이내복액 30ml", bc:"8806789012345", qy:60, rs:"" },
+    { nm:"겔포스엠현탁액", bc:"8803333000044", qy:40, rs:"파손 2개 폐기 처리" },
+    { nm:"훼스탈플러스정", bc:"8801111000022", qy:30, rs:"" },
+    { nm:"베아제정", bc:"8802222000033", qy:18, rs:"유통기한 임박분 폐기" },
+    { nm:"우루사정", bc:"8808888000099", qy:25, rs:"" },
   ];
   const EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
   const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
@@ -84,9 +87,10 @@
     document.getElementById('list').innerHTML = ITEMS.map(function(it){
       return '<div class="sitem">'+
         '<div class="si-top"><div class="si-nm">'+it.nm+'</div><span class="si-qy num">'+it.qy+'<small>개</small></span></div>'+
+        (it.rs ? '<div class="si-rs"><span class="lb">재고 차이 사유</span><span class="vv" title="'+it.rs+'">'+it.rs+'</span></div>' : '')+
         '<div class="si-sub"><span class="si-bc">'+it.bc+'</span>'+
         '<span class="si-acts">'+
-        '<button class="si-btn" onclick="location.href=\'realstock-input.html\'">'+EDIT+'편집</button>'+
+        '<button class="si-btn" onclick="location.href=\'realstock-input.html?rs=\'+encodeURIComponent(it.rs||\'\')">'+EDIT+'편집</button>'+
         '<button class="si-btn" onclick="askDelete(this)">'+TRASH+'삭제</button>'+
         '</span></div></div>';
     }).join('');
