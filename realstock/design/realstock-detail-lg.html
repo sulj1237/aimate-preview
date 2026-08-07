@@ -13,8 +13,11 @@
   .dchip{flex-shrink:0;padding:7px 12px;border-radius:99px;border:1px solid var(--g-300);background:#fff;
     font-family:inherit;font-size:12.5px;font-weight:600;color:var(--g-700);cursor:pointer;white-space:nowrap}
   .dchip.on{background:var(--g-900);border-color:var(--g-900);color:#fff}
-  /* 앱 기준 안내(한 줄) */
-  .dnote{margin:8px 2px 2px;font-size:12px;color:var(--g-500);line-height:1.5;letter-spacing:var(--tracking)}
+  /* 참고 Info Banner */
+  .info-banner{margin:10px 2px 8px;padding:11px 13px 12px;background:var(--brand-50);border:1px solid var(--brand-100);border-radius:12px}
+  .info-banner .ihd{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:var(--brand-700);margin-bottom:5px}
+  .info-banner .ihd svg{width:15px;height:15px;flex:none}
+  .info-banner .bd{font-size:12.5px;line-height:1.6;color:var(--g-700);letter-spacing:var(--tracking)}
   .drow{padding:14px 2px;border-bottom:1px solid var(--g-100);display:flex;gap:12px;align-items:flex-start}
   .drow .dl{flex:1;min-width:0}
   .dnm{font-size:14.5px;font-weight:600;color:var(--g-900);line-height:1.35;
@@ -47,7 +50,10 @@
   .searchbox input{font-size:29px}
   .dfilter{gap:8px;margin:16px 0 8px}
   .dchip{font-size:25px;padding:10px 16px}
-  .dnote{font-size:22px;margin:12px 2px 4px}
+  .info-banner{margin:16px 2px 12px;padding:16px 18px 18px}
+  .info-banner .ihd{font-size:20px;margin-bottom:8px}
+  .info-banner .ihd svg{width:24px;height:24px}
+  .info-banner .bd{font-size:20px;line-height:1.6}
   .drow{padding:18px 2px;gap:14px}
   .dnm{font-size:29px;line-height:1.35}
   .dbc{font-size:24px;margin-top:4px}
@@ -83,13 +89,16 @@
         <button class="dchip">반영반려 1</button>
         <button class="dchip">반영전 1</button>
       </div>
-      <p class="dnote">반영 전·전산상 재고는 앱 조회 시점 기준(앱 기준)이에요.</p>
+      <div class="info-banner">
+        <div class="ihd"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>참고</div>
+        <div class="bd">반영 전, 전산상 재고는 앱에서 조회한 당시의 재고입니다. 현재 전산 재고와 다를 수 있습니다.</div>
+      </div>
 
       <div class="drow">
         <div class="dl">
           <div class="dnm">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</div>
           <div class="dbc">8801234567890</div>
-          <div class="dchg">반영 전(앱 기준) 48개 → <b>반영 후 24개</b></div>
+          <div class="dchg">반영 전 48개 → <b>반영 후 24개</b></div>
           <div class="dmeta">A21 · 제출 10:31 · 처리 정OO</div>
           <div class="drs"><span class="lb">재고 차이 사유</span><span class="vv">정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정</span></div>
         </div>
@@ -99,7 +108,7 @@
         <div class="dl">
           <div class="dnm">판콜에이내복액 30ml</div>
           <div class="dbc">8806789012345</div>
-          <div class="dchg">반영 전(앱 기준) 52개 → <b>반영 후 60개</b></div>
+          <div class="dchg">반영 전 52개 → <b>반영 후 60개</b></div>
           <div class="dmeta">A21 · 제출 10:31 · 처리 정OO</div>
         </div>
         <span class="status done">반영완료</span>
@@ -108,7 +117,7 @@
         <div class="dl">
           <div class="dnm">겔포스엠현탁액</div>
           <div class="dbc">8803333000044</div>
-          <div class="dchg">전산상(앱 기준) 재고 38개 <span class="gray">· 제출 40개</span></div>
+          <div class="dchg">전산상 재고 38개 <span class="gray">· 제출 40개</span></div>
           <div class="dmeta">B07 · 제출 09:22 · 처리 정OO</div>
           <div class="drs"><span class="lb">재고 차이 사유</span><span class="vv">입고 검수 중 수량 오차 발견</span></div>
         </div>
@@ -118,7 +127,7 @@
         <div class="dl">
           <div class="dnm">훼스탈플러스정</div>
           <div class="dbc">8801111000022</div>
-          <div class="dchg">전산상(앱 기준) 재고 30개 <span class="gray">· 제출 30개</span></div>
+          <div class="dchg">전산상 재고 30개 <span class="gray">· 제출 30개</span></div>
           <div class="dmeta">A21 · 제출 09:22</div>
         </div>
         <span class="status wait">반영전</span>

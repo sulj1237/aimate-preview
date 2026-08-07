@@ -16,7 +16,11 @@
   .appbar h1{font-size:calc(19px*var(--k))}
   .dt-head{margin-left:10px;font-size:calc(13px*var(--k));font-weight:700;color:var(--g-600);letter-spacing:var(--tracking);white-space:nowrap}
 
-  .dnote{margin:calc(9px*var(--k)) 2px calc(3px*var(--k));font-size:calc(12px*var(--k));color:var(--g-500);line-height:1.5;letter-spacing:var(--tracking)}
+  /* 참고 Info Banner */
+  .info-banner{margin:calc(9px*var(--k)) 2px calc(7px*var(--k));padding:calc(11px*var(--k)) calc(13px*var(--k)) calc(12px*var(--k));background:var(--brand-50);border:1px solid var(--brand-100);border-radius:12px}
+  .info-banner .ihd{display:flex;align-items:center;gap:5px;font-size:calc(12.5px*var(--k));font-weight:700;color:var(--brand-700);margin-bottom:calc(5px*var(--k))}
+  .info-banner .ihd svg{width:calc(15px*var(--k));height:calc(15px*var(--k));flex:none}
+  .info-banner .bd{font-size:calc(12.5px*var(--k));line-height:1.6;color:var(--g-700);letter-spacing:var(--tracking)}
   .dfilter{display:flex;gap:6px;margin:calc(10px*var(--k)) 0 calc(4px*var(--k));overflow-x:auto;padding-bottom:2px}
   .dchip{flex-shrink:0;padding:calc(6px*var(--k)) calc(11px*var(--k));border-radius:999px;border:1px solid var(--g-300);background:#fff;
     font-family:inherit;font-size:calc(12.5px*var(--k));font-weight:600;color:var(--g-700);white-space:nowrap}
@@ -79,13 +83,16 @@
         <button class="dchip">반영반려 1</button>
         <button class="dchip">반영전 1</button>
       </div>
-      <p class="dnote">반영 전·전산상 재고는 앱 조회 시점 기준(앱 기준)이에요.</p>
+      <div class="info-banner">
+        <div class="ihd"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>참고</div>
+        <div class="bd">반영 전, 전산상 재고는 앱에서 조회한 당시의 재고입니다. 현재 전산 재고와 다를 수 있습니다.</div>
+      </div>
 
       <details class="drow" open>
         <summary>
           <span class="stb done">반영완료</span>
           <div class="dnm">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</div>
-          <div class="dchg">반영 전(앱 기준) 48개 → <b>반영 후 24개</b></div>
+          <div class="dchg">반영 전 48개 → <b>반영 후 24개</b></div>
           <span class="more"><span class="txt"></span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></span>
         </summary>
         <div class="ddetail">
@@ -98,7 +105,7 @@
         <summary>
           <span class="stb done">반영완료</span>
           <div class="dnm">판콜에이내복액 30ml</div>
-          <div class="dchg">반영 전(앱 기준) 52개 → <b>반영 후 60개</b></div>
+          <div class="dchg">반영 전 52개 → <b>반영 후 60개</b></div>
           <span class="more"><span class="txt"></span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></span>
         </summary>
         <div class="ddetail">
@@ -110,7 +117,7 @@
         <summary>
           <span class="stb rej">반영반려</span>
           <div class="dnm">겔포스엠현탁액</div>
-          <div class="dchg">전산상(앱 기준) 재고 38개 <span class="gray">· 제출 40개</span></div>
+          <div class="dchg">전산상 재고 38개 <span class="gray">· 제출 40개</span></div>
           <span class="more"><span class="txt"></span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></span>
         </summary>
         <div class="ddetail">
@@ -123,7 +130,7 @@
         <summary>
           <span class="stb wait">반영전</span>
           <div class="dnm">훼스탈플러스정</div>
-          <div class="dchg">제출 <b>30개</b> <span class="gray">· 전산상(앱 기준) 재고 미제공</span></div>
+          <div class="dchg">제출 <b>30개</b> <span class="gray">· 전산상 재고 미제공</span></div>
           <span class="more"><span class="txt"></span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></span>
         </summary>
         <div class="ddetail">
