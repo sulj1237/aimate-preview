@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>실재고 입력 — UI 개선안 비교 (A · B · C)</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<style>
+  :root{
+    --brand:#0AB4AD; --brand-ink:#0a7c77; --brand-50:#e6f7f6;
+    --ink:#11201f; --sub:#5b6b6a; --line:#e5eae9; --bg:#f4f6f6; --card:#ffffff; --chip:#eef2f1; --chip-ink:#3f4f4e;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--ink:#e8efee;--sub:#9fb0ae;--line:#22302f;--bg:#0e1615;--card:#131e1d;--chip:#1c2a29;--chip-ink:#bcccca;--brand-50:#0f2422;}
+  }
+  :root[data-theme="light"]{--ink:#11201f;--sub:#5b6b6a;--line:#e5eae9;--bg:#f4f6f6;--card:#fff;--chip:#eef2f1;--chip-ink:#3f4f4e;--brand-50:#e6f7f6;}
+  :root[data-theme="dark"]{--ink:#e8efee;--sub:#9fb0ae;--line:#22302f;--bg:#0e1615;--card:#131e1d;--chip:#1c2a29;--chip-ink:#bcccca;--brand-50:#0f2422;}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:Pretendard,-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);letter-spacing:-.01em;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  header{max-width:1200px;margin:0 auto;padding:52px 24px 26px}
+  .eyebrow{display:inline-block;font-size:12.5px;font-weight:700;color:var(--brand);background:var(--brand-50);padding:5px 11px;border-radius:999px;letter-spacing:.04em;margin-bottom:15px}
+  h1{font-size:clamp(25px,4.2vw,36px);font-weight:800;margin:0 0 11px;letter-spacing:-.03em;text-wrap:balance}
+  .desc{font-size:15px;color:var(--sub);max-width:680px;margin:0}
+  .desc b{color:var(--ink)}
+
+  main{max-width:1200px;margin:0 auto;padding:8px 24px 80px}
+  .sec{margin-top:42px}
+  .sec-h{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:5px}
+  .sec-h h2{font-size:20px;font-weight:800;margin:0;letter-spacing:-.02em}
+  .pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .pill.rec{background:var(--brand);color:#fff}
+  .pill.now{background:var(--chip);color:var(--chip-ink);border:1px solid var(--line)}
+  .pill.alt{background:var(--chip);color:var(--chip-ink);border:1px solid var(--line)}
+  .sec-sub{font-size:13.5px;color:var(--sub);margin:0 0 18px;max-width:820px}
+  .sec-sub b{color:var(--ink)}
+
+  .grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  figcaption{padding:12px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  figcaption .nm{font-size:13.5px;font-weight:700}
+  figcaption .sm{font-size:12px;color:var(--sub);font-weight:500}
+  figcaption .star{margin-left:auto;font-size:11px;font-weight:700;color:#fff;background:var(--brand);padding:3px 8px;border-radius:6px}
+  .frame{background:#fff;overflow:auto;height:880px}
+  iframe{border:0;display:block;background:#fff;width:100%;height:100%}
+
+  footer{max-width:1200px;margin:0 auto;padding:0 24px 60px;color:var(--sub);font-size:12.5px}
+  .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;line-height:1.8}
+  .note b{color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <span class="eyebrow">굿팜 약사님용앱 · 실재고 입력 UI 개선안</span>
+  <h1>실재고 입력 — UI 개선안 비교</h1>
+  <p class="desc">약국에서 실재고를 빠르게 입력하는 ‘실재고 입력’ 화면의 <b>현행(A)</b>과 재설계 <b>시안 B·C</b>, 그리고 도출 과정에서 검토한 <b>탐색안(시안 1·2·3)</b>을 한곳에 모았습니다. 모두 실제 동작하는 프로토타입이라 숫자 키패드로 직접 입력해 볼 수 있어요.</p>
+</header>
+
+<main>
+  <!-- 현행 A -->
+  <section class="sec">
+    <div class="sec-h"><h2>A · 현행</h2><span class="pill now">배포본</span></div>
+    <p class="sec-sub">현재 배포된 화면. 상품 정보(라벨–값) + 진열/창고 카드 + 재고 차이 사유 + 총 수량(키패드 위). ‘앱 조회 시점 재고’·‘앱 동기화’ 표기 반영.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">A · 현행</span><span class="sm">기본</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input.html"></iframe></div></figure>
+    </div>
+  </section>
+
+  <!-- 시안 B -->
+  <section class="sec">
+    <div class="sec-h"><h2>B · 세그먼트 단일 포커스</h2><span class="pill rec">재설계</span></div>
+    <p class="sec-sub">세그먼트로 진열/창고를 전환하며 <b>한 번에 한 필드만 큰 숫자</b>로 입력(토스식) · 총 수량 상시 강조 · 재고 차이 사유는 Bottom Sheet. 큰 글씨(200%)에서도 잘림 최소.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">B · 세그먼트</span><span class="sm">기본</span><span class="star">추천</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-b.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">B · 세그먼트</span><span class="sm">큰글씨 200%</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-b-lg.html"></iframe></div></figure>
+    </div>
+  </section>
+
+  <!-- 시안 C -->
+  <section class="sec">
+    <div class="sec-h"><h2>C · 계산기 + 정보 집중</h2><span class="pill rec">재설계</span></div>
+    <p class="sec-sub">상단 상품 정보는 세로·여백(‘앱 조회 시점 재고’·‘조회 시각’ side 정렬) · 진열/창고 2카드 · <b>총 수량은 키패드에 붙여 고정</b> · 재고 차이 사유는 화면(스크롤)에 카드로. 정보 밀도↓·숫자 우선.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">C · 계산기+정보집중</span><span class="sm">기본</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-c.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">C · 계산기+정보집중</span><span class="sm">큰글씨 200%</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-c-lg.html"></iframe></div></figure>
+    </div>
+  </section>
+
+  <!-- 초기 탐색안 -->
+  <section class="sec">
+    <div class="sec-h"><h2>초기 탐색안</h2><span class="pill alt">참고</span></div>
+    <p class="sec-sub">B·C 도출 과정에서 검토한 3가지 입력 패러다임입니다.</p>
+    <div class="grid">
+      <figure><figcaption><span class="nm">시안 1 · 트리플 셀</span><span class="sm">진열·창고·총 병렬</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-b1.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">시안 2 · 계산기</span><span class="sm">총 수량 대형</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-b2.html"></iframe></div></figure>
+      <figure><figcaption><span class="nm">시안 3 · 세그먼트</span><span class="sm">B안의 원형</span></figcaption><div class="frame"><iframe loading="lazy" src="design/realstock-input-b3.html"></iframe></div></figure>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="note">
+    <b>안내</b> · 입력값(진열 86 · 창고 63)·재고 차이 사유는 <b>데모 데이터</b>입니다. · A(현행)는 배포 확정본이고, B·C는 <b>재설계 검토안</b>입니다 — 확정 시 반영합니다. · 문의는 기획팀으로 주세요.
+  </div>
+</footer>
+</body>
+</html>
