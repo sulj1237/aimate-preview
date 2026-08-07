@@ -49,12 +49,11 @@
   .m-title{margin:0 0 12px;font-size:21px;font-weight:700;color:var(--g-900);letter-spacing:-0.02em;line-height:1.35}
   .m-body{margin:0;font-size:15.5px;font-weight:500;color:var(--g-600);line-height:1.6;letter-spacing:-0.01em}
 
-  /* 스캔한 바코드 — 유지·강조 */
-  .m-bc{margin:18px 0 0;display:flex;align-items:center;gap:10px;background:var(--brand-50);border-radius:12px;padding:13px 14px}
-  .m-bc .ic{color:var(--brand-600);display:grid;place-items:center;flex-shrink:0}
-  .m-bc .lb{font-size:12.5px;font-weight:600;color:var(--brand-700);flex-shrink:0}
-  .m-bc .no{margin-left:auto;font-size:16px;font-weight:800;color:var(--g-900);letter-spacing:.02em;
-    font-feature-settings:"tnum" 1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 스캔한 바코드 — 유지·강조. 라벨 위 / 번호 아래(전체 폭) → 번호 절대 잘리지 않음 */
+  .m-bc{margin:18px 0 0;display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--brand-50);border-radius:12px;padding:12px 15px}
+  .m-bc .lb{font-size:12px;font-weight:600;color:var(--brand-700)}
+  .m-bc .no{font-size:18px;font-weight:800;color:var(--g-900);letter-spacing:.04em;
+    font-feature-settings:"tnum" 1;white-space:nowrap}
 
   /* 버튼영역(2버튼) */
   .m-acts{display:flex;gap:10px;margin-top:22px}

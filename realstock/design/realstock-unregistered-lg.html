@@ -48,12 +48,11 @@
   .m-title{margin:0 0 14px;font-size:28px;font-weight:700;color:var(--g-900);letter-spacing:-0.02em;line-height:1.32}
   .m-body{margin:0;font-size:20px;font-weight:500;color:var(--g-600);line-height:1.55;letter-spacing:-0.01em}
 
-  .m-bc{margin:22px 0 0;display:flex;align-items:center;gap:12px;background:var(--brand-50);border-radius:14px;padding:16px 18px}
-  .m-bc .ic{color:var(--brand-600);display:grid;place-items:center;flex-shrink:0}
-  .m-bc .ic svg{width:23px;height:23px}
-  .m-bc .lb{font-size:16px;font-weight:600;color:var(--brand-700);flex-shrink:0}
-  .m-bc .no{margin-left:auto;font-size:22px;font-weight:800;color:var(--g-900);letter-spacing:.02em;
-    font-feature-settings:"tnum" 1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 스캔한 바코드 — 라벨 위 / 번호 아래(전체 폭) → 큰 글씨에서도 번호 안 잘림 */
+  .m-bc{margin:22px 0 0;display:flex;flex-direction:column;align-items:flex-start;gap:5px;background:var(--brand-50);border-radius:14px;padding:15px 18px}
+  .m-bc .lb{font-size:16px;font-weight:600;color:var(--brand-700)}
+  .m-bc .no{font-size:24px;font-weight:800;color:var(--g-900);letter-spacing:.04em;
+    font-feature-settings:"tnum" 1;white-space:nowrap}
 
   .m-acts{display:flex;gap:12px;margin-top:26px}
   .m-acts .btn{flex:1;height:64px;border-radius:14px;border:0;cursor:pointer;font-family:inherit;
