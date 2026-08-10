@@ -542,17 +542,20 @@
   $('waitModal').onclick=function(e){if(e.target===$('waitModal'))closeWait();};
 
   // ④ 변경 내용 보기 — 이전 상품 정보 수정 반영 기록(실재고 관리 '변경 내용 보기'와 동일 성격)
-  //   검색 카테고리: 상품명·제조사·바코드 / 기간(캘린더+빠른선택) / 처리결과(반영완료·반영실패). 시안 B는 반려 없음 → 반영반려 제외.
+  //   검색 카테고리: 상품명·제조사·바코드 / 기간(캘린더+빠른선택) / 처리결과(반영완료·반영반려). 시안 B는 반려 개념 사용.
+  //   ※ 날짜는 '오늘 기준 상대일'로 생성 → 언제 열어도 기본 1개월 범위에 데이터가 보인다(고정 날짜의 범위 이탈 방지).
   var CGST={done:['반영완료','st-done'],rej:['반영반려','st-rej']};
+  function rDate(days,hh,mm){var d=new Date();d.setDate(d.getDate()-days);var p=function(x){return(x<10?'0':'')+x;};
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(hh)+':'+p(mm);}
   var applied=[
-    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'판매가',   before:'4,300원',      after:'4,500원',            by:'김약사(A21)', st:'done', appBy:'정OO'},
-    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'중분류',   before:'일반의약품',   after:'의약외품',           by:'김약사(A21)', st:'done', appBy:'정OO'},
-    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'위치',     before:'A-2',          after:'A-3',                by:'김약사(A21)', st:'done', appBy:'정OO'},
-    {at:'2026-08-07 16:41', nm:'베아제정',            mfr:'대웅제약',  bc:'8802223000011', f:'위치',     before:'B-1',          after:'B-4',                by:'박직원(C15)', st:'done', appBy:'정OO'},
-    {at:'2026-08-07 09:05', nm:'훼스탈플러스정',       mfr:'한독',      bc:'8801111000022', f:'제조업체', before:'-',            after:'한독',               by:'이약사(B07)', st:'rej',  appBy:'정OO'},
-    {at:'2026-08-05 14:12', nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'상품명',   before:'판콜에이 30ml', after:'판콜에이내복액 30ml', by:'이약사(B07)', st:'done', appBy:'정OO'},
-    {at:'2026-08-05 14:12', nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'판매가',   before:'2,800원',      after:'3,000원',            by:'이약사(B07)', st:'done', appBy:'정OO'},
-    {at:'2026-06-20 11:30', nm:'우루사정 100mg',       mfr:'대웅제약',  bc:'8808888000099', f:'판매가',   before:'7,800원',      after:'8,000원',            by:'김약사(A21)', st:'done', appBy:'정OO'}
+    {at:rDate(2,10,22),  nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'판매가',   before:'4,300원',      after:'4,500원',            by:'김약사(A21)', st:'done', appBy:'정OO'},
+    {at:rDate(2,10,22),  nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'중분류',   before:'일반의약품',   after:'의약외품',           by:'김약사(A21)', st:'done', appBy:'정OO'},
+    {at:rDate(2,10,22),  nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'위치',     before:'A-2',          after:'A-3',                by:'김약사(A21)', st:'done', appBy:'정OO'},
+    {at:rDate(3,16,41),  nm:'베아제정',            mfr:'대웅제약',  bc:'8802223000011', f:'위치',     before:'B-1',          after:'B-4',                by:'박직원(C15)', st:'done', appBy:'정OO'},
+    {at:rDate(3,9,5),    nm:'훼스탈플러스정',       mfr:'한독',      bc:'8801111000022', f:'제조업체', before:'-',            after:'한독',               by:'이약사(B07)', st:'rej',  appBy:'정OO'},
+    {at:rDate(5,14,12),  nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'상품명',   before:'판콜에이 30ml', after:'판콜에이내복액 30ml', by:'이약사(B07)', st:'done', appBy:'정OO'},
+    {at:rDate(5,14,12),  nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'판매가',   before:'2,800원',      after:'3,000원',            by:'이약사(B07)', st:'done', appBy:'정OO'},
+    {at:rDate(50,11,30), nm:'우루사정 100mg',       mfr:'대웅제약',  bc:'8808888000099', f:'판매가',   before:'7,800원',      after:'8,000원',            by:'김약사(A21)', st:'done', appBy:'정OO'}
   ];
   function ymd(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(day<10?'0'+day:day);}
   function cgSetRange(months){

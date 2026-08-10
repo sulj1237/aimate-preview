@@ -260,11 +260,14 @@
     {id:6,name:'사아연고',  bc:'8807777',base:71,kind:'total',wh:null,disp:null,total:75, by:'김약사(A21)',rs:'유통기한 임박분 폐기', at:'2026-04-29 09:25',willFail:true}
   ];
   // 반영 기록 — 반영완료 / 반영실패 / 반영반려 3종. 수량은 모두 제출 시점 스냅샷. 실패 건은 reason 표시.
+  // ※ 날짜는 '오늘 기준 상대일'로 생성 → 언제 열어도 기본 1개월 범위에 반영 기록이 보인다(고정 날짜의 범위 이탈 방지).
+  function rDate(days,hh,mm){var d=new Date();d.setDate(d.getDate()-days);var p=function(x){return(x<10?'0':'')+x;};
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(hh)+':'+p(mm);}
   var records=[
-    {at:'2026-08-08 18:30',name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:55,by:'김약사(A21)',rs:'정기 실사 중 차이 확인', appBy:'정OO',st:'done'},
-    {at:'2026-08-07 17:11',name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',rs:'',                 appBy:'정OO',st:'rejected'},
-    {at:'2026-08-06 16:40',name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',rs:'파손 2개 폐기 처리',   appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'},
-    {at:'2026-08-04 11:05',name:'가나정 10mg',bc:'8801234',wh:55,  disp:38,  total:93,before:72,by:'김약사(A21)',rs:'입고 검수 중 수량 오차', appBy:'정OO',st:'done'}
+    {at:rDate(2,18,30),name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:55,by:'김약사(A21)',rs:'정기 실사 중 차이 확인', appBy:'정OO',st:'done'},
+    {at:rDate(3,17,11),name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',rs:'',                 appBy:'정OO',st:'rejected'},
+    {at:rDate(4,16,40),name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',rs:'파손 2개 폐기 처리',   appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'},
+    {at:rDate(6,11,5),name:'가나정 10mg',bc:'8801234',wh:55,  disp:38,  total:93,before:72,by:'김약사(A21)',rs:'입고 검수 중 수량 오차', appBy:'정OO',st:'done'}
   ];
   var sel={};      // bc -> subId (그룹 내 1건만)
   var expanded={}; // bc -> bool
