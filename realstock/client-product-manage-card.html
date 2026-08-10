@@ -37,7 +37,6 @@
   .btn.teal:hover{background:var(--teal-d)}
   .btn.line{background:#fff}
   .btn.sm{height:26px;padding:0 9px;font-size:11.5px}
-  .btn:disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.25)}
   .btn.red{border-color:#ecc7c2;color:var(--red)}
   .btn .spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:none;animation:sp .7s linear infinite}
   .btn.loading .spin{display:inline-block}
@@ -52,61 +51,33 @@
     background:#ee4a3a;color:#fff;font-size:10.5px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;
     box-shadow:0 0 0 2px #fff}
 
-  /* 앱 상품 수정 요청 — 기기(Device ID)별 묶음 아코디언 + Compact List */
+  /* 앱 수정 대기목록 — 카드형(POS 판매 저장목록 UX 참고) */
   .wl{display:flex;flex-direction:column;gap:12px}
   .wl-empty{padding:44px 0;text-align:center;color:#9aa0a6}
-  /* 기기 그룹 = 상위 폴더(장바구니). Grouping Key = Device ID */
-  .wg{border:1px solid #e2e6ea;border-radius:12px;background:#fff;overflow:hidden}
-  .wg.open{border-color:#d0d5da}
-  .wg-h{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:#f7f9fa;border:none;cursor:pointer;text-align:left;font:inherit}
-  .wg-h:hover{background:#f1f4f6}
-  .wg-chev{flex:none;color:#8a9099;font-size:11px;transition:transform .15s;display:inline-block}
-  .wg.open .wg-chev{transform:rotate(90deg)}
-  .wg-icon{flex:none;width:22px;height:22px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:12px}
-  /* 색상만으로 구분하지 않도록 사용자명 + Device ID(Label) 병기 */
-  .wg-id{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:#28303a}
-  .wg-id b{font-weight:800}
-  .wg-dev{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 7px}
-  .wg-cnt{font-size:12px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:2px 10px}
-  .wg-time{margin-left:auto;font-size:11.5px;color:#8a9099;white-space:nowrap}
-  .wg-b{display:none;padding:12px 14px 14px}
-  .wg.open .wg-b{display:block}
-  .wg-tools{display:flex;align-items:center;gap:10px;padding:0 2px 10px;border-bottom:1px solid #eef0f3;margin-bottom:8px}
-  .wg-tools .selall{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#4b5158;cursor:pointer}
-  .wg-tools .selall input{width:16px;height:16px;cursor:pointer}
-  .wg-selcnt{margin-left:auto;font-size:11.5px;color:#6b7178}.wg-selcnt b{color:var(--teal-d);font-weight:800}
-  /* Compact List item = 내부 Item(상품 수정 요청) */
-  .wi{border-radius:8px;border:1px solid transparent}
-  .wi+.wi{margin-top:2px}
-  .wi.sel{background:var(--teal-soft);border-color:#cdeee8}
-  .wi-row{display:flex;align-items:center;gap:12px;padding:9px 10px}
-  .wi-ck{flex:none;display:inline-flex}
-  .wi-ck input{width:16px;height:16px;cursor:pointer}
-  .wi-main{flex:1;min-width:0}
-  .wi-nm{font-size:13px;font-weight:700;color:#28303a}
-  .wi-bc{font-size:11px;color:#9aa0a6;font-family:ui-monospace,Menlo,monospace;margin-top:2px}
-  .wi-sum{display:inline-block;font-size:11.5px;color:var(--teal-d);font-weight:700;background:#fff;border:1px solid #cdeee8;border-radius:6px;padding:2px 8px;margin-top:5px}
-  /* 등록(신규)만 하는 케이스 — 수정과 구분(amber) */
-  .wi-sum.reg{color:var(--amber);background:#fbeecb;border-color:#f0dca6}
-  .regtag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--amber);border-radius:5px;padding:2px 6px;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
-  .wi-detail-btn,.wi-del{flex:none}
-  /* 상세 내용 — 오른쪽 서브 모달(드로어) */
-  .drawer-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.32);z-index:90}
-  .drawer-bg.open{display:block}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:400px;max-width:88vw;background:#fff;z-index:91;
-    transform:translateX(100%);transition:transform .24s ease;display:flex;flex-direction:column;box-shadow:-24px 0 60px -30px rgba(0,0,0,.5)}
-  .drawer.open{transform:translateX(0)}
-  .drawer-h{display:flex;align-items:flex-start;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
-  .dw-tt{flex:1;min-width:0}
-  .dw-nm{font-size:15px;font-weight:800;color:#28303a}
-  .dw-bc{font-size:11.5px;color:#9aa0a6;font-family:ui-monospace,Menlo,monospace;margin-top:3px}
-  .dw-type{display:inline-block;margin-top:8px;font-size:11px;font-weight:800;border-radius:6px;padding:2px 9px}
-  .dw-type.mod{color:var(--teal-d);background:var(--teal-soft)}
-  .dw-type.reg{color:var(--amber);background:#fbeecb}
-  .drawer-h .x{border:none;background:none;font-size:18px;color:var(--muted);cursor:pointer;flex:none;line-height:1}
-  .drawer-b{padding:14px 18px;overflow:auto}
-  /* 푸터 — (좌) 선택 건수 · (우) 닫기/선택 반영 */
-  .f-selcnt{margin-right:auto;font-size:12.5px;color:#6b7178;align-self:center}.f-selcnt b{color:var(--teal-d);font-weight:800}
+  /* 상단 툴바 — 전체선택 · 선택 건수 · (우측) 반영/반려 일괄 */
+  .wl-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .wl-bar .selall{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#4b5158;cursor:pointer}
+  .wl-cnt{font-size:12px;color:#6b7178}.wl-cnt b{color:var(--teal-d)}
+  .wl-bulk{margin-left:auto;display:flex;gap:8px}
+  .wcard{border:1px solid #e6e9ed;border-radius:12px;background:#fff;overflow:hidden}
+  .wcard.sel{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset}
+  .wcard-h{display:flex;align-items:flex-start;gap:14px;padding:16px 18px}
+  .wc-ck{flex:none;padding-top:2px}
+  .wc-ck input{width:17px;height:17px;cursor:pointer}
+  .wc-main{flex:1;min-width:0}
+  .wc-nm{font-size:15px;font-weight:800;color:#28303a;letter-spacing:-.01em}
+  .wc-bc{font-size:12px;color:#8a9099;font-family:ui-monospace,Menlo,monospace;margin-top:4px}
+  .wc-sum{display:inline-block;font-size:12px;color:var(--teal-d);font-weight:800;background:var(--teal-soft);border-radius:6px;padding:3px 9px;margin-top:9px}
+  /* 상품 등록(신규)만 하는 케이스 — 수정과 구분(amber) */
+  .wc-sum.reg{color:var(--amber);background:#fbeecb}
+  .regtag{display:inline-block;font-size:10.5px;font-weight:800;color:#fff;background:var(--amber);border-radius:5px;padding:2px 7px;margin-right:7px;vertical-align:2px;letter-spacing:.02em}
+  .wc-meta{font-size:11.5px;color:#8a9099;margin-top:9px;display:flex;flex-wrap:wrap;gap:3px 12px;align-items:center}
+  .wc-acts{display:flex;flex-direction:column;gap:6px;flex:none;min-width:104px}
+  .wc-acts .btn{justify-content:center}
+  .wcard.open .togg{background:var(--ink);border-color:var(--ink);color:#fff}
+  /* 변경 내용 보기(아코디언) — 현재값 ↔ 앱 제출값 비교(조회 전용) */
+  .wc-detail{display:none;border-top:1px solid #eef0f3;background:#fafbfc;padding:6px 16px 12px}
+  .wcard.open .wc-detail{display:block}
   .cmp{width:100%;border-collapse:collapse;font-size:12px}
   .cmp th{text-align:left;color:#8a9099;font-weight:700;padding:8px 10px 6px;border-bottom:1px solid #e3e6ea;white-space:nowrap}
   .cmp th.c{width:26px;text-align:center}
@@ -230,12 +201,12 @@
         <label><input type="checkbox" checked /> 사용 약품만 조회</label>
         <label><input type="checkbox" checked /> 재고 0이상 조회</label>
       </div>
-      <!-- 그 밑: (왼쪽) 상품 데이터 올리기 · 마지막 동기화 일시 · (오른쪽) 앱 데이터 동기화 버튼 -->
+      <!-- 그 밑: (왼쪽) 상품 데이터 올리기 · (오른쪽) 마지막 동기화 일시 + 앱 데이터 동기화 버튼 -->
       <div class="sync-row">
         <button class="btn teal sm" id="uploadBtn"><span class="spin"></span>상품 데이터 올리기</button>
         <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/반려할 수 있습니다.</span></span>
-        <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
         <span class="spacer"></span>
+        <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
         <button class="btn sync sm" id="syncBtn">앱 데이터 동기화<span class="badge-n" id="syncBadge">3</span></button>
         <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 수정한 상품 정보를 <b>앱 상품 수정 요청</b>에서 확인해 반영/반려합니다. 미처리 건수가 배지로 표시됩니다.</span></span>
       </div>
@@ -335,29 +306,24 @@
 <div class="modal-bg" id="waitModal">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:720px">
     <div class="modal-h">
-      <div class="mtitle">앱 상품 수정 요청
-        <span class="help" id="wlHelp" tabindex="0">i<span class="tip">기기(Device ID) 단위로 앱에서 제출한 상품 수정 요청을 묶어 보여줍니다. 상품을 선택해 <b>선택 반영</b> 또는 <b>선택 반려</b>하세요. 동일 상품은 최신 요청 1건만 노출되고, 처리 결과는 <b>변경 내용 보기</b> 이력에 저장됩니다.</span></span>
-      </div>
+      <div class="mtitle">앱 상품 수정 요청</div>
       <button class="x" id="wClose">✕</button>
     </div>
     <div class="modal-b">
+      <div class="wl-bar">
+        <label class="selall"><input type="checkbox" id="wlAll"> 전체선택</label>
+        <span class="wl-cnt">선택 <b id="wlSel">0</b>건</span>
+        <span class="wl-bulk">
+          <button class="btn teal sm" id="wlApply" disabled>반영</button>
+          <button class="btn red sm" id="wlReject" disabled>반려</button>
+        </span>
+      </div>
       <div class="wl" id="waitBody"></div>
     </div>
     <div class="modal-f">
-      <span class="f-selcnt">선택 <b id="wlFootSel">0</b>건</span>
       <button class="mbtn ghost" id="wCloseF">닫기</button>
-      <button class="mbtn primary" id="wApplyAll" disabled>선택 반영</button>
     </div>
   </div>
-</div>
-<!-- 상세 내용 — 오른쪽 서브 모달(드로어) -->
-<div class="drawer-bg" id="dwBg"></div>
-<div class="drawer" id="dwPanel" role="dialog" aria-modal="true">
-  <div class="drawer-h">
-    <div class="dw-tt"><div class="dw-nm" id="dwNm"></div><div class="dw-bc" id="dwBc"></div><span class="dw-type" id="dwType"></span></div>
-    <button class="x" id="dwClose">✕</button>
-  </div>
-  <div class="drawer-b" id="dwBody"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -395,99 +361,74 @@
     $('cnt').textContent=2131;
   }
 
-  // ① 앱 상품 수정 요청 — 기기(Device ID)별 묶음. 기기 = 상위 폴더/장바구니, 상품 수정 요청 = 내부 Item.
-  //    Grouping Key = Device ID (사용자명은 표시용). 동일 상품은 최신 요청 1건만 노출.
-  var groups=[
-    {dev:'A21', by:'김약사', items:[
-      {nm:'타이레놀 500mg', bc:'8801234567890', at:'2026-08-10 09:31',
-        changes:[{f:'판매가', cur:'2,000원', nw:'2,200원'},{f:'위치', cur:'A-3', nw:'B-1'},{f:'단위(포장)', cur:'정', nw:'박스'}]},
-      {nm:'판콜에이내복액', bc:'8806789012345', at:'2026-08-10 09:20',
-        changes:[{f:'판매가', cur:'1,100원', nw:'1,300원'}]},
-      {nm:'겔포스엠현탁액', bc:'8803333000044', at:'2026-08-09 17:10',
-        changes:[{f:'상품명', cur:'겔포스엠', nw:'겔포스엠현탁액'},{f:'중분류', cur:'일반의약품', nw:'의약외품'}]},
-      // 같은 기기에서 '수정'이 아닌 '등록'(미등록 상품 신규 등록) 케이스
-      {nm:'뉴트리원 마그네슘 240', bc:'8809111222333', at:'2026-08-10 09:05', type:'new',
-        changes:[{f:'상품명', cur:'-', nw:'뉴트리원 마그네슘 240'},{f:'분류', cur:'-', nw:'의약외품'},{f:'제조사', cur:'-', nw:'뉴트리원'},{f:'판매가', cur:'-', nw:'12,000원'},{f:'재고', cur:'-', nw:'20개'}]}
-    ]},
-    {dev:'B07', by:'이약사', items:[
-      {nm:'베아제정', bc:'8802223000011', at:'2026-08-10 09:18',
-        changes:[{f:'판매가', cur:'1,300원', nw:'1,500원'}]},
-      {nm:'후시딘연고', bc:'8801444000055', at:'2026-08-10 08:40',
-        changes:[{f:'제조업체', cur:'-', nw:'동화약품'},{f:'판매가', cur:'5,000원', nw:'5,500원'}]}
-    ]}
+  // ① 앱 수정 대기목록 — POS 판매 저장목록 UX. 동기화 버튼 클릭 시 모달, 카드별 반영/반려 승인.
+  var pending=[
+    {nm:'[2+1]비타리움 프로폴리스…', bc:'9343202002627', by:'김약사', dev:'A21', at:'2026-07-03 08:51',
+      changes:[{f:'판매가', cur:'26,500원', nw:'27,500원'},{f:'위치', cur:'A-3', nw:'B-1'},{f:'단위(포장)', cur:'회', nw:'병'}]},
+    // 상품 '등록'만 하는 케이스 — 미등록 상품 신규 등록(수정 아님). 현재값 없음(-).
+    {nm:'뉴트리원 마그네슘 240', bc:'8809111222333', by:'김약사', dev:'A21', at:'2026-07-03 08:55', type:'new',
+      changes:[{f:'상품명', cur:'-', nw:'뉴트리원 마그네슘 240'},{f:'분류', cur:'-', nw:'의약외품'},{f:'제조사', cur:'-', nw:'뉴트리원'},{f:'판매가', cur:'-', nw:'12,000원'},{f:'재고', cur:'-', nw:'20개'}]},
+    {nm:'판콜에이 30ml', bc:'8806789012345', by:'이약사', dev:'B07', at:'2026-07-03 08:32',
+      changes:[{f:'판매가', cur:'1,100원', nw:'1,300원'}]},
+    {nm:'겔포스엠현탁액', bc:'8803333000044', by:'김약사', dev:'A21', at:'2026-07-02 17:10',
+      changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'},{f:'중분류', cur:'일반의약품', nw:'의약외품'}]},
+    {nm:'타이레놀 500mg', bc:'8801234567890', by:'김약사', dev:'A21', at:'2026-07-03 08:47',
+      changes:[{f:'판매가', cur:'2,000원', nw:'2,200원'},{f:'위치', cur:'C-2', nw:'C-4'}]},
+    {nm:'베아제정', bc:'8802223000011', by:'이약사', dev:'B07', at:'2026-07-03 08:20',
+      changes:[{f:'판매가', cur:'1,300원', nw:'1,500원'}]},
+    {nm:'후시딘연고', bc:'8801444000055', by:'박직원', dev:'C15', at:'2026-07-02 18:05',
+      changes:[{f:'제조업체', cur:'-', nw:'동화약품'},{f:'판매가', cur:'5,000원', nw:'5,500원'}]},
+    {nm:'대웅 우루사정', bc:'8806555000077', by:'김약사', dev:'A21', at:'2026-07-02 16:40',
+      changes:[{f:'중분류', cur:'일반의약품', nw:'전문의약품'}]}
   ];
-  function typeLabel(it){return it.type==='new'?'신규':'수정';}   // 갯수 없이 수정/신규만
-  function grpLast(g){return g.items.reduce(function(m,it){return it.at>m?it.at:m;},'');}
-  function grpSel(g){return g.items.filter(function(it){return it._sel;}).length;}
-  function totalSel(){return groups.reduce(function(s,g){return s+grpSel(g);},0);}
-  function fmtLast(s){return s?s.slice(5).replace('-','.'):'';}       // '2026-08-10 09:31' → '08.10 09:31'
-  function totalCount(){return groups.reduce(function(s,g){return s+g.items.length;},0);}
-  function updateBadge(){var el=$('syncBadge'),t=totalCount();if(t){el.textContent=t;el.style.display='';}else{el.style.display='none';}}
-  function updateFooter(){var n=totalSel();$('wlFootSel').textContent=n;$('wApplyAll').disabled=n===0;}
-  // 최근 제출 그룹만 기본 펼침, 나머지는 접힘
-  (function(){var li=-1,lm='';groups.forEach(function(g,i){var l=grpLast(g);if(l>lm){lm=l;li=i;}});if(li>=0)groups[li]._open=true;})();
-  // 전체 클릭(선택)된 상태가 디폴트
-  groups.forEach(function(g){g.items.forEach(function(it){it._sel=true;});});
+  function summaryOf(p){if(p.type==='new')return '신규 등록';var c=p.changes;return c.length>1?(c[0].f+' 외 '+(c.length-1)+'개 변경'):(c[0].f+' 변경');}
+  function updateBadge(){var el=$('syncBadge');if(pending.length){el.textContent=pending.length;el.style.display='';}else{el.style.display='none';}}
+  function selCount(){return pending.filter(function(p){return p._sel;}).length;}
+  function updateWlBar(){var n=selCount(),tot=pending.length;
+    $('wlSel').textContent=n;
+    var d=n===0;$('wlApply').disabled=d;$('wlReject').disabled=d;
+    $('wlAll').checked=tot>0&&n===tot;$('wlAll').indeterminate=n>0&&n<tot;updateBadge();}
   function renderWaitlist(){
-    var b=$('waitBody'), total=totalCount();
-    if(!total){b.innerHTML='<div class="wl-empty">반영할 수정 요청이 없습니다.</div>';updateBadge();return;}
-    b.innerHTML=groups.map(function(g,gi){
-      var sel=grpSel(g), allChk=sel>0&&sel===g.items.length;
-      var items=g.items.map(function(it,ii){
-        return '<div class="wi'+(it._sel?' sel':'')+'" data-g="'+gi+'" data-i="'+ii+'">'+
-          '<div class="wi-row">'+
-            '<label class="wi-ck"><input type="checkbox" class="wi-pick" '+(it._sel?'checked':'')+'></label>'+
-            '<div class="wi-main"><div class="wi-nm">'+it.nm+'</div><div class="wi-bc">'+it.bc+'</div><div class="wi-sum'+(it.type==='new'?' reg':'')+'">'+typeLabel(it)+'</div></div>'+
-            '<button class="btn line sm wi-detail-btn">상세 내용</button>'+
-            '<button class="btn red sm wi-del">삭제</button>'+
+    var b=$('waitBody');
+    if(!pending.length){b.innerHTML='<div class="wl-empty">반영할 수정 요청이 없습니다.</div>';updateWlBar();return;}
+    b.innerHTML=pending.map(function(p,i){
+      var cmp=p.changes.map(function(ch){return '<tr><td class="fld-n">'+ch.f+'</td><td class="cur">'+ch.cur+'</td><td class="arw">→</td><td class="new">'+ch.nw+'</td></tr>';}).join('');
+      return '<div class="wcard'+(p._sel?' sel':'')+'" data-i="'+i+'">'+
+        '<div class="wcard-h">'+
+          '<label class="wc-ck"><input type="checkbox" class="wl-pick" '+(p._sel?'checked':'')+'></label>'+
+          '<div class="wc-main">'+
+            '<div class="wc-nm">'+(p.type==='new'?'<span class="regtag">신규 등록</span>':'')+p.nm+'</div>'+
+            '<div class="wc-bc">'+p.bc+'</div>'+
+            '<div class="wc-sum'+(p.type==='new'?' reg':'')+'">'+summaryOf(p)+'</div>'+
+            '<div class="wc-meta"><span><span class="devtype app">굿팜 약사님용앱</span>'+p.by+'</span><span>기기 '+p.dev+'</span><span>제출 '+p.at+'</span></div>'+
           '</div>'+
-        '</div>';
-      }).join('');
-      return '<div class="wg'+(g._open?' open':'')+'" data-g="'+gi+'">'+
-        '<button type="button" class="wg-h">'+
-          '<span class="wg-chev">▶</span>'+
-          '<span class="wg-id"><b>'+g.by+'</b><span class="wg-dev">'+g.dev+'</span></span>'+
-          '<span class="wg-cnt">'+g.items.length+'건</span>'+
-          '<span class="wg-time">마지막 제출 '+fmtLast(grpLast(g))+'</span>'+
-        '</button>'+
-        '<div class="wg-b">'+
-          '<div class="wg-tools"><label class="selall"><input type="checkbox" class="wg-all"'+(allChk?' checked':'')+'> 전체 선택</label><span class="wg-selcnt">선택 <b>'+sel+'</b>건</span></div>'+
-          '<div class="wg-list">'+items+'</div>'+
+          '<div class="wc-acts">'+
+            '<button class="btn line sm togg">'+(p.type==='new'?'등록 내용 보기':'변경 내용 보기')+'</button>'+
+            '<button class="btn teal sm" data-act="apply">반영</button>'+
+            '<button class="btn red sm" data-act="reject">반려</button>'+
+          '</div>'+
         '</div>'+
+        '<div class="wc-detail"><table class="cmp"><thead><tr><th>항목</th><th>'+(p.type==='new'?'현재':'현재값')+'</th><th class="c"></th><th>'+(p.type==='new'?'등록값':'앱 제출값')+'</th></tr></thead><tbody>'+cmp+'</tbody></table></div>'+
       '</div>';
     }).join('');
-    groups.forEach(function(g,gi){var s=grpSel(g),el=b.querySelector('.wg[data-g="'+gi+'"] .wg-all');if(el)el.indeterminate=s>0&&s<g.items.length;});
-    updateBadge();updateFooter();
+    updateWlBar();
   }
-  // 상세 내용 — 오른쪽 서브 모달(드로어)
-  function openDrawer(gi,ii){var it=groups[gi].items[ii];
-    $('dwNm').textContent=it.nm;$('dwBc').textContent=it.bc;
-    var tp=$('dwType');tp.textContent=it.type==='new'?'신규 등록':'수정';tp.className='dw-type '+(it.type==='new'?'reg':'mod');
-    var cmp=it.changes.map(function(ch){return '<tr><td class="fld-n">'+ch.f+'</td><td class="cur">'+ch.cur+'</td><td class="arw">→</td><td class="new">'+ch.nw+'</td></tr>';}).join('');
-    $('dwBody').innerHTML='<table class="cmp"><thead><tr><th>항목</th><th>'+(it.type==='new'?'현재':'현재값')+'</th><th class="c"></th><th>'+(it.type==='new'?'등록값':'앱 제출값')+'</th></tr></thead><tbody>'+cmp+'</tbody></table>';
-    $('dwBg').classList.add('open');$('dwPanel').classList.add('open');}
-  function closeDrawer(){$('dwBg').classList.remove('open');$('dwPanel').classList.remove('open');}
-  // 각 상품별 삭제(개별 제거)
-  function deleteItem(gi,ii){var g=groups[gi],it=g.items[ii];g.items.splice(ii,1);if(!g.items.length)groups.splice(gi,1);renderWaitlist();toast('삭제 · '+it.nm);}
-  // 선택 반영 — 전체 그룹에서 선택된 건 일괄 반영
-  function applyAll(){var picked=totalSel();if(!picked)return;
-    groups.forEach(function(g){g.items=g.items.filter(function(it){return !it._sel;});});
-    for(var i=groups.length-1;i>=0;i--){if(!groups[i].items.length)groups.splice(i,1);}
-    renderWaitlist();closeDrawer();toast('반영 완료 · '+picked+'건 · 수정 이력 생성');}
   $('waitBody').addEventListener('click',function(e){
-    var db=e.target.closest('.wi-detail-btn');
-    if(db){var wi=db.closest('.wi');openDrawer(+wi.getAttribute('data-g'),+wi.getAttribute('data-i'));return;}
-    var del=e.target.closest('.wi-del');
-    if(del){var wi2=del.closest('.wi');deleteItem(+wi2.getAttribute('data-g'),+wi2.getAttribute('data-i'));return;}
-    var h=e.target.closest('.wg-h');
-    if(h){var gi=+h.closest('.wg').getAttribute('data-g');groups[gi]._open=!groups[gi]._open;renderWaitlist();}
+    var card=e.target.closest('.wcard'); if(!card)return;
+    var i=+card.getAttribute('data-i'), p=pending[i];
+    if(e.target.classList.contains('wl-pick')){p._sel=e.target.checked;card.classList.toggle('sel',e.target.checked);updateWlBar();return;}
+    if(e.target.classList.contains('togg')){var open=card.classList.toggle('open');e.target.textContent=open?'변경 내용 닫기':'변경 내용 보기';return;}
+    var act=e.target.getAttribute('data-act');
+    if(act==='apply'){pending.splice(i,1);renderWaitlist();toast('반영 완료 · '+p.nm+' · 수정 이력 생성');}
+    else if(act==='reject'){pending.splice(i,1);renderWaitlist();toast('반려 처리 · '+p.nm);}
   });
-  $('waitBody').addEventListener('change',function(e){
-    if(e.target.classList.contains('wi-pick')){var wi=e.target.closest('.wi');groups[+wi.getAttribute('data-g')].items[+wi.getAttribute('data-i')]._sel=e.target.checked;renderWaitlist();return;}
-    if(e.target.classList.contains('wg-all')){var gi=+e.target.closest('.wg').getAttribute('data-g'),v=e.target.checked;groups[gi].items.forEach(function(it){it._sel=v;});renderWaitlist();}
-  });
-  $('wApplyAll').onclick=applyAll;
-  $('dwClose').onclick=closeDrawer;$('dwBg').onclick=closeDrawer;
+  // 전체선택 · 일괄 반영/반려(상단 우측)
+  $('wlAll').addEventListener('change',function(){var v=$('wlAll').checked;pending.forEach(function(p){p._sel=v;});renderWaitlist();});
+  function bulk(apply){var picked=pending.filter(function(p){return p._sel;});if(!picked.length)return;
+    pending=pending.filter(function(p){return !p._sel;});renderWaitlist();
+    toast((apply?'반영 완료':'반려 처리')+' · '+picked.length+'건'+(apply?' · 수정 이력 생성':''));}
+  $('wlApply').onclick=function(){bulk(true);};
+  $('wlReject').onclick=function(){bulk(false);};
   $('syncBtn').onclick=function(){renderWaitlist();$('waitModal').classList.add('open');};
   function closeWait(){$('waitModal').classList.remove('open');}
   $('wClose').onclick=closeWait;$('wCloseF').onclick=closeWait;
@@ -501,8 +442,7 @@
   // 도움말 클릭 토글
   $('syncHelp').addEventListener('click',function(e){e.stopPropagation();$('syncHelp').classList.toggle('on');});
   $('uploadHelp').addEventListener('click',function(e){e.stopPropagation();$('uploadHelp').classList.toggle('on');});
-  $('wlHelp').addEventListener('click',function(e){e.stopPropagation();$('wlHelp').classList.toggle('on');});
-  document.addEventListener('click',function(){$('syncHelp').classList.remove('on');$('uploadHelp').classList.remove('on');$('wlHelp').classList.remove('on');});
+  document.addEventListener('click',function(){$('syncHelp').classList.remove('on');$('uploadHelp').classList.remove('on');});
 
   // ②③ 상품 정보 수정 기록 — 클라이언트+앱 전체 이력. 수정자에 앱/클라이언트 구분.
   // 수정자 = 이름만 / 기기 = APP(단말명) 또는 PC(PC명) 별도 컬럼
@@ -557,10 +497,9 @@
   function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('show')},2000);}
 
   renderList();
-  // (미리보기) #wait: 요청 모달 열기 / #wait-open: 첫 상품 상세 드로어 열기
-  if(location.hash.indexOf('wait')>=0){
-    renderWaitlist();$('waitModal').classList.add('open');
-    if(location.hash.indexOf('open')>=0&&groups[0]&&groups[0].items[0]){openDrawer(0,0);}}
+  // (미리보기) #wait: 대기목록 모달 열기 / #wait-open: 첫 카드 변경 내용 펼침
+  if(location.hash.indexOf('wait')>=0){renderWaitlist();$('waitModal').classList.add('open');
+    if(location.hash.indexOf('open')>=0){var c=$('waitBody').querySelector('.wcard');if(c){c.classList.add('open');c.querySelector('.togg').textContent='변경 내용 닫기';}}}
 })();
 </script>
 </body>
