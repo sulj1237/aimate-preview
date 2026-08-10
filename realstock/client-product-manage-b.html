@@ -94,14 +94,23 @@
   .cmp .new{color:var(--teal-d);font-weight:800}
   /* ④ 변경 내용 보기(반영 기록) 모달 — 실재고 관리 '변경 내용 보기'와 동일 성격 */
   .cg-note{margin:0 0 12px;font-size:12px;color:#8a9099;line-height:1.6}
-  .cg-bar{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-  .cg-inp{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;width:260px;outline:none}
+  .cg-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .cg-date{height:32px;padding:0 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;color:#3d444c;background:#fff}
+  .cg-dash{color:var(--muted)}
+  .cg-qbtn{height:32px;padding:0 13px;border:1px solid var(--line);border-radius:8px;background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:#4b5158;cursor:pointer}
+  .cg-qbtn.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .cg-sel{height:32px;padding:0 8px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;color:#3d444c;background:#fff;cursor:pointer}
+  .cg-inp{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;width:230px;outline:none}
   .cg-inp:focus{border-color:var(--teal)}
   .cg-cnt{font-size:12px;color:#6b7178}.cg-cnt b{color:var(--teal-d)}
-  .cgtable{border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .cgtable table{width:100%;border-collapse:collapse;font-size:12px}
-  .cgtable th{background:#f6f8fa;text-align:left;color:#8a9099;font-weight:700;padding:9px 12px;border-bottom:1px solid #e3e6ea;white-space:nowrap}
-  .cgtable td{padding:11px 12px;border-bottom:1px solid #eef0f3;color:#3d444c;vertical-align:middle}
+  .st{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .st-done{background:var(--teal-soft);color:var(--teal-d)}
+  .st-fail{background:#fdecea;color:#d64431}
+  .cgtable th.c,.cgtable td.c{text-align:center}
+  .cgtable{border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+  .cgtable table{width:100%;min-width:940px;border-collapse:collapse;font-size:12px}
+  .cgtable th{background:#f6f8fa;text-align:left;color:#8a9099;font-weight:700;padding:9px 11px;border-bottom:1px solid #e3e6ea;white-space:nowrap}
+  .cgtable td{padding:11px 11px;border-bottom:1px solid #eef0f3;color:#3d444c;vertical-align:middle;white-space:nowrap}
   .cgtable tbody tr:last-child td{border-bottom:none}
   .cgtable td.vt{color:#6b7178;white-space:nowrap}
   .cgtable td.mono{font-family:ui-monospace,Menlo,monospace;color:#6b7178}
@@ -349,20 +358,39 @@
 
 <!-- ④ 변경 내용 보기 — 이전 상품 정보 수정 반영 기록(실재고 관리 '변경 내용 보기'와 동일 성격) -->
 <div class="modal-bg" id="chgModal">
-  <div class="modal" role="dialog" aria-modal="true" style="max-width:920px">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:1040px">
     <div class="modal-h">
-      <div class="mtitle">변경 내용 보기</div>
+      <div class="mtitle">변경 내용 보기
+        <span class="help" tabindex="0" role="button" aria-label="반영 기록 도움말">i<span class="tip">
+          앱에서 제출된 상품 정보 수정이 <b>반영된 기록</b>입니다.<br>값은 <b>반영 시점</b> 기준이라 현재 값과 다를 수 있습니다.
+        </span></span>
+      </div>
       <button class="x" id="cgClose">✕</button>
     </div>
     <div class="modal-b">
-      <p class="cg-note">ⓘ 앱에서 제출된 상품 정보 수정이 <b>반영된 기록</b>입니다. 값은 반영 시점 기준입니다.</p>
+      <p class="cg-note">앱에서 제출된 상품 정보 수정이 반영된 기록입니다. 값은 반영 시점 기준이라 현재 값과 다를 수 있습니다.</p>
       <div class="cg-bar">
-        <input class="cg-inp" id="cgInp" placeholder="상품명·바코드 검색" />
+        <input type="date" class="cg-date" id="cgFrom" />
+        <span class="cg-dash">~</span>
+        <input type="date" class="cg-date" id="cgTo" />
+        <button class="cg-qbtn on" data-m="1">1개월</button>
+        <button class="cg-qbtn" data-m="3">3개월</button>
+        <button class="cg-qbtn" data-m="6">6개월</button>
+        <button class="cg-qbtn" data-m="0">전체</button>
+      </div>
+      <div class="cg-bar">
+        <select class="cg-sel" id="cgKey"><option>상품명</option><option>제조사</option><option>바코드</option></select>
+        <input class="cg-inp" id="cgInp" placeholder="검색어를 입력해주세요" />
+        <select class="cg-sel" id="cgStatus">
+          <option value="all">처리결과 전체</option>
+          <option value="done">반영완료</option>
+          <option value="fail">반영실패</option>
+        </select>
         <span class="cg-cnt">조회 <b id="cgCnt">0</b>건</span>
       </div>
       <div class="cgtable">
         <table>
-          <thead><tr><th>반영일시</th><th>상품명</th><th>바코드</th><th>변경 항목</th><th>이전값</th><th>변경값</th><th>제출자</th><th>처리자</th></tr></thead>
+          <thead><tr><th>반영일시</th><th>상품명</th><th>제조사</th><th>바코드</th><th>변경 항목</th><th>이전값</th><th>변경값</th><th>제출자</th><th class="c">처리결과</th><th>처리자</th></tr></thead>
           <tbody id="cgBody"></tbody>
         </table>
       </div>
@@ -505,26 +533,51 @@
   $('waitModal').onclick=function(e){if(e.target===$('waitModal'))closeWait();};
 
   // ④ 변경 내용 보기 — 이전 상품 정보 수정 반영 기록(실재고 관리 '변경 내용 보기'와 동일 성격)
+  //   검색 카테고리: 상품명·제조사·바코드 / 기간(캘린더+빠른선택) / 처리결과(반영완료·반영실패). 시안 B는 반려 없음 → 반영반려 제외.
+  var CGST={done:['반영완료','st-done'],fail:['반영실패','st-fail']};
   var applied=[
-    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', bc:'8806789012345', f:'판매가',   before:'4,300원',      after:'4,500원',            by:'김약사(A21)', appBy:'정OO'},
-    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', bc:'8806789012345', f:'중분류',   before:'일반의약품',   after:'의약외품',           by:'김약사(A21)', appBy:'정OO'},
-    {at:'2026-08-07 16:41', nm:'베아제정',            bc:'8802223000011', f:'위치',     before:'B-1',          after:'B-4',                by:'박직원(C15)', appBy:'정OO'},
-    {at:'2026-08-07 09:05', nm:'훼스탈플러스정',       bc:'8801111000022', f:'제조업체', before:'-',            after:'한독',               by:'이약사(B07)', appBy:'정OO'},
-    {at:'2026-08-05 14:12', nm:'판콜에이내복액 30ml',  bc:'8806789012399', f:'상품명',   before:'판콜에이 30ml', after:'판콜에이내복액 30ml', by:'이약사(B07)', appBy:'정OO'}
+    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'판매가',   before:'4,300원',      after:'4,500원',            by:'김약사(A21)', st:'done', appBy:'정OO'},
+    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'중분류',   before:'일반의약품',   after:'의약외품',           by:'김약사(A21)', st:'done', appBy:'정OO'},
+    {at:'2026-08-07 16:41', nm:'베아제정',            mfr:'대웅제약',  bc:'8802223000011', f:'위치',     before:'B-1',          after:'B-4',                by:'박직원(C15)', st:'done', appBy:'정OO'},
+    {at:'2026-08-07 09:05', nm:'훼스탈플러스정',       mfr:'한독',      bc:'8801111000022', f:'제조업체', before:'-',            after:'한독',               by:'이약사(B07)', st:'fail', appBy:'정OO'},
+    {at:'2026-08-05 14:12', nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'상품명',   before:'판콜에이 30ml', after:'판콜에이내복액 30ml', by:'이약사(B07)', st:'done', appBy:'정OO'},
+    {at:'2026-06-20 11:30', nm:'우루사정 100mg',       mfr:'대웅제약',  bc:'8808888000099', f:'판매가',   before:'7,800원',      after:'8,000원',            by:'김약사(A21)', st:'done', appBy:'정OO'}
   ];
-  function renderCG(){
-    var q=($('cgInp').value||'').trim();
-    var rows=applied.filter(function(r){return !q||r.nm.indexOf(q)>=0||r.bc.indexOf(q)>=0;});
-    $('cgCnt').textContent=rows.length;
-    $('cgBody').innerHTML=rows.length?rows.map(function(r){
-      return '<tr><td class="vt">'+r.at+'</td><td>'+r.nm+'</td><td class="mono">'+r.bc+'</td><td><b>'+r.f+'</b></td><td class="before">'+r.before+'</td><td class="after">'+r.after+'</td><td>'+r.by+'</td><td>'+r.appBy+'</td></tr>';
-    }).join(''):'<tr><td colspan="8"><div class="ib-empty">반영된 수정 기록이 없습니다.</div></td></tr>';
+  function ymd(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(day<10?'0'+day:day);}
+  function cgSetRange(months){
+    var to=new Date();
+    $('cgTo').value=ymd(to);
+    if(months===0){$('cgFrom').value='';}
+    else{var from=new Date();from.setMonth(from.getMonth()-months);$('cgFrom').value=ymd(from);}
   }
-  $('cgOpen').onclick=function(){renderCG();$('chgModal').classList.add('open');};
+  function cgClearQuick(){var qs=document.querySelectorAll('.cg-qbtn');for(var i=0;i<qs.length;i++)qs[i].classList.remove('on');}
+  function renderCG(){
+    var key=$('cgKey').value, q=($('cgInp').value||'').trim(), stf=$('cgStatus').value;
+    var from=$('cgFrom').value, to=$('cgTo').value;
+    var rows=applied.filter(function(r){
+      var day=r.at.slice(0,10);
+      if(from&&day<from)return false;
+      if(to&&day>to)return false;
+      if(stf!=='all'&&r.st!==stf)return false;
+      if(q){var hay=key==='제조사'?r.mfr:(key==='바코드'?r.bc:r.nm);if(hay.indexOf(q)<0)return false;}
+      return true;
+    });
+    $('cgCnt').textContent=rows.length;
+    $('cgBody').innerHTML=rows.length?rows.map(function(r){var s=CGST[r.st];
+      return '<tr><td class="vt">'+r.at+'</td><td>'+r.nm+'</td><td>'+r.mfr+'</td><td class="mono">'+r.bc+'</td><td><b>'+r.f+'</b></td><td class="before">'+r.before+'</td><td class="after">'+r.after+'</td><td>'+r.by+'</td><td class="c"><span class="st '+s[1]+'">'+s[0]+'</span></td><td>'+r.appBy+'</td></tr>';
+    }).join(''):'<tr><td colspan="10"><div class="ib-empty">반영된 수정 기록이 없습니다.</div></td></tr>';
+  }
+  (function(){var qs=document.querySelectorAll('.cg-qbtn');for(var i=0;i<qs.length;i++){(function(b){b.onclick=function(){cgClearQuick();b.classList.add('on');cgSetRange(+b.getAttribute('data-m'));renderCG();};})(qs[i]);}})();
+  function openCG(){cgClearQuick();document.querySelector('.cg-qbtn[data-m="1"]').classList.add('on');cgSetRange(1);renderCG();$('chgModal').classList.add('open');}
+  $('cgOpen').onclick=openCG;
   function closeCG(){$('chgModal').classList.remove('open');}
   $('cgClose').onclick=closeCG;$('cgCloseF').onclick=closeCG;
   $('chgModal').onclick=function(e){if(e.target===$('chgModal'))closeCG();};
   $('cgInp').addEventListener('input',renderCG);
+  $('cgKey').addEventListener('change',renderCG);
+  $('cgStatus').addEventListener('change',renderCG);
+  $('cgFrom').addEventListener('change',function(){cgClearQuick();renderCG();});
+  $('cgTo').addEventListener('change',function(){cgClearQuick();renderCG();});
 
   updateBadge();
   // 도움말 클릭 토글
@@ -585,7 +638,7 @@
 
   renderList();
   // (미리보기) #wait: 요청 모달 / #wait-open: 첫 묶음 펼침+변경 상세 / #chg: 변경 내용 보기(반영 기록)
-  if(location.hash.indexOf('chg')>=0){renderCG();$('chgModal').classList.add('open');}
+  if(location.hash.indexOf('chg')>=0){openCG();}
   else if(location.hash.indexOf('wait')>=0){
     if(location.hash.indexOf('open')>=0){gOpen[pending[0].bc]=true;cOpen[pending[0].reqs[0].id]=true;}
     renderIB();$('waitModal').classList.add('open');}
