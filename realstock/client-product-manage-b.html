@@ -61,13 +61,19 @@
   .iltable{border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:52vh}
   .iltable table{width:100%;border-collapse:collapse;font-size:12px}
   .iltable thead th{position:sticky;top:0;background:#f4f6f8;color:#5a6066;font-weight:700;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);z-index:2}
-  .iltable tbody td{padding:11px 12px;border-bottom:1px solid #eef0f2;color:#3a3f44;vertical-align:middle}
-  .iltable tbody tr{cursor:pointer}
-  .iltable tbody tr:hover{background:#fafbfc}
-  .iltable tbody tr.sel{background:var(--sel)}
+  .iltable table{min-width:920px}
+  .iltable tbody td{padding:11px 12px;border-bottom:1px solid #f2f4f6;color:#3a3f44;vertical-align:middle;white-space:nowrap}
+  .iltable tbody tr.gend td{border-bottom:1px solid #e3e6ea}
+  .iltable tbody tr:last-child td{border-bottom:none}
+  .iltable td[rowspan]{vertical-align:middle;background:#fff}
+  .iltable td.ck{text-align:center}
+  .iltable td.vt{color:#6b7178}
+  .iltable td.mono{font-family:ui-monospace,Menlo,monospace;color:#6b7178}
+  .iltable tbody tr.sel td{background:var(--sel)!important}
   .il-nm{font-weight:700;color:#28303a}
-  .il-sum{color:var(--teal-d);font-weight:700}
   .il-meta{color:#8a9099;font-size:11.5px;white-space:nowrap}
+  .iltable .bval{color:var(--muted)}                    /* 이전값(현재 전산값) — 반영 전이라 취소선 없음 */
+  .iltable .aval{color:var(--teal-d);font-weight:800}   /* 변경값(앱 제출값) */
   .ib-note{margin-top:10px;font-size:11px;color:#8a9099;line-height:1.6}
   .ib-empty{padding:44px 0;text-align:center;color:#9aa0a6}
   /* 동일 상품 묶음(실재고 관리 동일) — 수정 N건 배지·펼침 */
@@ -338,7 +344,7 @@
 </div>
 <!-- 시안 B · 앱 상품 수정 요청(결재함) — 리스트 + 체크박스 일괄처리 -->
 <div class="modal-bg" id="waitModal">
-  <div class="modal" role="dialog" aria-modal="true" style="max-width:840px">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:1040px">
     <div class="modal-h">
       <div class="mtitle">앱 상품 수정 요청</div>
       <button class="x" id="wClose">✕</button>
@@ -354,7 +360,10 @@
       </div>
       <div class="iltable">
         <table>
-          <thead><tr><th style="width:34px"></th><th>상품명</th><th>변경 요약</th><th>제출자</th><th>제출일시</th><th style="width:104px"></th></tr></thead>
+          <thead><tr>
+            <th style="width:34px"></th><th>제출일시</th><th>상품명</th><th>제조사</th><th>바코드</th>
+            <th>변경 항목</th><th>이전값</th><th>변경값</th><th>제출자</th>
+          </tr></thead>
           <tbody id="ibBody"></tbody>
         </table>
       </div>
@@ -446,34 +455,32 @@
     $('cnt').textContent=2131;
   }
 
-  // ① 시안 B · 앱 상품 수정 요청 — 리스트 + 체크박스 · 선택 반영(반려 없음·미승인 누적).
-  //   동일 바코드로 여러 번 제출되면 '수정 N건'으로 묶어 표시(실재고 관리와 동일 UI).
-  //   변경 내용 보기 → 해당 레코드 하단에 비교 표(인라인 아코디언)로 전개.
+  // ① 시안 B · 앱 상품 수정 요청 — 반영 기록과 동일한 열 구성(변경 항목별 행 + 상품 정보 rowspan).
+  //   열: 제출일시·상품명·제조사·바코드·변경 항목·이전값·변경값·제출자 (반영 전이라 반영일시/처리결과/처리자 없음).
+  //   동일 상품 여러 번 제출 시 '수정 N건'으로 묶고, 체크박스로 선택해 반영(반려 없음·미승인 누적).
   var pending=[
-    {bc:'8806789012345', nm:'타이레놀서방정 500mg', reqs:[
+    {bc:'8806789012345', nm:'타이레놀서방정 500mg', mfr:'한국얀센', reqs:[
       {id:1, by:'김약사', dev:'A21', at:'08-10 09:31', changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'},{f:'위치', cur:'A-2', nw:'A-3'},{f:'단위(포장)', cur:'정', nw:'병'}]},
       {id:2, by:'이약사', dev:'B07', at:'08-09 14:10', changes:[{f:'판매가', cur:'4,500원', nw:'4,800원'}]}
     ]},
-    {bc:'8806789012399', nm:'판콜에이내복액 30ml', reqs:[
+    {bc:'8806789012399', nm:'판콜에이내복액 30ml', mfr:'동화약품', reqs:[
       {id:3, by:'이약사', dev:'B07', at:'08-10 09:18', changes:[{f:'상품명', cur:'판콜에이 30ml', nw:'판콜에이내복액 30ml'}]}
     ]},
-    {bc:'9343202002627', nm:'[2+1]비타리움 프로폴리스…', reqs:[
+    {bc:'9343202002627', nm:'[2+1]비타리움 프로폴리스…', mfr:'비타리움', reqs:[
       {id:4, by:'김약사', dev:'A21', at:'08-10 08:51', changes:[{f:'판매가', cur:'26,500원', nw:'27,500원'},{f:'중분류', cur:'일반의약품', nw:'의약외품'}]}
     ]},
-    {bc:'8803333000044', nm:'겔포스엠현탁액', reqs:[
+    {bc:'8803333000044', nm:'겔포스엠현탁액', mfr:'보령', reqs:[
       {id:5, by:'정약사', dev:'A08', at:'08-10 08:33', changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'}]}
     ]},
-    {bc:'8808888000099', nm:'우루사정 100mg', reqs:[
+    {bc:'8808888000099', nm:'우루사정 100mg', mfr:'대웅제약', reqs:[
       {id:6, by:'김약사', dev:'A21', at:'08-09 16:05', changes:[{f:'판매가', cur:'8,000원', nw:'8,500원'},{f:'단위(포장)', cur:'정', nw:'병'}]}
     ]},
-    {bc:'8801234500011', nm:'가스활명수큐액', reqs:[
+    {bc:'8801234500011', nm:'가스활명수큐액', mfr:'동화약품', reqs:[
       {id:7, by:'정약사', dev:'A08', at:'08-09 15:22', changes:[{f:'상품명', cur:'활명수', nw:'가스활명수큐액'},{f:'분류', cur:'일반', nw:'의약외품'},{f:'판매가', cur:'800원', nw:'900원'}]}
     ]}
   ];
   var gOpen={};   // 펼친 묶음(바코드) — 이전 요청 표시
-  var cOpen={};   // 변경 내용 비교 표를 펼친 요청(id)
   var sel={};     // 선택된 요청(id)
-  function summaryOf(c){return c.length>1?(c[0].f+' 외 '+(c.length-1)+'건 변경'):(c[0].f+' 변경');}
   function totalReqs(){return pending.reduce(function(s,g){return s+g.reqs.length;},0);}
   function selCount(){return Object.keys(sel).filter(function(k){return sel[k];}).length;}
   function updateBadge(){var el=$('syncBadge'),n=totalReqs();if(n){el.textContent=n>99?'99+':n;el.style.display='';}else{el.style.display='none';}}
@@ -481,40 +488,32 @@
     $('ibSel').textContent=n;$('ibTotal').textContent=tot;
     $('ibApply').disabled=n===0;
     $('ibAll').checked=tot>0&&n===tot;$('ibAll').indeterminate=n>0&&n<tot;updateBadge();}
-  function cmpHtml(r){
-    var rows=r.changes.map(function(ch){return '<tr><td class="fld-n">'+ch.f+'</td><td class="cur">'+ch.cur+'</td><td class="new">'+ch.nw+'</td></tr>';}).join('');
-    return '<tr class="ib-cmp"><td colspan="6"><div class="cmpwrap"><table class="cmp"><thead><tr><th>항목</th><th>현재값</th><th>앱 제출값</th></tr></thead><tbody>'+rows+'</tbody></table></div></td></tr>';
-  }
-  function rowHtml(g,r,o){
-    var nameCell;
-    if(o.parent){
-      nameCell='<span class="il-nm">'+g.nm+(o.multi?'<span class="nbadge">수정 '+g.reqs.length+'건</span><span class="caret" data-bc="'+g.bc+'">'+(o.open?'▾':'▸')+'</span>':'')+'</span>';
-    }else{
-      nameCell='<span class="il-nm sub">└ 이전 요청</span>';
-    }
-    return '<tr class="ib-row'+(o.sub?' ib-sub':'')+(sel[r.id]?' sel':'')+'" data-id="'+r.id+'">'+
-      '<td><input type="checkbox" class="ibck" '+(sel[r.id]?'checked':'')+'></td>'+
-      '<td>'+nameCell+'</td>'+
-      '<td class="il-sum">'+summaryOf(r.changes)+'</td>'+
-      '<td class="il-meta">'+r.by+'('+r.dev+')</td>'+
-      '<td class="il-meta">'+r.at+'</td>'+
-      '<td><button class="btn line sm ibview" data-id="'+r.id+'">'+(cOpen[r.id]?'변경 상세 닫기':'변경 상세')+'</button></td>'+
-    '</tr>';
+  // 한 제출(요청) = 변경 항목만 여러 줄, 상품 정보·체크박스·제출일시·제출자는 rowspan
+  function reqRows(g,r,o){
+    var n=r.changes.length;
+    var nameCell=o.sub
+      ? '<span class="il-nm sub">└ 이전 요청</span>'
+      : '<span class="il-nm">'+g.nm+(o.multi?'<span class="nbadge">수정 '+g.reqs.length+'건</span><span class="caret" data-bc="'+g.bc+'">'+(o.open?'▾':'▸')+'</span>':'')+'</span>';
+    return r.changes.map(function(ch,i){var first=i===0,last=i===n-1;
+      return '<tr class="ib-row'+(o.sub?' ib-sub':'')+(last?' gend':'')+(sel[r.id]?' sel':'')+'" data-id="'+r.id+'">'+
+        (first?'<td class="ck" rowspan="'+n+'"><input type="checkbox" class="ibck" '+(sel[r.id]?'checked':'')+'></td>':'')+
+        (first?'<td class="vt" rowspan="'+n+'">'+r.at+'</td>':'')+
+        (first?'<td rowspan="'+n+'">'+nameCell+'</td>':'')+
+        (first?'<td rowspan="'+n+'">'+(o.sub?'':g.mfr)+'</td>':'')+
+        (first?'<td class="mono" rowspan="'+n+'">'+(o.sub?'':g.bc)+'</td>':'')+
+        '<td><b>'+ch.f+'</b></td><td class="bval">'+ch.cur+'</td><td class="aval">'+ch.nw+'</td>'+
+        (first?'<td rowspan="'+n+'">'+r.by+'('+r.dev+')</td>':'')+
+      '</tr>';
+    }).join('');
   }
   function renderIB(){
     var b=$('ibBody');
-    if(!pending.length){b.innerHTML='<tr><td colspan="6"><div class="ib-empty">반영할 수정 요청이 없습니다.</div></td></tr>';syncBar();return;}
+    if(!pending.length){b.innerHTML='<tr><td colspan="9"><div class="ib-empty">반영할 수정 요청이 없습니다.</div></td></tr>';syncBar();return;}
     var html='';
     pending.forEach(function(g){
-      var multi=g.reqs.length>1, open=!!gOpen[g.bc], head=g.reqs[0];
-      html+=rowHtml(g,head,{parent:true,multi:multi,open:open});
-      if(cOpen[head.id]) html+=cmpHtml(head);
-      if(multi&&open){
-        g.reqs.slice(1).forEach(function(r){
-          html+=rowHtml(g,r,{sub:true});
-          if(cOpen[r.id]) html+=cmpHtml(r);
-        });
-      }
+      var multi=g.reqs.length>1, open=!!gOpen[g.bc];
+      html+=reqRows(g,g.reqs[0],{parent:true,multi:multi,open:open});
+      if(multi&&open){g.reqs.slice(1).forEach(function(r){html+=reqRows(g,r,{sub:true});});}
     });
     b.innerHTML=html;
     syncBar();
@@ -522,8 +521,7 @@
   $('ibBody').addEventListener('click',function(e){
     var t=e.target;
     if(t.classList.contains('caret')){var bc=t.getAttribute('data-bc');gOpen[bc]=!gOpen[bc];renderIB();return;}
-    if(t.classList.contains('ibview')){var idv=+t.getAttribute('data-id');cOpen[idv]=!cOpen[idv];renderIB();return;}
-    if(t.classList.contains('ibck')){var idc=+t.closest('tr').getAttribute('data-id');sel[idc]=t.checked;syncBar();t.closest('tr').classList.toggle('sel',t.checked);return;}
+    if(t.classList.contains('ibck')){var idc=+t.closest('tr').getAttribute('data-id');sel[idc]=t.checked;renderIB();return;}
   });
   $('ibAll').addEventListener('change',function(){var v=$('ibAll').checked;
     pending.forEach(function(g){g.reqs.forEach(function(r){sel[r.id]=v;});});renderIB();});
@@ -532,7 +530,7 @@
     var ids=Object.keys(sel).filter(function(k){return sel[k];}).map(Number);
     if(!ids.length)return;
     pending=pending.map(function(g){g.reqs=g.reqs.filter(function(r){return ids.indexOf(r.id)<0;});return g;}).filter(function(g){return g.reqs.length;});
-    ids.forEach(function(id){delete sel[id];delete cOpen[id];});
+    ids.forEach(function(id){delete sel[id];});
     renderIB();
     toast('반영 완료 · '+ids.length+'건 · 수정 이력 생성');
   };
@@ -672,7 +670,7 @@
   // (미리보기) #wait: 요청 모달 / #wait-open: 첫 묶음 펼침+변경 상세 / #chg: 변경 내용 보기(반영 기록)
   if(location.hash.indexOf('chg')>=0){openCG();}
   else if(location.hash.indexOf('wait')>=0){
-    if(location.hash.indexOf('open')>=0){gOpen[pending[0].bc]=true;cOpen[pending[0].reqs[0].id]=true;}
+    if(location.hash.indexOf('open')>=0){gOpen[pending[0].bc]=true;}
     renderIB();$('waitModal').classList.add('open');}
 })();
 </script>
