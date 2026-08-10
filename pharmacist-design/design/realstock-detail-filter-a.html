@@ -23,7 +23,12 @@
     font-family:inherit;font-size:calc(13px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking);cursor:pointer}
   .fbtn:active{background:var(--g-50)}
   .fbtn .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .fbtn svg{flex:none;color:var(--g-500)}
+  .fbtn .funnel{flex:none;color:var(--g-600)}
+  .fbtn.on{border-color:var(--brand-500);color:var(--brand-700)}
+  .fbtn.on .funnel{color:var(--brand-500)}
+  .fbtn .fnum{flex:none;min-width:calc(17px*var(--k));height:calc(17px*var(--k));padding:0 calc(4px*var(--k));border-radius:999px;
+    background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .fbtn .fnum[hidden]{display:none}
 
   /* 카드 = 아코디언 (기준 파일 재사용) */
   .drow{border-bottom:1px solid var(--g-100);padding:calc(14px*var(--k)) 0}
@@ -79,15 +84,14 @@
   .opt{display:flex;align-items:center;gap:calc(10px*var(--k));padding:calc(13px*var(--k)) calc(2px*var(--k));
     border-bottom:1px solid var(--g-100);cursor:pointer}
   .opt:last-of-type{border-bottom:0}
-  .opt .rad{flex:none;width:calc(20px*var(--k));height:calc(20px*var(--k));border-radius:99px;border:2px solid var(--g-400);
-    display:grid;place-items:center;transition:border-color .12s ease}
-  .opt .rad::after{content:"";width:calc(10px*var(--k));height:calc(10px*var(--k));border-radius:99px;background:var(--brand-500);
-    transform:scale(0);transition:transform .14s ease}
-  .opt.sel .rad{border-color:var(--brand-500)}
-  .opt.sel .rad::after{transform:scale(1)}
+  .opt .chk{flex:none;width:calc(20px*var(--k));height:calc(20px*var(--k));border-radius:calc(6px*var(--k));border:2px solid var(--g-400);
+    display:grid;place-items:center;transition:background .12s ease,border-color .12s ease}
+  .opt .chk svg{width:calc(13px*var(--k));height:calc(13px*var(--k));color:#fff;opacity:0;transform:scale(.5);transition:opacity .12s ease,transform .14s ease}
+  .opt.sel .chk{background:var(--brand-500);border-color:var(--brand-500)}
+  .opt.sel .chk svg{opacity:1;transform:scale(1)}
   .opt .otxt{flex:1;min-width:0;font-size:calc(14.5px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking)}
-  .opt .ocnt{flex:none;font-size:calc(13px*var(--k));font-weight:700;color:var(--g-500)}
   .opt.sel .otxt{color:var(--g-900)}
+  .opt.all{border-bottom:1px solid var(--g-200)}
   .sheet-act{display:flex;gap:10px;margin-top:calc(14px*var(--k))}
   .sheet-act .btn{flex:1;width:auto}
 </style>
@@ -114,8 +118,9 @@
       <div class="fbar">
         <span class="fcount">전체 <b id="fcnt">4</b>건</span>
         <button class="fbtn" id="fbtn" aria-haspopup="dialog">
-          <span class="lbl" id="fbtnLbl">전체</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg class="funnel" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span class="lbl">반영상태</span>
+          <span class="fnum" id="fnum" hidden>2</span>
         </button>
       </div>
 
@@ -177,11 +182,11 @@
     <div class="sheet-backdrop" id="backdrop">
       <div class="sheet" role="dialog" aria-modal="true" aria-label="상태 필터">
         <div class="grip"></div>
-        <h3>상태 필터</h3>
-        <div class="opt sel" data-val="all"><span class="rad"></span><span class="otxt">전체</span><span class="ocnt">(4)</span></div>
-        <div class="opt" data-val="done"><span class="rad"></span><span class="otxt">반영완료</span><span class="ocnt">(2)</span></div>
-        <div class="opt" data-val="rej"><span class="rad"></span><span class="otxt">반영반려</span><span class="ocnt">(1)</span></div>
-        <div class="opt" data-val="wait"><span class="rad"></span><span class="otxt">반영전</span><span class="ocnt">(1)</span></div>
+        <h3>반영상태</h3>
+        <div class="opt all sel" data-val="all"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">전체</span></div>
+        <div class="opt sel" data-val="done"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영완료</span></div>
+        <div class="opt sel" data-val="rej"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영반려</span></div>
+        <div class="opt sel" data-val="wait"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영전</span></div>
         <div class="sheet-act">
           <button class="btn btn-line" id="cancelBtn">취소</button>
           <button class="btn btn-primary" id="applyBtn">적용</button>
@@ -191,38 +196,58 @@
   </div>
 </div>
 <script>
-  var LABELS = {all:"전체", done:"반영완료", rej:"반영반려", wait:"반영전"};
-  var COUNTS = {all:4, done:2, rej:1, wait:1};
-  var current = "all";      // 적용된 값
-  var pending = "all";      // 시트에서 선택 중인 값
+  // 다중 선택(체크박스). 상태 3종 — 전체 = 세 개 모두 선택.
+  var STATUSES = ["done","rej","wait"];
+  var COUNTS = {done:2, rej:1, wait:1};
+  var applied = {done:true, rej:true, wait:true};   // 적용된 선택
+  var pending = {done:true, rej:true, wait:true};    // 시트에서 선택 중
   var backdrop = document.getElementById("backdrop");
   var opts = backdrop.querySelectorAll(".opt");
 
-  function openSheet(){
-    pending = current;
-    setPending(pending);
-    backdrop.classList.add("open");
-  }
+  function isAll(s){ return s.done && s.rej && s.wait; }
+  function isNone(s){ return !s.done && !s.rej && !s.wait; }
+
+  function openSheet(){ pending = {done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
   function closeSheet(){ backdrop.classList.remove("open"); }
-  function setPending(val){
-    pending = val;
-    opts.forEach(function(o){ o.classList.toggle("sel", o.getAttribute("data-val")===val); });
-  }
-  function applyFilter(val){
-    current = val;
-    document.getElementById("fbtnLbl").textContent = LABELS[val];
-    document.getElementById("fcnt").textContent = COUNTS[val];
-    document.querySelectorAll(".drow").forEach(function(row){
-      var show = (val==="all") || (row.getAttribute("data-status")===val);
-      row.style.display = show ? "" : "none";
+  function renderPending(){
+    var all = isAll(pending);
+    opts.forEach(function(o){
+      var v = o.getAttribute("data-val");
+      o.classList.toggle("sel", v==="all" ? all : pending[v]);
     });
+  }
+  function toggle(v){
+    if(v==="all"){
+      var next = !isAll(pending);          // 전체 체크 → 모두 선택 / 해제 → 모두 해제
+      pending = {done:next, rej:next, wait:next};
+    } else {
+      pending[v] = !pending[v];
+    }
+    renderPending();
+  }
+  function applyFilter(){
+    applied = {done:pending.done, rej:pending.rej, wait:pending.wait};
+    var showAll = isAll(applied) || isNone(applied);   // 전체 또는 아무것도 없으면 전체 노출
+    var shown = 0;
+    document.querySelectorAll(".drow").forEach(function(row){
+      var st = row.getAttribute("data-status");
+      var show = showAll || applied[st];
+      row.style.display = show ? "" : "none";
+      if(show) shown += COUNTS[st] || 0;
+    });
+    // 좌측 건수 · 필터 버튼 상태(선택 개수 배지)
+    document.getElementById("fcnt").textContent = shown;
+    var selN = STATUSES.filter(function(s){return applied[s];}).length;
+    var fnum = document.getElementById("fnum"), fbtn = document.getElementById("fbtn");
+    var filtered = !showAll;   // 일부만 선택
+    fnum.hidden = !filtered; fnum.textContent = selN;
+    fbtn.classList.toggle("on", filtered);
+    document.querySelector(".fcount").firstChild.textContent = filtered ? "선택 " : "전체 ";
   }
 
   document.getElementById("fbtn").addEventListener("click", openSheet);
-  opts.forEach(function(o){
-    o.addEventListener("click", function(){ setPending(o.getAttribute("data-val")); });
-  });
-  document.getElementById("applyBtn").addEventListener("click", function(){ applyFilter(pending); closeSheet(); });
+  opts.forEach(function(o){ o.addEventListener("click", function(){ toggle(o.getAttribute("data-val")); }); });
+  document.getElementById("applyBtn").addEventListener("click", function(){ applyFilter(); closeSheet(); });
   document.getElementById("cancelBtn").addEventListener("click", closeSheet);
   backdrop.addEventListener("click", function(e){ if(e.target===backdrop) closeSheet(); });
 </script>
