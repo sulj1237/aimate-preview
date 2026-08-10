@@ -3,34 +3,47 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>제출 상세 · 굿팜 약사님용앱</title>
+<title>제출 상세 · 필터 B(Dropdown) · 굿팜 약사님용앱</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
 <link href="ds.css" rel="stylesheet" />
 <style>
-  /* ── 제출 상세 · 카드 재설계 ──
-     ① 수량 = 숫자 강조 `48 → 24개` + 증감 배지(감소=red / 증가=green). '반영 전/후' 텍스트 제거(상태 배지로 대체)
-     ② 메타 한 줄 `HH:MM · 입력자(기기) → 처리자`
-     ③ 상세(재고 차이 사유·처리·반려 사유)는 '자세히' 아코디언
-     배율 --k 로 전체 확대(이 파일=100%). */
+  /* ── 제출 상세 · 필터 B ── 칩·안내문 제거 → 우측 작은 필터 버튼 + Dropdown 메뉴(선택 즉시 적용). */
   :root{ --k:1.00; }
 
   .appbar h1{font-size:calc(19px*var(--k))}
   .dt-head{margin-left:10px;font-size:calc(13px*var(--k));font-weight:700;color:var(--g-600);letter-spacing:var(--tracking);white-space:nowrap}
 
-  /* 안내 힌트 — 2줄, 채운 ⓘ + 텍스트(#A4A4A4) */
-  .hint{margin:calc(4px*var(--k)) 0 calc(8px*var(--k));font-size:calc(12.5px*var(--k));line-height:1.55;color:#A4A4A4;font-weight:500;letter-spacing:var(--tracking)}
-  .hint svg{width:calc(16px*var(--k));height:calc(16px*var(--k));vertical-align:-3px;margin-right:5px}
+  .fbar{position:relative;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:calc(8px*var(--k)) 0 calc(6px*var(--k))}
+  .fcount{font-size:calc(13px*var(--k));font-weight:700;color:var(--g-700);letter-spacing:var(--tracking)}
+  .fcount b{color:var(--g-900)}
+  .fbtn{margin-left:auto;display:inline-flex;align-items:center;gap:calc(5px*var(--k));max-width:100%;
+    padding:calc(7px*var(--k)) calc(12px*var(--k));border-radius:999px;border:1px solid var(--g-300);background:#fff;
+    font-family:inherit;font-size:calc(13px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking);cursor:pointer}
+  .fbtn:active{background:var(--g-50)}
+  .fbtn.on{border-color:var(--brand-400);color:var(--g-900)}
+  .fbtn .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .fbtn svg{flex:none;color:var(--g-500);transition:transform .18s ease}
+  .fbtn.on svg{transform:rotate(180deg)}
 
-  .dfilter{display:flex;gap:6px;margin:calc(10px*var(--k)) 0 calc(6px*var(--k));overflow-x:auto;padding-bottom:2px}
-  .dchip{flex-shrink:0;padding:calc(6px*var(--k)) calc(11px*var(--k));border-radius:999px;border:1px solid var(--g-300);background:#fff;
-    font-family:inherit;font-size:calc(12.5px*var(--k));font-weight:600;color:var(--g-700);white-space:nowrap}
-  .dchip.on{background:var(--g-900);border-color:var(--g-900);color:#fff}
+  /* ── Dropdown 메뉴 ── */
+  .menu{position:absolute;top:calc(100% + 6px);right:0;min-width:calc(150px*var(--k));max-width:calc(220px*var(--k));
+    background:#fff;border:1px solid var(--g-200);border-radius:12px;box-shadow:0 12px 30px -8px rgba(16,24,40,.22);
+    padding:calc(5px*var(--k));z-index:30;opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity .15s ease,transform .15s ease,visibility .15s ease}
+  .menu.open{opacity:1;visibility:visible;transform:translateY(0)}
+  .mitem{display:flex;align-items:center;gap:calc(8px*var(--k));padding:calc(10px*var(--k)) calc(10px*var(--k));
+    border-radius:8px;cursor:pointer;font-size:calc(14px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking)}
+  .mitem:active{background:var(--g-50)}
+  .mitem .ck{flex:none;width:calc(18px*var(--k));height:calc(18px*var(--k));color:var(--brand-500);visibility:hidden}
+  .mitem.sel .ck{visibility:visible}
+  .mitem.sel{color:var(--g-900)}
+  .mitem .mtxt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mitem .mcnt{flex:none;font-size:calc(12.5px*var(--k));font-weight:700;color:var(--g-500)}
 
-  /* 카드 = 아코디언 */
+  /* 카드 = 아코디언 (기준 파일 재사용) */
   .drow{border-bottom:1px solid var(--g-100);padding:calc(14px*var(--k)) 0}
   .drow>summary{list-style:none;cursor:pointer;display:block}
   .drow>summary::-webkit-details-marker{display:none}
-  /* 상단: 바코드·상품명(좌) + 상태 배지(우) */
   .drow-top{display:flex;gap:calc(10px*var(--k));align-items:flex-start}
   .dtitle{flex:1;min-width:0}
   .dbc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(11px*var(--k));color:var(--g-500);letter-spacing:.02em}
@@ -43,7 +56,6 @@
   .stb.rej{background:#fbe3e0;color:var(--sys-red)}
   .stb.wait{background:var(--g-100);color:var(--g-600)}
 
-  /* 수량 — 숫자 강조 + 증감 배지 */
   .dqty{display:flex;align-items:baseline;gap:calc(7px*var(--k));margin-top:calc(10px*var(--k))}
   .dqty .from{font-size:calc(19px*var(--k));font-weight:600;color:var(--g-500)}
   .dqty .arw{font-size:calc(16px*var(--k));color:var(--g-400);font-weight:700}
@@ -55,13 +67,11 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 메타 한 줄 + 자세히 chevron */
   .drow-foot{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(9px*var(--k))}
   .dmeta{flex:1;min-width:0;font-size:calc(12px*var(--k));color:var(--g-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .18s ease}
   .drow[open] .chev{transform:rotate(180deg)}
 
-  /* 상세(펼침) */
   .ddetail{margin-top:calc(10px*var(--k));padding-top:calc(10px*var(--k));border-top:1px dashed var(--g-200)}
   .drs{font-size:calc(12.5px*var(--k));color:var(--g-700);line-height:1.5;margin-top:calc(9px*var(--k))}
   .drs:first-child{margin-top:0}
@@ -72,7 +82,7 @@
 </head>
 <body>
 <div class="stage">
-  <div class="device" data-screen-label="제출 상세">
+  <div class="device" data-screen-label="제출 상세 · 필터 B">
     <div class="statusbar">
       <span class="num">9:41</span>
       <div class="sb-right">
@@ -89,14 +99,21 @@
     </div>
 
     <div class="scroll pad">
-      <div class="dfilter">
-        <button class="dchip on">전체 4</button>
-        <button class="dchip">반영완료 2</button>
-        <button class="dchip">반영반려 1</button>
-        <button class="dchip">반영전 1</button>
+      <div class="fbar">
+        <span class="fcount">전체 <b id="fcnt">4</b>건</span>
+        <button class="fbtn" id="fbtn" aria-haspopup="menu" aria-expanded="false">
+          <span class="lbl" id="fbtnLbl">전체</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="menu" id="menu" role="menu">
+          <div class="mitem sel" data-val="all" role="menuitemradio"><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="mtxt">전체</span><span class="mcnt">4</span></div>
+          <div class="mitem" data-val="done" role="menuitemradio"><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="mtxt">반영완료</span><span class="mcnt">2</span></div>
+          <div class="mitem" data-val="rej" role="menuitemradio"><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="mtxt">반영반려</span><span class="mcnt">1</span></div>
+          <div class="mitem" data-val="wait" role="menuitemradio"><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="mtxt">반영전</span><span class="mcnt">1</span></div>
+        </div>
       </div>
 
-      <details class="drow" open>
+      <details class="drow" data-status="done" open>
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8801234567890</span><div class="dnm">타이레놀콜드-에스정</div><div class="dsub">아세트아미노펜·클로르페니라민 복합제</div></div><span class="stb done">반영완료</span></div>
           <div class="dqty"><span class="from">48</span><span class="arw">→</span><span class="to">24</span><span class="unit">개</span><span class="delta down">−24</span></div>
@@ -108,7 +125,7 @@
         </div>
       </details>
 
-      <details class="drow">
+      <details class="drow" data-status="done">
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8806789012345</span><div class="dnm">판콜에이내복액 30ml</div></div><span class="stb done">반영완료</span></div>
           <div class="dqty"><span class="from">52</span><span class="arw">→</span><span class="to">60</span><span class="unit">개</span><span class="delta up">+8</span></div>
@@ -120,7 +137,7 @@
         </div>
       </details>
 
-      <details class="drow">
+      <details class="drow" data-status="rej">
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8803333000044</span><div class="dnm">겔포스엠현탁액</div></div><span class="stb rej">반영반려</span></div>
           <div class="dqty"><span class="from">38</span><span class="arw">→</span><span class="to">40</span><span class="unit">개</span><span class="delta up">+2</span></div>
@@ -133,7 +150,7 @@
         </div>
       </details>
 
-      <details class="drow">
+      <details class="drow" data-status="wait">
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8801111000022</span><div class="dnm">훼스탈플러스정</div></div><span class="stb wait">반영전</span></div>
           <div class="dqty"><span class="only">제출 30</span><span class="unit">개</span></div>
@@ -151,5 +168,36 @@
     </div>
   </div>
 </div>
+<script>
+  var LABELS = {all:"전체", done:"반영완료", rej:"반영반려", wait:"반영전"};
+  var COUNTS = {all:4, done:2, rej:1, wait:1};
+  var fbtn = document.getElementById("fbtn");
+  var menu = document.getElementById("menu");
+  var items = menu.querySelectorAll(".mitem");
+
+  function toggleMenu(open){
+    var willOpen = (open===undefined) ? !menu.classList.contains("open") : open;
+    menu.classList.toggle("open", willOpen);
+    fbtn.classList.toggle("on", willOpen);
+    fbtn.setAttribute("aria-expanded", willOpen ? "true":"false");
+  }
+  function applyFilter(val){
+    document.getElementById("fbtnLbl").textContent = LABELS[val];
+    document.getElementById("fcnt").textContent = COUNTS[val];
+    items.forEach(function(it){ it.classList.toggle("sel", it.getAttribute("data-val")===val); });
+    document.querySelectorAll(".drow").forEach(function(row){
+      var show = (val==="all") || (row.getAttribute("data-status")===val);
+      row.style.display = show ? "" : "none";
+    });
+  }
+
+  fbtn.addEventListener("click", function(e){ e.stopPropagation(); toggleMenu(); });
+  items.forEach(function(it){
+    it.addEventListener("click", function(){ applyFilter(it.getAttribute("data-val")); toggleMenu(false); });
+  });
+  document.addEventListener("click", function(e){
+    if(!menu.contains(e.target) && e.target!==fbtn) toggleMenu(false);
+  });
+</script>
 </body>
 </html>
