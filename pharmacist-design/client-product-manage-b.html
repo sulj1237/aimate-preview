@@ -70,18 +70,19 @@
   .il-meta{color:#8a9099;font-size:11.5px;white-space:nowrap}
   .ib-note{margin-top:10px;font-size:11px;color:#8a9099;line-height:1.6}
   .ib-empty{padding:44px 0;text-align:center;color:#9aa0a6}
-  /* 변경 내용 Drawer(우측 슬라이드) */
-  .drawer-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.35);z-index:90}
-  .drawer-bg.open{display:block}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:430px;max-width:92vw;background:#fff;z-index:91;
-    transform:translateX(100%);transition:transform .22s ease;box-shadow:-16px 0 50px -24px rgba(0,0,0,.4);display:flex;flex-direction:column}
-  .drawer.open{transform:translateX(0)}
-  .drawer-h{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
-  .drawer-h .dt{font-size:14px;font-weight:800;color:#28303a}
-  .drawer-h .x{margin-left:auto;border:none;background:none;font-size:18px;color:var(--muted);cursor:pointer}
-  .drawer-b{padding:16px 18px;overflow:auto;flex:1}
-  .drawer-f{display:flex;gap:8px;padding:14px 18px;border-top:1px solid var(--line);background:#fbfbfc}
-  .drawer-f .mbtn{flex:1}
+  /* 동일 상품 묶음(실재고 관리 동일) — 수정 N건 배지·펼침 */
+  .nbadge{display:inline-block;font-size:10px;font-weight:800;background:var(--teal-soft);color:var(--teal-d);border:1px solid #cdeee8;border-radius:999px;padding:1px 7px;margin-left:6px}
+  .caret{display:inline-block;width:14px;text-align:center;margin-left:4px;color:#9aa0a6;cursor:pointer;user-select:none}
+  .iltable tbody tr.ib-sub td{background:#fbfcfd}
+  .il-nm.sub{color:#6b7178;font-weight:600}
+  /* 변경 내용 = 해당 레코드 하단에 표(인라인) */
+  .iltable tbody tr.ib-cmp{cursor:default}
+  .iltable tbody tr.ib-cmp:hover>td{background:#f6f8fb}
+  .ib-cmp>td{background:#f6f8fb;padding:0;border-bottom:1px solid #eef0f2}
+  .cmpwrap{padding:10px 14px 14px}
+  .cmpwrap .cmp{background:#fff;border:1px solid #e6e9ed;border-radius:8px;overflow:hidden}
+  .cmpwrap .cmp th{background:#f4f6f8;padding:7px 12px}
+  .cmpwrap .cmp td{padding:9px 12px}
   .cmp{width:100%;border-collapse:collapse;font-size:12px}
   .cmp th{text-align:left;color:#8a9099;font-weight:700;padding:8px 10px 6px;border-bottom:1px solid #e3e6ea;white-space:nowrap}
   .cmp th.c{width:26px;text-align:center}
@@ -314,19 +315,18 @@
     <div class="modal-b">
       <div class="ib-bar">
         <label class="selall"><input type="checkbox" id="ibAll"> 전체선택</label>
-        <span class="ib-cnt">총 <b id="ibTotal">0</b>건 · 선택 <b id="ibSel">0</b>건</span>
+        <span class="ib-cnt">전체 <b id="ibTotal">0</b>건 중 선택 <b id="ibSel">0</b>건</span>
         <span class="ib-bulk">
-          <button class="btn red sm" id="ibReject" disabled>일괄 반려</button>
-          <button class="btn teal sm" id="ibApply" disabled>일괄 반영</button>
+          <button class="btn teal sm" id="ibApply" disabled>반영</button>
         </span>
       </div>
       <div class="iltable">
         <table>
-          <thead><tr><th style="width:34px"></th><th>상품명</th><th>변경 요약</th><th>제출자</th><th>제출일시</th><th style="width:90px"></th></tr></thead>
+          <thead><tr><th style="width:34px"></th><th>상품명</th><th>변경 요약</th><th>제출자</th><th>제출일시</th><th style="width:104px"></th></tr></thead>
           <tbody id="ibBody"></tbody>
         </table>
       </div>
-      <div class="ib-note">ⓘ 최신순 정렬 · 동일 상품은 <b>최신 요청 1건만</b> 노출(이전 요청 숨김) · <b>7일 미처리 시 자동 반려</b>(또는 동일 상품 새 요청 시 이전 요청 자동 반려).</div>
+      <div class="ib-note">ⓘ 동일 상품으로 여러 번 수정 제출된 경우 <b>바코드 기준으로 묶어</b> 표시됩니다(<b>수정 N건</b>). · 승인(반영)하지 않은 요청은 <b>계속 누적</b>됩니다(자동 반려 없음).</div>
     </div>
     <div class="modal-f">
       <button class="mbtn ghost" id="wCloseF">닫기</button>
@@ -334,19 +334,6 @@
   </div>
 </div>
 
-<!-- 변경 내용 Drawer (우측 슬라이드) -->
-<div class="drawer-bg" id="drawerBg"></div>
-<aside class="drawer" id="drawer" aria-hidden="true">
-  <div class="drawer-h"><div class="dt">변경 내용 — <span id="drNm"></span></div><button class="x" id="drClose">✕</button></div>
-  <div class="drawer-b">
-    <div class="pcard" style="display:flex;flex-direction:column;gap:6px">
-      <div style="font-size:12px"><span style="color:#8a9099">바코드</span> <span class="mono" style="font-family:ui-monospace,Menlo,monospace" id="drBc"></span></div>
-      <div style="font-size:12px"><span style="color:#8a9099">제출</span> <span id="drBy"></span> · <span id="drAt"></span></div>
-    </div>
-    <table class="cmp"><thead><tr><th>항목</th><th>현재값</th><th class="c"></th><th>앱 제출값</th></tr></thead><tbody id="drCmp"></tbody></table>
-  </div>
-  <div class="drawer-f"><button class="mbtn ghost" id="drReject">반려</button><button class="mbtn primary" id="drApply">반영</button></div>
-</aside>
 
 <div class="toast" id="toast"></div>
 
@@ -383,60 +370,96 @@
     $('cnt').textContent=2131;
   }
 
-  // ① 시안 B · 앱 상품 수정 요청(결재함) — 리스트 + 체크박스 일괄 반영/반려 + 우측 Drawer.
-  //   정책: 최신순 정렬 · 동일 상품 최신 1건만 노출(이전 요청 숨김) · 7일 미처리 자동 반려.
+  // ① 시안 B · 앱 상품 수정 요청 — 리스트 + 체크박스 · 선택 반영(반려 없음·미승인 누적).
+  //   동일 바코드로 여러 번 제출되면 '수정 N건'으로 묶어 표시(실재고 관리와 동일 UI).
+  //   변경 내용 보기 → 해당 레코드 하단에 비교 표(인라인 아코디언)로 전개.
   var pending=[
-    {nm:'타이레놀서방정 500mg', bc:'8806789012345', by:'김약사', dev:'A21', at:'08-10 09:31', changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'},{f:'위치', cur:'A-2', nw:'A-3'},{f:'단위(포장)', cur:'정', nw:'병'}]},
-    {nm:'판콜에이내복액 30ml', bc:'8806789012399', by:'이약사', dev:'B07', at:'08-10 09:18', changes:[{f:'상품명', cur:'판콜에이 30ml', nw:'판콜에이내복액 30ml'}]},
-    {nm:'[2+1]비타리움 프로폴리스…', bc:'9343202002627', by:'김약사', dev:'A21', at:'08-10 08:51', changes:[{f:'판매가', cur:'26,500원', nw:'27,500원'},{f:'중분류', cur:'일반의약품', nw:'의약외품'}]},
-    {nm:'겔포스엠현탁액', bc:'8803333000044', by:'정약사', dev:'A08', at:'08-10 08:33', changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'}]},
-    {nm:'베아제정', bc:'8802223000011', by:'박직원', dev:'C15', at:'08-09 18:12', changes:[{f:'위치', cur:'B-1', nw:'B-4'},{f:'판매가', cur:'1,300원', nw:'1,400원'}]},
-    {nm:'훼스탈플러스정', bc:'8801111000022', by:'이약사', dev:'B07', at:'08-09 17:40', changes:[{f:'제조업체', cur:'-', nw:'한독'}]},
-    {nm:'우루사정 100mg', bc:'8808888000099', by:'김약사', dev:'A21', at:'08-09 16:05', changes:[{f:'판매가', cur:'8,000원', nw:'8,500원'},{f:'단위(포장)', cur:'정', nw:'병'}]},
-    {nm:'가스활명수큐액', bc:'8801234500011', by:'정약사', dev:'A08', at:'08-09 15:22', changes:[{f:'상품명', cur:'활명수', nw:'가스활명수큐액'},{f:'분류', cur:'일반', nw:'의약외품'},{f:'판매가', cur:'800원', nw:'900원'}]}
+    {bc:'8806789012345', nm:'타이레놀서방정 500mg', reqs:[
+      {id:1, by:'김약사', dev:'A21', at:'08-10 09:31', changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'},{f:'위치', cur:'A-2', nw:'A-3'},{f:'단위(포장)', cur:'정', nw:'병'}]},
+      {id:2, by:'이약사', dev:'B07', at:'08-09 14:10', changes:[{f:'판매가', cur:'4,500원', nw:'4,800원'}]}
+    ]},
+    {bc:'8806789012399', nm:'판콜에이내복액 30ml', reqs:[
+      {id:3, by:'이약사', dev:'B07', at:'08-10 09:18', changes:[{f:'상품명', cur:'판콜에이 30ml', nw:'판콜에이내복액 30ml'}]}
+    ]},
+    {bc:'9343202002627', nm:'[2+1]비타리움 프로폴리스…', reqs:[
+      {id:4, by:'김약사', dev:'A21', at:'08-10 08:51', changes:[{f:'판매가', cur:'26,500원', nw:'27,500원'},{f:'중분류', cur:'일반의약품', nw:'의약외품'}]}
+    ]},
+    {bc:'8803333000044', nm:'겔포스엠현탁액', reqs:[
+      {id:5, by:'정약사', dev:'A08', at:'08-10 08:33', changes:[{f:'판매가', cur:'4,500원', nw:'5,000원'}]}
+    ]},
+    {bc:'8808888000099', nm:'우루사정 100mg', reqs:[
+      {id:6, by:'김약사', dev:'A21', at:'08-09 16:05', changes:[{f:'판매가', cur:'8,000원', nw:'8,500원'},{f:'단위(포장)', cur:'정', nw:'병'}]}
+    ]},
+    {bc:'8801234500011', nm:'가스활명수큐액', reqs:[
+      {id:7, by:'정약사', dev:'A08', at:'08-09 15:22', changes:[{f:'상품명', cur:'활명수', nw:'가스활명수큐액'},{f:'분류', cur:'일반', nw:'의약외품'},{f:'판매가', cur:'800원', nw:'900원'}]}
+    ]}
   ];
+  var gOpen={};   // 펼친 묶음(바코드) — 이전 요청 표시
+  var cOpen={};   // 변경 내용 비교 표를 펼친 요청(id)
+  var sel={};     // 선택된 요청(id)
   function summaryOf(c){return c.length>1?(c[0].f+' 외 '+(c.length-1)+'건 변경'):(c[0].f+' 변경');}
-  function updateBadge(){var el=$('syncBadge'),n=pending.length;if(n){el.textContent=n>99?'99+':n;el.style.display='';}else{el.style.display='none';}}
-  function selCount(){return pending.filter(function(p){return p._sel;}).length;}
-  function syncBulk(){var n=selCount();$('ibSel').textContent=n;$('ibTotal').textContent=pending.length;
-    var d=n===0;$('ibApply').disabled=d;$('ibReject').disabled=d;
-    $('ibAll').checked=pending.length>0&&n===pending.length;$('ibAll').indeterminate=n>0&&n<pending.length;updateBadge();}
+  function totalReqs(){return pending.reduce(function(s,g){return s+g.reqs.length;},0);}
+  function selCount(){return Object.keys(sel).filter(function(k){return sel[k];}).length;}
+  function updateBadge(){var el=$('syncBadge'),n=totalReqs();if(n){el.textContent=n>99?'99+':n;el.style.display='';}else{el.style.display='none';}}
+  function syncBar(){var n=selCount(),tot=totalReqs();
+    $('ibSel').textContent=n;$('ibTotal').textContent=tot;
+    $('ibApply').disabled=n===0;
+    $('ibAll').checked=tot>0&&n===tot;$('ibAll').indeterminate=n>0&&n<tot;updateBadge();}
+  function cmpHtml(r){
+    var rows=r.changes.map(function(ch){return '<tr><td class="fld-n">'+ch.f+'</td><td class="cur">'+ch.cur+'</td><td class="arw">→</td><td class="new">'+ch.nw+'</td></tr>';}).join('');
+    return '<tr class="ib-cmp"><td colspan="6"><div class="cmpwrap"><table class="cmp"><thead><tr><th>항목</th><th>현재값</th><th class="c"></th><th>앱 제출값</th></tr></thead><tbody>'+rows+'</tbody></table></div></td></tr>';
+  }
+  function rowHtml(g,r,o){
+    var nameCell;
+    if(o.parent){
+      nameCell='<span class="il-nm">'+g.nm+(o.multi?'<span class="nbadge">수정 '+g.reqs.length+'건</span><span class="caret" data-bc="'+g.bc+'">'+(o.open?'▾':'▸')+'</span>':'')+'</span>';
+    }else{
+      nameCell='<span class="il-nm sub">└ 이전 요청</span>';
+    }
+    return '<tr class="ib-row'+(o.sub?' ib-sub':'')+(sel[r.id]?' sel':'')+'" data-id="'+r.id+'">'+
+      '<td><input type="checkbox" class="ibck" '+(sel[r.id]?'checked':'')+'></td>'+
+      '<td>'+nameCell+'</td>'+
+      '<td class="il-sum">'+summaryOf(r.changes)+'</td>'+
+      '<td class="il-meta">'+r.by+'('+r.dev+')</td>'+
+      '<td class="il-meta">'+r.at+'</td>'+
+      '<td><button class="btn line sm ibview" data-id="'+r.id+'">'+(cOpen[r.id]?'변경 내용 닫기':'변경 내용 보기')+'</button></td>'+
+    '</tr>';
+  }
   function renderIB(){
     var b=$('ibBody');
-    if(!pending.length){b.innerHTML='<tr><td colspan="6"><div class="ib-empty">앱 수정 요청이 없습니다.</div></td></tr>';syncBulk();return;}
-    b.innerHTML=pending.map(function(p,i){
-      return '<tr data-i="'+i+'" class="'+(p._sel?'sel':'')+'">'+
-        '<td><input type="checkbox" class="ibck" '+(p._sel?'checked':'')+'></td>'+
-        '<td class="il-nm">'+p.nm+'</td>'+
-        '<td class="il-sum">'+summaryOf(p.changes)+'</td>'+
-        '<td class="il-meta">'+p.by+'('+p.dev+')</td>'+
-        '<td class="il-meta">'+p.at+'</td>'+
-        '<td><button class="btn line sm il-view">변경 내용</button></td>'+
-      '</tr>';
-    }).join('');
-    syncBulk();
+    if(!pending.length){b.innerHTML='<tr><td colspan="6"><div class="ib-empty">반영할 수정 요청이 없습니다.</div></td></tr>';syncBar();return;}
+    var html='';
+    pending.forEach(function(g){
+      var multi=g.reqs.length>1, open=!!gOpen[g.bc], head=g.reqs[0];
+      html+=rowHtml(g,head,{parent:true,multi:multi,open:open});
+      if(cOpen[head.id]) html+=cmpHtml(head);
+      if(multi&&open){
+        g.reqs.slice(1).forEach(function(r){
+          html+=rowHtml(g,r,{sub:true});
+          if(cOpen[r.id]) html+=cmpHtml(r);
+        });
+      }
+    });
+    b.innerHTML=html;
+    syncBar();
   }
   $('ibBody').addEventListener('click',function(e){
-    var tr=e.target.closest('tr'); if(!tr||!tr.hasAttribute('data-i'))return; var i=+tr.getAttribute('data-i');
-    if(e.target.classList.contains('ibck')){pending[i]._sel=e.target.checked;tr.classList.toggle('sel',e.target.checked);syncBulk();return;}
-    openDrawer(i); // 행 클릭 또는 '변경 내용' → Drawer
+    var t=e.target;
+    if(t.classList.contains('caret')){var bc=t.getAttribute('data-bc');gOpen[bc]=!gOpen[bc];renderIB();return;}
+    if(t.classList.contains('ibview')){var idv=+t.getAttribute('data-id');cOpen[idv]=!cOpen[idv];renderIB();return;}
+    if(t.classList.contains('ibck')){var idc=+t.closest('tr').getAttribute('data-id');sel[idc]=t.checked;syncBar();t.closest('tr').classList.toggle('sel',t.checked);return;}
   });
-  $('ibAll').addEventListener('change',function(){var v=$('ibAll').checked;pending.forEach(function(p){p._sel=v;});renderIB();});
-  function bulk(apply){var sel=pending.filter(function(p){return p._sel;});if(!sel.length)return;
-    pending=pending.filter(function(p){return !p._sel;});renderIB();
-    toast((apply?'일괄 반영':'일괄 반려')+' · '+sel.length+'건'+(apply?' · 수정 이력 생성':''));}
-  $('ibApply').onclick=function(){bulk(true);};
-  $('ibReject').onclick=function(){bulk(false);};
-  // 변경 내용 Drawer(우측)
-  var drIdx=-1;
-  function openDrawer(i){drIdx=i;var p=pending[i];
-    $('drNm').textContent=p.nm;$('drBc').textContent=p.bc;$('drBy').textContent=p.by+'('+p.dev+')';$('drAt').textContent=p.at;
-    $('drCmp').innerHTML=p.changes.map(function(ch){return '<tr><td class="fld-n">'+ch.f+'</td><td class="cur">'+ch.cur+'</td><td class="arw">→</td><td class="new">'+ch.nw+'</td></tr>';}).join('');
-    $('drawer').classList.add('open');$('drawerBg').classList.add('open');}
-  function closeDrawer(){$('drawer').classList.remove('open');$('drawerBg').classList.remove('open');drIdx=-1;}
-  $('drClose').onclick=closeDrawer;$('drawerBg').onclick=closeDrawer;
-  $('drApply').onclick=function(){if(drIdx<0)return;var p=pending[drIdx];pending.splice(drIdx,1);closeDrawer();renderIB();toast('반영 완료 · '+p.nm+' · 수정 이력 생성');};
-  $('drReject').onclick=function(){if(drIdx<0)return;var p=pending[drIdx];pending.splice(drIdx,1);closeDrawer();renderIB();toast('반려 처리 · '+p.nm);};
+  $('ibAll').addEventListener('change',function(){var v=$('ibAll').checked;
+    pending.forEach(function(g){g.reqs.forEach(function(r){sel[r.id]=v;});});renderIB();});
+  // 선택 반영 — 체크된 요청만 반영(제거). 나머지(미승인)는 계속 누적.
+  $('ibApply').onclick=function(){
+    var ids=Object.keys(sel).filter(function(k){return sel[k];}).map(Number);
+    if(!ids.length)return;
+    pending=pending.map(function(g){g.reqs=g.reqs.filter(function(r){return ids.indexOf(r.id)<0;});return g;}).filter(function(g){return g.reqs.length;});
+    ids.forEach(function(id){delete sel[id];delete cOpen[id];});
+    renderIB();
+    toast('반영 완료 · '+ids.length+'건 · 수정 이력 생성');
+  };
   $('syncBtn').onclick=function(){renderIB();$('waitModal').classList.add('open');};
   function closeWait(){$('waitModal').classList.remove('open');}
   $('wClose').onclick=closeWait;$('wCloseF').onclick=closeWait;
@@ -499,9 +522,10 @@
   function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toastEl.classList.remove('show')},2000);}
 
   renderList();
-  // (미리보기) #wait: 요청 모달 열기 / #wait-open: 첫 건 변경 내용 Drawer
-  if(location.hash.indexOf('wait')>=0){renderIB();$('waitModal').classList.add('open');
-    if(location.hash.indexOf('open')>=0){openDrawer(0);}}
+  // (미리보기) #wait: 요청 모달 열기 / #wait-open: 첫 묶음 펼침 + 변경 내용 표
+  if(location.hash.indexOf('wait')>=0){
+    if(location.hash.indexOf('open')>=0){gOpen[pending[0].bc]=true;cOpen[pending[0].reqs[0].id]=true;}
+    renderIB();$('waitModal').classList.add('open');}
 })();
 </script>
 </body>

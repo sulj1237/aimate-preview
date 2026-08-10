@@ -151,7 +151,7 @@
         <b>0개</b>는 재고 없음, <b>-</b>는 수량 미입력을 의미합니다.<br>
         반영/실패 결과는 <b>변경 내용 보기</b>에서 확인할 수 있습니다.
       </span></span>
-      <button class="btn primary" id="applyBtn" disabled>재고 반영</button>
+      <button class="btn primary" id="applyBtn" disabled>반영</button>
       <button class="linkbtn" id="histBtn">변경 내용 보기</button>
     </div>
 
@@ -354,7 +354,7 @@
     if(!ids.length){toast('선택한 제출 건이 없습니다.');return;}
     $('mTitle').textContent='선택한 실재고를 전산상 재고에 반영하시겠습니까?';
     $('mDesc').textContent='선택한 상품의 전산상 재고가 굿팜 약사님용앱 입력 총 수량으로 변경됩니다.';
-    $('mOk').textContent='재고 반영';$('mOk').className='btn primary';
+    $('mOk').textContent='반영';$('mOk').className='btn primary';
     $('mCnt').textContent=ids.length;modal.classList.add('open');
   }
   $('applyBtn').onclick=function(){openModal()};
