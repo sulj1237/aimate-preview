@@ -103,10 +103,19 @@
   .cg-inp{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;width:230px;outline:none}
   .cg-inp:focus{border-color:var(--teal)}
   .cg-cnt{font-size:12px;color:#6b7178}.cg-cnt b{color:var(--teal-d)}
+  /* 변경 내용 보기 — 실재고 관리 '변경 내용 보기'와 동일한 링크형 버튼 */
+  .linkbtn{background:none;border:none;padding:0 2px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--teal-d);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .linkbtn:hover{color:var(--teal)}
+  .linkbtn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:3px}
   .st{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap}
   .st-done{background:var(--teal-soft);color:var(--teal-d)}
-  .st-fail{background:#fdecea;color:#d64431}
+  .st-rej{background:#fdecea;color:#d64431}
   .cgtable th.c,.cgtable td.c{text-align:center}
+  /* 같은 반영(상품+반영일시) 묶음 — 변경 항목만 여러 줄, 나머지는 rowspan */
+  .cgtable td[rowspan]{vertical-align:middle;background:#fff}
+  .cgtable tbody td{border-bottom:1px solid #f2f4f6}
+  .cgtable tbody tr.gend td{border-bottom:1px solid #e3e6ea}
+  .cgtable tbody tr:last-child td{border-bottom:none}
   .cgtable{border:1px solid var(--line);border-radius:10px;overflow-x:auto}
   .cgtable table{width:100%;min-width:940px;border-collapse:collapse;font-size:12px}
   .cgtable th{background:#f6f8fa;text-align:left;color:#8a9099;font-weight:700;padding:9px 11px;border-bottom:1px solid #e3e6ea;white-space:nowrap}
@@ -339,8 +348,8 @@
         <label class="selall"><input type="checkbox" id="ibAll"> 전체선택</label>
         <span class="ib-cnt">전체 <b id="ibTotal">0</b>건 중 선택 <b id="ibSel">0</b>건</span>
         <span class="ib-bulk">
-          <button class="btn line sm" id="cgOpen">변경 내용 보기</button>
           <button class="btn teal sm" id="ibApply" disabled>반영</button>
+          <button class="linkbtn" id="cgOpen">변경 내용 보기</button>
         </span>
       </div>
       <div class="iltable">
@@ -384,7 +393,7 @@
         <select class="cg-sel" id="cgStatus">
           <option value="all">처리결과 전체</option>
           <option value="done">반영완료</option>
-          <option value="fail">반영실패</option>
+          <option value="rej">반영반려</option>
         </select>
         <span class="cg-cnt">조회 <b id="cgCnt">0</b>건</span>
       </div>
@@ -534,13 +543,15 @@
 
   // ④ 변경 내용 보기 — 이전 상품 정보 수정 반영 기록(실재고 관리 '변경 내용 보기'와 동일 성격)
   //   검색 카테고리: 상품명·제조사·바코드 / 기간(캘린더+빠른선택) / 처리결과(반영완료·반영실패). 시안 B는 반려 없음 → 반영반려 제외.
-  var CGST={done:['반영완료','st-done'],fail:['반영실패','st-fail']};
+  var CGST={done:['반영완료','st-done'],rej:['반영반려','st-rej']};
   var applied=[
     {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'판매가',   before:'4,300원',      after:'4,500원',            by:'김약사(A21)', st:'done', appBy:'정OO'},
     {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'중분류',   before:'일반의약품',   after:'의약외품',           by:'김약사(A21)', st:'done', appBy:'정OO'},
+    {at:'2026-08-08 10:22', nm:'타이레놀서방정 500mg', mfr:'한국얀센',  bc:'8806789012345', f:'위치',     before:'A-2',          after:'A-3',                by:'김약사(A21)', st:'done', appBy:'정OO'},
     {at:'2026-08-07 16:41', nm:'베아제정',            mfr:'대웅제약',  bc:'8802223000011', f:'위치',     before:'B-1',          after:'B-4',                by:'박직원(C15)', st:'done', appBy:'정OO'},
-    {at:'2026-08-07 09:05', nm:'훼스탈플러스정',       mfr:'한독',      bc:'8801111000022', f:'제조업체', before:'-',            after:'한독',               by:'이약사(B07)', st:'fail', appBy:'정OO'},
+    {at:'2026-08-07 09:05', nm:'훼스탈플러스정',       mfr:'한독',      bc:'8801111000022', f:'제조업체', before:'-',            after:'한독',               by:'이약사(B07)', st:'rej',  appBy:'정OO'},
     {at:'2026-08-05 14:12', nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'상품명',   before:'판콜에이 30ml', after:'판콜에이내복액 30ml', by:'이약사(B07)', st:'done', appBy:'정OO'},
+    {at:'2026-08-05 14:12', nm:'판콜에이내복액 30ml',  mfr:'동화약품',  bc:'8806789012399', f:'판매가',   before:'2,800원',      after:'3,000원',            by:'이약사(B07)', st:'done', appBy:'정OO'},
     {at:'2026-06-20 11:30', nm:'우루사정 100mg',       mfr:'대웅제약',  bc:'8808888000099', f:'판매가',   before:'7,800원',      after:'8,000원',            by:'김약사(A21)', st:'done', appBy:'정OO'}
   ];
   function ymd(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(day<10?'0'+day:day);}
@@ -562,9 +573,27 @@
       if(q){var hay=key==='제조사'?r.mfr:(key==='바코드'?r.bc:r.nm);if(hay.indexOf(q)<0)return false;}
       return true;
     });
-    $('cgCnt').textContent=rows.length;
-    $('cgBody').innerHTML=rows.length?rows.map(function(r){var s=CGST[r.st];
-      return '<tr><td class="vt">'+r.at+'</td><td>'+r.nm+'</td><td>'+r.mfr+'</td><td class="mono">'+r.bc+'</td><td><b>'+r.f+'</b></td><td class="before">'+r.before+'</td><td class="after">'+r.after+'</td><td>'+r.by+'</td><td class="c"><span class="st '+s[1]+'">'+s[0]+'</span></td><td>'+r.appBy+'</td></tr>';
+    // 같은 반영(상품+반영일시+처리결과)으로 묶어 변경 항목만 여러 줄, 나머지는 rowspan
+    var groups=[], map={};
+    rows.forEach(function(r){
+      var k=r.at+'|'+r.bc+'|'+r.st;
+      if(!map[k]){map[k]={at:r.at,nm:r.nm,mfr:r.mfr,bc:r.bc,by:r.by,st:r.st,appBy:r.appBy,items:[]};groups.push(map[k]);}
+      map[k].items.push(r);
+    });
+    $('cgCnt').textContent=groups.length;
+    $('cgBody').innerHTML=groups.length?groups.map(function(g){var s=CGST[g.st],n=g.items.length;
+      return g.items.map(function(it,i){var first=i===0,last=i===n-1;
+        return '<tr class="'+(last?'gend':'')+'">'+
+          (first?'<td class="vt" rowspan="'+n+'">'+g.at+'</td>':'')+
+          (first?'<td rowspan="'+n+'">'+g.nm+'</td>':'')+
+          (first?'<td rowspan="'+n+'">'+g.mfr+'</td>':'')+
+          (first?'<td class="mono" rowspan="'+n+'">'+g.bc+'</td>':'')+
+          '<td><b>'+it.f+'</b></td><td class="before">'+it.before+'</td><td class="after">'+it.after+'</td>'+
+          (first?'<td rowspan="'+n+'">'+g.by+'</td>':'')+
+          (first?'<td class="c" rowspan="'+n+'"><span class="st '+s[1]+'">'+s[0]+'</span></td>':'')+
+          (first?'<td rowspan="'+n+'">'+g.appBy+'</td>':'')+
+        '</tr>';
+      }).join('');
     }).join(''):'<tr><td colspan="10"><div class="ib-empty">반영된 수정 기록이 없습니다.</div></td></tr>';
   }
   (function(){var qs=document.querySelectorAll('.cg-qbtn');for(var i=0;i<qs.length;i++){(function(b){b.onclick=function(){cgClearQuick();b.classList.add('on');cgSetRange(+b.getAttribute('data-m'));renderCG();};})(qs[i]);}})();

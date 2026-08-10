@@ -261,9 +261,10 @@
   ];
   // 반영 기록 — 반영완료 / 반영실패 / 반영반려 3종. 수량은 모두 제출 시점 스냅샷. 실패 건은 reason 표시.
   var records=[
-    {at:'2026-04-28 18:30',name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:55,by:'김약사(A21)',rs:'정기 실사 중 차이 확인', appBy:'정OO',st:'done'},
-    {at:'2026-04-28 17:11',name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',rs:'',                 appBy:'정OO',st:'rejected'},
-    {at:'2026-04-28 16:40',name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',rs:'파손 2개 폐기 처리',   appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'}
+    {at:'2026-08-08 18:30',name:'마바시럽',bc:'8805555',wh:30,  disp:30,  total:60,before:55,by:'김약사(A21)',rs:'정기 실사 중 차이 확인', appBy:'정OO',st:'done'},
+    {at:'2026-08-07 17:11',name:'라마크림',bc:'8803333',wh:22,  disp:10,  total:32,before:40,by:'이약사(B07)',rs:'',                 appBy:'정OO',st:'rejected'},
+    {at:'2026-08-06 16:40',name:'아스피린정',bc:'8804444',wh:null,disp:null,total:88,before:50,by:'김약사(A21)',rs:'파손 2개 폐기 처리',   appBy:'정OO',st:'fail',reason:'GPC 반영 오류 — 재시도 필요'},
+    {at:'2026-08-04 11:05',name:'가나정 10mg',bc:'8801234',wh:55,  disp:38,  total:93,before:72,by:'김약사(A21)',rs:'입고 검수 중 수량 오차', appBy:'정OO',st:'done'}
   ];
   var sel={};      // bc -> subId (그룹 내 1건만)
   var expanded={}; // bc -> bool
@@ -448,6 +449,8 @@
     });
   }
   doSync(true);initSelection();renderMain();renderRec();   // 탭 진입 시 자동 동기화 + 기본 선택
+  // (미리보기) #rec: 변경 내용 보기(반영 기록) 모달 열기
+  if(location.hash.indexOf('rec')>=0){$('histModal').classList.add('open');renderRec();}
 })();
 </script>
 </body>
