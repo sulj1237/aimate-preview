@@ -298,7 +298,9 @@
     var nameCell=isSub
       ? '<td class="name">└ 제출</td>'
       : '<td class="name">'+s.name+'</td>';
-    return '<td class="c">'+chk+'</td>'+nameCell+'<td>'+s.bc+'</td>'+
+    // 묶음 하위(제출) 행은 동일 상품이라 바코드를 반복 출력하지 않음(그룹 헤더에 표기)
+    var bcCell=isSub ? '<td></td>' : '<td>'+s.bc+'</td>';
+    return '<td class="c">'+chk+'</td>'+nameCell+bcCell+
       '<td class="num">'+s.base+'</td><td class="num">'+n2(s.wh)+'</td><td class="num">'+n2(s.disp)+'</td>'+
       '<td class="num">'+s.total+'</td><td class="num">'+diffHtml(s.total,s.base)+'</td>'+
       '<td>'+s.by+'</td><td class="rs-cell" title="'+(s.rs||'')+'"><div class="rs-clamp">'+rsn(s.rs)+'</div></td><td>'+s.at+'</td>';

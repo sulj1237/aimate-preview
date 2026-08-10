@@ -414,7 +414,7 @@
   function reqRows(g,r,o){
     var n=r.changes.length;
     var nameCell=o.sub
-      ? '<span class="il-nm sub">└ 이전 요청</span>'
+      ? '<span class="il-nm sub">└ 제출</span>'
       : '<span class="il-nm">'+g.nm+(o.multi?'<span class="nbadge">수정 '+g.reqs.length+'건</span><span class="caret" data-bc="'+g.bc+'">'+(o.open?'▾':'▸')+'</span>':'')+'</span>';
     return r.changes.map(function(ch,i){var first=i===0,last=i===n-1;
       return '<tr class="ib-row'+(o.sub?' ib-sub':'')+(last?' gend':'')+(sel[r.id]?' sel':'')+'" data-id="'+r.id+'">'+
