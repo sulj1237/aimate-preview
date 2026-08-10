@@ -412,7 +412,7 @@
         return '<div class="wi'+(it._sel?' sel':'')+(it._open?' open':'')+'" data-g="'+gi+'" data-i="'+ii+'">'+
           '<div class="wi-row">'+
             '<label class="wi-ck"><input type="checkbox" class="wi-pick" '+(it._sel?'checked':'')+'></label>'+
-            '<div class="wi-main"><div class="wi-nm">'+(it.type==='new'?'<span class="regtag">신규 등록</span>':'')+it.nm+'</div><div class="wi-bc">'+it.bc+'</div><div class="wi-sum'+(it.type==='new'?' reg':'')+'">'+summaryOf(it)+'</div></div>'+
+            '<div class="wi-main"><div class="wi-nm">'+it.nm+'</div><div class="wi-bc">'+it.bc+'</div><div class="wi-sum'+(it.type==='new'?' reg':'')+'">'+summaryOf(it)+'</div></div>'+
             '<button class="btn line sm wi-togg">'+(it.type==='new'?'등록 내용':'변경 내용')+'</button>'+
           '</div>'+
           '<div class="wi-detail"><table class="cmp"><thead><tr><th>항목</th><th>'+(it.type==='new'?'현재':'현재값')+'</th><th class="c"></th><th>'+(it.type==='new'?'등록값':'앱 제출값')+'</th></tr></thead><tbody>'+cmp+'</tbody></table></div>'+
