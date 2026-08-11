@@ -33,12 +33,16 @@
     background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
   .fbtn .fnum[hidden]{display:none}
 
-  /* ── 기기별 Compact 요약 카드 (메인) ── */
-  .gcard{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;text-align:left;
+  /* ── 기기별 아코디언 그룹 헤더 ── */
+  .dgrp{border-bottom:calc(1px*var(--k)) solid var(--g-150,#eceef1)}
+  .dgrp:last-child{border-bottom:0}
+  .dgrp-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;text-align:left;
     font-family:inherit;border:0;background:transparent;cursor:pointer;
-    padding:calc(13px*var(--k)) calc(2px*var(--k));border-bottom:1px solid var(--g-100)}
-  .gcard:active{background:var(--g-50)}
-  .gmain{flex:1;min-width:0}
+    padding:calc(14px*var(--k)) calc(2px*var(--k))}
+  .dgrp-h:active{background:var(--g-50)}
+  .dgrp-hmain{flex:1;min-width:0}
+  .dgrp-b{padding:calc(4px*var(--k)) 0 calc(16px*var(--k))}
+  .dgrp-b[hidden]{display:none}
   /* 1행: 사용자 · 기기ID */
   .grow1{display:flex;align-items:baseline;gap:calc(6px*var(--k));flex-wrap:wrap}
   .guser{font-size:calc(15px*var(--k));font-weight:700;color:var(--g-900);letter-spacing:var(--tracking)}
@@ -57,14 +61,6 @@
   .gcnt-n{font-size:calc(17px*var(--k));font-weight:800;color:var(--g-900)}
   .gcnt-u{font-size:calc(12px*var(--k));font-weight:600;color:var(--g-500)}
   .gchev{flex:none;color:var(--g-400);display:inline-flex}
-
-  /* ── 기기 상세 상단 영역 (반복 정보 1회) ── */
-  .dvhead{padding:calc(14px*var(--k)) 0 calc(12px*var(--k));border-bottom:calc(1px*var(--k)) solid var(--g-200);margin-bottom:calc(2px*var(--k))}
-  .dvh-top{display:flex;align-items:baseline;gap:calc(7px*var(--k));flex-wrap:wrap}
-  .dvh-user{font-size:calc(17px*var(--k));font-weight:800;color:var(--g-900);letter-spacing:var(--tracking-title)}
-  .dvh-dev{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(13px*var(--k));color:var(--g-500);letter-spacing:.02em}
-  .dvh-sub{font-size:calc(12.5px*var(--k));color:var(--g-600);font-weight:600;margin-top:calc(5px*var(--k));letter-spacing:var(--tracking)}
-  .dvh-sub b{color:var(--g-900);font-weight:800}
 
   /* 카드 = 아코디언 (상품) */
   /* 상품 = 개별 카드(둥근 테두리·흰 배경·간격) */
@@ -183,13 +179,8 @@
         </button>
       </div>
 
-      <!-- 메인: 기기별 요약 카드 목록 -->
-      <div id="mainView"></div>
-
-      <!-- 상세: 선택한 기기의 상품 목록 (헤더 제목이 제출자이므로 별도 기기 헤더 없음) -->
-      <div id="detailView" hidden>
-        <div id="detailProducts"></div>
-      </div>
+      <!-- 기기별 아코디언: 그룹 헤더(제출자·기기ID·상태별 건수·건수) → 펼치면 상품 카드 -->
+      <div id="listView"></div>
     </div>
 
     <div class="bottom">
@@ -260,7 +251,7 @@
   // 반영상태 필터(다중 선택 체크박스)
   var applied = {done:true, rej:true, wait:true};
   var pending = {done:true, rej:true, wait:true};
-  var currentDevice = -1;   // -1 = 메인, 그 외 = 기기 인덱스
+  var openState = DEVICES.map(function(_, i){ return i===0; });   // 기기별 펼침 상태 (첫 기기 펼침)
   var backdrop = document.getElementById("backdrop");
   var opts = backdrop.querySelectorAll(".opt");
 
@@ -274,6 +265,7 @@
 
   var CHEV_DOWN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
   var CHEV_RIGHT = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  var CHEV_UP = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
 
   // 필터 반영 상품만 카운트
   function filteredProducts(dev){
@@ -286,9 +278,9 @@
     return c;
   }
 
-  // ── 메인: 기기별 요약 카드 ──
-  function renderMain(){
-    var host = document.getElementById("mainView");
+  // ── 기기별 아코디언 목록 ──
+  function renderList(){
+    var host = document.getElementById("listView");
     var act = activeStatuses();
     var total = 0, html = "";
     DEVICES.forEach(function(dev, idx){
@@ -299,20 +291,33 @@
       var brk = act.filter(function(s){ return c[s]>0; }).map(function(s){
         return '<span class="gbrk '+s+'">'+BRK_LABEL[s]+' '+c[s]+'</span>';
       }).join('<span class="gsep">·</span>');
+      var open = !!openState[idx];
+      var cards = fp.map(function(p){ return productHtml(p, dev.user); }).join("");
       html +=
-        '<button class="gcard" data-idx="'+idx+'">'+
-          '<div class="gmain">'+
-            '<div class="grow1"><span class="guser">'+esc(dev.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(dev.dev)+'</span></div>'+
-            '<div class="grow2"><span class="glast">마지막 제출 '+dev.last+'</span><span class="gsep">·</span>'+brk+'</div>'+
-          '</div>'+
-          '<span class="gcount"><span class="gcnt-n num">'+fp.length+'</span><span class="gcnt-u">건</span></span>'+
-          '<span class="gchev">'+CHEV_RIGHT+'</span>'+
-        '</button>';
+        '<div class="dgrp'+(open?" open":"")+'" data-idx="'+idx+'">'+
+          '<button class="dgrp-h" data-idx="'+idx+'" aria-expanded="'+(open?"true":"false")+'">'+
+            '<div class="dgrp-hmain">'+
+              '<div class="grow1"><span class="guser">'+esc(dev.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(dev.dev)+'</span></div>'+
+              '<div class="grow2">'+brk+'</div>'+
+            '</div>'+
+            '<span class="gcount"><span class="gcnt-n num">'+fp.length+'</span><span class="gcnt-u">건</span></span>'+
+            '<span class="gchev">'+(open?CHEV_UP:CHEV_RIGHT)+'</span>'+
+          '</button>'+
+          '<div class="dgrp-b"'+(open?"":" hidden")+'>'+cards+'</div>'+
+        '</div>';
     });
     if(html==="") html = '<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
     host.innerHTML = html;
-    host.querySelectorAll(".gcard").forEach(function(b){
-      b.addEventListener("click", function(){ openDevice(parseInt(b.getAttribute("data-idx"),10)); });
+    host.querySelectorAll(".dgrp-h").forEach(function(b){
+      b.addEventListener("click", function(){
+        var i = parseInt(b.getAttribute("data-idx"),10);
+        openState[i] = !openState[i];
+        var grp = b.parentNode;
+        grp.classList.toggle("open", openState[i]);
+        grp.querySelector(".dgrp-b").hidden = !openState[i];
+        b.setAttribute("aria-expanded", openState[i] ? "true" : "false");
+        b.querySelector(".gchev").innerHTML = openState[i] ? CHEV_UP : CHEV_RIGHT;
+      });
     });
     document.getElementById("fcnt").textContent = total;
   }
@@ -362,43 +367,7 @@
         '<div class="ddetail"><div class="dgroup">'+rows+'</div></div>'+
       '</details>';
   }
-  function renderDetail(){
-    if(currentDevice<0) return;
-    var dev = DEVICES[currentDevice];
-    var fp = filteredProducts(dev);
-    var host = document.getElementById("detailProducts");
-    if(fp.length===0){
-      host.innerHTML = '<div class="gempty">제출 상품이 없습니다.</div>';
-    } else {
-      host.innerHTML = fp.map(function(p){ return productHtml(p, dev.user); }).join("");
-    }
-  }
-
-  // ── 뷰 전환 ──
-  function openDevice(idx){
-    currentDevice = idx;
-    var dev = DEVICES[idx];
-    document.getElementById("mainView").hidden = true;
-    document.getElementById("detailView").hidden = false;
-    document.getElementById("hdrTitle").textContent = dev.user + " " + dev.dev;   // 헤더 제목 = 제출자
-    document.getElementById("hdrDate").hidden = true;
-    document.querySelector(".scroll").scrollTop = 0;
-    renderDetail();
-  }
-  function showMain(){
-    currentDevice = -1;
-    document.getElementById("detailView").hidden = true;
-    document.getElementById("mainView").hidden = false;
-    document.getElementById("hdrTitle").textContent = "제출 상세";
-    document.getElementById("hdrDate").hidden = false;
-    document.querySelector(".scroll").scrollTop = 0;
-    renderMain();
-  }
-  document.getElementById("backBtn").addEventListener("click", function(){
-    if(currentDevice>=0) showMain();
-  });
-
-  // ── 반영상태 필터(Bottom Sheet) — 메인 카드·기기 상세 양쪽 연동 ──
+  // ── 반영상태 필터(Bottom Sheet) — 아코디언 목록 연동 ──
   function openSheet(){ pending={done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
   function closeSheet(){ backdrop.classList.remove("open"); }
   function renderPending(){ var all=isAll(pending); opts.forEach(function(o){var v=o.getAttribute("data-val"); o.classList.toggle("sel", v==="all"?all:pending[v]);}); }
@@ -409,8 +378,7 @@
     var fnum=document.getElementById("fnum"), fbtn=document.getElementById("fbtn"), filtered=!showAll;
     fnum.hidden=!filtered; fnum.textContent=selN; fbtn.classList.toggle("on",filtered);
     document.querySelector(".fcount").firstChild.textContent=filtered?"선택 ":"전체 ";
-    renderMain();
-    if(currentDevice>=0){ if(filteredProducts(DEVICES[currentDevice]).length===0){showMain();} else {renderDetail();} }
+    renderList();
   }
   document.getElementById("fbtn").addEventListener("click", openSheet);
   opts.forEach(function(o){ o.addEventListener("click", function(){ toggle(o.getAttribute("data-val")); }); });
@@ -419,9 +387,9 @@
   backdrop.addEventListener("click", function(e){ if(e.target===backdrop) closeSheet(); });
 
   // 초기 렌더
-  renderMain();
-  // (미리보기 케이스) #device: 첫 기기 상세 / #filter: 반영상태 필터 열림
-  if(location.hash.indexOf("device")>=0){ openDevice(0); }
+  renderList();
+  // (미리보기 케이스) #device: 전체 기기 펼침 / #filter: 반영상태 필터 열림
+  if(location.hash.indexOf("device")>=0){ openState = DEVICES.map(function(){ return true; }); renderList(); }
   else if(location.hash.indexOf("filter")>=0){ openSheet(); }
 </script>
 </body>
