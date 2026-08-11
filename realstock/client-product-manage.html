@@ -83,20 +83,24 @@
   .wi-ck{flex:none;display:inline-flex}
   .wi-ck input{width:16px;height:16px;cursor:pointer}
   .wi-main{flex:1;min-width:0}
-  .wi-nm{font-size:13px;font-weight:700;color:#28303a}
+  /* 상품명 줄 — 좌측상단에 수정/신규 배지 + 상품명 */
+  .wi-nmrow{display:flex;align-items:center;gap:6px;min-width:0}
+  .wi-nm{font-size:13px;font-weight:700;color:#28303a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .wi-bc{font-size:11px;color:#9aa0a6;font-family:ui-monospace,Menlo,monospace;margin-top:2px}
-  .wi-sum{display:inline-block;font-size:11.5px;color:var(--teal-d);font-weight:700;background:#fff;border:1px solid #cdeee8;border-radius:6px;padding:2px 8px;margin-top:5px}
+  .wi-sum{flex:none;display:inline-block;font-size:10.5px;color:var(--teal-d);font-weight:800;background:var(--teal-soft);border:1px solid #cdeee8;border-radius:5px;padding:1px 7px;letter-spacing:.02em}
   /* 등록(신규)만 하는 케이스 — 수정과 구분(amber) */
   .wi-sum.reg{color:var(--amber);background:#fbeecb;border-color:#f0dca6}
   .regtag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--amber);border-radius:5px;padding:2px 6px;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
   .wi-detail-btn,.wi-del{flex:none}
-  /* 상세 내용 — 오른쪽 서브 모달(드로어) */
-  .drawer-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.32);z-index:90}
+  /* 상세 내용 — 화면 우측 드로어가 아니라, 가운데 모달의 우측에 '붙는' 플로팅 팝업 */
+  .drawer-bg{display:none;position:fixed;inset:0;background:transparent;z-index:90}   /* 투명 — 바깥 클릭 시 닫기 */
   .drawer-bg.open{display:block}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:400px;max-width:88vw;background:#fff;z-index:91;
-    transform:translateX(100%);transition:transform .24s ease;display:flex;flex-direction:column;box-shadow:-24px 0 60px -30px rgba(0,0,0,.5)}
-  .drawer.open{transform:translateX(0)}
-  .drawer-h{display:flex;align-items:flex-start;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+  .drawer{position:fixed;top:50%;left:50%;transform:translate(376px,-50%) scale(.98);transform-origin:left center;
+    width:330px;max-height:80vh;background:#fff;border:1px solid #d5d9df;border-radius:12px;z-index:92;
+    display:flex;flex-direction:column;overflow:hidden;box-shadow:0 26px 70px -24px rgba(0,0,0,.5);
+    opacity:0;visibility:hidden;transition:opacity .16s ease,transform .18s ease,visibility .16s}
+  .drawer.open{opacity:1;visibility:visible;transform:translate(376px,-50%) scale(1)}
+  .drawer-h{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:#f7f8fa}
   .dw-tt{flex:1;min-width:0}
   .dw-nm{font-size:15px;font-weight:800;color:#28303a}
   .dw-bc{font-size:11.5px;color:#9aa0a6;font-family:ui-monospace,Menlo,monospace;margin-top:3px}
@@ -104,7 +108,7 @@
   .dw-type.mod{color:var(--teal-d);background:var(--teal-soft)}
   .dw-type.reg{color:var(--amber);background:#fbeecb}
   .drawer-h .x{border:none;background:none;font-size:18px;color:var(--muted);cursor:pointer;flex:none;line-height:1}
-  .drawer-b{padding:14px 18px;overflow:auto}
+  .drawer-b{padding:12px 14px;overflow:auto}
   /* 푸터 — (좌) 선택 건수 · (우) 닫기/선택 반영 */
   .f-selcnt{margin-right:auto;font-size:12.5px;color:#6b7178;align-self:center}.f-selcnt b{color:var(--teal-d);font-weight:800}
   .cmp{width:100%;border-collapse:collapse;font-size:12px}
@@ -437,7 +441,7 @@
         return '<div class="wi'+(it._sel?' sel':'')+'" data-g="'+gi+'" data-i="'+ii+'">'+
           '<div class="wi-row">'+
             '<label class="wi-ck"><input type="checkbox" class="wi-pick" '+(it._sel?'checked':'')+'></label>'+
-            '<div class="wi-main"><div class="wi-nm">'+it.nm+'</div><div class="wi-bc">'+it.bc+'</div><div class="wi-sum'+(it.type==='new'?' reg':'')+'">'+typeLabel(it)+'</div></div>'+
+            '<div class="wi-main"><div class="wi-nmrow"><span class="wi-sum'+(it.type==='new'?' reg':'')+'">'+typeLabel(it)+'</span><span class="wi-nm">'+it.nm+'</span></div><div class="wi-bc">'+it.bc+'</div></div>'+
             '<button class="btn line sm wi-detail-btn">상세 내용</button>'+
             '<button class="btn red sm wi-del">삭제</button>'+
           '</div>'+
