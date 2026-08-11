@@ -58,8 +58,12 @@
   /* 기기 그룹 = 상위 폴더(장바구니). Grouping Key = Device ID */
   .wg{border:1px solid #e2e6ea;border-radius:12px;background:#fff;overflow:hidden}
   .wg.open{border-color:#d0d5da}
-  .wg-h{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:#f7f9fa;border:none;cursor:pointer;text-align:left;font:inherit}
+  /* 헤더 행 = (좌)전체 선택 체크박스 + 펼침 토글(약사·건수·마지막 제출) */
+  .wg-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f7f9fa}
   .wg-h:hover{background:#f1f4f6}
+  .wg-hck{flex:none;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#6b7178;cursor:pointer;white-space:nowrap}
+  .wg-hck input{width:16px;height:16px;cursor:pointer}
+  .wg-toggle{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0}
   .wg-chev{flex:none;color:#8a9099;font-size:11px;transition:transform .15s;display:inline-block}
   .wg.open .wg-chev{transform:rotate(90deg)}
   .wg-icon{flex:none;width:22px;height:22px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:12px}
@@ -239,7 +243,7 @@
       <!-- 그 밑: (왼쪽) 상품 데이터 올리기 · 마지막 동기화 일시 · (오른쪽) 앱 데이터 동기화 버튼 -->
       <div class="sync-row">
         <button class="btn teal sm" id="uploadBtn"><span class="spin"></span>상품 데이터 올리기</button>
-        <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/반려할 수 있습니다.</span></span>
+        <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/삭제할 수 있습니다.</span></span>
         <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
         <span class="spacer"></span>
         <button class="btn sync sm" id="syncBtn">앱 데이터 동기화<span class="badge-n" id="syncBadge">3</span></button>
@@ -342,7 +346,7 @@
   <div class="modal" role="dialog" aria-modal="true" style="max-width:720px">
     <div class="modal-h">
       <div class="mtitle">앱 상품 수정 요청
-        <span class="help" id="wlHelp" tabindex="0">i<span class="tip">기기(Device ID) 단위로 앱에서 제출한 상품 수정 요청을 묶어 보여줍니다. 상품을 선택해 <b>선택 반영</b> 또는 <b>선택 반려</b>하세요. 동일 상품은 최신 요청 1건만 노출되고, 처리 결과는 <b>변경 내용 보기</b> 이력에 저장됩니다.</span></span>
+        <span class="help" id="wlHelp" tabindex="0">i<span class="tip">기기(Device ID) 단위로 앱에서 제출한 상품 수정 요청을 묶어 보여줍니다. 상품을 선택해 <b>선택 반영</b> 또는 <b>선택 삭제</b>하세요(<b>전체 삭제</b>도 가능). 동일 상품은 최신 요청 1건만 노출되고, 처리 결과는 <b>변경 내용 보기</b> 이력에 저장됩니다.</span></span>
       </div>
       <button class="x" id="wClose">✕</button>
     </div>
@@ -352,6 +356,7 @@
     <div class="modal-f">
       <button class="mbtn red" id="wDelAll" style="margin-right:auto">전체 삭제</button>
       <button class="mbtn ghost" id="wCloseF">닫기</button>
+      <button class="mbtn red" id="wDelSel" disabled>선택 삭제</button>
       <button class="mbtn primary" id="wApplyAll" disabled>선택 반영</button>
     </div>
   </div>
@@ -429,7 +434,7 @@
   function fmtLast(s){return s?s.slice(5).replace('-','.'):'';}       // '2026-08-10 09:31' → '08.10 09:31'
   function totalCount(){return groups.reduce(function(s,g){return s+g.items.length;},0);}
   function updateBadge(){var el=$('syncBadge'),t=totalCount();if(t){el.textContent=t;el.style.display='';}else{el.style.display='none';}}
-  function updateFooter(){$('wApplyAll').disabled=totalSel()===0;}
+  function updateFooter(){var none=totalSel()===0;$('wApplyAll').disabled=none;$('wDelSel').disabled=none;}
   // 최근 제출 그룹만 기본 펼침, 나머지는 접힘
   (function(){var li=-1,lm='';groups.forEach(function(g,i){var l=grpLast(g);if(l>lm){lm=l;li=i;}});if(li>=0)groups[li]._open=true;})();
   // 전체 클릭(선택)된 상태가 디폴트
@@ -450,14 +455,16 @@
         '</div>';
       }).join('');
       return '<div class="wg'+(g._open?' open':'')+'" data-g="'+gi+'">'+
-        '<button type="button" class="wg-h">'+
-          '<span class="wg-chev">▶</span>'+
-          '<span class="wg-id"><b>'+g.by+'</b><span class="wg-dev">'+g.dev+'</span></span>'+
-          '<span class="wg-cnt">'+g.items.length+'건</span>'+
-          '<span class="wg-time">마지막 제출 '+fmtLast(grpLast(g))+'</span>'+
-        '</button>'+
+        '<div class="wg-h">'+
+          '<label class="wg-hck" title="이 약사 제출 전체 선택"><input type="checkbox" class="wg-all"'+(allChk?' checked':'')+'> 전체 선택</label>'+
+          '<button type="button" class="wg-toggle">'+
+            '<span class="wg-chev">▶</span>'+
+            '<span class="wg-id"><b>'+g.by+'</b><span class="wg-dev">'+g.dev+'</span></span>'+
+            '<span class="wg-cnt">'+g.items.length+'건</span>'+
+            '<span class="wg-time">마지막 제출 '+fmtLast(grpLast(g))+'</span>'+
+          '</button>'+
+        '</div>'+
         '<div class="wg-b">'+
-          '<div class="wg-tools"><label class="selall"><input type="checkbox" class="wg-all"'+(allChk?' checked':'')+'> 전체 선택</label></div>'+
           '<div class="wg-list">'+items+'</div>'+
         '</div>'+
       '</div>';
@@ -480,19 +487,25 @@
     groups.forEach(function(g){g.items=g.items.filter(function(it){return !it._sel;});});
     for(var i=groups.length-1;i>=0;i--){if(!groups[i].items.length)groups.splice(i,1);}
     renderWaitlist();closeDrawer();toast('반영 완료 · '+picked+'건 · 수정 이력 생성');}
+  function deleteSel(){var picked=totalSel();if(!picked)return;
+    groups.forEach(function(g){g.items=g.items.filter(function(it){return !it._sel;});});
+    for(var i=groups.length-1;i>=0;i--){if(!groups[i].items.length)groups.splice(i,1);}
+    renderWaitlist();closeDrawer();toast('선택 삭제 · '+picked+'건 삭제');}
   $('waitBody').addEventListener('click',function(e){
     var db=e.target.closest('.wi-detail-btn');
     if(db){var wi=db.closest('.wi');openDrawer(+wi.getAttribute('data-g'),+wi.getAttribute('data-i'));return;}
     var del=e.target.closest('.wi-del');
     if(del){var wi2=del.closest('.wi');deleteItem(+wi2.getAttribute('data-g'),+wi2.getAttribute('data-i'));return;}
-    var h=e.target.closest('.wg-h');
+    var h=e.target.closest('.wg-toggle');
     if(h){var gi=+h.closest('.wg').getAttribute('data-g');groups[gi]._open=!groups[gi]._open;renderWaitlist();}
   });
   $('waitBody').addEventListener('change',function(e){
     if(e.target.classList.contains('wi-pick')){var wi=e.target.closest('.wi');groups[+wi.getAttribute('data-g')].items[+wi.getAttribute('data-i')]._sel=e.target.checked;renderWaitlist();return;}
-    if(e.target.classList.contains('wg-all')){var gi=+e.target.closest('.wg').getAttribute('data-g'),v=e.target.checked;groups[gi].items.forEach(function(it){it._sel=v;});renderWaitlist();}
+    // 전체 선택 = 해당 약사 제출 전체 선택 + 자동 펼침(더보기 없이 상품 노출)
+    if(e.target.classList.contains('wg-all')){var gi=+e.target.closest('.wg').getAttribute('data-g'),v=e.target.checked;groups[gi].items.forEach(function(it){it._sel=v;});if(v)groups[gi]._open=true;renderWaitlist();}
   });
   $('wApplyAll').onclick=applyAll;
+  $('wDelSel').onclick=deleteSel;
   $('wDelAll').onclick=function(){if(!totalCount())return;groups.length=0;renderWaitlist();closeDrawer();toast('전체 삭제 · 모든 수정 요청 삭제');};
   $('dwClose').onclick=closeDrawer;$('dwBg').onclick=closeDrawer;
   $('syncBtn').onclick=function(){renderWaitlist();$('waitModal').classList.add('open');};
