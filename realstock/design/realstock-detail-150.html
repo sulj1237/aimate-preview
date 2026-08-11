@@ -94,9 +94,14 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 자세히 chevron 행 (상품별 메타 제거 → '자세히'만) */
+  /* 메타 프리뷰 행: 시각 | 제출자 → 처리자 | 사유(말줄임) + chevron */
   .drow-foot{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(9px*var(--k))}
-  .dmeta{flex:1;min-width:0;font-size:calc(12px*var(--k));color:var(--g-500);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dmeta{flex:1;min-width:0;display:flex;align-items:center;gap:calc(6px*var(--k));font-size:calc(12px*var(--k));color:var(--g-500);overflow:hidden}
+  .dmeta .dm-t{flex:none;color:var(--g-600);font-weight:600}
+  .dmeta .dm-flow{flex:none;color:var(--g-600);font-weight:600;white-space:nowrap}
+  .dmeta .dm-arw{color:var(--g-400)}
+  .dmeta .dm-sep{flex:none;color:var(--g-300)}
+  .dmeta .dm-reason{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--g-500)}
   .chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .18s ease}
   .drow[open] .chev{transform:rotate(180deg)}
 
@@ -167,6 +172,11 @@
     <div class="scroll pad">
       <div class="fbar">
         <span class="fcount">전체 <b id="fcnt">12</b>건</span>
+        <button class="fbtn" id="fbtn" aria-haspopup="dialog">
+          <svg class="funnel" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span class="lbl">반영상태</span>
+          <span class="fnum" id="fnum" hidden>2</span>
+        </button>
       </div>
 
       <!-- 메인: 기기별 요약 카드 목록 -->
@@ -180,6 +190,22 @@
 
     <div class="bottom">
       <button class="btn btn-tertiary">제출 이력으로</button>
+    </div>
+
+    <!-- 반영상태 필터 Bottom Sheet -->
+    <div class="sheet-backdrop" id="backdrop">
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="반영상태 필터">
+        <div class="grip"></div>
+        <h3>반영상태</h3>
+        <div class="opt all sel" data-val="all"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">전체</span></div>
+        <div class="opt sel" data-val="done"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영완료</span></div>
+        <div class="opt sel" data-val="rej"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영반려</span></div>
+        <div class="opt sel" data-val="wait"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영전</span></div>
+        <div class="sheet-act">
+          <button class="btn btn-line" id="cancelBtn">취소</button>
+          <button class="btn btn-primary" id="applyBtn">적용</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -227,9 +253,12 @@
   var ST_LABEL = {done:"반영완료", rej:"반영반려", wait:"반영전"};
   var BRK_LABEL = {done:"완료", rej:"반려", wait:"반영전"};
 
-  // 상태 필터 UI 제거 — 항상 전체 노출
+  // 반영상태 필터(다중 선택 체크박스)
   var applied = {done:true, rej:true, wait:true};
+  var pending = {done:true, rej:true, wait:true};
   var currentDevice = -1;   // -1 = 메인, 그 외 = 기기 인덱스
+  var backdrop = document.getElementById("backdrop");
+  var opts = backdrop.querySelectorAll(".opt");
 
   function isAll(s){ return s.done && s.rej && s.wait; }
   function isNone(s){ return !s.done && !s.rej && !s.wait; }
@@ -296,11 +325,18 @@
            '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
            '<span class="delta '+cls+' num">'+sign+'</span></div>';
   }
-  function productHtml(p){
+  function productHtml(p, user){
     var sub = p.sub ? '<div class="dsub">'+esc(p.sub)+'</div>' : '';
     // 처리 — PC id 제거(예: '10:31 · 정약사(PC DESKTOP-…)' → '10:31 · 정약사')
     var handler = p.handler ? p.handler.replace(/\s*\(PC[^)]*\)/, "") : "";
-    // 자세히 = [재고 차이 · 재고 차이 사유 · 처리] 묶음 카드 (+ 반려 시 반려 사유)
+    var mTime = "", mName = "";
+    if(handler){ var pr = handler.split(" · "); mTime = pr[0]||""; mName = pr[1]||""; }
+    // 접힌 카드 메타 프리뷰: 시각 | 제출자 → 처리자 | 재고 차이 사유(말줄임)
+    var meta = "";
+    if(mTime) meta += '<span class="dm-t">'+esc(mTime)+'</span><span class="dm-sep">|</span>';
+    meta += '<span class="dm-flow">'+esc(user)+(mName ? ' <span class="dm-arw">→</span> '+esc(mName) : '')+'</span>';
+    if(p.reason && p.reason!=="-") meta += '<span class="dm-sep">|</span><span class="dm-reason">'+esc(p.reason)+'</span>';
+    // 자세히(펼침) = [재고 차이 · 재고 차이 사유 · 처리] 묶음 카드 (+ 반려 시 반려 사유)
     var rows = "";
     if(p.only==null){
       var d = p.to - p.from;
@@ -317,7 +353,7 @@
           '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
             '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
           qtyHtml(p)+
-          '<div class="drow-foot"><span class="dmeta">자세히</span><span class="chev">'+CHEV_DOWN+'</span></div>'+
+          '<div class="drow-foot"><span class="dmeta">'+meta+'</span><span class="chev">'+CHEV_DOWN+'</span></div>'+
         '</summary>'+
         '<div class="ddetail"><div class="dgroup">'+rows+'</div></div>'+
       '</details>';
@@ -330,7 +366,7 @@
     if(fp.length===0){
       host.innerHTML = '<div class="gempty">제출 상품이 없습니다.</div>';
     } else {
-      host.innerHTML = fp.map(productHtml).join("");
+      host.innerHTML = fp.map(function(p){ return productHtml(p, dev.user); }).join("");
     }
   }
 
@@ -357,6 +393,26 @@
   document.getElementById("backBtn").addEventListener("click", function(){
     if(currentDevice>=0) showMain();
   });
+
+  // ── 반영상태 필터(Bottom Sheet) — 메인 카드·기기 상세 양쪽 연동 ──
+  function openSheet(){ pending={done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
+  function closeSheet(){ backdrop.classList.remove("open"); }
+  function renderPending(){ var all=isAll(pending); opts.forEach(function(o){var v=o.getAttribute("data-val"); o.classList.toggle("sel", v==="all"?all:pending[v]);}); }
+  function toggle(v){ if(v==="all"){var next=!isAll(pending);pending={done:next,rej:next,wait:next};} else {pending[v]=!pending[v];} renderPending(); }
+  function applyFilter(){
+    applied={done:pending.done,rej:pending.rej,wait:pending.wait};
+    var showAll=isAll(applied)||isNone(applied), selN=STATUSES.filter(function(s){return applied[s];}).length;
+    var fnum=document.getElementById("fnum"), fbtn=document.getElementById("fbtn"), filtered=!showAll;
+    fnum.hidden=!filtered; fnum.textContent=selN; fbtn.classList.toggle("on",filtered);
+    document.querySelector(".fcount").firstChild.textContent=filtered?"선택 ":"전체 ";
+    renderMain();
+    if(currentDevice>=0){ if(filteredProducts(DEVICES[currentDevice]).length===0){showMain();} else {renderDetail();} }
+  }
+  document.getElementById("fbtn").addEventListener("click", openSheet);
+  opts.forEach(function(o){ o.addEventListener("click", function(){ toggle(o.getAttribute("data-val")); }); });
+  document.getElementById("applyBtn").addEventListener("click", function(){ applyFilter(); closeSheet(); });
+  document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+  backdrop.addEventListener("click", function(e){ if(e.target===backdrop) closeSheet(); });
 
   // 초기 렌더
   renderMain();
