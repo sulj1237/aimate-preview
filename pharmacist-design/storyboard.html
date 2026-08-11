@@ -902,7 +902,7 @@
 
 
     <section class="screen" data-sid="CNT-01-004">
-      <div class="sc-head"><span class="sid">CNT-01-004</span><span class="nm">앱 상품 수정 요청 (동기화 → 선택 반영) <span class="tbu" style="font-size:11px">시안 A/B TBU</span></span><span class="pf">굿팜 클라이언트 3.0 · 상품 관리</span></div>
+      <div class="sc-head"><span class="sid">CNT-01-004</span><span class="nm">앱 상품 수정 요청 (동기화 → 선택 반영·삭제) <span style="font-size:11px;color:var(--teal-d);font-weight:700">시안 A 확정</span></span><span class="pf">굿팜 클라이언트 3.0 · 상품 관리</span></div>
       <div class="sc-grid stack">
         <div class="mock deskgut">
           <!-- 트리거: 앱 데이터 동기화 버튼(미처리 배지) -->
@@ -951,7 +951,7 @@
                   </div>
                 </div>
               </div>
-              <div class="footb hot" data-n="6" style="justify-content:flex-end;align-items:center"><span class="num">6</span><span class="bn r" style="margin-right:auto;justify-content:center">전체 삭제</span><span class="bn g" style="justify-content:center">닫기</span><span class="bn r" style="justify-content:center">선택 삭제</span><span class="bn" style="justify-content:center">선택 반영</span></div>
+              <div class="footb hot" data-n="6" style="justify-content:flex-end;align-items:center"><span class="num">6</span><span class="bn r" style="margin-right:auto;justify-content:center">전체 삭제</span><span class="bn g" style="justify-content:center">닫기</span><span class="bn" style="justify-content:center">선택 반영</span></div>
             </div>
             <!-- 상세 내용 = 모달 옆에 붙는 플로팅 팝업 -->
             <div class="hot" data-n="5" style="position:absolute;top:44px;left:576px;width:250px;border:1px solid #d5d9df;border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 20px 50px -20px rgba(0,0,0,.4)"><span class="num">5</span>
@@ -974,14 +974,14 @@
           </div>
         </div>
         <ol class="desc" style="max-width:820px">
-          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 목업 · 시안 B(리스트/표)는 TBU 병기</span></div>
+          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정 · 시안 B(리스트/표) 미채택</span></div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>진입 = 앱 데이터 동기화</b> — 상품 관리(CNT-01-001)의 `앱 데이터 동기화` 버튼(미처리 건수 Badge, 0건 미노출) 클릭 시 <b>`앱 상품 수정 요청` 모달</b>이 열린다.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>모달 제목(가운데)</b> — `앱 상품 수정 요청`. 굿팜 약사님용앱에서 제출한 상품 수정/신규 요청을 확인해 <b>선택 반영</b>한다.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 기기 그룹 헤더 `사용자 · 기기ID · N건 · 마지막 제출`. 펼치면 `전체 선택` + 상품 요청 목록. 최근 제출 그룹 기본 펼침.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b> · <b>`삭제`</b>(항목별). 동일 상품은 최신 요청 1건만 노출.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
-          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 삭제`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(선택/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
-          <li><span class="di" style="background:var(--amber);color:#fff">B</span><span class="dt"><b class="tbu">[시안 B · TBU]</b> <b>리스트(표) 결재함</b> — 상단 `전체선택`·`전체 N건 중 선택 N건`·`반영`. 열: <b>☐ · 제출일시 · 상품명 · 제조사 · 바코드 · 변경 항목 · 이전값 · 변경값 · 제출자</b>. 변경 항목 다수는 <b>rowspan</b>으로 상품 정보를 묶고, 동일 상품 여러 제출은 <b>`수정 N건`</b> 배지로 접었다 펼친다. 처리 정책(선택 반영·선택 삭제·전체 삭제·반려 없음·미반영 누적·이력 생성)은 시안 A와 동일. <b>시안 A(기기별 묶음·상세 팝업) vs 시안 B(표·인라인 비교) 중 확정 필요</b>.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). 삭제는 <b>항목별 `삭제`</b>·푸터 <b>`전체 삭제`</b>. <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(항목별/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
+          <li><span class="di" style="background:var(--muted);color:#fff">B</span><span class="dt"><b>[시안 B · 미채택]</b> <b>리스트(표) 결재함</b> — 열: ☐·제출일시·상품명·제조사·바코드·변경 항목·이전값·변경값·제출자(변경 항목 다수 rowspan·동일 상품 `수정 N건` 묶음). <b>시안 A(기기별 묶음·상세 팝업)로 확정</b>되어 참고용으로만 남긴다.</span></li>
         </ol>
       </div>
       <div class="cases">
@@ -990,7 +990,7 @@
           <tr><td><span class="cb warn">요청 있음</span></td><td>미처리 N건</td><td>동기화 버튼 Badge N · 클릭 시 요청 모달</td><td class="nx">CNT-01-004</td></tr>
           <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>상품 정보 반영 · 목록에서 제거 · 이력 생성 · Toast `반영 완료 · N건`</td><td class="nx">CNT-01-003</td></tr>
           <tr><td><span class="cb dis">미선택</span></td><td>선택 0</td><td>`선택 반영` <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
-          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / `선택 삭제` / `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / 푸터 `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb empty">요청 없음</span></td><td>미처리 0</td><td>`반영할 수정 요청이 없습니다.` · Badge 미노출</td><td class="nx">—</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
