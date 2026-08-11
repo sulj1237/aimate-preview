@@ -7,11 +7,10 @@
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
 <link href="ds.css" rel="stylesheet" />
 <style>
-  /* ── 제출 상세 · 카드 재설계 ──
-     ① 수량 = 숫자 강조 `48 → 24개` + 증감 배지(감소=red / 증가=green). '반영 전/후' 텍스트 제거(상태 배지로 대체)
-     ② 메타 한 줄 `HH:MM · 입력자(기기) → 처리자`
-     ③ 상세(재고 차이 사유·처리·반려 사유)는 '자세히' 아코디언
-     ④ 상태 필터 = 목록 위 우측 `반영상태` 버튼 + Bottom Sheet(다중선택 체크박스) — 확정
+  /* ── 제출 상세 · 2단 구조 재설계 ──
+     ① 메인 = 기기별 Compact 요약 카드(사용자·기기ID / 건수·마지막 제출·상태별 건수), 카드 전체 클릭
+     ② 기기 상세 = 뷰 전환(메인 숨김). 상단 기기 영역 1회 + 상품 카드 목록(반복 메타 제거)
+     ③ 상품 카드·증감 배지·상태 배지·자세히 아코디언·상태 필터(Bottom Sheet)는 기존 그대로 재사용
      배율 --k 로 전체 확대(이 파일=100%). */
   :root{ --k:1.00; }
 
@@ -34,11 +33,43 @@
     background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
   .fbtn .fnum[hidden]{display:none}
 
-  /* 카드 = 아코디언 */
+  /* ── 기기별 Compact 요약 카드 (메인) ── */
+  .gcard{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;text-align:left;
+    font-family:inherit;border:0;background:transparent;cursor:pointer;
+    padding:calc(13px*var(--k)) calc(2px*var(--k));border-bottom:1px solid var(--g-100)}
+  .gcard:active{background:var(--g-50)}
+  .gmain{flex:1;min-width:0}
+  /* 1행: 사용자 · 기기ID */
+  .grow1{display:flex;align-items:baseline;gap:calc(6px*var(--k));flex-wrap:wrap}
+  .guser{font-size:calc(15px*var(--k));font-weight:700;color:var(--g-900);letter-spacing:var(--tracking)}
+  .gdot{color:var(--g-300);font-weight:700}
+  .gdev{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(12.5px*var(--k));color:var(--g-500);letter-spacing:.02em}
+  /* 2행: 마지막 제출 · 상태별 건수 */
+  .grow2{display:flex;align-items:center;gap:calc(4px*var(--k)) calc(8px*var(--k));flex-wrap:wrap;margin-top:calc(5px*var(--k))}
+  .glast{font-size:calc(12px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
+  .gsep{color:var(--g-300)}
+  .gbrk{font-size:calc(12px*var(--k));font-weight:700;letter-spacing:var(--tracking);white-space:nowrap}
+  .gbrk.done{color:#1d8a76}
+  .gbrk.rej{color:var(--sys-red)}
+  .gbrk.wait{color:var(--g-600)}
+  /* 우: 건수 + chevron */
+  .gcount{flex:none;display:flex;align-items:center;gap:calc(3px*var(--k))}
+  .gcnt-n{font-size:calc(17px*var(--k));font-weight:800;color:var(--g-900)}
+  .gcnt-u{font-size:calc(12px*var(--k));font-weight:600;color:var(--g-500)}
+  .gchev{flex:none;color:var(--g-400);display:inline-flex}
+
+  /* ── 기기 상세 상단 영역 (반복 정보 1회) ── */
+  .dvhead{padding:calc(14px*var(--k)) 0 calc(12px*var(--k));border-bottom:calc(1px*var(--k)) solid var(--g-200);margin-bottom:calc(2px*var(--k))}
+  .dvh-top{display:flex;align-items:baseline;gap:calc(7px*var(--k));flex-wrap:wrap}
+  .dvh-user{font-size:calc(17px*var(--k));font-weight:800;color:var(--g-900);letter-spacing:var(--tracking-title)}
+  .dvh-dev{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(13px*var(--k));color:var(--g-500);letter-spacing:.02em}
+  .dvh-sub{font-size:calc(12.5px*var(--k));color:var(--g-600);font-weight:600;margin-top:calc(5px*var(--k));letter-spacing:var(--tracking)}
+  .dvh-sub b{color:var(--g-900);font-weight:800}
+
+  /* 카드 = 아코디언 (상품) */
   .drow{border-bottom:1px solid var(--g-100);padding:calc(14px*var(--k)) 0}
   .drow>summary{list-style:none;cursor:pointer;display:block}
   .drow>summary::-webkit-details-marker{display:none}
-  /* 상단: 바코드·상품명(좌) + 상태 배지(우) */
   .drow-top{display:flex;gap:calc(10px*var(--k));align-items:flex-start}
   .dtitle{flex:1;min-width:0}
   .dbc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(11px*var(--k));color:var(--g-500);letter-spacing:.02em}
@@ -63,9 +94,9 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 메타 한 줄 + 자세히 chevron */
+  /* 자세히 chevron 행 (상품별 메타 제거 → '자세히'만) */
   .drow-foot{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(9px*var(--k))}
-  .dmeta{flex:1;min-width:0;font-size:calc(12px*var(--k));color:var(--g-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dmeta{flex:1;min-width:0;font-size:calc(12px*var(--k));color:var(--g-500);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .18s ease}
   .drow[open] .chev{transform:rotate(180deg)}
 
@@ -74,6 +105,9 @@
   .drs{font-size:calc(12.5px*var(--k));color:var(--g-700);line-height:1.5;margin-top:calc(9px*var(--k))}
   .drs:first-child{margin-top:0}
   .drs .lb{display:block;font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(2px*var(--k))}
+
+  /* 빈 상태(필터로 표시할 항목 없음) */
+  .gempty{padding:calc(48px*var(--k)) calc(24px*var(--k));text-align:center;color:var(--g-500);font-size:calc(13.5px*var(--k));font-weight:600}
 
   .btn{height:calc(48px*var(--k));font-size:calc(15px*var(--k))}
 
@@ -117,14 +151,14 @@
     </div>
 
     <div class="appbar">
-      <button class="ico-btn" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <h1>제출 상세</h1>
-      <span class="dt-head num">2026-07-02</span>
+      <button class="ico-btn" id="backBtn" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h1 id="hdrTitle">제출 상세</h1>
+      <span class="dt-head num" id="hdrDate">2026-07-02</span>
     </div>
 
     <div class="scroll pad">
       <div class="fbar">
-        <span class="fcount">전체 <b id="fcnt">4</b>건</span>
+        <span class="fcount">전체 <b id="fcnt">12</b>건</span>
         <button class="fbtn" id="fbtn" aria-haspopup="dialog">
           <svg class="funnel" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
           <span class="lbl">반영상태</span>
@@ -132,54 +166,14 @@
         </button>
       </div>
 
-      <details class="drow" data-status="done" open>
-        <summary>
-          <div class="drow-top"><div class="dtitle"><span class="dbc">#8801234567890</span><div class="dnm">타이레놀콜드-에스정</div><div class="dsub">아세트아미노펜·클로르페니라민 복합제</div></div><span class="stb done">반영완료</span></div>
-          <div class="dqty"><span class="from">48</span><span class="arw">→</span><span class="to">24</span><span class="unit">개</span><span class="delta down">−24</span></div>
-          <div class="drow-foot"><span class="dmeta">제출 10:31 · 김약사(SM-S911)</span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
-        </summary>
-        <div class="ddetail">
-          <div class="drs"><span class="lb">재고 차이 사유</span>정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정</div>
-          <div class="drs"><span class="lb">처리</span>10:31 · 정약사(PC DESKTOP-QALLC7M)</div>
-        </div>
-      </details>
+      <!-- 메인: 기기별 요약 카드 목록 -->
+      <div id="mainView"></div>
 
-      <details class="drow" data-status="done">
-        <summary>
-          <div class="drow-top"><div class="dtitle"><span class="dbc">#8806789012345</span><div class="dnm">판콜에이내복액 30ml</div></div><span class="stb done">반영완료</span></div>
-          <div class="dqty"><span class="from">52</span><span class="arw">→</span><span class="to">60</span><span class="unit">개</span><span class="delta up">+8</span></div>
-          <div class="drow-foot"><span class="dmeta">제출 10:31 · 김약사(SM-S911)</span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
-        </summary>
-        <div class="ddetail">
-          <div class="drs"><span class="lb">재고 차이 사유</span>-</div>
-          <div class="drs"><span class="lb">처리</span>10:31 · 정약사(PC DESKTOP-QALLC7M)</div>
-        </div>
-      </details>
-
-      <details class="drow" data-status="rej">
-        <summary>
-          <div class="drow-top"><div class="dtitle"><span class="dbc">#8803333000044</span><div class="dnm">겔포스엠현탁액</div></div><span class="stb rej">반영반려</span></div>
-          <div class="dqty"><span class="from">38</span><span class="arw">→</span><span class="to">40</span><span class="unit">개</span><span class="delta up">+2</span></div>
-          <div class="drow-foot"><span class="dmeta">제출 09:22 · 이약사(SM-S911)</span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
-        </summary>
-        <div class="ddetail">
-          <div class="drs"><span class="lb">재고 차이 사유</span>입고 검수 중 수량 오차 발견</div>
-          <div class="drs"><span class="lb">처리</span>09:30 · 정약사(PC DESKTOP-ENFJ2GD)</div>
-          <div class="drs"><span class="lb">반려 사유</span>근거 자료 부족 — 재실사 후 재제출 요청</div>
-        </div>
-      </details>
-
-      <details class="drow" data-status="wait">
-        <summary>
-          <div class="drow-top"><div class="dtitle"><span class="dbc">#8801111000022</span><div class="dnm">훼스탈플러스정</div></div><span class="stb wait">반영전</span></div>
-          <div class="dqty"><span class="only">제출 30</span><span class="unit">개</span></div>
-          <div class="drow-foot"><span class="dmeta">제출 09:22 · 김약사(SM-S911)</span><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></div>
-        </summary>
-        <div class="ddetail">
-          <div class="drs"><span class="lb">재고 차이 사유</span>-</div>
-          <div class="drs"><span class="lb">전산상 재고</span>미제공 (앱 조회 시점 재고 없음) · <span style="color:var(--g-400)">반영 전이라 처리자 없음</span></div>
-        </div>
-      </details>
+      <!-- 상세: 선택한 기기의 상품 목록 -->
+      <div id="detailView" hidden>
+        <div class="dvhead" id="dvhead"></div>
+        <div id="detailProducts"></div>
+      </div>
     </div>
 
     <div class="bottom">
@@ -204,17 +198,182 @@
   </div>
 </div>
 <script>
-  // 다중 선택(체크박스). 상태 3종 — 전체 = 세 개 모두 선택.
+  // ── 데이터: 기기(Device ID)별 그룹, 각 그룹에 제출 상품 배열 ──
+  var SUB_DATE = "2026-07-02";
+  var DEVICES = [
+    { user:"김약사", dev:"SM-S911", last:"10:31",
+      products:[
+        {bc:"8801234567890", nm:"타이레놀콜드-에스정", sub:"아세트아미노펜·클로르페니라민 복합제", from:48, to:24, status:"done",
+          reason:"정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정", handler:"10:31 · 정약사(PC DESKTOP-QALLC7M)"},
+        {bc:"8806789012345", nm:"판콜에이내복액 30ml", from:52, to:60, status:"done",
+          reason:"-", handler:"10:31 · 정약사(PC DESKTOP-QALLC7M)"},
+        {bc:"8802222000033", nm:"베아제정", from:20, to:18, status:"done",
+          reason:"낱알 조제 후 잔량 정정", handler:"10:28 · 정약사(PC DESKTOP-QALLC7M)"},
+        {bc:"8804444000055", nm:"우루사정 100mg", from:45, to:50, status:"done",
+          reason:"입고 반영 누락분 추가", handler:"10:25 · 정약사(PC DESKTOP-QALLC7M)"},
+        {bc:"8805555000066", nm:"이지엔6프로연질캡슐", from:30, to:28, status:"done",
+          reason:"파손 폐기 2정 반영", handler:"10:22 · 정약사(PC DESKTOP-QALLC7M)"},
+        {bc:"8806666000077", nm:"컨디션환", from:12, to:24, status:"done",
+          reason:"창고 이월 재고 합산", handler:"10:20 · 정약사(PC DESKTOP-QALLC7M)"},
+        {bc:"8803333000044", nm:"겔포스엠현탁액", from:38, to:40, status:"rej",
+          reason:"입고 검수 중 수량 오차 발견", handler:"10:35 · 정약사(PC DESKTOP-ENFJ2GD)",
+          reject:"근거 자료 부족 — 재실사 후 재제출 요청"},
+        {bc:"8801111000022", nm:"훼스탈플러스정", only:30, status:"wait",
+          reason:"-", handler:null}
+      ]
+    },
+    { user:"이약사", dev:"SM-A21", last:"09:22",
+      products:[
+        {bc:"8807777000088", nm:"후시딘연고 5g", from:15, to:12, status:"done",
+          reason:"판매 후 잔량 정정", handler:"09:24 · 정약사(PC DESKTOP-ENFJ2GD)"},
+        {bc:"8808888000099", nm:"인사돌정", from:40, to:45, status:"done",
+          reason:"입고 반영 누락분 추가", handler:"09:24 · 정약사(PC DESKTOP-ENFJ2GD)"},
+        {bc:"8809999000011", nm:"마데카솔케어연고", from:22, to:20, status:"done",
+          reason:"진열 파손 2개 폐기", handler:"09:23 · 정약사(PC DESKTOP-ENFJ2GD)"},
+        {bc:"8801212000034", nm:"신신파스 아렉스", from:60, to:48, status:"rej",
+          reason:"실사 수량 차이 정정", handler:"09:30 · 정약사(PC DESKTOP-ENFJ2GD)",
+          reject:"제출 수량과 실물 재고 불일치 — 재확인 요청"}
+      ]
+    }
+  ];
+
   var STATUSES = ["done","rej","wait"];
-  var COUNTS = {done:2, rej:1, wait:1};
-  var applied = {done:true, rej:true, wait:true};   // 적용된 선택
-  var pending = {done:true, rej:true, wait:true};    // 시트에서 선택 중
+  var ST_LABEL = {done:"반영완료", rej:"반영반려", wait:"반영전"};
+  var BRK_LABEL = {done:"완료", rej:"반려", wait:"반영전"};
+
+  // 필터 상태(다중 선택 체크박스)
+  var applied = {done:true, rej:true, wait:true};
+  var pending = {done:true, rej:true, wait:true};
+  var currentDevice = -1;   // -1 = 메인, 그 외 = 기기 인덱스
+
   var backdrop = document.getElementById("backdrop");
   var opts = backdrop.querySelectorAll(".opt");
 
   function isAll(s){ return s.done && s.rej && s.wait; }
   function isNone(s){ return !s.done && !s.rej && !s.wait; }
+  function activeStatuses(){
+    var showAll = isAll(applied) || isNone(applied);
+    return STATUSES.filter(function(s){ return showAll || applied[s]; });
+  }
+  function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
+  var CHEV_DOWN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  var CHEV_RIGHT = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+  // 필터 반영 상품만 카운트
+  function filteredProducts(dev){
+    var act = activeStatuses();
+    return dev.products.filter(function(p){ return act.indexOf(p.status)>=0; });
+  }
+  function statusCounts(products){
+    var c = {done:0, rej:0, wait:0};
+    products.forEach(function(p){ c[p.status]++; });
+    return c;
+  }
+
+  // ── 메인: 기기별 요약 카드 ──
+  function renderMain(){
+    var host = document.getElementById("mainView");
+    var act = activeStatuses();
+    var total = 0, html = "";
+    DEVICES.forEach(function(dev, idx){
+      var fp = filteredProducts(dev);
+      if(fp.length===0) return;   // 선택 상태 없는 기기는 숨김
+      total += fp.length;
+      var c = statusCounts(fp);
+      var brk = act.filter(function(s){ return c[s]>0; }).map(function(s){
+        return '<span class="gbrk '+s+'">'+BRK_LABEL[s]+' '+c[s]+'</span>';
+      }).join('<span class="gsep">·</span>');
+      html +=
+        '<button class="gcard" data-idx="'+idx+'">'+
+          '<div class="gmain">'+
+            '<div class="grow1"><span class="guser">'+esc(dev.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(dev.dev)+'</span></div>'+
+            '<div class="grow2"><span class="glast">마지막 제출 '+dev.last+'</span><span class="gsep">·</span>'+brk+'</div>'+
+          '</div>'+
+          '<span class="gcount"><span class="gcnt-n num">'+fp.length+'</span><span class="gcnt-u">건</span></span>'+
+          '<span class="gchev">'+CHEV_RIGHT+'</span>'+
+        '</button>';
+    });
+    if(html==="") html = '<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
+    host.innerHTML = html;
+    host.querySelectorAll(".gcard").forEach(function(b){
+      b.addEventListener("click", function(){ openDevice(parseInt(b.getAttribute("data-idx"),10)); });
+    });
+    document.getElementById("fcnt").textContent = total;
+  }
+
+  // ── 상세: 한 기기의 상품 목록 ──
+  function qtyHtml(p){
+    if(p.only!=null){
+      return '<div class="dqty"><span class="only">제출 '+p.only+'</span><span class="unit">개</span></div>';
+    }
+    var d = p.to - p.from;
+    var cls = d<0 ? "down" : "up";
+    var sign = d<0 ? "−"+Math.abs(d) : "+"+d;
+    return '<div class="dqty"><span class="from num">'+p.from+'</span><span class="arw">→</span>'+
+           '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
+           '<span class="delta '+cls+' num">'+sign+'</span></div>';
+  }
+  function productHtml(p){
+    var sub = p.sub ? '<div class="dsub">'+esc(p.sub)+'</div>' : '';
+    var detail = '<div class="drs"><span class="lb">재고 차이 사유</span>'+esc(p.reason)+'</div>';
+    if(p.handler){
+      detail += '<div class="drs"><span class="lb">처리</span>'+esc(p.handler)+'</div>';
+    } else {
+      detail += '<div class="drs"><span class="lb">처리</span><span style="color:var(--g-400)">반영 전이라 처리자 없음</span></div>';
+    }
+    if(p.reject){
+      detail += '<div class="drs"><span class="lb">반려 사유</span>'+esc(p.reject)+'</div>';
+    }
+    return '<details class="drow" data-status="'+p.status+'">'+
+        '<summary>'+
+          '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
+            '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
+          qtyHtml(p)+
+          '<div class="drow-foot"><span class="dmeta">자세히</span><span class="chev">'+CHEV_DOWN+'</span></div>'+
+        '</summary>'+
+        '<div class="ddetail">'+detail+'</div>'+
+      '</details>';
+  }
+  function renderDetail(){
+    if(currentDevice<0) return;
+    var dev = DEVICES[currentDevice];
+    var fp = filteredProducts(dev);
+    document.getElementById("dvhead").innerHTML =
+      '<div class="dvh-top"><span class="dvh-user">'+esc(dev.user)+'</span><span class="dvh-dev">'+esc(dev.dev)+'</span></div>'+
+      '<div class="dvh-sub">마지막 제출 '+SUB_DATE+' '+dev.last+' · <b>'+fp.length+'건</b></div>';
+    var host = document.getElementById("detailProducts");
+    if(fp.length===0){
+      host.innerHTML = '<div class="gempty">선택한 상태의 상품이 없습니다.</div>';
+    } else {
+      host.innerHTML = fp.map(productHtml).join("");
+    }
+  }
+
+  // ── 뷰 전환 ──
+  function openDevice(idx){
+    currentDevice = idx;
+    document.getElementById("mainView").hidden = true;
+    document.getElementById("detailView").hidden = false;
+    document.getElementById("hdrTitle").textContent = "기기별 제출";
+    document.getElementById("hdrDate").hidden = true;
+    document.querySelector(".scroll").scrollTop = 0;
+    renderDetail();
+  }
+  function showMain(){
+    currentDevice = -1;
+    document.getElementById("detailView").hidden = true;
+    document.getElementById("mainView").hidden = false;
+    document.getElementById("hdrTitle").textContent = "제출 상세";
+    document.getElementById("hdrDate").hidden = false;
+    document.querySelector(".scroll").scrollTop = 0;
+    renderMain();
+  }
+  document.getElementById("backBtn").addEventListener("click", function(){
+    if(currentDevice>=0) showMain();
+  });
+
+  // ── 필터(Bottom Sheet) ──
   function openSheet(){ pending = {done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
   function closeSheet(){ backdrop.classList.remove("open"); }
   function renderPending(){
@@ -226,7 +385,7 @@
   }
   function toggle(v){
     if(v==="all"){
-      var next = !isAll(pending);          // 전체 체크 → 모두 선택 / 해제 → 모두 해제
+      var next = !isAll(pending);
       pending = {done:next, rej:next, wait:next};
     } else {
       pending[v] = !pending[v];
@@ -235,22 +394,20 @@
   }
   function applyFilter(){
     applied = {done:pending.done, rej:pending.rej, wait:pending.wait};
-    var showAll = isAll(applied) || isNone(applied);   // 전체 또는 아무것도 없으면 전체 노출
-    var shown = 0;
-    document.querySelectorAll(".drow").forEach(function(row){
-      var st = row.getAttribute("data-status");
-      var show = showAll || applied[st];
-      row.style.display = show ? "" : "none";
-      if(show) shown += COUNTS[st] || 0;
-    });
-    // 좌측 건수 · 필터 버튼 상태(선택 개수 배지)
-    document.getElementById("fcnt").textContent = shown;
+    var showAll = isAll(applied) || isNone(applied);
     var selN = STATUSES.filter(function(s){return applied[s];}).length;
     var fnum = document.getElementById("fnum"), fbtn = document.getElementById("fbtn");
-    var filtered = !showAll;   // 일부만 선택
+    var filtered = !showAll;
     fnum.hidden = !filtered; fnum.textContent = selN;
     fbtn.classList.toggle("on", filtered);
     document.querySelector(".fcount").firstChild.textContent = filtered ? "선택 " : "전체 ";
+    // 두 뷰 모두 재계산
+    renderMain();
+    if(currentDevice>=0){
+      // 현재 기기가 필터로 사라졌으면 메인 복귀
+      if(filteredProducts(DEVICES[currentDevice]).length===0){ showMain(); }
+      else { renderDetail(); }
+    }
   }
 
   document.getElementById("fbtn").addEventListener("click", openSheet);
@@ -258,6 +415,9 @@
   document.getElementById("applyBtn").addEventListener("click", function(){ applyFilter(); closeSheet(); });
   document.getElementById("cancelBtn").addEventListener("click", closeSheet);
   backdrop.addEventListener("click", function(e){ if(e.target===backdrop) closeSheet(); });
+
+  // 초기 렌더
+  renderMain();
 </script>
 </body>
 </html>
