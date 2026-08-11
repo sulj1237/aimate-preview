@@ -312,35 +312,33 @@
       <div class="flow"><span class="fh">흐름</span><code>APP-01-001</code><span class="ar">→</span><code>APP-01-002</code><span class="ar">→</span> 선택 <code>APP-01-004</code>(상품 정보)</div>
     </section>
 
-    <!-- APP-01-003 기존 상품 안내 -->
+    <!-- APP-01-003 상품 정보 수정 (기존 상품 진입) -->
     <section class="screen" data-sid="APP-01-003">
-      <div class="sc-head"><span class="sid">APP-01-003</span><span class="nm">기존 상품 안내 모달 <span class="tbu" style="font-size:11px">흐름 제외 · APP-01-004 직행</span></span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
+      <div class="sc-head"><span class="sid">APP-01-003</span><span class="nm">상품 정보 수정 (기존 상품 진입)</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
       <div class="sc-grid">
         <div class="mock">
           <div class="phone">
-            <div class="ph-bar"><span class="bk">‹</span><span class="tt">상품 조회</span></div>
+            <div class="ph-bar"><span class="bk">‹</span><span class="tt">정보 수정</span><span class="hot" data-n="1" style="display:inline-flex;align-items:center;gap:5px;margin-left:6px"><span class="num">1</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700">8801234567890</span></span></div>
             <div class="ph-body">
-              <div class="hot" data-n="1" style="text-align:center;margin-bottom:6px"><span class="num">1</span><div class="rico warn" style="margin:0 auto">!</div><div style="font-weight:800;font-size:13px;margin-top:6px">이미 등록된 상품입니다</div></div>
-              <div class="hot" data-n="2"><span class="num">2</span>
-                <div class="kv"><span class="k">상품명</span><span>타이레놀 500mg</span></div>
-                <div class="kv"><span class="k">바코드</span><span>8801234567890</span></div>
-                <div class="kv"><span class="k">분류</span><span>일반의약품</span></div>
-                <div class="kv"><span class="k">판매가</span><span>4,500원</span></div>
-                <div class="kv"><span class="k">상품 상세위치</span><span>A-3 선반</span></div>
-              </div>
+              <div class="fld"><span class="lb">상품명 <span style="color:var(--danger)">*</span></span><div class="bx">타이레놀 500mg</div></div>
+              <div class="hot fld" data-n="2"><span class="num">2</span><span class="lb">분류 <span style="color:var(--danger)">*</span></span><div class="bx">일반의약품 ▾</div></div>
+              <div class="fld"><span class="lb">제조사</span><div class="bx">한국얀센 ▸</div></div>
+              <div class="fld"><span class="lb">판매가 (원) <span style="color:var(--danger)">*</span></span><div class="bx">4,500</div></div>
+              <div class="fld"><span class="lb">단위</span><div class="bx">정 ▾</div></div>
+              <div class="fld"><span class="lb">상품 상세위치</span><div class="bx">A-3 선반</div></div>
+              <div style="font-size:9.5px;color:var(--muted);margin-top:4px">상품 정보 <b>수정 시에는 재고 수량을 입력하지 않습니다.</b> 실재고는 <b>실재고 관리</b>에서 입력합니다.</div>
             </div>
-            <div class="footb"><span class="hot bn g" data-n="4" style="flex:1;justify-content:center"><span class="num">4</span>확인</span><span class="hot bn" data-n="3" style="flex:1;justify-content:center"><span class="num">3</span>상품정보 수정</span></div>
+            <div class="ph-foot hot" data-n="3" style="padding:11px 13px;border-top:1px solid var(--line)"><span class="num">3</span><span class="bn" style="width:100%;justify-content:center;height:34px">저장</span></div>
           </div>
         </div>
         <ol class="desc">
-          <div class="dh">APP-01-003 · 컴포넌트 <span class="asis-note">※ <b>흐름에서 제외</b> — 등록 상품 인식 시 이 안내 모달 없이 상품 정보(APP-01-004 수정)로 <b>바로 진입</b>한다. 아래 목업은 참고용(이전안).</span></div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>안내 헤더</b> — `이미 등록된 상품입니다`.</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>상품 정보(읽기 전용)</b> — 상품명·바코드·분류·판매가·상세위치.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>상품정보 수정</b> — APP-01-004 수정 모드 진입.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>확인</b> — 닫고 APP-01-001.</span></li>
+          <div class="dh">APP-01-003 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>기존 상품 진입</b> — 기존 등록한 상품일 경우 <b>상품 수정 페이지</b>로 이동하여 상품 정보를 확인하고, 정보를 수정하거나 그대로 저장한다. 앱바 헤더 `정보 수정  8801234567890`(바코드 수정 불가).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>필수(*)</b> — 상품명·분류·판매가. <b>재고 수량 필드는 없음</b>(수정 시 재고 미입력).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>저장</b> — 변경분 저장 → APP-01-005 저장 결과. 변경 없이 그대로 저장도 가능.</span></li>
         </ol>
       </div>
-      <div class="flow"><span class="fh">흐름</span><code>APP-01-001/APP-01-002</code><span class="ar">→</span> (등록 상품) <code>APP-01-004</code> 직행 <span style="color:var(--faint)">· APP-01-003 모달 제외</span></div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-01-001/APP-01-002</code><span class="ar">→</span> (등록 상품) <code>APP-01-003</code> 상품 정보 수정 <span class="ar">→</span><code>APP-01-005</code></div>
     </section>
 
     <!-- APP-01-004 상품 정보 (신규 / 수정) -->
@@ -369,7 +367,7 @@
             <!-- 정보 수정 -->
             <div class="state-col"><div class="state-cap"><span class="cb warn">정보 수정</span></div>
               <div class="phone">
-                <div class="ph-bar"><span class="bk">‹</span><span class="tt">등록 · 수정</span><span class="hot" data-n="1b" style="display:inline-flex;align-items:center;gap:5px;margin-left:6px"><span class="num">1</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700">8801234567890</span></span></div>
+                <div class="ph-bar"><span class="bk">‹</span><span class="tt">정보 수정</span><span class="hot" data-n="1b" style="display:inline-flex;align-items:center;gap:5px;margin-left:6px"><span class="num">1</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700">8801234567890</span></span></div>
                 <div class="ph-body">
                   <div class="fld"><span class="lb">상품명 <span style="color:var(--danger)">*</span></span><div class="bx">타이레놀 500mg</div></div>
                   <div class="hot fld" data-n="2"><span class="num">2</span><span class="lb">분류 <span style="color:var(--danger)">*</span></span><div class="bx">일반의약품 ▾</div></div>
@@ -386,7 +384,7 @@
         </div>
         <ol class="desc">
           <div class="dh">APP-01-004 · 컴포넌트 <span class="asis-note">신규/수정 공통 폼 · 수정은 재고 수량 필드 없음</span></div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>앱바 헤더(제목 옆 바코드)</b> — 수정 `등록 · 수정  8801234567890`, 신규 `신규 등록  8809999999999`. <b>바코드 수정 불가</b>.</span></li>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>앱바 헤더(제목 옆 바코드)</b> — 상태별 제목: 신규 `신규 등록  8809999999999`, 수정 `정보 수정  8801234567890`. <b>바코드 수정 불가</b>.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>분류(select)</b> — 일반의약품 / 의약외품. 필수(*).</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>제조사(제조사 선택 팝업 APP-01-007)</b> — 코드 저장 / 제조사명 표시.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 수량</b> — <b>신규 등록에서만</b> 노출(정보 수정엔 없음).</span></li>
@@ -406,7 +404,7 @@
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
           <div class="mini"><div class="mh"><span class="cb info">신규 · 최초</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;color:var(--faint);font-family:ui-monospace,Menlo,monospace">신규 등록 · 8809999999999</div><div style="font-size:9.5px">빈 폼 · <b>재고 수량 노출</b> · 등록 <span class="cb dis">Disabled</span></div></div></div>
-          <div class="mini"><div class="mh"><span class="cb info">수정 · 최초</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;color:var(--faint);font-family:ui-monospace,Menlo,monospace">등록 · 수정 · 8801234567890</div><div style="font-size:9.5px">현재값 채움 · <b>재고 수량 필드 없음</b> · 저장 <span class="cb dis">Disabled</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">수정 · 최초</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;color:var(--faint);font-family:ui-monospace,Menlo,monospace">정보 수정 · 8801234567890</div><div style="font-size:9.5px">현재값 채움 · <b>재고 수량 필드 없음</b> · 저장 <span class="cb dis">Disabled</span></div></div></div>
           <div class="mini"><div class="mh"><span class="cb warn">Validation</span></div><div class="mb" style="align-items:stretch"><div class="fld" style="margin:0;text-align:left"><span class="lb">판매가 (원) *</span><div class="bx bad sel">0</div><div class="er">숫자만 입력하세요</div></div></div></div>
         </div>
       </div>
