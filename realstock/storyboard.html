@@ -878,7 +878,7 @@
           <li data-n="2"><span class="di">2</span><span class="dt"><b>조회 필터</b> — 사용 약품만 / 재고 0이상(기본 체크).</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>상품 목록</b> — 상품명·바코드·단위·사입가·판매가·재고. <b>앱 수정분은 목록에 직접 노출하지 않고</b> `앱 상품 수정 요청`에서 반영(승인 후 최신값 반영). 선택 시 우측 상세 갱신.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>상품 상세 정보 · 액션(상단)</b> — 상세 패널 상단에 <b>변경 내용 보기 · 삭제 · 저장</b>. `변경 내용 보기` 클릭 → CNT-01-003. 상품 정보는 <b>최신 정보 기준 덮어씀</b>.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b>앱 상품 수정 요청(CNT-01-004)</b> — <b>선택 반영으로 확정</b>: 앱 수정분을 목록에 직접 노출하지 않고, 동기화 시 열리는 요청 모달에서 <b>체크박스로 선택한 요청만 `반영`</b>(반려·삭제 없음·미승인 누적)한다. <b class="tbu">UI 세부 시안(카드형/리스트/기기별 드로어)은 (TBU)</b>.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>앱 상품 수정 요청(CNT-01-004)</b> — <b>선택 반영으로 확정</b>: 앱 수정분을 목록에 직접 노출하지 않고, 동기화 시 열리는 요청 모달에서 <b>체크박스로 선택한 요청을 `반영` 또는 `삭제`</b>한다(<b>전체 삭제</b>도 가능 · 반려 개념 없음 · 미반영 요청은 누적). <b class="tbu">UI 세부 시안(카드형/리스트/기기별 드로어)은 (TBU)</b>.</span></li>
         </ol>
       </div>
       <div class="cases">
@@ -951,7 +951,7 @@
                   </div>
                 </div>
               </div>
-              <div class="footb hot" data-n="6" style="justify-content:flex-end;align-items:center"><span class="num">6</span><span class="bn r" style="margin-right:auto;justify-content:center">전체 삭제</span><span class="bn g" style="justify-content:center">닫기</span><span class="bn" style="justify-content:center">선택 반영</span></div>
+              <div class="footb hot" data-n="6" style="justify-content:flex-end;align-items:center"><span class="num">6</span><span class="bn r" style="margin-right:auto;justify-content:center">전체 삭제</span><span class="bn g" style="justify-content:center">닫기</span><span class="bn r" style="justify-content:center">선택 삭제</span><span class="bn" style="justify-content:center">선택 반영</span></div>
             </div>
             <!-- 상세 내용 = 모달 옆에 붙는 플로팅 팝업 -->
             <div class="hot" data-n="5" style="position:absolute;top:44px;left:576px;width:250px;border:1px solid #d5d9df;border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 20px 50px -20px rgba(0,0,0,.4)"><span class="num">5</span>
@@ -980,8 +980,8 @@
           <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 기기 그룹 헤더 `사용자 · 기기ID · N건 · 마지막 제출`. 펼치면 `전체 선택` + 상품 요청 목록. 최근 제출 그룹 기본 펼침.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b> · <b>`삭제`</b>(항목별). 동일 상품은 최신 요청 1건만 노출.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
-          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). <b>반려 버튼 없음</b>(삭제는 시안 A 항목별 `삭제`·푸터 `전체 삭제`만). 반영하지 않은 요청은 <b>미승인 누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
-          <li><span class="di" style="background:var(--amber);color:#fff">B</span><span class="dt"><b class="tbu">[시안 B · TBU]</b> <b>리스트(표) 결재함</b> — 상단 `전체선택`·`전체 N건 중 선택 N건`·`반영`. 열: <b>☐ · 제출일시 · 상품명 · 제조사 · 바코드 · 변경 항목 · 이전값 · 변경값 · 제출자</b>. 변경 항목 다수는 <b>rowspan</b>으로 상품 정보를 묶고, 동일 상품 여러 제출은 <b>`수정 N건`</b> 배지로 접었다 펼친다. 처리 정책(선택 반영·반려 없음·미승인 누적·이력 생성)은 시안 A와 동일. <b>시안 A(기기별 묶음·상세 팝업) vs 시안 B(표·인라인 비교) 중 확정 필요</b>.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 삭제`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(선택/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
+          <li><span class="di" style="background:var(--amber);color:#fff">B</span><span class="dt"><b class="tbu">[시안 B · TBU]</b> <b>리스트(표) 결재함</b> — 상단 `전체선택`·`전체 N건 중 선택 N건`·`반영`. 열: <b>☐ · 제출일시 · 상품명 · 제조사 · 바코드 · 변경 항목 · 이전값 · 변경값 · 제출자</b>. 변경 항목 다수는 <b>rowspan</b>으로 상품 정보를 묶고, 동일 상품 여러 제출은 <b>`수정 N건`</b> 배지로 접었다 펼친다. 처리 정책(선택 반영·선택 삭제·전체 삭제·반려 없음·미반영 누적·이력 생성)은 시안 A와 동일. <b>시안 A(기기별 묶음·상세 팝업) vs 시안 B(표·인라인 비교) 중 확정 필요</b>.</span></li>
         </ol>
       </div>
       <div class="cases">
@@ -990,7 +990,7 @@
           <tr><td><span class="cb warn">요청 있음</span></td><td>미처리 N건</td><td>동기화 버튼 Badge N · 클릭 시 요청 모달</td><td class="nx">CNT-01-004</td></tr>
           <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>상품 정보 반영 · 목록에서 제거 · 이력 생성 · Toast `반영 완료 · N건`</td><td class="nx">CNT-01-003</td></tr>
           <tr><td><span class="cb dis">미선택</span></td><td>선택 0</td><td>`선택 반영` <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
-          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / 푸터 `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / `선택 삭제` / `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb empty">요청 없음</span></td><td>미처리 0</td><td>`반영할 수정 요청이 없습니다.` · Badge 미노출</td><td class="nx">—</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">

@@ -54,7 +54,7 @@
   /* 앱 수정 대기목록 — 카드형(POS 판매 저장목록 UX 참고) */
   .wl{display:flex;flex-direction:column;gap:12px}
   .wl-empty{padding:44px 0;text-align:center;color:#9aa0a6}
-  /* 상단 툴바 — 전체선택 · 선택 건수 · (우측) 반영/반려 일괄 */
+  /* 상단 툴바 — 전체선택 · 선택 건수 · (우측) 반영/삭제 일괄 */
   .wl-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
   .wl-bar .selall{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#4b5158;cursor:pointer}
   .wl-cnt{font-size:12px;color:#6b7178}.wl-cnt b{color:var(--teal-d)}
@@ -204,11 +204,11 @@
       <!-- 그 밑: (왼쪽) 상품 데이터 올리기 · (오른쪽) 마지막 동기화 일시 + 앱 데이터 동기화 버튼 -->
       <div class="sync-row">
         <button class="btn teal sm" id="uploadBtn"><span class="spin"></span>상품 데이터 올리기</button>
-        <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/반려할 수 있습니다.</span></span>
+        <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/삭제할 수 있습니다.</span></span>
         <span class="spacer"></span>
         <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
         <button class="btn sync sm" id="syncBtn">앱 데이터 동기화<span class="badge-n" id="syncBadge">3</span></button>
-        <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 수정한 상품 정보를 <b>앱 상품 수정 요청</b>에서 확인해 반영/반려합니다. 미처리 건수가 배지로 표시됩니다.</span></span>
+        <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 수정한 상품 정보를 <b>앱 상품 수정 요청</b>에서 확인해 반영/삭제합니다. 미처리 건수가 배지로 표시됩니다.</span></span>
       </div>
       <!-- 목록 리스트 바로 위: 전체·판매 드롭다운·신규·내보내기 -->
       <div class="cnt-row">
@@ -302,7 +302,7 @@
     </div>
   </div>
 </div>
-<!-- ① 앱 수정 대기목록 모달 (POS 판매 저장목록 UX · 카드형 · 반영/반려 승인) -->
+<!-- ① 앱 수정 대기목록 모달 (POS 판매 저장목록 UX · 카드형 · 반영/삭제 승인) -->
 <div class="modal-bg" id="waitModal">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:720px">
     <div class="modal-h">
@@ -315,7 +315,7 @@
         <span class="wl-cnt">선택 <b id="wlSel">0</b>건</span>
         <span class="wl-bulk">
           <button class="btn teal sm" id="wlApply" disabled>반영</button>
-          <button class="btn red sm" id="wlReject" disabled>반려</button>
+          <button class="btn red sm" id="wlReject" disabled>삭제</button>
         </span>
       </div>
       <div class="wl" id="waitBody"></div>
@@ -361,7 +361,7 @@
     $('cnt').textContent=2131;
   }
 
-  // ① 앱 수정 대기목록 — POS 판매 저장목록 UX. 동기화 버튼 클릭 시 모달, 카드별 반영/반려 승인.
+  // ① 앱 수정 대기목록 — POS 판매 저장목록 UX. 동기화 버튼 클릭 시 모달, 카드별 반영/삭제 승인.
   var pending=[
     {nm:'[2+1]비타리움 프로폴리스…', bc:'9343202002627', by:'김약사', dev:'A21', at:'2026-07-03 08:51',
       changes:[{f:'판매가', cur:'26,500원', nw:'27,500원'},{f:'위치', cur:'A-3', nw:'B-1'},{f:'단위(포장)', cur:'회', nw:'병'}]},
@@ -405,7 +405,7 @@
           '<div class="wc-acts">'+
             '<button class="btn line sm togg">'+(p.type==='new'?'등록 내용 보기':'변경 내용 보기')+'</button>'+
             '<button class="btn teal sm" data-act="apply">반영</button>'+
-            '<button class="btn red sm" data-act="reject">반려</button>'+
+            '<button class="btn red sm" data-act="reject">삭제</button>'+
           '</div>'+
         '</div>'+
         '<div class="wc-detail"><table class="cmp"><thead><tr><th>항목</th><th>'+(p.type==='new'?'현재':'현재값')+'</th><th class="c"></th><th>'+(p.type==='new'?'등록값':'앱 제출값')+'</th></tr></thead><tbody>'+cmp+'</tbody></table></div>'+
@@ -420,13 +420,13 @@
     if(e.target.classList.contains('togg')){var open=card.classList.toggle('open');e.target.textContent=open?'변경 내용 닫기':'변경 내용 보기';return;}
     var act=e.target.getAttribute('data-act');
     if(act==='apply'){pending.splice(i,1);renderWaitlist();toast('반영 완료 · '+p.nm+' · 수정 이력 생성');}
-    else if(act==='reject'){pending.splice(i,1);renderWaitlist();toast('반려 처리 · '+p.nm);}
+    else if(act==='reject'){pending.splice(i,1);renderWaitlist();toast('삭제 처리 · '+p.nm);}
   });
-  // 전체선택 · 일괄 반영/반려(상단 우측)
+  // 전체선택 · 일괄 반영/삭제(상단 우측)
   $('wlAll').addEventListener('change',function(){var v=$('wlAll').checked;pending.forEach(function(p){p._sel=v;});renderWaitlist();});
   function bulk(apply){var picked=pending.filter(function(p){return p._sel;});if(!picked.length)return;
     pending=pending.filter(function(p){return !p._sel;});renderWaitlist();
-    toast((apply?'반영 완료':'반려 처리')+' · '+picked.length+'건'+(apply?' · 수정 이력 생성':''));}
+    toast((apply?'반영 완료':'삭제 처리')+' · '+picked.length+'건'+(apply?' · 수정 이력 생성':''));}
   $('wlApply').onclick=function(){bulk(true);};
   $('wlReject').onclick=function(){bulk(false);};
   $('syncBtn').onclick=function(){renderWaitlist();$('waitModal').classList.add('open');};
