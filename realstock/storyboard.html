@@ -486,6 +486,7 @@
                       <div style="font-size:10px;color:#9fb">바코드를 비추면 자동으로 인식합니다</div>
                     </div>
                   </div>
+                  <div class="hot" data-n="5" style="font-size:8.5px;color:var(--muted);background:#f7f8fa;border-radius:6px;padding:5px 7px;margin-top:6px"><span class="num">5</span>ⓘ 앱에 표시된 재고는 현재 전산 재고와 다를 수 있어요. 정확한 재고는 PC 클라이언트 › 재고관리 › '상품 데이터 올리기' 후 확인. <span class="tbu">(노출 방식 TBU)</span></div>
                 </div>
               </div>
             </div>
@@ -510,6 +511,7 @@
           <li data-n="2"><span class="di">2</span><span class="dt"><b>제출 목록 (N건)</b> — 담은 건이 있을 때만 하단 노출 → APP-02-003.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>제출 이력</b> — 앱바 우측 아이콘 → APP-02-005.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>인식 실패</b> — `인식하지 못했습니다` · `바코드를 화면 안에 맞춰 다시 비춰 주세요`.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>재고 안내</b>(문구 확정 · 노출 방식 <b class="tbu">TBU</b>) — `앱에 표시된 재고는 현재 전산 재고와 다를 수 있습니다. 더 정확한 재고를 확인하려면 먼저 PC 클라이언트 > 재고관리 > '상품 데이터 올리기'를 실행해 주세요.` 노출 방식(최초 진입 모달 / 상단 배너)은 확정 전.</span></li>
         </ol>
       </div>
       <div class="cases">
@@ -691,7 +693,7 @@
           <div class="phone">
             <div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 상세</span><span class="hot" data-n="1" style="display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span class="num">1</span><span style="font-size:10px;color:var(--faint);font-weight:700">2026-07-02</span></span></div>
             <div class="ph-body">
-              <div class="hot filt" data-n="2"><span class="num">2</span><span class="f on">전체 17</span><span class="f">반영완료 14</span><span class="f">반영반려 2</span><span class="f">반영전 1</span></div>
+              <div class="hot" data-n="2" style="display:flex;align-items:center;gap:6px;margin:2px 0 4px"><span class="num">2</span><span style="font-size:9px;font-weight:800;color:var(--ink)">전체 <b>17</b>건</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:9px;font-weight:700;color:#3a424c">▽ 반영상태</span></div>
               <div class="hot" data-n="3" style="font-size:9px;color:var(--muted);background:#f7f8fa;border-radius:6px;padding:5px 8px;margin:6px 0 2px"><span class="num">3</span>ⓘ 숫자는 앱 조회 시점 기준입니다. 현재 전산 재고와 다를 수 있습니다.</div>
               <div class="hot" data-n="4"><span class="num">4</span>
                 <div class="drow">
@@ -722,7 +724,7 @@
         <ol class="desc">
           <div class="dh">APP-02-006 · 컴포넌트</div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — `제출 상세` + 제출일자(제목 옆).</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>상태 필터(칩)</b> — 전체·반영완료·반영반려·반영전(건수). 선택 칩 강조.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>반영상태 필터(Bottom Sheet · 다중선택, 확정)</b> — 목록 위 우측 <b>`반영상태` 버튼</b> → Bottom Sheet(체크박스: 전체·반영완료·반영반려·반영전). 좌측 결과 건수 · 버튼 선택 개수 배지(일부만 선택 시).</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>안내(2줄)</b> — `ⓘ 숫자는 앱 조회 시점 기준입니다. 현재 전산 재고와 다를 수 있습니다.`</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>품목 카드(아코디언)</b> — 바코드(#)·상품명·상태 배지 + <b>수량 `A → B개`(결과 숫자 강조) + 증감 배지</b>(감소 <span style="color:#e5484d;font-weight:800">−N</span>·red / 증가 <span style="color:#1d8a76;font-weight:800">+N</span>·green). '반영 전/후' 텍스트는 상태 배지로 대체해 삭제. 메타 <b>한 줄 = 제출자만</b> `제출 HH:MM · 이름(기기 SM-S911)`. <b>처리자는 접힌 카드에서 숨기고</b> `자세히`에서 `처리 HH:MM · 이름(PC DESKTOP-…)` 형식으로 노출. 그 외 재고 차이 사유·반려 사유도 `자세히`. (기기명 = 앱 폰 모델 · PC명)</span></li>
         </ol>

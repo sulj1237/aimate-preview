@@ -11,20 +11,28 @@
      ① 수량 = 숫자 강조 `48 → 24개` + 증감 배지(감소=red / 증가=green). '반영 전/후' 텍스트 제거(상태 배지로 대체)
      ② 메타 한 줄 `HH:MM · 입력자(기기) → 처리자`
      ③ 상세(재고 차이 사유·처리·반려 사유)는 '자세히' 아코디언
+     ④ 상태 필터 = 목록 위 우측 `반영상태` 버튼 + Bottom Sheet(다중선택 체크박스) — 확정
      배율 --k 로 전체 확대(이 파일=100%). */
   :root{ --k:1.00; }
 
   .appbar h1{font-size:calc(19px*var(--k))}
   .dt-head{margin-left:10px;font-size:calc(13px*var(--k));font-weight:700;color:var(--g-600);letter-spacing:var(--tracking);white-space:nowrap}
 
-  /* 안내 힌트 — 2줄, 채운 ⓘ + 텍스트(#A4A4A4) */
-  .hint{margin:calc(4px*var(--k)) 0 calc(8px*var(--k));font-size:calc(12.5px*var(--k));line-height:1.55;color:#A4A4A4;font-weight:500;letter-spacing:var(--tracking)}
-  .hint svg{width:calc(16px*var(--k));height:calc(16px*var(--k));vertical-align:-3px;margin-right:5px}
-
-  .dfilter{display:flex;gap:6px;margin:calc(10px*var(--k)) 0 calc(6px*var(--k));overflow-x:auto;padding-bottom:2px}
-  .dchip{flex-shrink:0;padding:calc(6px*var(--k)) calc(11px*var(--k));border-radius:999px;border:1px solid var(--g-300);background:#fff;
-    font-family:inherit;font-size:calc(12.5px*var(--k));font-weight:600;color:var(--g-700);white-space:nowrap}
-  .dchip.on{background:var(--g-900);border-color:var(--g-900);color:#fff}
+  /* 필터 바 — 좌: 건수 / 우: 반영상태 버튼 */
+  .fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:calc(8px*var(--k)) 0 calc(6px*var(--k))}
+  .fcount{font-size:calc(13px*var(--k));font-weight:700;color:var(--g-700);letter-spacing:var(--tracking)}
+  .fcount b{color:var(--g-900)}
+  .fbtn{margin-left:auto;display:inline-flex;align-items:center;gap:calc(5px*var(--k));max-width:100%;
+    padding:calc(7px*var(--k)) calc(12px*var(--k));border-radius:999px;border:1px solid var(--g-300);background:#fff;
+    font-family:inherit;font-size:calc(13px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking);cursor:pointer}
+  .fbtn:active{background:var(--g-50)}
+  .fbtn .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .fbtn .funnel{flex:none;color:var(--g-600)}
+  .fbtn.on{border-color:var(--brand-500);color:var(--brand-700)}
+  .fbtn.on .funnel{color:var(--brand-500)}
+  .fbtn .fnum{flex:none;min-width:calc(17px*var(--k));height:calc(17px*var(--k));padding:0 calc(4px*var(--k));border-radius:999px;
+    background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .fbtn .fnum[hidden]{display:none}
 
   /* 카드 = 아코디언 */
   .drow{border-bottom:1px solid var(--g-100);padding:calc(14px*var(--k)) 0}
@@ -68,6 +76,32 @@
   .drs .lb{display:block;font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(2px*var(--k))}
 
   .btn{height:calc(48px*var(--k));font-size:calc(15px*var(--k))}
+
+  /* ── Material Bottom Sheet ── */
+  .sheet-backdrop{position:absolute;inset:0;background:rgba(16,24,40,.42);opacity:0;visibility:hidden;
+    transition:opacity .22s ease,visibility .22s ease;z-index:20}
+  .sheet-backdrop.open{opacity:1;visibility:visible}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:20px 20px 0 0;
+    padding:calc(8px*var(--k)) calc(20px*var(--k)) max(calc(18px*var(--k)),env(safe-area-inset-bottom));
+    box-shadow:0 -8px 30px -8px rgba(16,24,40,.25);transform:translateY(100%);
+    transition:transform .26s cubic-bezier(.22,.61,.36,1);z-index:21}
+  .sheet-backdrop.open .sheet{transform:translateY(0)}
+  .sheet .grip{width:36px;height:4px;border-radius:99px;background:var(--g-300);margin:calc(8px*var(--k)) auto calc(6px*var(--k))}
+  .sheet h3{margin:calc(4px*var(--k)) 0 calc(10px*var(--k));font-size:calc(16px*var(--k));font-weight:700;
+    color:var(--g-900);letter-spacing:var(--tracking-title)}
+  .opt{display:flex;align-items:center;gap:calc(10px*var(--k));padding:calc(13px*var(--k)) calc(2px*var(--k));
+    border-bottom:1px solid var(--g-100);cursor:pointer}
+  .opt:last-of-type{border-bottom:0}
+  .opt .chk{flex:none;width:calc(20px*var(--k));height:calc(20px*var(--k));border-radius:calc(6px*var(--k));border:2px solid var(--g-400);
+    display:grid;place-items:center;transition:background .12s ease,border-color .12s ease}
+  .opt .chk svg{width:calc(13px*var(--k));height:calc(13px*var(--k));color:#fff;opacity:0;transform:scale(.5);transition:opacity .12s ease,transform .14s ease}
+  .opt.sel .chk{background:var(--brand-500);border-color:var(--brand-500)}
+  .opt.sel .chk svg{opacity:1;transform:scale(1)}
+  .opt .otxt{flex:1;min-width:0;font-size:calc(14.5px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking)}
+  .opt.sel .otxt{color:var(--g-900)}
+  .opt.all{border-bottom:1px solid var(--g-200)}
+  .sheet-act{display:flex;gap:10px;margin-top:calc(14px*var(--k))}
+  .sheet-act .btn{flex:1;width:auto}
 </style>
 </head>
 <body>
@@ -89,14 +123,16 @@
     </div>
 
     <div class="scroll pad">
-      <div class="dfilter">
-        <button class="dchip on">전체 4</button>
-        <button class="dchip">반영완료 2</button>
-        <button class="dchip">반영반려 1</button>
-        <button class="dchip">반영전 1</button>
+      <div class="fbar">
+        <span class="fcount">전체 <b id="fcnt">4</b>건</span>
+        <button class="fbtn" id="fbtn" aria-haspopup="dialog">
+          <svg class="funnel" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span class="lbl">반영상태</span>
+          <span class="fnum" id="fnum" hidden>2</span>
+        </button>
       </div>
 
-      <details class="drow" open>
+      <details class="drow" data-status="done" open>
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8801234567890</span><div class="dnm">타이레놀콜드-에스정</div><div class="dsub">아세트아미노펜·클로르페니라민 복합제</div></div><span class="stb done">반영완료</span></div>
           <div class="dqty"><span class="from">48</span><span class="arw">→</span><span class="to">24</span><span class="unit">개</span><span class="delta down">−24</span></div>
@@ -108,7 +144,7 @@
         </div>
       </details>
 
-      <details class="drow">
+      <details class="drow" data-status="done">
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8806789012345</span><div class="dnm">판콜에이내복액 30ml</div></div><span class="stb done">반영완료</span></div>
           <div class="dqty"><span class="from">52</span><span class="arw">→</span><span class="to">60</span><span class="unit">개</span><span class="delta up">+8</span></div>
@@ -120,7 +156,7 @@
         </div>
       </details>
 
-      <details class="drow">
+      <details class="drow" data-status="rej">
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8803333000044</span><div class="dnm">겔포스엠현탁액</div></div><span class="stb rej">반영반려</span></div>
           <div class="dqty"><span class="from">38</span><span class="arw">→</span><span class="to">40</span><span class="unit">개</span><span class="delta up">+2</span></div>
@@ -133,7 +169,7 @@
         </div>
       </details>
 
-      <details class="drow">
+      <details class="drow" data-status="wait">
         <summary>
           <div class="drow-top"><div class="dtitle"><span class="dbc">#8801111000022</span><div class="dnm">훼스탈플러스정</div></div><span class="stb wait">반영전</span></div>
           <div class="dqty"><span class="only">제출 30</span><span class="unit">개</span></div>
@@ -149,7 +185,79 @@
     <div class="bottom">
       <button class="btn btn-tertiary">제출 이력으로</button>
     </div>
+
+    <!-- Bottom Sheet -->
+    <div class="sheet-backdrop" id="backdrop">
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="상태 필터">
+        <div class="grip"></div>
+        <h3>반영상태</h3>
+        <div class="opt all sel" data-val="all"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">전체</span></div>
+        <div class="opt sel" data-val="done"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영완료</span></div>
+        <div class="opt sel" data-val="rej"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영반려</span></div>
+        <div class="opt sel" data-val="wait"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영전</span></div>
+        <div class="sheet-act">
+          <button class="btn btn-line" id="cancelBtn">취소</button>
+          <button class="btn btn-primary" id="applyBtn">적용</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+<script>
+  // 다중 선택(체크박스). 상태 3종 — 전체 = 세 개 모두 선택.
+  var STATUSES = ["done","rej","wait"];
+  var COUNTS = {done:2, rej:1, wait:1};
+  var applied = {done:true, rej:true, wait:true};   // 적용된 선택
+  var pending = {done:true, rej:true, wait:true};    // 시트에서 선택 중
+  var backdrop = document.getElementById("backdrop");
+  var opts = backdrop.querySelectorAll(".opt");
+
+  function isAll(s){ return s.done && s.rej && s.wait; }
+  function isNone(s){ return !s.done && !s.rej && !s.wait; }
+
+  function openSheet(){ pending = {done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
+  function closeSheet(){ backdrop.classList.remove("open"); }
+  function renderPending(){
+    var all = isAll(pending);
+    opts.forEach(function(o){
+      var v = o.getAttribute("data-val");
+      o.classList.toggle("sel", v==="all" ? all : pending[v]);
+    });
+  }
+  function toggle(v){
+    if(v==="all"){
+      var next = !isAll(pending);          // 전체 체크 → 모두 선택 / 해제 → 모두 해제
+      pending = {done:next, rej:next, wait:next};
+    } else {
+      pending[v] = !pending[v];
+    }
+    renderPending();
+  }
+  function applyFilter(){
+    applied = {done:pending.done, rej:pending.rej, wait:pending.wait};
+    var showAll = isAll(applied) || isNone(applied);   // 전체 또는 아무것도 없으면 전체 노출
+    var shown = 0;
+    document.querySelectorAll(".drow").forEach(function(row){
+      var st = row.getAttribute("data-status");
+      var show = showAll || applied[st];
+      row.style.display = show ? "" : "none";
+      if(show) shown += COUNTS[st] || 0;
+    });
+    // 좌측 건수 · 필터 버튼 상태(선택 개수 배지)
+    document.getElementById("fcnt").textContent = shown;
+    var selN = STATUSES.filter(function(s){return applied[s];}).length;
+    var fnum = document.getElementById("fnum"), fbtn = document.getElementById("fbtn");
+    var filtered = !showAll;   // 일부만 선택
+    fnum.hidden = !filtered; fnum.textContent = selN;
+    fbtn.classList.toggle("on", filtered);
+    document.querySelector(".fcount").firstChild.textContent = filtered ? "선택 " : "전체 ";
+  }
+
+  document.getElementById("fbtn").addEventListener("click", openSheet);
+  opts.forEach(function(o){ o.addEventListener("click", function(){ toggle(o.getAttribute("data-val")); }); });
+  document.getElementById("applyBtn").addEventListener("click", function(){ applyFilter(); closeSheet(); });
+  document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+  backdrop.addEventListener("click", function(e){ if(e.target===backdrop) closeSheet(); });
+</script>
 </body>
 </html>
