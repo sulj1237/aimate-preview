@@ -350,8 +350,7 @@
       <div class="wl" id="waitBody"></div>
     </div>
     <div class="modal-f">
-      <span class="f-selcnt">선택 <b id="wlFootSel">0</b>건</span>
-      <button class="mbtn red" id="wDelAll">전체 삭제</button>
+      <button class="mbtn red" id="wDelAll" style="margin-right:auto">전체 삭제</button>
       <button class="mbtn ghost" id="wCloseF">닫기</button>
       <button class="mbtn primary" id="wApplyAll" disabled>선택 반영</button>
     </div>
@@ -430,7 +429,7 @@
   function fmtLast(s){return s?s.slice(5).replace('-','.'):'';}       // '2026-08-10 09:31' → '08.10 09:31'
   function totalCount(){return groups.reduce(function(s,g){return s+g.items.length;},0);}
   function updateBadge(){var el=$('syncBadge'),t=totalCount();if(t){el.textContent=t;el.style.display='';}else{el.style.display='none';}}
-  function updateFooter(){var n=totalSel();$('wlFootSel').textContent=n;$('wApplyAll').disabled=n===0;}
+  function updateFooter(){$('wApplyAll').disabled=totalSel()===0;}
   // 최근 제출 그룹만 기본 펼침, 나머지는 접힘
   (function(){var li=-1,lm='';groups.forEach(function(g,i){var l=grpLast(g);if(l>lm){lm=l;li=i;}});if(li>=0)groups[li]._open=true;})();
   // 전체 클릭(선택)된 상태가 디폴트
