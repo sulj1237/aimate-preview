@@ -640,7 +640,7 @@
         </div>
         <ol class="desc">
           <div class="dh">APP-02-003 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 차이 사유(있을 때)·바코드. 건별 `편집`/`삭제`. 삭제 시 `제출 상품 삭제` 확인 모달(`해당 항목을 삭제하시겠습니까?`).</span></li>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 차이 사유(있을 때)·바코드. 건별 `편집`/`삭제`. <b>`편집` → APP-02-002(실재고 입력)로 이동</b>해 해당 건의 진열·창고 수량을 다시 입력·수정한다. <b>`삭제` → `제출 상품 삭제` 확인 모달</b>(`해당 항목을 삭제하시겠습니까?` · 취소/삭제).</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>제출하기 (N건)</b> — Confirm 후 제출 → APP-02-004. 0건이면 <b>Disabled</b>.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>상품 더 추가</b> — APP-02-001 스캔 복귀.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>Empty</b> — 담은 건 없음 안내.</span></li>
@@ -651,12 +651,16 @@
         <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
           <tr><td><span class="cb empty">건 없음</span></td><td>담긴 항목 0</td><td>Empty · 제출 <span class="cb dis">Disabled</span></td><td class="nx">APP-02-001</td></tr>
           <tr><td><span class="cb ok">건 있음</span></td><td>1건 이상</td><td>목록·건수·제출 활성</td><td class="nx">APP-02-004</td></tr>
+          <tr><td><span class="cb info">건 편집</span></td><td>카드 `편집`</td><td>APP-02-002 실재고 입력으로 이동(값 재입력)</td><td class="nx">APP-02-002</td></tr>
+          <tr><td><span class="cb err">건 삭제</span></td><td>카드 `삭제`</td><td>`제출 상품 삭제` 확인 모달(`해당 항목을 삭제하시겠습니까?` · 취소/삭제)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb warn">제출 확인</span></td><td>제출하기 클릭</td><td>Confirm(중복 제출·되돌릴 수 없음 안내)</td><td class="nx">APP-02-004</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
           <div class="mini"><div class="mh"><span class="cb ok">건 있음</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9.5px;font-weight:700;display:flex;justify-content:space-between;gap:6px">타이레놀콜드-에스정<span style="white-space:nowrap">24 개</span></div><span class="bn" style="height:24px">제출하기 (3건)</span></div></div>
           <div class="mini"><div class="mh"><span class="cb empty">건 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">담은 실재고가 없습니다</div><div style="font-size:9.5px">스캔해서 수량을 담아주세요 · 제출 <span class="cb dis">Disabled</span></div></div></div>
           <div class="mini"><div class="mh"><span class="cb warn">제출 확인</span></div><div class="mb"><div style="font-size:9.5px">제출 후 되돌릴 수 없습니다. 제출할까요?</div><div style="display:flex;gap:5px"><span class="bn g" style="height:22px">취소</span><span class="bn" style="height:22px">제출</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb err">삭제 확인</span></div><div class="mb"><div style="font-weight:800;font-size:10px">제출 상품 삭제</div><div style="font-size:9.5px">해당 항목을 삭제하시겠습니까?</div><div style="display:flex;gap:5px"><span class="bn g" style="height:22px">취소</span><span class="bn r" style="height:22px">삭제</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">건 편집</span></div><div class="mb"><div style="font-size:9.5px">카드 `편집` → <b>APP-02-002</b>(실재고 입력)</div><div style="font-size:9px;color:var(--faint)">진열·창고 수량 재입력·수정</div></div></div>
         </div>
       </div>
       <div class="flow"><span class="fh">흐름</span><code>APP-02-002</code><span class="ar">→</span><code>APP-02-003</code><span class="ar">→</span> 제출 <code>APP-02-004</code> · 추가 <code>APP-02-001</code></div>
