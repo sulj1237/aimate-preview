@@ -58,12 +58,9 @@
   /* 기기 그룹 = 상위 폴더(장바구니). Grouping Key = Device ID */
   .wg{border:1px solid #e2e6ea;border-radius:12px;background:#fff;overflow:hidden}
   .wg.open{border-color:#d0d5da}
-  /* 헤더 행 = (좌)전체 선택 체크박스 + 펼침 토글(약사·건수·마지막 제출) */
-  .wg-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f7f9fa}
+  /* 헤더 행 = 약사·기기ID·건수·더보기(건수 우측)·마지막 제출 — 행 전체 클릭 시 펼침 */
+  .wg-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f7f9fa;cursor:pointer}
   .wg-h:hover{background:#f1f4f6}
-  .wg-hck{flex:none;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#6b7178;cursor:pointer;white-space:nowrap}
-  .wg-hck input{width:16px;height:16px;cursor:pointer}
-  .wg-toggle{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0}
   .wg-chev{flex:none;color:#8a9099;font-size:11px;transition:transform .15s;display:inline-block}
   .wg.open .wg-chev{transform:rotate(90deg)}
   .wg-icon{flex:none;width:22px;height:22px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:12px}
@@ -456,15 +453,13 @@
       }).join('');
       return '<div class="wg'+(g._open?' open':'')+'" data-g="'+gi+'">'+
         '<div class="wg-h">'+
-          '<label class="wg-hck" title="이 약사 제출 전체 선택"><input type="checkbox" class="wg-all"'+(allChk?' checked':'')+'> 전체 선택</label>'+
-          '<button type="button" class="wg-toggle">'+
-            '<span class="wg-chev">▶</span>'+
-            '<span class="wg-id"><b>'+g.by+'</b><span class="wg-dev">'+g.dev+'</span></span>'+
-            '<span class="wg-cnt">'+g.items.length+'건</span>'+
-            '<span class="wg-time">마지막 제출 '+fmtLast(grpLast(g))+'</span>'+
-          '</button>'+
+          '<span class="wg-id"><b>'+g.by+'</b><span class="wg-dev">'+g.dev+'</span></span>'+
+          '<span class="wg-cnt">'+g.items.length+'건</span>'+
+          '<span class="wg-chev" aria-label="더보기">▶</span>'+
+          '<span class="wg-time">마지막 제출 '+fmtLast(grpLast(g))+'</span>'+
         '</div>'+
         '<div class="wg-b">'+
+          '<div class="wg-tools"><label class="selall"><input type="checkbox" class="wg-all"'+(allChk?' checked':'')+'> 전체 선택</label></div>'+
           '<div class="wg-list">'+items+'</div>'+
         '</div>'+
       '</div>';
@@ -496,13 +491,12 @@
     if(db){var wi=db.closest('.wi');openDrawer(+wi.getAttribute('data-g'),+wi.getAttribute('data-i'));return;}
     var del=e.target.closest('.wi-del');
     if(del){var wi2=del.closest('.wi');deleteItem(+wi2.getAttribute('data-g'),+wi2.getAttribute('data-i'));return;}
-    var h=e.target.closest('.wg-toggle');
+    var h=e.target.closest('.wg-h');
     if(h){var gi=+h.closest('.wg').getAttribute('data-g');groups[gi]._open=!groups[gi]._open;renderWaitlist();}
   });
   $('waitBody').addEventListener('change',function(e){
     if(e.target.classList.contains('wi-pick')){var wi=e.target.closest('.wi');groups[+wi.getAttribute('data-g')].items[+wi.getAttribute('data-i')]._sel=e.target.checked;renderWaitlist();return;}
-    // 전체 선택 = 해당 약사 제출 전체 선택 + 자동 펼침(더보기 없이 상품 노출)
-    if(e.target.classList.contains('wg-all')){var gi=+e.target.closest('.wg').getAttribute('data-g'),v=e.target.checked;groups[gi].items.forEach(function(it){it._sel=v;});if(v)groups[gi]._open=true;renderWaitlist();}
+    if(e.target.classList.contains('wg-all')){var gi=+e.target.closest('.wg').getAttribute('data-g'),v=e.target.checked;groups[gi].items.forEach(function(it){it._sel=v;});renderWaitlist();}
   });
   $('wApplyAll').onclick=applyAll;
   $('wDelSel').onclick=deleteSel;
