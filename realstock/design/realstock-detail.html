@@ -156,7 +156,8 @@
 </head>
 <body>
 <div class="stage">
-  <div class="device" data-screen-label="제출 상세">
+  <div style="max-width:calc(390px*var(--k));margin:0 auto calc(12px*var(--k));background:#fdecea;color:#d64431;font-size:calc(12.5px*var(--k));font-weight:800;text-align:center;padding:calc(9px*var(--k)) calc(12px*var(--k));border-radius:calc(12px*var(--k));border:1px solid #f3c9c2;letter-spacing:var(--tracking)">⚠ 이 화면(제출 상세)은 <u>확정 전</u> — (TBU)</div>
+  <div class="device" data-screen-label="제출 상세 (TBU)">
     <div class="statusbar">
       <span class="num">9:41</span>
       <div class="sb-right">
@@ -419,6 +420,9 @@
 
   // 초기 렌더
   renderMain();
+  // (미리보기 케이스) #device: 첫 기기 상세 / #filter: 반영상태 필터 열림
+  if(location.hash.indexOf("device")>=0){ openDevice(0); }
+  else if(location.hash.indexOf("filter")>=0){ openSheet(); }
 </script>
 </body>
 </html>

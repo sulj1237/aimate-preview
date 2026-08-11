@@ -236,14 +236,12 @@
         <label><input type="checkbox" checked /> 사용 약품만 조회</label>
         <label><input type="checkbox" checked /> 재고 0이상 조회</label>
       </div>
-      <!-- 그 밑: (왼쪽) 상품 데이터 올리기 · 마지막 동기화 일시 · (오른쪽) 앱 데이터 동기화 버튼 -->
+      <!-- 그 밑: (왼쪽) 마지막 동기화 일시 · (오른쪽) 앱 데이터 동기화 버튼 -->
       <div class="sync-row">
-        <button class="btn teal sm" id="uploadBtn"><span class="spin"></span>상품 데이터 올리기</button>
-        <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/반려할 수 있습니다.</span></span>
         <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
         <span class="spacer"></span>
         <button class="btn sync sm" id="syncBtn">앱 데이터 동기화<span class="badge-n" id="syncBadge">3</span></button>
-        <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 수정한 상품 정보를 <b>앱 상품 수정 요청</b>에서 확인해 반영/반려합니다. 미처리 건수가 배지로 표시됩니다.</span></span>
+        <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 수정한 상품 정보를 <b>앱 상품 수정 요청</b>에서 확인해 반영/삭제합니다. 미처리 건수가 배지로 표시됩니다.</span></span>
       </div>
       <!-- 목록 리스트 바로 위: 전체·판매 드롭다운·신규·내보내기 -->
       <div class="cnt-row">
@@ -500,11 +498,6 @@
   $('wClose').onclick=closeWait;$('wCloseF').onclick=closeWait;
   $('waitModal').onclick=function(e){if(e.target===$('waitModal'))closeWait();};
   updateBadge();
-  // 상품 데이터 올리기 — 기준 상품 데이터를 서버에 올려 동기화(앱 데이터 수신 전 선행 단계)
-  $('uploadBtn').onclick=function(){var b=$('uploadBtn');if(b.classList.contains('loading'))return;
-    b.classList.add('loading');b.disabled=true;
-    setTimeout(function(){b.classList.remove('loading');b.disabled=false;
-      toast('상품 데이터 올리기 완료 · 서버 동기화');},900);};
   // 도움말 클릭 토글
   $('syncHelp').addEventListener('click',function(e){e.stopPropagation();$('syncHelp').classList.toggle('on');});
   $('uploadHelp').addEventListener('click',function(e){e.stopPropagation();$('uploadHelp').classList.toggle('on');});
