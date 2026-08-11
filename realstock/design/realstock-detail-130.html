@@ -33,16 +33,17 @@
     background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
   .fbtn .fnum[hidden]{display:none}
 
-  /* ── 기기별 아코디언 그룹 헤더 ── */
-  .dgrp{border-bottom:calc(1px*var(--k)) solid var(--g-100)}
-  .dgrp:last-child{border-bottom:0}
+  /* ── 기기별 아코디언 = 제출자 카드 ── */
+  .dgrp{background:#fff;border:1px solid var(--g-200);border-radius:calc(16px*var(--k));
+    box-shadow:0 1px 3px rgba(16,24,40,.05);margin-bottom:calc(12px*var(--k));overflow:hidden}
+  .dgrp:last-child{margin-bottom:0}
   .dgrp-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;text-align:left;
     font-family:inherit;border:0;background:transparent;cursor:pointer;
-    padding:calc(14px*var(--k)) calc(2px*var(--k))}
+    padding:calc(14px*var(--k)) calc(16px*var(--k))}
   .dgrp-h:active{background:var(--g-50)}
   .dgrp-hmain{flex:1;min-width:0}
   /* 그룹 본문 = 하나의 눌린(뮤트) 회색 영역 (개별 카드 X) */
-  .dgrp-b{background:var(--g-50);border-radius:calc(12px*var(--k));padding:0 calc(16px*var(--k));margin:calc(2px*var(--k)) 0 calc(14px*var(--k))}
+  .dgrp-b{background:var(--g-50);border-radius:calc(12px*var(--k));padding:0 calc(12px*var(--k));margin:0 calc(12px*var(--k)) calc(14px*var(--k))}
   .dgrp-b[hidden]{display:none}
   /* 1행: 사용자 · 기기ID */
   .grow1{display:flex;align-items:baseline;gap:calc(6px*var(--k));flex-wrap:wrap}
