@@ -149,6 +149,79 @@
   .opt.all{border-bottom:1px solid var(--g-200)}
   .sheet-act{display:flex;gap:10px;margin-top:calc(14px*var(--k))}
   .sheet-act .btn{flex:1;width:auto}
+
+  /* === 시안1: 제출건 아코디언 + 상태 색 카드 === */
+  .subc{background:#fff;border:1px solid var(--g-200);border-radius:calc(16px*var(--k));box-shadow:0 1px 3px rgba(16,24,40,.05);margin-bottom:calc(14px*var(--k));overflow:hidden}
+  .subc:last-child{margin-bottom:0}
+  .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer;padding:calc(12px*var(--k)) calc(15px*var(--k));border-bottom:1px solid var(--g-150,#eceef1)}
+  .subc-h:active{background:var(--g-50)}
+  .subc-hl{flex:1;min-width:0}
+  .subc-nm{display:flex;align-items:baseline;gap:calc(7px*var(--k))}
+  .subc-user{font-size:calc(15px*var(--k));font-weight:800;color:var(--g-900)}
+  .subc-dev{font-family:ui-monospace,Menlo,monospace;font-size:calc(12px*var(--k));color:var(--g-500)}
+  .subc-meta{font-size:calc(11.5px*var(--k));color:var(--g-400);font-weight:600;margin-top:calc(4px*var(--k))}
+  .subc-meta .sm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
+  .subc-meta .mut{color:var(--g-400)}
+  .subc-meta .m-lb{color:var(--g-400)}
+  .subc-meta .m-v{color:var(--g-700)}
+  .subc-sum{flex:none;display:flex;gap:calc(4px*var(--k));flex-wrap:wrap;justify-content:flex-end}
+  .sm-chip{font-size:calc(10.5px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(7px*var(--k));border-radius:999px;white-space:nowrap}
+  .sm-chip.done{background:#e2f3ee;color:#1d8a76}
+  .sm-chip.rej{background:#fbe3e0;color:#e5484d}
+  .sm-chip.wait{background:var(--g-100);color:var(--g-600)}
+  .subc-chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
+  .subc.open .subc-chev{transform:rotate(180deg)}
+  .subc-b{padding:calc(4px*var(--k)) calc(15px*var(--k)) calc(14px*var(--k))}
+  .gc{border-radius:calc(12px*var(--k));margin-top:calc(11px*var(--k));padding:calc(11px*var(--k)) calc(12px*var(--k))}
+  .gc.done{background:#eafaf3;border:1px solid #cdeede}
+  .gc.rej{background:#fdeeec;border:1px solid #f6d6d0}
+  .gc.wait{background:var(--g-50);border:1px solid var(--g-200)}
+  .gc-h{display:flex;align-items:center;gap:calc(6px*var(--k));margin-bottom:calc(9px*var(--k))}
+  .gc-h .sic{width:calc(15px*var(--k));height:calc(15px*var(--k))}
+  .gc.done .gc-h{color:#1d8a76}
+  .gc.rej .gc-h{color:#e5484d}
+  .gc.wait .gc-h{color:var(--g-600)}
+  .gc-lb{font-size:calc(12.5px*var(--k));font-weight:800}
+  .gc-cnt{font-size:calc(11.5px*var(--k));font-weight:700;opacity:.75}
+  .irow{display:flex;align-items:center;gap:calc(9px*var(--k));background:#fff;border-radius:calc(9px*var(--k));padding:calc(9px*var(--k)) calc(11px*var(--k));margin-top:calc(7px*var(--k))}
+  .irow:first-child{margin-top:0}
+  .ir-l{flex:1;min-width:0}
+  .ir-nm{font-size:calc(13px*var(--k));font-weight:700;color:var(--g-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ir-bc{font-family:ui-monospace,Menlo,monospace;font-size:calc(10px*var(--k));color:var(--g-400);margin-top:calc(1px*var(--k))}
+  .ir-q{flex:none;display:flex;align-items:baseline;gap:calc(4px*var(--k))}
+  .ir-from{font-size:calc(13px*var(--k));color:var(--g-400);font-weight:600}
+  .ir-ar{color:var(--g-300);font-size:calc(11px*var(--k))}
+  .ir-to{font-size:calc(16px*var(--k));font-weight:800;color:var(--g-900)}
+  .ir-u{font-size:calc(11px*var(--k));color:var(--g-500)}
+  .ir-d{font-size:calc(11px*var(--k));font-weight:800;padding:calc(1px*var(--k)) calc(6px*var(--k));border-radius:6px;margin-left:calc(3px*var(--k))}
+  .ir-d.down{background:#fbe3e0;color:#e5484d}
+  .ir-d.up{background:#e2f3ee;color:#1d8a76}
+  .ir-memo{flex:none;color:var(--g-400);display:inline-flex}
+  /* 시안3: 상태그룹 접기 + 큰 요약 */
+  .gc-h{width:100%;border:0;background:transparent;font-family:inherit;cursor:pointer;padding:0}
+  .gc-chev{margin-left:auto;display:inline-flex;color:inherit;opacity:.7;transition:transform .2s ease}
+  .gc[data-open="1"] .gc-chev{transform:rotate(180deg)}
+  .gc[data-open="0"] .gc-h{margin-bottom:0}
+  .gc-b[hidden]{display:none}
+  /* 묶음 = 배경색 제거, 테두리만 */
+  .gc.done{background:#fff;border-color:#bfe6d5}
+  .gc.rej{background:#fff;border-color:#f0c8c1}
+  .gc.wait{background:#fff;border-color:var(--g-200)}
+  .gc .irow{display:block;background:transparent;border-radius:0;padding:calc(11px*var(--k)) calc(2px*var(--k));margin-top:0;border-bottom:1px solid var(--g-100)}
+  .gc .irow:last-child{border-bottom:0}
+  .gc .ir-q{margin-top:calc(6px*var(--k))}
+  .gc .ir-d{margin-left:auto}
+  .ir-top{display:flex;align-items:center;gap:calc(9px*var(--k))}
+  .ir-rsn{display:flex;gap:calc(6px*var(--k));margin-top:calc(6px*var(--k))}
+  .ir-rsn-ic{flex:none;color:var(--g-400);display:inline-flex;margin-top:calc(1px*var(--k))}
+  .ir-rsn-tx{flex:1;min-width:0;font-size:calc(12px*var(--k));color:var(--g-600);line-height:1.45;word-break:break-word}
+  .subc-sum{gap:calc(9px*var(--k))}
+  .bsum{display:inline-flex;align-items:center;gap:calc(3px*var(--k));font-size:calc(13px*var(--k));font-weight:800}
+  .bsum .sic{width:calc(14px*var(--k));height:calc(14px*var(--k))}
+  .bsum.done{color:#1d8a76}
+  .bsum.rej{color:#e5484d}
+  .bsum.wait{color:var(--g-500)}
+  .bsum b{font-size:calc(15px*var(--k))}
 </style>
 </head>
 <body>
@@ -269,49 +342,68 @@
     return sub.items.filter(function(it){ return act.indexOf(it.status)>=0; });
   }
 
-  // ── 제출건(제출자+제출시각) 목록 → 상태 묶음(반영전·반영완료·반영반려) → 세부항목 카드 ──
-  var STATUS_ORDER = ["wait","done","rej"];   // 반영전(상단) → 완료 → 반려
-  function statusSection(st, items){
-    var cards = items.map(function(p){ return productHtml(p); }).join("");
-    return '<div class="ssec '+st+'">'+
-        '<div class="ssec-h"><span class="ssec-lb">'+ST_LABEL[st]+'</span>'+
-          '<span class="ssec-cnt">'+items.length+'건</span></div>'+
-        '<div class="ssec-b">'+cards+'</div>'+
-      '</div>';
+  // ── 시안1: 제출건 아코디언 + 상태별 색 채운 카드 + 요약 칩 ──
+  var STATUS_ORDER = ["wait","done","rej"];
+  var STAT_IC = {
+    done:'<svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    rej:'<svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    wait:'<svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7.5 12 12 15 14"/></svg>'
+  };
+  var OPEN = SUBMISSIONS.map(function(_, i){ return i===0; });   // 제출건 펼침(첫 건만)
+  function itemRow(p){
+    var qty = (p.from==null)
+      ? '<span class="ir-to num">'+p.to+'</span><span class="ir-u">개</span>'
+      : '<span class="ir-from num">'+p.from+'</span><span class="ir-ar">→</span><span class="ir-to num">'+p.to+'</span><span class="ir-u">개</span>';
+    var delta = "";
+    if(p.from!=null){ var d=p.to-p.from; delta='<span class="ir-d '+(d<0?'down':'up')+' num">'+(d<0?'−'+Math.abs(d):'+'+d)+'</span>'; }
+    var reason = (p.reason&&p.reason!=='-') ? '<div class="ir-rsn"><span class="ir-rsn-ic">'+MEMO_IC+'</span><span class="ir-rsn-tx">'+esc(p.reason)+'</span></div>' : '';
+    return '<div class="irow">'+
+      '<div class="ir-nm">'+esc(p.nm)+'</div><div class="ir-bc">#'+esc(p.bc)+'</div>'+
+      '<div class="ir-q">'+qty+delta+'</div>'+
+      reason+'</div>';
+  }
+  function grpCard(st, items){
+    return '<div class="gc '+st+'"><div class="gc-h">'+STAT_IC[st]+'<span class="gc-lb">'+ST_LABEL[st]+'</span>'+
+      '<span class="gc-cnt">'+items.length+'건</span></div>'+
+      '<div class="gc-b">'+items.map(itemRow).join('')+'</div></div>';
+  }
+  function summaryChips(sub){
+    var c={done:0,rej:0,wait:0}; sub.items.forEach(function(it){c[it.status]++;});
+    var t=[];
+    if(c.done)t.push('<span class="bsum done">'+STAT_IC.done+'<b>'+c.done+'</b></span>');
+    if(c.rej)t.push('<span class="bsum rej">'+STAT_IC.rej+'<b>'+c.rej+'</b></span>');
+    if(c.wait)t.push('<span class="bsum wait">'+STAT_IC.wait+'<b>'+c.wait+'</b></span>');
+    return t.join('');
   }
   function renderList(){
-    var host = document.getElementById("listView");
-    var act = activeStatuses();
-    var total = 0, html = "";
-    SUBMISSIONS.forEach(function(sub){
-      var fi = subFilteredItems(sub);
-      if(fi.length===0) return;   // 선택 상태 없는 제출건은 숨김
-      total += fi.length;
-      // 제출건 메타 = 제출 시각 · (처리자·처리시각 | 처리 전) — 제출건 단위 일괄 처리
-      var smeta = sub.processAt
-        ? '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span>처리 '+esc(sub.processor)+' '+esc(sub.processAt)
-        : '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span><span class="mut">반영 전(처리 전)</span>';
-      var sections = "";
-      STATUS_ORDER.forEach(function(st){
-        if(act.indexOf(st)<0) return;
-        var items = fi.filter(function(p){ return p.status===st; });
-        if(items.length) sections += statusSection(st, items);
-      });
-      html +=
-        '<div class="dgrp">'+
-          '<div class="dgrp-h">'+
-            '<div class="dgrp-hmain">'+
-              '<div class="grow1"><span class="guser">'+esc(sub.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(sub.dev)+'</span></div>'+
-              '<div class="smeta">'+smeta+'</div>'+
-            '</div>'+
-            '<span class="gcount"><span class="gcnt-n num">'+fi.length+'</span><span class="gcnt-u">건</span></span>'+
-          '</div>'+
-          sections+
-        '</div>';
+    var host=document.getElementById("listView"), act=activeStatuses(), total=0, html="";
+    SUBMISSIONS.forEach(function(sub, i){
+      var fi=subFilteredItems(sub); if(!fi.length) return; total+=fi.length;
+      var meta = sub.processAt
+        ? '<span class="m-lb">제출</span> <span class="m-v">'+esc(sub.submitAt)+'</span><span class="sm-sep">·</span><span class="m-lb">처리</span> <span class="m-v">'+esc(sub.processor)+' '+esc(sub.processAt)+'</span>'
+        : '<span class="m-lb">제출</span> <span class="m-v">'+esc(sub.submitAt)+'</span><span class="sm-sep">·</span><span class="mut">반영 전</span>';
+      var groups="";
+      STATUS_ORDER.forEach(function(st){ if(act.indexOf(st)<0) return; var its=fi.filter(function(p){return p.status===st;}); if(its.length) groups+=grpCard(st,its); });
+      var open=!!OPEN[i];
+      html+='<div class="subc'+(open?' open':'')+'">'+
+        '<button class="subc-h" data-i="'+i+'">'+
+          '<div class="subc-hl"><div class="subc-nm"><span class="subc-user">'+esc(sub.user)+'</span><span class="subc-dev">'+esc(sub.dev)+'</span></div>'+
+            '<div class="subc-meta">'+meta+'</div></div>'+
+          '<div class="subc-sum">'+summaryChips(sub)+'</div>'+
+          '<span class="subc-chev">'+CHEV_DOWN+'</span>'+
+        '</button>'+
+        '<div class="subc-b"'+(open?'':' hidden')+'>'+groups+'</div>'+
+      '</div>';
     });
-    if(html==="") html = '<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
-    host.innerHTML = html;
-    document.getElementById("fcnt").textContent = total;
+    if(!html) html='<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
+    host.innerHTML=html;
+    host.querySelectorAll('.subc-h').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.getAttribute('data-i'); OPEN[i]=!OPEN[i];
+        var c=b.parentNode; c.classList.toggle('open',OPEN[i]); c.querySelector('.subc-b').hidden=!OPEN[i];
+      });
+    });
+    document.getElementById("fcnt").textContent=total;
   }
 
   // ── 상세: 한 기기의 상품 목록 ──
