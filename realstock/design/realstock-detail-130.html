@@ -33,18 +33,15 @@
     background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
   .fbtn .fnum[hidden]{display:none}
 
-  /* ── 기기별 아코디언 = 제출자 카드 ── */
-  .dgrp{background:#fff;border:1px solid var(--g-200);border-radius:calc(16px*var(--k));
-    box-shadow:0 1px 3px rgba(16,24,40,.05);margin-bottom:calc(12px*var(--k));overflow:hidden}
+  /* ── 제출자별 그룹 = 목록형(리스트 섹션, 펼침 아이콘 없음·항상 전체 노출) ── */
+  .dgrp{margin-bottom:calc(20px*var(--k))}
   .dgrp:last-child{margin-bottom:0}
-  .dgrp-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;text-align:left;
-    font-family:inherit;border:0;background:transparent;cursor:pointer;
-    padding:calc(14px*var(--k)) calc(16px*var(--k))}
-  .dgrp-h:active{background:var(--g-50)}
+  .dgrp-h{display:flex;align-items:center;gap:calc(10px*var(--k));
+    padding:calc(4px*var(--k)) calc(2px*var(--k)) calc(12px*var(--k));
+    border-bottom:1px solid var(--g-200);margin-bottom:calc(12px*var(--k))}
   .dgrp-hmain{flex:1;min-width:0}
-  /* 그룹 본문 = 카드 내부, 상품은 선(라인)으로만 구분 */
-  .dgrp-b{padding:0 calc(16px*var(--k)) calc(6px*var(--k));border-top:1px solid var(--g-200)}
-  .dgrp-b[hidden]{display:none}
+  /* 그룹 본문 = 세부항목(상품) 카드 목록 */
+  .dgrp-b{}
   /* 1행: 사용자 · 기기ID */
   .grow1{display:flex;align-items:baseline;gap:calc(6px*var(--k));flex-wrap:wrap}
   .guser{font-size:calc(15px*var(--k));font-weight:700;color:var(--g-900);letter-spacing:var(--tracking)}
@@ -64,9 +61,10 @@
   .gcnt-u{font-size:calc(12px*var(--k));font-weight:600;color:var(--g-500)}
   .gchev{flex:none;color:var(--g-400);display:inline-flex}
 
-  /* 상품 = 개별 카드 대신 항목별 선(라인) 구분 (뮤트 영역 위 flat 행) */
-  .drow{background:transparent;padding:calc(16px*var(--k)) 0;border-bottom:1px solid var(--g-200)}
-  .drow:last-child{border-bottom:0}
+  /* 세부항목(상품) = 카드형 */
+  .drow{background:#fff;border:1px solid var(--g-200);border-radius:calc(14px*var(--k));
+    box-shadow:0 1px 2px rgba(16,24,40,.04);padding:calc(15px*var(--k)) calc(16px*var(--k));margin-bottom:calc(10px*var(--k))}
+  .drow:last-child{margin-bottom:0}
   .drow>summary{list-style:none;cursor:pointer;display:block}
   .drow>summary::-webkit-details-marker{display:none}
   .drow-top{display:flex;gap:calc(10px*var(--k));align-items:flex-start}
@@ -93,18 +91,26 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 제출자 입력 내용 = 더보기 없이 항상 노출 (제목행 아래 구분선) */
-  .drow-body{border-top:1px solid var(--g-150,#eceef1);margin-top:calc(12px*var(--k));padding-top:calc(6px*var(--k))}
+  /* 제출자 메타(제출자명·제출일시) + 재고 입력 사유(선택·자세히보기) */
+  .drow-foot{margin-top:calc(13px*var(--k));padding-top:calc(12px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
+  .pmeta{font-size:calc(12.5px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
+  .pmeta .pm-name{color:var(--g-900);font-weight:700}
+  .pmeta .pm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
 
-  /* 재고 차이 사유(선택값) + 처리 — 박스 없이 flat */
-  .dsrc{margin-top:calc(13px*var(--k))}
-  .dm-lb{display:block;font-size:calc(12px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(5px*var(--k));letter-spacing:var(--tracking)}
-  .dg-reason{font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
-  .dg-proc{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(13px*var(--k));
-    font-size:calc(12.5px*var(--k));color:var(--g-600);letter-spacing:var(--tracking)}
-  .dg-proc.mut{color:var(--g-400)}
-  .dg-badge{flex:none;background:var(--g-150,#eceef1);color:var(--g-600);font-size:calc(11px*var(--k));font-weight:700;
-    padding:calc(3px*var(--k)) calc(9px*var(--k));border-radius:999px}
+  /* 재고 입력 사유(선택값) — 일부 노출 + 자세히보기(펼침) */
+  .rsn{margin-top:calc(10px*var(--k))}
+  .rsn>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:calc(7px*var(--k))}
+  .rsn>summary::-webkit-details-marker{display:none}
+  .rsn-lb{flex:none;font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);letter-spacing:var(--tracking)}
+  .rsn-prev{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    font-size:calc(12.5px*var(--k));color:var(--g-700)}
+  .rsn-more{flex:none;display:inline-flex;align-items:center;gap:calc(3px*var(--k));
+    font-size:calc(11.5px*var(--k));font-weight:600;color:var(--g-500)}
+  .rsn-chev{display:inline-flex;transition:transform .2s ease}
+  .rsn[open] .rsn-chev{transform:rotate(180deg)}
+  .rsn[open] .rsn-prev{display:none}
+  .rsn[open] .rsn-more .rsn-txt{display:none}
+  .rsn-full{margin-top:calc(9px*var(--k));font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
   /* 반영전·반영반려 수량 = 전산(앱 기준) 재고 · 제출 ('반영 후' 없음) */
   .dqty2{display:flex;align-items:baseline;gap:calc(9px*var(--k));margin-top:calc(10px*var(--k));flex-wrap:wrap}
   .q-sys{font-size:calc(13px*var(--k));color:var(--g-500);font-weight:600}
@@ -205,33 +211,33 @@
   var DEVICES = [
     { user:"김약사", dev:"SM-S911", last:"10:31",
       products:[
-        {bc:"8801234567890", nm:"타이레놀콜드-에스정", from:48, to:24, status:"done",
+        {bc:"8801234567890", nm:"타이레놀콜드-에스정", t:"10:31", from:48, to:24, status:"done",
           reason:"정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정", handler:"10:31 · 정약사(PC DESKTOP-QALLC7M)"},
-        {bc:"8806789012345", nm:"판콜에이내복액 30ml", from:52, to:60, status:"done",
+        {bc:"8806789012345", nm:"판콜에이내복액 30ml", t:"10:31", from:52, to:60, status:"done",
           reason:"-", handler:"10:31 · 정약사(PC DESKTOP-QALLC7M)"},
-        {bc:"8802222000033", nm:"베아제정", from:20, to:18, status:"done",
+        {bc:"8802222000033", nm:"베아제정", t:"10:28", from:20, to:18, status:"done",
           reason:"낱알 조제 후 잔량 정정", handler:"10:28 · 정약사(PC DESKTOP-QALLC7M)"},
-        {bc:"8804444000055", nm:"우루사정 100mg", from:45, to:50, status:"done",
+        {bc:"8804444000055", nm:"우루사정 100mg", t:"10:25", from:45, to:50, status:"done",
           reason:"입고 반영 누락분 추가", handler:"10:25 · 정약사(PC DESKTOP-QALLC7M)"},
-        {bc:"8805555000066", nm:"이지엔6프로연질캡슐", from:30, to:28, status:"done",
+        {bc:"8805555000066", nm:"이지엔6프로연질캡슐", t:"10:22", from:30, to:28, status:"done",
           reason:"파손 폐기 2정 반영", handler:"10:22 · 정약사(PC DESKTOP-QALLC7M)"},
-        {bc:"8806666000077", nm:"컨디션환", from:12, to:24, status:"done",
+        {bc:"8806666000077", nm:"컨디션환", t:"10:20", from:12, to:24, status:"done",
           reason:"창고 이월 재고 합산", handler:"10:20 · 정약사(PC DESKTOP-QALLC7M)"},
-        {bc:"8803333000044", nm:"겔포스엠현탁액", from:38, to:40, status:"rej",
+        {bc:"8803333000044", nm:"겔포스엠현탁액", t:"10:33", from:38, to:40, status:"rej",
           reason:"입고 검수 중 수량 오차 발견", handler:"10:35 · 정약사(PC DESKTOP-ENFJ2GD)"},
-        {bc:"8801111000022", nm:"훼스탈플러스정", from:28, to:30, status:"wait",
+        {bc:"8801111000022", nm:"훼스탈플러스정", t:"09:58", from:28, to:30, status:"wait",
           reason:"-", handler:null}
       ]
     },
     { user:"이약사", dev:"SM-A21", last:"09:22",
       products:[
-        {bc:"8807777000088", nm:"후시딘연고 5g", from:15, to:12, status:"done",
+        {bc:"8807777000088", nm:"후시딘연고 5g", t:"09:22", from:15, to:12, status:"done",
           reason:"판매 후 잔량 정정", handler:"09:24 · 정약사(PC DESKTOP-ENFJ2GD)"},
-        {bc:"8808888000099", nm:"인사돌정", from:40, to:45, status:"done",
+        {bc:"8808888000099", nm:"인사돌정", t:"09:22", from:40, to:45, status:"done",
           reason:"입고 반영 누락분 추가", handler:"09:24 · 정약사(PC DESKTOP-ENFJ2GD)"},
-        {bc:"8809999000011", nm:"마데카솔케어연고", from:22, to:20, status:"done",
+        {bc:"8809999000011", nm:"마데카솔케어연고", t:"09:20", from:22, to:20, status:"done",
           reason:"진열 파손 2개 폐기", handler:"09:23 · 정약사(PC DESKTOP-ENFJ2GD)"},
-        {bc:"8801212000034", nm:"신신파스 아렉스", from:60, to:48, status:"rej",
+        {bc:"8801212000034", nm:"신신파스 아렉스", t:"09:19", from:60, to:48, status:"rej",
           reason:"실사 수량 차이 정정", handler:"09:30 · 정약사(PC DESKTOP-ENFJ2GD)"}
       ]
     }
@@ -244,7 +250,6 @@
   // 반영상태 필터(다중 선택 체크박스)
   var applied = {done:true, rej:true, wait:true};
   var pending = {done:true, rej:true, wait:true};
-  var openState = DEVICES.map(function(_, i){ return i===0; });   // 기기별 펼침 상태 (첫 기기 펼침)
   var backdrop = document.getElementById("backdrop");
   var opts = backdrop.querySelectorAll(".opt");
 
@@ -271,12 +276,12 @@
     return c;
   }
 
-  // ── 기기별 아코디언 목록 ──
+  // ── 제출자별 목록(펼침 없음, 항상 전체 노출) + 세부항목 카드 ──
   function renderList(){
     var host = document.getElementById("listView");
     var act = activeStatuses();
     var total = 0, html = "";
-    DEVICES.forEach(function(dev, idx){
+    DEVICES.forEach(function(dev){
       var fp = filteredProducts(dev);
       if(fp.length===0) return;   // 선택 상태 없는 기기는 숨김
       total += fp.length;
@@ -284,34 +289,21 @@
       var brk = act.filter(function(s){ return c[s]>0; }).map(function(s){
         return '<span class="gbrk '+s+'">'+BRK_LABEL[s]+' '+c[s]+'</span>';
       }).join('<span class="gsep">·</span>');
-      var open = !!openState[idx];
       var cards = fp.map(function(p){ return productHtml(p, dev.user); }).join("");
       html +=
-        '<div class="dgrp'+(open?" open":"")+'" data-idx="'+idx+'">'+
-          '<button class="dgrp-h" data-idx="'+idx+'" aria-expanded="'+(open?"true":"false")+'">'+
+        '<div class="dgrp">'+
+          '<div class="dgrp-h">'+
             '<div class="dgrp-hmain">'+
               '<div class="grow1"><span class="guser">'+esc(dev.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(dev.dev)+'</span></div>'+
               '<div class="grow2">'+brk+'</div>'+
             '</div>'+
             '<span class="gcount"><span class="gcnt-n num">'+fp.length+'</span><span class="gcnt-u">건</span></span>'+
-            '<span class="gchev">'+(open?CHEV_UP:CHEV_RIGHT)+'</span>'+
-          '</button>'+
-          '<div class="dgrp-b"'+(open?"":" hidden")+'>'+cards+'</div>'+
+          '</div>'+
+          '<div class="dgrp-b">'+cards+'</div>'+
         '</div>';
     });
     if(html==="") html = '<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
     host.innerHTML = html;
-    host.querySelectorAll(".dgrp-h").forEach(function(b){
-      b.addEventListener("click", function(){
-        var i = parseInt(b.getAttribute("data-idx"),10);
-        openState[i] = !openState[i];
-        var grp = b.parentNode;
-        grp.classList.toggle("open", openState[i]);
-        grp.querySelector(".dgrp-b").hidden = !openState[i];
-        b.setAttribute("aria-expanded", openState[i] ? "true" : "false");
-        b.querySelector(".gchev").innerHTML = openState[i] ? CHEV_UP : CHEV_RIGHT;
-      });
-    });
     document.getElementById("fcnt").textContent = total;
   }
 
@@ -331,25 +323,25 @@
            '<span class="q-dot">·</span><span class="q-sub">제출 <b class="num">'+p.to+'</b>개</span></div>';
   }
   function productHtml(p, user){
-    var sub = p.sub ? '<div class="dsub">'+esc(p.sub)+'</div>' : '';
     var hasReason = p.reason && p.reason!=="-";
-    // 처리 — PC id 제거 + 날짜 병기 (예: '10:31 · 정약사(PC …)' → '2026-07-02 10:31 · 정약사')
-    var handler = p.handler ? p.handler.replace(/\s*\(PC[^)]*\)/, "") : "";
-    var procHtml = handler
-      ? '<div class="dg-proc"><span class="dg-badge">처리</span><span>'+esc(SUB_DATE+" "+handler)+'</span></div>'
-      : '<div class="dg-proc mut"><span class="dg-badge">처리</span><span>반영 전 · 처리 전</span></div>';
-    // 재고 차이 사유 = 선택값 → 없으면 블록 자체를 노출하지 않음 (박스 없이 flat)
-    var reasonBlock = hasReason
-      ? '<div class="dsrc"><div class="dm-lb">재고 차이 사유</div><div class="dg-reason">'+esc(p.reason)+'</div></div>'
+    // 메타 = 제출자명 · 제출년월일시
+    var meta = '<div class="pmeta"><span class="pm-name">'+esc(user)+'</span>'+
+               '<span class="pm-sep">·</span>'+esc(SUB_DATE+" "+(p.t||"")).trim()+'</div>';
+    // 재고 입력 사유 = 선택값 → 있을 때만 일부 노출 + 자세히보기(펼침)
+    var reason = hasReason
+      ? '<details class="rsn"><summary>'+
+          '<span class="rsn-lb">재고 입력 사유</span>'+
+          '<span class="rsn-prev">'+esc(p.reason)+'</span>'+
+          '<span class="rsn-more"><span class="rsn-txt">자세히보기</span><span class="rsn-chev">'+CHEV_DOWN+'</span></span>'+
+        '</summary>'+
+        '<div class="rsn-full">'+esc(p.reason)+'</div>'+
+        '</details>'
       : '';
     return '<div class="drow" data-status="'+p.status+'">'+
-        '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
+        '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div></div>'+
           '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
-        '<div class="drow-body">'+
-          qtyHtml(p)+
-          reasonBlock+
-          procHtml+
-        '</div>'+
+        qtyHtml(p)+
+        '<div class="drow-foot">'+meta+reason+'</div>'+
       '</div>';
   }
   // ── 반영상태 필터(Bottom Sheet) — 아코디언 목록 연동 ──
@@ -373,9 +365,8 @@
 
   // 초기 렌더
   renderList();
-  // (미리보기 케이스) #device: 전체 기기 펼침 / #filter: 반영상태 필터 열림
-  if(location.hash.indexOf("device")>=0){ openState = DEVICES.map(function(){ return true; }); renderList(); }
-  else if(location.hash.indexOf("filter")>=0){ openSheet(); }
+  // (미리보기 케이스) #filter: 반영상태 필터 열림
+  if(location.hash.indexOf("filter")>=0){ openSheet(); }
 </script>
 </body>
 </html>
