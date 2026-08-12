@@ -151,8 +151,9 @@
   .sheet-act .btn{flex:1;width:auto}
 
   /* === 시안1: 제출건 아코디언 + 상태 색 카드 === */
-  .subc{border:1px solid var(--g-200);border-radius:calc(16px*var(--k));background:#fff;margin-bottom:calc(12px*var(--k));box-shadow:0 1px 3px rgba(16,24,40,.05);overflow:hidden}
-  .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer;padding:calc(13px*var(--k)) calc(15px*var(--k))}
+  .subc{margin-bottom:calc(20px*var(--k))}
+  .subc:last-child{margin-bottom:0}
+  .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer;padding:calc(8px*var(--k)) calc(2px*var(--k));border-bottom:1px solid var(--g-200)}
   .subc-h:active{background:var(--g-50)}
   .subc-hl{flex:1;min-width:0}
   .subc-nm{display:flex;align-items:baseline;gap:calc(7px*var(--k))}
@@ -168,7 +169,7 @@
   .sm-chip.wait{background:var(--g-100);color:var(--g-600)}
   .subc-chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
   .subc.open .subc-chev{transform:rotate(180deg)}
-  .subc-b{padding:0 calc(12px*var(--k)) calc(12px*var(--k))}
+  .subc-b{padding:calc(2px*var(--k)) 0 calc(2px*var(--k))}
   .gc{border-radius:calc(12px*var(--k));margin-top:calc(11px*var(--k));padding:calc(11px*var(--k)) calc(12px*var(--k))}
   .gc.done{background:#eafaf3;border:1px solid #cdeede}
   .gc.rej{background:#fdeeec;border:1px solid #f6d6d0}
