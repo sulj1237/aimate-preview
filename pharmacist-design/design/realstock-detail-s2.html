@@ -151,10 +151,10 @@
   .sheet-act .btn{flex:1;width:auto}
 
   /* === 시안2: 좌측 색 바 흰 카드 + 제출건 헤더 sticky === */
-  .subc{margin-bottom:calc(18px*var(--k));padding-bottom:calc(18px*var(--k));border-bottom:calc(1px*var(--k)) solid var(--g-200)}
-  .subc:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
-  .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;font-family:inherit;text-align:left;cursor:pointer;padding:calc(10px*var(--k)) calc(2px*var(--k));
-    position:sticky;top:0;z-index:3;background:var(--g-50);border-bottom:1px solid var(--g-200)}
+  .subc{background:#fff;border:1px solid var(--g-200);border-radius:calc(16px*var(--k));box-shadow:0 1px 3px rgba(16,24,40,.05);margin-bottom:calc(14px*var(--k))}
+  .subc:last-child{margin-bottom:0}
+  .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;font-family:inherit;text-align:left;cursor:pointer;padding:calc(12px*var(--k)) calc(15px*var(--k));
+    position:sticky;top:0;z-index:3;background:#fff;border-bottom:1px solid var(--g-150,#eceef1);border-radius:calc(16px*var(--k)) calc(16px*var(--k)) 0 0}
   .subc-h:active{background:var(--g-50)}
   .subc-hl{flex:1;min-width:0}
   .subc-nm{display:flex;align-items:baseline;gap:calc(7px*var(--k))}
@@ -171,7 +171,7 @@
   .sm-chip.wait{background:var(--g-100);color:var(--g-600)}
   .subc-chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
   .subc.open .subc-chev{transform:rotate(180deg)}
-  .subc-b{padding:calc(4px*var(--k)) 0 calc(4px*var(--k))}
+  .subc-b{padding:calc(4px*var(--k)) calc(15px*var(--k)) calc(14px*var(--k))}
   .gc{background:#fff;border:1px solid var(--g-200);border-left:calc(4px*var(--k)) solid var(--g-300);border-radius:calc(10px*var(--k));margin-top:calc(11px*var(--k));padding:calc(9px*var(--k)) calc(13px*var(--k))}
   .gc.done{border-left-color:#1d8a76}
   .gc.rej{border-left-color:#e5484d}
