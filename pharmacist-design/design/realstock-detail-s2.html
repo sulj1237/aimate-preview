@@ -160,11 +160,12 @@
   .subc-nm{display:flex;align-items:baseline;gap:calc(7px*var(--k))}
   .subc-user{font-size:calc(15px*var(--k));font-weight:800;color:var(--g-900)}
   .subc-dev{font-family:ui-monospace,Menlo,monospace;font-size:calc(12px*var(--k));color:var(--g-500)}
-  .subc-meta{font-size:calc(11.5px*var(--k));color:var(--g-600);font-weight:600;margin-top:calc(4px*var(--k))}
+  .subc-meta{font-size:calc(11.5px*var(--k));color:var(--g-400);font-weight:600;margin-top:calc(4px*var(--k))}
   .subc-meta .sm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
   .subc-meta .mut{color:var(--g-400)}
-  .subc-sum{flex:none;display:flex;gap:calc(4px*var(--k));flex-wrap:wrap;justify-content:flex-end}
-  .sm-chip{font-size:calc(10.5px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(7px*var(--k));border-radius:999px;white-space:nowrap}
+  .subc-sum{flex:none;display:flex;gap:calc(6px*var(--k));flex-wrap:wrap;justify-content:flex-end}
+  .sm-chip{display:inline-flex;align-items:center;gap:calc(3px*var(--k));font-size:calc(11px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(8px*var(--k));border-radius:999px;white-space:nowrap}
+  .sm-chip .sic{width:calc(12px*var(--k));height:calc(12px*var(--k))}
   .sm-chip.done{background:#e2f3ee;color:#1d8a76}
   .sm-chip.rej{background:#fbe3e0;color:#e5484d}
   .sm-chip.wait{background:var(--g-100);color:var(--g-600)}
@@ -341,9 +342,9 @@
   function summaryChips(sub){
     var c={done:0,rej:0,wait:0}; sub.items.forEach(function(it){c[it.status]++;});
     var t=[];
-    if(c.done)t.push('<span class="sm-chip done">반영 '+c.done+'</span>');
-    if(c.rej)t.push('<span class="sm-chip rej">반려 '+c.rej+'</span>');
-    if(c.wait)t.push('<span class="sm-chip wait">반영전 '+c.wait+'</span>');
+    if(c.done)t.push('<span class="sm-chip done">'+STAT_IC.done+c.done+'</span>');
+    if(c.rej)t.push('<span class="sm-chip rej">'+STAT_IC.rej+c.rej+'</span>');
+    if(c.wait)t.push('<span class="sm-chip wait">'+STAT_IC.wait+c.wait+'</span>');
     return t.join('');
   }
   function renderList(){

@@ -201,6 +201,12 @@
   .gc[data-open="1"] .gc-chev{transform:rotate(180deg)}
   .gc[data-open="0"] .gc-h{margin-bottom:0}
   .gc-b[hidden]{display:none}
+  /* 묶음 = 배경색 제거, 테두리만 */
+  .gc.done{background:#fff;border-color:#bfe6d5}
+  .gc.rej{background:#fff;border-color:#f0c8c1}
+  .gc.wait{background:#fff;border-color:var(--g-200)}
+  .gc .irow{background:transparent;border-radius:0;padding:calc(9px*var(--k)) calc(2px*var(--k));margin-top:0;border-bottom:1px solid var(--g-100)}
+  .gc .irow:last-child{border-bottom:0}
   .subc-sum{gap:calc(9px*var(--k))}
   .bsum{display:inline-flex;align-items:center;gap:calc(3px*var(--k));font-size:calc(13px*var(--k));font-weight:800}
   .bsum .sic{width:calc(14px*var(--k));height:calc(14px*var(--k))}
