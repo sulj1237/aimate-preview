@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>제출 상세 · 시안3 · 굿팜 약사님용앱</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<link href="ds.css" rel="stylesheet" />
+<style>
+  /* ── 제출 상세 · 2단 구조 재설계 ──
+     ① 메인 = 기기별 Compact 요약 카드(사용자·기기ID / 건수·마지막 제출·상태별 건수), 카드 전체 클릭
+     ② 기기 상세 = 뷰 전환(메인 숨김). 상단 기기 영역 1회 + 상품 카드 목록(반복 메타 제거)
+     ③ 상품 카드·증감 배지·상태 배지·자세히 아코디언·상태 필터(Bottom Sheet)는 기존 그대로 재사용
+     배율 --k 로 전체 확대(이 파일=100%). */
+  :root{ --k:1.00; }
+
+  .appbar h1{font-size:calc(19px*var(--k))}
+  .dt-head{margin-left:10px;font-size:calc(13px*var(--k));font-weight:700;color:var(--g-600);letter-spacing:var(--tracking);white-space:nowrap}
+
+  /* 필터 바 — 좌: 건수 / 우: 반영상태 버튼 */
+  .fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:calc(8px*var(--k)) 0 calc(6px*var(--k))}
+  .fcount{font-size:calc(13px*var(--k));font-weight:700;color:var(--g-700);letter-spacing:var(--tracking)}
+  .fcount b{color:var(--g-900)}
+  .fbtn{margin-left:auto;display:inline-flex;align-items:center;gap:calc(5px*var(--k));max-width:100%;
+    padding:calc(7px*var(--k)) calc(12px*var(--k));border-radius:999px;border:1px solid var(--g-300);background:#fff;
+    font-family:inherit;font-size:calc(13px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking);cursor:pointer}
+  .fbtn:active{background:var(--g-50)}
+  .fbtn .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .fbtn .funnel{flex:none;color:var(--g-600)}
+  .fbtn.on{border-color:var(--brand-500);color:var(--brand-700)}
+  .fbtn.on .funnel{color:var(--brand-500)}
+  .fbtn .fnum{flex:none;min-width:calc(17px*var(--k));height:calc(17px*var(--k));padding:0 calc(4px*var(--k));border-radius:999px;
+    background:var(--brand-500);color:#fff;font-size:calc(10.5px*var(--k));font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .fbtn .fnum[hidden]{display:none}
+
+  /* ── 제출자별 그룹 = 목록형(리스트 섹션, 펼침 아이콘 없음·항상 전체 노출) ── */
+  .dgrp{margin-bottom:calc(20px*var(--k))}
+  .dgrp:last-child{margin-bottom:0}
+  .dgrp-h{display:flex;align-items:center;gap:calc(10px*var(--k));
+    padding:calc(4px*var(--k)) calc(2px*var(--k)) calc(12px*var(--k));
+    border-bottom:1px solid var(--g-200);margin-bottom:calc(12px*var(--k))}
+  .dgrp-hmain{flex:1;min-width:0}
+  /* 그룹 본문 = 세부항목(상품) 카드 목록 */
+  .dgrp-b{}
+  /* 1행: 사용자 · 기기ID */
+  .grow1{display:flex;align-items:baseline;gap:calc(6px*var(--k));flex-wrap:wrap}
+  .guser{font-size:calc(15px*var(--k));font-weight:700;color:var(--g-900);letter-spacing:var(--tracking)}
+  .gdot{color:var(--g-300);font-weight:700}
+  .gdev{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(12.5px*var(--k));color:var(--g-500);letter-spacing:.02em}
+  /* 2행: 마지막 제출 · 상태별 건수 */
+  .grow2{display:flex;align-items:center;gap:calc(4px*var(--k)) calc(8px*var(--k));flex-wrap:wrap;margin-top:calc(5px*var(--k))}
+  .glast{font-size:calc(12px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
+  .gsep{color:var(--g-300)}
+  .gbrk{font-size:calc(12px*var(--k));font-weight:700;letter-spacing:var(--tracking);white-space:nowrap}
+  .gbrk.done{color:#1d8a76}
+  .gbrk.rej{color:var(--sys-red)}
+  .gbrk.wait{color:var(--g-600)}
+  /* 우: 건수 + chevron */
+  .gcount{flex:none;display:flex;align-items:center;gap:calc(3px*var(--k))}
+  .gcnt-n{font-size:calc(17px*var(--k));font-weight:800;color:var(--g-900)}
+  .gcnt-u{font-size:calc(12px*var(--k));font-weight:600;color:var(--g-500)}
+  .gchev{flex:none;color:var(--g-400);display:inline-flex}
+
+  /* 세부항목(상품) = 카드형 */
+  .drow{background:#fff;border:1px solid var(--g-200);border-radius:calc(14px*var(--k));
+    box-shadow:0 1px 2px rgba(16,24,40,.04);padding:calc(15px*var(--k)) calc(16px*var(--k));margin-bottom:calc(10px*var(--k))}
+  .drow:last-child{margin-bottom:0}
+  .drow>summary{list-style:none;cursor:pointer;display:block}
+  .drow>summary::-webkit-details-marker{display:none}
+  .drow-top{display:flex;gap:calc(10px*var(--k));align-items:flex-start}
+  .dtitle{flex:1;min-width:0}
+  .dbc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:calc(11px*var(--k));color:var(--g-500);letter-spacing:.02em}
+  .dnm{font-size:calc(15px*var(--k));font-weight:700;color:var(--g-900);line-height:1.35;margin-top:calc(2px*var(--k));
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .dsub{font-size:calc(12px*var(--k));color:var(--g-500);margin-top:calc(2px*var(--k));line-height:1.4}
+  .stb{flex:none;align-self:flex-start;display:inline-block;font-size:calc(11px*var(--k));font-weight:700;
+    padding:calc(2px*var(--k)) calc(9px*var(--k));border-radius:999px;white-space:nowrap}
+  .stb.done{background:#e2f3ee;color:#1d8a76}
+  .stb.rej{background:#fbe3e0;color:var(--sys-red)}
+  .stb.wait{background:var(--g-100);color:var(--g-600)}
+
+  /* 수량 — 숫자 강조 + 증감 배지 */
+  .dqty{display:flex;align-items:baseline;gap:calc(7px*var(--k));margin-top:calc(10px*var(--k))}
+  .dqty .from{font-size:calc(19px*var(--k));font-weight:600;color:var(--g-500)}
+  .dqty .arw{font-size:calc(16px*var(--k));color:var(--g-400);font-weight:700}
+  .dqty .to{font-size:calc(25px*var(--k));font-weight:800;color:var(--g-900);letter-spacing:-.01em}
+  .dqty .only{font-size:calc(22px*var(--k));font-weight:800;color:var(--g-900)}
+  .dqty .unit{font-size:calc(13px*var(--k));font-weight:600;color:var(--g-500);align-self:flex-end;margin-bottom:calc(3px*var(--k))}
+  .delta{margin-left:auto;align-self:center;font-size:calc(12.5px*var(--k));font-weight:800;
+    padding:calc(2px*var(--k)) calc(9px*var(--k));border-radius:7px;white-space:nowrap}
+  .delta.down{background:#fbe3e0;color:#e5484d}
+  .delta.up{background:#e2f3ee;color:#1d8a76}
+
+  /* 상태 묶음 섹션(반영전·반영완료·반영반려) — 헤더에 처리자·처리일시 */
+  .ssec{margin-top:calc(16px*var(--k))}
+  .ssec:first-child{margin-top:calc(2px*var(--k))}
+  .ssec-h{display:flex;align-items:baseline;gap:calc(8px*var(--k));margin-bottom:calc(10px*var(--k));flex-wrap:wrap}
+  .ssec-lb{font-size:calc(13px*var(--k));font-weight:800;letter-spacing:var(--tracking)}
+  .ssec.done .ssec-lb{color:#1d8a76}
+  .ssec.rej .ssec-lb{color:var(--sys-red)}
+  .ssec.wait .ssec-lb{color:var(--g-600)}
+  .ssec-cnt{font-size:calc(12.5px*var(--k));font-weight:700;color:var(--g-500)}
+  /* 제출건 메타(제출 시각 · 처리자·처리시각 | 반영 전) */
+  .smeta{font-size:calc(12px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking);margin-top:calc(5px*var(--k))}
+  .smeta .sm-sep{color:var(--g-300);margin:0 calc(6px*var(--k))}
+  .smeta .mut{color:var(--g-400)}
+  /* 카드 하단(재고 보정 사유) */
+  .drow-foot{margin-top:calc(12px*var(--k));padding-top:calc(11px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
+
+  /* 재고 보정 사유(선택값) — 메모 아이콘 + 내용 바로 노출(자세히보기 없음) */
+  .rsn{display:flex;gap:calc(7px*var(--k));margin-top:calc(9px*var(--k))}
+  .rsn-ic{flex:none;color:var(--g-400);margin-top:calc(1px*var(--k))}
+  .rsn-full{flex:1;min-width:0;font-size:calc(12.5px*var(--k));color:var(--g-700);line-height:1.5;word-break:break-word}
+  /* 반영전·반영반려 수량 = 전산(앱 기준) 재고 · 제출 ('반영 후' 없음) */
+  .dqty2{display:flex;align-items:baseline;gap:calc(9px*var(--k));margin-top:calc(10px*var(--k));flex-wrap:wrap}
+  .q-sys{font-size:calc(13px*var(--k));color:var(--g-500);font-weight:600}
+  .q-sys b{font-size:calc(18px*var(--k));color:var(--g-700);font-weight:800;letter-spacing:-.01em}
+  .q-dot{color:var(--g-300);font-weight:700}
+  .q-sub{font-size:calc(13px*var(--k));color:var(--g-600);font-weight:600}
+  .q-sub b{font-size:calc(22px*var(--k));color:var(--g-900);font-weight:800;letter-spacing:-.01em}
+
+  /* 빈 상태(필터로 표시할 항목 없음) */
+  .gempty{padding:calc(48px*var(--k)) calc(24px*var(--k));text-align:center;color:var(--g-500);font-size:calc(13.5px*var(--k));font-weight:600}
+
+  .btn{height:calc(48px*var(--k));font-size:calc(15px*var(--k))}
+
+  /* ── Material Bottom Sheet ── */
+  .sheet-backdrop{position:absolute;inset:0;background:rgba(16,24,40,.42);opacity:0;visibility:hidden;
+    transition:opacity .22s ease,visibility .22s ease;z-index:20}
+  .sheet-backdrop.open{opacity:1;visibility:visible}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:20px 20px 0 0;
+    padding:calc(8px*var(--k)) calc(20px*var(--k)) max(calc(18px*var(--k)),env(safe-area-inset-bottom));
+    box-shadow:0 -8px 30px -8px rgba(16,24,40,.25);transform:translateY(100%);
+    transition:transform .26s cubic-bezier(.22,.61,.36,1);z-index:21}
+  .sheet-backdrop.open .sheet{transform:translateY(0)}
+  .sheet .grip{width:36px;height:4px;border-radius:99px;background:var(--g-300);margin:calc(8px*var(--k)) auto calc(6px*var(--k))}
+  .sheet h3{margin:calc(4px*var(--k)) 0 calc(10px*var(--k));font-size:calc(16px*var(--k));font-weight:700;
+    color:var(--g-900);letter-spacing:var(--tracking-title)}
+  .opt{display:flex;align-items:center;gap:calc(10px*var(--k));padding:calc(13px*var(--k)) calc(2px*var(--k));
+    border-bottom:1px solid var(--g-100);cursor:pointer}
+  .opt:last-of-type{border-bottom:0}
+  .opt .chk{flex:none;width:calc(20px*var(--k));height:calc(20px*var(--k));border-radius:calc(6px*var(--k));border:2px solid var(--g-400);
+    display:grid;place-items:center;transition:background .12s ease,border-color .12s ease}
+  .opt .chk svg{width:calc(13px*var(--k));height:calc(13px*var(--k));color:#fff;opacity:0;transform:scale(.5);transition:opacity .12s ease,transform .14s ease}
+  .opt.sel .chk{background:var(--brand-500);border-color:var(--brand-500)}
+  .opt.sel .chk svg{opacity:1;transform:scale(1)}
+  .opt .otxt{flex:1;min-width:0;font-size:calc(14.5px*var(--k));font-weight:600;color:var(--g-800);letter-spacing:var(--tracking)}
+  .opt.sel .otxt{color:var(--g-900)}
+  .opt.all{border-bottom:1px solid var(--g-200)}
+  .sheet-act{display:flex;gap:10px;margin-top:calc(14px*var(--k))}
+  .sheet-act .btn{flex:1;width:auto}
+
+  /* === 시안1: 제출건 아코디언 + 상태 색 카드 === */
+  .subc{border:1px solid var(--g-200);border-radius:calc(16px*var(--k));background:#fff;margin-bottom:calc(12px*var(--k));box-shadow:0 1px 3px rgba(16,24,40,.05);overflow:hidden}
+  .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer;padding:calc(13px*var(--k)) calc(15px*var(--k))}
+  .subc-h:active{background:var(--g-50)}
+  .subc-hl{flex:1;min-width:0}
+  .subc-nm{display:flex;align-items:baseline;gap:calc(7px*var(--k))}
+  .subc-user{font-size:calc(15px*var(--k));font-weight:800;color:var(--g-900)}
+  .subc-dev{font-family:ui-monospace,Menlo,monospace;font-size:calc(12px*var(--k));color:var(--g-500)}
+  .subc-meta{font-size:calc(11.5px*var(--k));color:var(--g-600);font-weight:600;margin-top:calc(4px*var(--k))}
+  .subc-meta .sm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
+  .subc-meta .mut{color:var(--g-400)}
+  .subc-sum{flex:none;display:flex;gap:calc(4px*var(--k));flex-wrap:wrap;justify-content:flex-end}
+  .sm-chip{font-size:calc(10.5px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(7px*var(--k));border-radius:999px;white-space:nowrap}
+  .sm-chip.done{background:#e2f3ee;color:#1d8a76}
+  .sm-chip.rej{background:#fbe3e0;color:#e5484d}
+  .sm-chip.wait{background:var(--g-100);color:var(--g-600)}
+  .subc-chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
+  .subc.open .subc-chev{transform:rotate(180deg)}
+  .subc-b{padding:0 calc(12px*var(--k)) calc(12px*var(--k))}
+  .gc{border-radius:calc(12px*var(--k));margin-top:calc(11px*var(--k));padding:calc(11px*var(--k)) calc(12px*var(--k))}
+  .gc.done{background:#eafaf3;border:1px solid #cdeede}
+  .gc.rej{background:#fdeeec;border:1px solid #f6d6d0}
+  .gc.wait{background:var(--g-50);border:1px solid var(--g-200)}
+  .gc-h{display:flex;align-items:center;gap:calc(6px*var(--k));margin-bottom:calc(9px*var(--k))}
+  .gc-h .sic{width:calc(15px*var(--k));height:calc(15px*var(--k))}
+  .gc.done .gc-h{color:#1d8a76}
+  .gc.rej .gc-h{color:#e5484d}
+  .gc.wait .gc-h{color:var(--g-600)}
+  .gc-lb{font-size:calc(12.5px*var(--k));font-weight:800}
+  .gc-cnt{font-size:calc(11.5px*var(--k));font-weight:700;opacity:.75}
+  .irow{display:flex;align-items:center;gap:calc(9px*var(--k));background:#fff;border-radius:calc(9px*var(--k));padding:calc(9px*var(--k)) calc(11px*var(--k));margin-top:calc(7px*var(--k))}
+  .irow:first-child{margin-top:0}
+  .ir-l{flex:1;min-width:0}
+  .ir-nm{font-size:calc(13px*var(--k));font-weight:700;color:var(--g-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ir-bc{font-family:ui-monospace,Menlo,monospace;font-size:calc(10px*var(--k));color:var(--g-400);margin-top:calc(1px*var(--k))}
+  .ir-q{flex:none;display:flex;align-items:baseline;gap:calc(4px*var(--k))}
+  .ir-from{font-size:calc(13px*var(--k));color:var(--g-400);font-weight:600}
+  .ir-ar{color:var(--g-300);font-size:calc(11px*var(--k))}
+  .ir-to{font-size:calc(16px*var(--k));font-weight:800;color:var(--g-900)}
+  .ir-u{font-size:calc(11px*var(--k));color:var(--g-500)}
+  .ir-d{font-size:calc(11px*var(--k));font-weight:800;padding:calc(1px*var(--k)) calc(6px*var(--k));border-radius:6px;margin-left:calc(3px*var(--k))}
+  .ir-d.down{background:#fbe3e0;color:#e5484d}
+  .ir-d.up{background:#e2f3ee;color:#1d8a76}
+  .ir-memo{flex:none;color:var(--g-400);display:inline-flex}
+  /* 시안3: 상태그룹 접기 + 큰 요약 */
+  .gc-h{width:100%;border:0;background:transparent;font-family:inherit;cursor:pointer;padding:0}
+  .gc-chev{margin-left:auto;display:inline-flex;color:inherit;opacity:.7;transition:transform .2s ease}
+  .gc[data-open="1"] .gc-chev{transform:rotate(180deg)}
+  .gc[data-open="0"] .gc-h{margin-bottom:0}
+  .gc-b[hidden]{display:none}
+  .subc-sum{gap:calc(9px*var(--k))}
+  .bsum{display:inline-flex;align-items:center;gap:calc(3px*var(--k));font-size:calc(13px*var(--k));font-weight:800}
+  .bsum .sic{width:calc(14px*var(--k));height:calc(14px*var(--k))}
+  .bsum.done{color:#1d8a76}
+  .bsum.rej{color:#e5484d}
+  .bsum.wait{color:var(--g-500)}
+  .bsum b{font-size:calc(15px*var(--k))}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div style="max-width:calc(390px*var(--k));margin:0 auto calc(12px*var(--k));background:#fdecea;color:#d64431;font-size:calc(12.5px*var(--k));font-weight:800;text-align:center;padding:calc(9px*var(--k)) calc(12px*var(--k));border-radius:calc(12px*var(--k));border:1px solid #f3c9c2;letter-spacing:var(--tracking)">⚠ 이 화면(제출 상세)은 <u>확정 전</u> — (TBU)</div>
+  <div class="device" data-screen-label="제출 상세 (TBU)">
+    <div class="statusbar">
+      <span class="num">9:41</span>
+      <div class="sb-right">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none"><path d="M1 8.5h2v1.5H1zM5 6h2v4H5zM9 3.5h2V10H9zM13 1h2v9h-2z" fill="currentColor"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2.5C5.6 2.5 3.4 3.4 1.7 4.9.6 3.6.0 2.2.0 2.2A12 12 0 0 1 8 -.5 12 12 0 0 1 16 2.2s-.6 1.4-1.7 2.7C12.6 3.4 10.4 2.5 8 2.5z" fill="currentColor"/></svg>
+        <svg width="25" height="11" viewBox="0 0 25 11" fill="none"><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" stroke="currentColor" fill="none"/><rect x="2" y="2" width="16" height="7" rx="1" fill="currentColor"/><rect x="22.5" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+      </div>
+    </div>
+
+    <div class="appbar">
+      <button class="ico-btn" id="backBtn" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h1 id="hdrTitle">제출 상세</h1>
+      <span class="dt-head num" id="hdrDate">2026-07-02</span>
+    </div>
+
+    <div class="scroll pad">
+      <div class="fbar">
+        <span class="fcount">전체 <b id="fcnt">12</b>건</span>
+        <button class="fbtn" id="fbtn" aria-haspopup="dialog">
+          <svg class="funnel" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span class="lbl">반영상태</span>
+          <span class="fnum" id="fnum" hidden>2</span>
+        </button>
+      </div>
+
+      <!-- 기기별 아코디언: 그룹 헤더(제출자·기기ID·상태별 건수·건수) → 펼치면 상품 카드 -->
+      <div id="listView"></div>
+    </div>
+
+    <div class="bottom">
+      <button class="btn btn-tertiary">제출 이력으로</button>
+    </div>
+
+    <!-- 반영상태 필터 Bottom Sheet -->
+    <div class="sheet-backdrop" id="backdrop">
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="반영상태 필터">
+        <div class="grip"></div>
+        <h3>반영상태</h3>
+        <div class="opt all sel" data-val="all"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">전체</span></div>
+        <div class="opt sel" data-val="done"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영완료</span></div>
+        <div class="opt sel" data-val="rej"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영반려</span></div>
+        <div class="opt sel" data-val="wait"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="otxt">반영전</span></div>
+        <div class="sheet-act">
+          <button class="btn btn-line" id="cancelBtn">취소</button>
+          <button class="btn btn-primary" id="applyBtn">적용</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // ── 데이터: 제출건(제출자+제출시각) 단위. 같은 제출자라도 제출시각 다르면 별도 제출건.
+  //    반영은 제출건 단위 일괄 → 체크한 건=반영완료, 미체크=반영반려. 처리자·처리시각은 제출건 1개.
+  var SUB_DATE = "2026-07-02";
+  var DATE_SHORT = SUB_DATE.replace(/^\d{4}-/, "");   // 2026-07-02 → 07-02
+  var SUBMISSIONS = [
+    // ① 김약사 오전 제출건 — 반영 완료(체크 6 반영 / 미체크 1 반려)
+    { user:"김약사", dev:"SM-S911", submitAt:"09:10", processor:"정약사", processAt:"10:31",
+      items:[
+        {bc:"8801234567890", nm:"타이레놀콜드-에스정", from:48, to:24, status:"done", reason:"정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정"},
+        {bc:"8806789012345", nm:"판콜에이내복액 30ml", from:52, to:60, status:"done", reason:"-"},
+        {bc:"8802222000033", nm:"베아제정", from:20, to:18, status:"done", reason:"낱알 조제 후 잔량 정정"},
+        {bc:"8804444000055", nm:"우루사정 100mg", from:45, to:50, status:"done", reason:"입고 반영 누락분 추가"},
+        {bc:"8805555000066", nm:"이지엔6프로연질캡슐", from:30, to:28, status:"done", reason:"파손 폐기 2정 반영"},
+        {bc:"8806666000077", nm:"컨디션환", from:12, to:24, status:"done", reason:"창고 이월 재고 합산"},
+        {bc:"8803333000044", nm:"겔포스엠현탁액", from:38, to:40, status:"rej", reason:"입고 검수 중 수량 오차 발견"}
+      ]
+    },
+    // ② 김약사 오후 제출건 — 아직 반영 전
+    { user:"김약사", dev:"SM-S911", submitAt:"14:20", processor:null, processAt:null,
+      items:[
+        {bc:"8801111000022", nm:"훼스탈플러스정", from:28, to:30, status:"wait", reason:"-"}
+      ]
+    },
+    // ③ 이약사 제출건 — 반영 완료(3 반영 / 1 반려)
+    { user:"이약사", dev:"SM-A21", submitAt:"09:22", processor:"정약사", processAt:"09:35",
+      items:[
+        {bc:"8807777000088", nm:"후시딘연고 5g", from:15, to:12, status:"done", reason:"판매 후 잔량 정정"},
+        {bc:"8808888000099", nm:"인사돌정", from:40, to:45, status:"done", reason:"입고 반영 누락분 추가"},
+        {bc:"8809999000011", nm:"마데카솔케어연고", from:22, to:20, status:"done", reason:"진열 파손 2개 폐기"},
+        {bc:"8801212000034", nm:"신신파스 아렉스", from:60, to:48, status:"rej", reason:"실사 수량 차이 정정"}
+      ]
+    }
+  ];
+
+  var STATUSES = ["done","rej","wait"];
+  var ST_LABEL = {done:"반영완료", rej:"반영반려", wait:"반영전"};
+  var BRK_LABEL = {done:"완료", rej:"반려", wait:"반영전"};
+
+  // 반영상태 필터(다중 선택 체크박스)
+  var applied = {done:true, rej:true, wait:true};
+  var pending = {done:true, rej:true, wait:true};
+  var backdrop = document.getElementById("backdrop");
+  var opts = backdrop.querySelectorAll(".opt");
+
+  function isAll(s){ return s.done && s.rej && s.wait; }
+  function isNone(s){ return !s.done && !s.rej && !s.wait; }
+  function activeStatuses(){
+    var showAll = isAll(applied) || isNone(applied);
+    return STATUSES.filter(function(s){ return showAll || applied[s]; });
+  }
+  function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  var CHEV_DOWN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  var MEMO_IC = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h12l4 4V20H4z"/><line x1="8" y1="10" x2="15" y2="10"/><line x1="8" y1="14" x2="15" y2="14"/><line x1="8" y1="17.5" x2="12" y2="17.5"/></svg>';
+  var CHEV_RIGHT = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  var CHEV_UP = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
+
+  // 필터 반영 항목만
+  function subFilteredItems(sub){
+    var act = activeStatuses();
+    return sub.items.filter(function(it){ return act.indexOf(it.status)>=0; });
+  }
+
+  // ── 시안1: 제출건 아코디언 + 상태별 색 채운 카드 + 요약 칩 ──
+  var STATUS_ORDER = ["wait","done","rej"];
+  var STAT_IC = {
+    done:'<svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    rej:'<svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    wait:'<svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7.5 12 12 15 14"/></svg>'
+  };
+  var OPEN = SUBMISSIONS.map(function(_, i){ return i===0; });   // 제출건 펼침(첫 건만)
+  function itemRow(p){
+    var qty = (p.from==null)
+      ? '<span class="ir-to num">'+p.to+'</span><span class="ir-u">개</span>'
+      : '<span class="ir-from num">'+p.from+'</span><span class="ir-ar">→</span><span class="ir-to num">'+p.to+'</span><span class="ir-u">개</span>';
+    var delta = "";
+    if(p.from!=null){ var d=p.to-p.from; delta='<span class="ir-d '+(d<0?'down':'up')+' num">'+(d<0?'−'+Math.abs(d):'+'+d)+'</span>'; }
+    var memo = (p.reason&&p.reason!=='-') ? '<span class="ir-memo" title="'+esc(p.reason)+'">'+MEMO_IC+'</span>' : '';
+    return '<div class="irow"><div class="ir-l"><div class="ir-nm">'+esc(p.nm)+'</div><div class="ir-bc">#'+esc(p.bc)+'</div></div>'+
+      '<div class="ir-q">'+qty+delta+'</div>'+memo+'</div>';
+  }
+  function grpCard(st, items){
+    return '<div class="gc '+st+'" data-open="1"><button type="button" class="gc-h">'+STAT_IC[st]+'<span class="gc-lb">'+ST_LABEL[st]+'</span>'+
+      '<span class="gc-cnt">'+items.length+'건</span><span class="gc-chev">'+CHEV_DOWN+'</span></button>'+
+      '<div class="gc-b">'+items.map(itemRow).join('')+'</div></div>';
+  }
+  function summaryChips(sub){
+    var c={done:0,rej:0,wait:0}; sub.items.forEach(function(it){c[it.status]++;});
+    var t=[];
+    if(c.done)t.push('<span class="bsum done">'+STAT_IC.done+'<b>'+c.done+'</b></span>');
+    if(c.rej)t.push('<span class="bsum rej">'+STAT_IC.rej+'<b>'+c.rej+'</b></span>');
+    if(c.wait)t.push('<span class="bsum wait">'+STAT_IC.wait+'<b>'+c.wait+'</b></span>');
+    return t.join('');
+  }
+  function renderList(){
+    var host=document.getElementById("listView"), act=activeStatuses(), total=0, html="";
+    SUBMISSIONS.forEach(function(sub, i){
+      var fi=subFilteredItems(sub); if(!fi.length) return; total+=fi.length;
+      var meta = sub.processAt
+        ? '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span>처리 '+esc(sub.processor)+' '+esc(sub.processAt)
+        : '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span><span class="mut">반영 전</span>';
+      var groups="";
+      STATUS_ORDER.forEach(function(st){ if(act.indexOf(st)<0) return; var its=fi.filter(function(p){return p.status===st;}); if(its.length) groups+=grpCard(st,its); });
+      var open=!!OPEN[i];
+      html+='<div class="subc'+(open?' open':'')+'">'+
+        '<button class="subc-h" data-i="'+i+'">'+
+          '<div class="subc-hl"><div class="subc-nm"><span class="subc-user">'+esc(sub.user)+'</span><span class="subc-dev">'+esc(sub.dev)+'</span></div>'+
+            '<div class="subc-meta">'+meta+'</div></div>'+
+          '<div class="subc-sum">'+summaryChips(sub)+'</div>'+
+          '<span class="subc-chev">'+CHEV_DOWN+'</span>'+
+        '</button>'+
+        '<div class="subc-b"'+(open?'':' hidden')+'>'+groups+'</div>'+
+      '</div>';
+    });
+    if(!html) html='<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
+    host.innerHTML=html;
+    host.querySelectorAll('.subc-h').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.getAttribute('data-i'); OPEN[i]=!OPEN[i];
+        var c=b.parentNode; c.classList.toggle('open',OPEN[i]); c.querySelector('.subc-b').hidden=!OPEN[i];
+      });
+    });
+    host.querySelectorAll('.gc-h').forEach(function(b){
+      b.addEventListener('click',function(){
+        var g=b.parentNode, open=g.getAttribute('data-open')==='1';
+        g.setAttribute('data-open',open?'0':'1'); g.querySelector('.gc-b').hidden=open;
+      });
+    });
+    document.getElementById("fcnt").textContent=total;
+  }
+
+  // ── 상세: 한 기기의 상품 목록 ──
+  function qtyHtml(p){
+    // 전 상태 공통 숫자 표기: from → to 개 + 증감
+    //  · 반영완료 = 반영 전(앱 기준) → 반영 후 / 반영전·반려 = 전산(앱 기준) 재고 → 제출
+    if(p.from==null){   // 전산(앱 기준) 미제공 시 제출값만
+      return '<div class="dqty"><span class="to num">'+p.to+'</span><span class="unit">개</span></div>';
+    }
+    var d = p.to - p.from;
+    var cls = d<0 ? "down" : "up";
+    var sign = d<0 ? "−"+Math.abs(d) : "+"+d;
+    return '<div class="dqty"><span class="from num">'+p.from+'</span><span class="arw">→</span>'+
+           '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
+           '<span class="delta '+cls+' num">'+sign+'</span></div>';
+  }
+  function productHtml(p){
+    var hasReason = p.reason && p.reason!=="-";
+    // 재고 보정 사유 = 선택값 → 있을 때만 메모 아이콘 + 내용 바로 노출(상태는 묶음 헤더가 표기)
+    var reason = hasReason
+      ? '<div class="drow-foot"><div class="rsn" title="재고 보정 사유"><span class="rsn-ic">'+MEMO_IC+'</span>'+
+        '<span class="rsn-full">'+esc(p.reason)+'</span></div></div>'
+      : '';
+    return '<div class="drow" data-status="'+p.status+'">'+
+        '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div></div></div>'+
+        qtyHtml(p)+
+        reason+
+      '</div>';
+  }
+  // ── 반영상태 필터(Bottom Sheet) — 아코디언 목록 연동 ──
+  function openSheet(){ pending={done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
+  function closeSheet(){ backdrop.classList.remove("open"); }
+  function renderPending(){ var all=isAll(pending); opts.forEach(function(o){var v=o.getAttribute("data-val"); o.classList.toggle("sel", v==="all"?all:pending[v]);}); }
+  function toggle(v){ if(v==="all"){var next=!isAll(pending);pending={done:next,rej:next,wait:next};} else {pending[v]=!pending[v];} renderPending(); }
+  function applyFilter(){
+    applied={done:pending.done,rej:pending.rej,wait:pending.wait};
+    var showAll=isAll(applied)||isNone(applied), selN=STATUSES.filter(function(s){return applied[s];}).length;
+    var fnum=document.getElementById("fnum"), fbtn=document.getElementById("fbtn"), filtered=!showAll;
+    fnum.hidden=!filtered; fnum.textContent=selN; fbtn.classList.toggle("on",filtered);
+    document.querySelector(".fcount").firstChild.textContent=filtered?"선택 ":"전체 ";
+    renderList();
+  }
+  document.getElementById("fbtn").addEventListener("click", openSheet);
+  opts.forEach(function(o){ o.addEventListener("click", function(){ toggle(o.getAttribute("data-val")); }); });
+  document.getElementById("applyBtn").addEventListener("click", function(){ applyFilter(); closeSheet(); });
+  document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+  backdrop.addEventListener("click", function(e){ if(e.target===backdrop) closeSheet(); });
+
+  // 초기 렌더
+  renderList();
+  // (미리보기 케이스) #filter: 반영상태 필터 열림
+  if(location.hash.indexOf("filter")>=0){ openSheet(); }
+</script>
+</body>
+</html>
