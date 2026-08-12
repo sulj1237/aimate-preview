@@ -94,6 +94,7 @@
   /* 제출자 메타(제출자명·제출일시) + 재고 입력 사유(선택·자세히보기) */
   .drow-foot{margin-top:calc(13px*var(--k));padding-top:calc(12px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
   .pmeta{font-size:calc(12.5px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
+  .pmeta .pm-lb{font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);margin-right:calc(8px*var(--k))}
   .pmeta .pm-name{color:var(--g-900);font-weight:700}
   .pmeta .pm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
 
@@ -324,9 +325,11 @@
   }
   function productHtml(p, user){
     var hasReason = p.reason && p.reason!=="-";
-    // 메타 = 제출자명 · 제출년월일시
-    var meta = '<div class="pmeta"><span class="pm-name">'+esc(user)+'</span>'+
-               '<span class="pm-sep">·</span>'+esc(SUB_DATE+" "+(p.t||"")).trim()+'</div>';
+    // 메타 = 처리자(라벨) + 이름 · 월일시(연도 제외)
+    var dateShort = SUB_DATE.replace(/^\d{4}-/, "");   // 2026-07-02 → 07-02
+    var meta = '<div class="pmeta"><span class="pm-lb">처리자</span>'+
+               '<span class="pm-name">'+esc(user)+'</span>'+
+               '<span class="pm-sep">·</span>'+esc((dateShort+" "+(p.t||"")).trim())+'</div>';
     // 재고 입력 사유 = 선택값 → 있을 때만 일부 노출 + 자세히보기(펼침)
     var reason = hasReason
       ? '<details class="rsn"><summary>'+
