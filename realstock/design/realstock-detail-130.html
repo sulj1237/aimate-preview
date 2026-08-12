@@ -289,8 +289,8 @@
       total += fi.length;
       // 제출건 메타 = 제출 시각 · (처리자·처리시각 | 처리 전) — 제출건 단위 일괄 처리
       var smeta = sub.processAt
-        ? '제출 '+esc(DATE_SHORT+" "+sub.submitAt)+'<span class="sm-sep">·</span>처리 '+esc(sub.processor)+' '+esc(DATE_SHORT+" "+sub.processAt)
-        : '제출 '+esc(DATE_SHORT+" "+sub.submitAt)+'<span class="sm-sep">·</span><span class="mut">반영 전(처리 전)</span>';
+        ? '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span>처리 '+esc(sub.processor)+' '+esc(sub.processAt)
+        : '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span><span class="mut">반영 전(처리 전)</span>';
       var sections = "";
       STATUS_ORDER.forEach(function(st){
         if(act.indexOf(st)<0) return;
@@ -316,18 +316,17 @@
 
   // ── 상세: 한 기기의 상품 목록 ──
   function qtyHtml(p){
-    // 반영완료: 반영 전(앱 기준) → 반영 후 + 증감
-    if(p.status==="done"){
-      var d = p.to - p.from;
-      var cls = d<0 ? "down" : "up";
-      var sign = d<0 ? "−"+Math.abs(d) : "+"+d;
-      return '<div class="dqty"><span class="from num">'+p.from+'</span><span class="arw">→</span>'+
-             '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
-             '<span class="delta '+cls+' num">'+sign+'</span></div>';
+    // 전 상태 공통 숫자 표기: from → to 개 + 증감
+    //  · 반영완료 = 반영 전(앱 기준) → 반영 후 / 반영전·반려 = 전산(앱 기준) 재고 → 제출
+    if(p.from==null){   // 전산(앱 기준) 미제공 시 제출값만
+      return '<div class="dqty"><span class="to num">'+p.to+'</span><span class="unit">개</span></div>';
     }
-    // 반영전·반영반려: 반영 후 없음 → 전산상(앱 기준) 재고 · 제출
-    return '<div class="dqty2"><span class="q-sys">전산상(앱 기준) 재고 <b class="num">'+p.from+'</b>개</span>'+
-           '<span class="q-dot">·</span><span class="q-sub">제출 <b class="num">'+p.to+'</b>개</span></div>';
+    var d = p.to - p.from;
+    var cls = d<0 ? "down" : "up";
+    var sign = d<0 ? "−"+Math.abs(d) : "+"+d;
+    return '<div class="dqty"><span class="from num">'+p.from+'</span><span class="arw">→</span>'+
+           '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
+           '<span class="delta '+cls+' num">'+sign+'</span></div>';
   }
   function productHtml(p){
     var hasReason = p.reason && p.reason!=="-";
