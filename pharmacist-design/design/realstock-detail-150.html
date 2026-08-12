@@ -91,12 +91,19 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 제출자 메타(제출자명·제출일시) + 재고 보정 사유(선택·자세히보기) */
-  .drow-foot{margin-top:calc(13px*var(--k));padding-top:calc(12px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
-  .pmeta{font-size:calc(12.5px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
-  .pmeta .pm-lb{font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);margin-right:calc(8px*var(--k))}
-  .pmeta .pm-name{color:var(--g-900);font-weight:700}
-  .pmeta .pm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
+  /* 상태 묶음 섹션(반영전·반영완료·반영반려) — 헤더에 처리자·처리일시 */
+  .ssec{margin-top:calc(16px*var(--k))}
+  .ssec:first-child{margin-top:calc(2px*var(--k))}
+  .ssec-h{display:flex;align-items:baseline;gap:calc(8px*var(--k));margin-bottom:calc(10px*var(--k));flex-wrap:wrap}
+  .ssec-lb{font-size:calc(13px*var(--k));font-weight:800;letter-spacing:var(--tracking)}
+  .ssec.done .ssec-lb{color:#1d8a76}
+  .ssec.rej .ssec-lb{color:var(--sys-red)}
+  .ssec.wait .ssec-lb{color:var(--g-600)}
+  .ssec-cnt{font-size:calc(12.5px*var(--k));font-weight:700;color:var(--g-500)}
+  .ssub{font-size:calc(12px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking);margin-left:auto}
+  .ssub.mut{color:var(--g-400)}
+  /* 카드 하단(재고 보정 사유) */
+  .drow-foot{margin-top:calc(12px*var(--k));padding-top:calc(11px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
 
   /* 재고 보정 사유(선택값) — 메모 아이콘 + 내용 바로 노출(자세히보기 없음) */
   .rsn{display:flex;gap:calc(7px*var(--k));margin-top:calc(9px*var(--k))}
@@ -199,6 +206,7 @@
 <script>
   // ── 데이터: 기기(Device ID)별 그룹, 각 그룹에 제출 상품 배열 ──
   var SUB_DATE = "2026-07-02";
+  var DATE_SHORT = SUB_DATE.replace(/^\d{4}-/, "");   // 2026-07-02 → 07-02
   var DEVICES = [
     { user:"김약사", dev:"SM-S911", last:"10:31",
       products:[
@@ -268,7 +276,37 @@
     return c;
   }
 
-  // ── 제출자별 목록(펼침 없음, 항상 전체 노출) + 세부항목 카드 ──
+  // ── 제출자별 목록 → 상태 묶음(반영전 상단·반영완료·반영반려) → 세부항목 카드 ──
+  var STATUS_ORDER = ["wait","done","rej"];   // 반영전(상단) → 완료 → 반려
+  // 상태 묶음의 처리자·처리일시(일괄 처리 가정) — handler에서 이름·최신 시각 추출
+  function procInfo(items){
+    var name = "", times = [];
+    items.forEach(function(p){
+      if(!p.handler) return;
+      var h = p.handler.replace(/\s*\(PC[^)]*\)/, "");   // "10:31 · 정약사"
+      var parts = h.split(" · ");
+      if(parts[0]) times.push(parts[0]);
+      if(parts[1] && !name) name = parts[1];
+    });
+    if(!name) return null;
+    times.sort();
+    return { name:name, time:times[times.length-1] || "" };
+  }
+  function statusSection(st, items){
+    var proc;
+    if(st==="wait"){
+      proc = '<span class="ssub mut">처리 전</span>';
+    } else {
+      var pi = procInfo(items);
+      proc = pi ? '<span class="ssub">처리 '+esc(pi.name)+' · '+esc((DATE_SHORT+" "+pi.time).trim())+'</span>' : '';
+    }
+    var cards = items.map(function(p){ return productHtml(p); }).join("");
+    return '<div class="ssec '+st+'">'+
+        '<div class="ssec-h"><span class="ssec-lb">'+ST_LABEL[st]+'</span>'+
+          '<span class="ssec-cnt">'+items.length+'건</span>'+proc+'</div>'+
+        '<div class="ssec-b">'+cards+'</div>'+
+      '</div>';
+  }
   function renderList(){
     var host = document.getElementById("listView");
     var act = activeStatuses();
@@ -277,21 +315,21 @@
       var fp = filteredProducts(dev);
       if(fp.length===0) return;   // 선택 상태 없는 기기는 숨김
       total += fp.length;
-      var c = statusCounts(fp);
-      var brk = act.filter(function(s){ return c[s]>0; }).map(function(s){
-        return '<span class="gbrk '+s+'">'+BRK_LABEL[s]+' '+c[s]+'</span>';
-      }).join('<span class="gsep">·</span>');
-      var cards = fp.map(function(p){ return productHtml(p, dev.user); }).join("");
+      var sections = "";
+      STATUS_ORDER.forEach(function(st){
+        if(act.indexOf(st)<0) return;
+        var items = fp.filter(function(p){ return p.status===st; });
+        if(items.length) sections += statusSection(st, items);
+      });
       html +=
         '<div class="dgrp">'+
           '<div class="dgrp-h">'+
-            '<div class="dgrp-hmain">'+
-              '<div class="grow1"><span class="guser">'+esc(dev.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(dev.dev)+'</span></div>'+
-              '<div class="grow2">'+brk+'</div>'+
-            '</div>'+
+            '<div class="dgrp-hmain"><div class="grow1">'+
+              '<span class="guser">'+esc(dev.user)+'</span><span class="gdot">·</span><span class="gdev">'+esc(dev.dev)+'</span>'+
+            '</div></div>'+
             '<span class="gcount"><span class="gcnt-n num">'+fp.length+'</span><span class="gcnt-u">건</span></span>'+
           '</div>'+
-          '<div class="dgrp-b">'+cards+'</div>'+
+          sections+
         '</div>';
     });
     if(html==="") html = '<div class="gempty">선택한 상태의 제출 내역이 없습니다.</div>';
@@ -314,23 +352,17 @@
     return '<div class="dqty2"><span class="q-sys">전산상(앱 기준) 재고 <b class="num">'+p.from+'</b>개</span>'+
            '<span class="q-dot">·</span><span class="q-sub">제출 <b class="num">'+p.to+'</b>개</span></div>';
   }
-  function productHtml(p, user){
+  function productHtml(p){
     var hasReason = p.reason && p.reason!=="-";
-    // 메타 = 처리자(라벨) + 이름 · 월일시(연도 제외)
-    var dateShort = SUB_DATE.replace(/^\d{4}-/, "");   // 2026-07-02 → 07-02
-    var meta = '<div class="pmeta"><span class="pm-lb">처리자</span>'+
-               '<span class="pm-name">'+esc(user)+'</span>'+
-               '<span class="pm-sep">·</span>'+esc((dateShort+" "+(p.t||"")).trim())+'</div>';
-    // 재고 보정 사유 = 선택값 → 있을 때만 메모 아이콘 + 내용 바로 노출(자세히보기 없음)
+    // 재고 보정 사유 = 선택값 → 있을 때만 메모 아이콘 + 내용 바로 노출(상태는 묶음 헤더가 표기)
     var reason = hasReason
-      ? '<div class="rsn" title="재고 보정 사유"><span class="rsn-ic">'+MEMO_IC+'</span>'+
-        '<span class="rsn-full">'+esc(p.reason)+'</span></div>'
+      ? '<div class="drow-foot"><div class="rsn" title="재고 보정 사유"><span class="rsn-ic">'+MEMO_IC+'</span>'+
+        '<span class="rsn-full">'+esc(p.reason)+'</span></div></div>'
       : '';
     return '<div class="drow" data-status="'+p.status+'">'+
-        '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div></div>'+
-          '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
+        '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div></div></div>'+
         qtyHtml(p)+
-        '<div class="drow-foot">'+meta+reason+'</div>'+
+        reason+
       '</div>';
   }
   // ── 반영상태 필터(Bottom Sheet) — 아코디언 목록 연동 ──
