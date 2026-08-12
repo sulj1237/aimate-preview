@@ -42,8 +42,8 @@
     padding:calc(14px*var(--k)) calc(16px*var(--k))}
   .dgrp-h:active{background:var(--g-50)}
   .dgrp-hmain{flex:1;min-width:0}
-  /* 그룹 본문 = 하나의 눌린(뮤트) 회색 영역 (개별 카드 X) */
-  .dgrp-b{background:var(--g-50);border-radius:calc(12px*var(--k));padding:0 calc(12px*var(--k));margin:0 calc(12px*var(--k)) calc(14px*var(--k))}
+  /* 그룹 본문 = 카드 내부, 상품은 선(라인)으로만 구분 */
+  .dgrp-b{padding:0 calc(16px*var(--k)) calc(6px*var(--k));border-top:1px solid var(--g-200)}
   .dgrp-b[hidden]{display:none}
   /* 1행: 사용자 · 기기ID */
   .grow1{display:flex;align-items:baseline;gap:calc(6px*var(--k));flex-wrap:wrap}
@@ -93,30 +93,28 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 메타 프리뷰 행: 시각 | 제출자 → 처리자 | 사유(말줄임) + chevron */
-  .drow-foot{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(12px*var(--k));padding-top:calc(11px*var(--k));border-top:1px solid var(--g-100)}
-  .dmeta{flex:1;min-width:0;display:flex;align-items:center;gap:calc(6px*var(--k));font-size:calc(12px*var(--k));color:var(--g-500);overflow:hidden}
-  .dmeta .dm-t{flex:none;color:var(--g-600);font-weight:600}
-  .dmeta .dm-flow{flex:none;color:var(--g-600);font-weight:600;white-space:nowrap}
-  .dmeta .dm-arw{color:var(--g-400)}
-  .dmeta .dm-sep{flex:none;color:var(--g-300)}
-  .dmeta .dm-reason{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--g-500)}
-  .chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .18s ease}
-  .drow[open] .chev{transform:rotate(180deg)}
+  /* 재고 차이 사유 요약 행: 라벨 + 값(우측 말줄임) + chevron */
+  .drow-foot{display:flex;align-items:center;gap:calc(10px*var(--k));margin-top:calc(12px*var(--k));padding-top:calc(12px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
+  .dm-lb{flex:none;font-size:calc(12.5px*var(--k));font-weight:700;color:var(--g-500);letter-spacing:var(--tracking)}
+  .dm-reason{flex:1;min-width:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(12.5px*var(--k));color:var(--g-700)}
+  .dm-reason.mut{color:var(--g-400)}
+  .chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
+  .drow[open] .chev{transform:rotate(90deg)}
 
-  /* 상세(펼침) */
-  .ddetail{margin-top:calc(10px*var(--k));padding-top:calc(10px*var(--k));border-top:1px dashed var(--g-200)}
-  .drs{font-size:calc(12.5px*var(--k));color:var(--g-700);line-height:1.5;margin-top:calc(9px*var(--k))}
-  .drs:first-child{margin-top:0}
-  .drs .lb{display:block;font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(2px*var(--k))}
-  /* 자세히 = 재고 차이·사유·처리 묶음 카드 */
-  .dgroup{border:1px solid var(--g-200);border-radius:calc(10px*var(--k));overflow:hidden;background:#fff}
-  .dg-row{display:flex;gap:calc(10px*var(--k));padding:calc(9px*var(--k)) calc(12px*var(--k));border-bottom:1px solid var(--g-150,#eceef1);
-    font-size:calc(12.5px*var(--k));line-height:1.5}
-  .dg-row:last-child{border-bottom:0}
-  .dg-lb{flex:none;width:calc(74px*var(--k));color:var(--g-500);font-weight:700}
-  .dg-v{flex:1;min-width:0;color:var(--g-800);word-break:break-word}
-  .dg-mut{color:var(--g-400)}
+  /* 펼침 = 제출자가 입력한 내용(재고 차이 사유 + 처리)을 하나로 묶은 그룹 박스 */
+  .ddetail{margin-top:calc(12px*var(--k))}
+  .dgroup{background:var(--g-50);border:1px solid var(--g-200);border-radius:calc(12px*var(--k));padding:calc(12px*var(--k))}
+  .dg-reason{background:#fff;border:1px solid var(--g-150,#eceef1);border-radius:calc(9px*var(--k));
+    padding:calc(11px*var(--k)) calc(13px*var(--k));font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
+  .dg-reason.mut{color:var(--g-400)}
+  .dg-proc{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(10px*var(--k));
+    font-size:calc(12.5px*var(--k));color:var(--g-600);letter-spacing:var(--tracking)}
+  .dg-proc.mut{color:var(--g-400)}
+  .dg-badge{flex:none;background:var(--g-200);color:var(--g-700);font-size:calc(11px*var(--k));font-weight:700;
+    padding:calc(3px*var(--k)) calc(9px*var(--k));border-radius:999px}
+  .dg-reject{margin-top:calc(10px*var(--k));padding-top:calc(10px*var(--k));border-top:1px dashed var(--g-300);
+    font-size:calc(12.5px*var(--k));color:var(--sys-red);line-height:1.5;word-break:break-word}
+  .dg-reject b{font-weight:700}
 
   /* 빈 상태(필터로 표시할 항목 없음) */
   .gempty{padding:calc(48px*var(--k)) calc(24px*var(--k));text-align:center;color:var(--g-500);font-size:calc(13.5px*var(--k));font-weight:600}
@@ -336,35 +334,27 @@
   }
   function productHtml(p, user){
     var sub = p.sub ? '<div class="dsub">'+esc(p.sub)+'</div>' : '';
-    // 처리 — PC id 제거(예: '10:31 · 정약사(PC DESKTOP-…)' → '10:31 · 정약사')
+    var hasReason = p.reason && p.reason!=="-";
+    var reasonVal = hasReason ? esc(p.reason) : "-";
+    // 처리 — PC id 제거 + 날짜 병기 (예: '10:31 · 정약사(PC …)' → '2026-07-02 10:31 · 정약사')
     var handler = p.handler ? p.handler.replace(/\s*\(PC[^)]*\)/, "") : "";
-    var mTime = "", mName = "";
-    if(handler){ var pr = handler.split(" · "); mTime = pr[0]||""; mName = pr[1]||""; }
-    // 접힌 카드 메타 프리뷰: 시각 | 제출자 → 처리자 | 재고 차이 사유(말줄임)
-    var meta = "";
-    if(mTime) meta += '<span class="dm-t">'+esc(mTime)+'</span><span class="dm-sep">|</span>';
-    meta += '<span class="dm-flow">'+esc(user)+(mName ? ' <span class="dm-arw">→</span> '+esc(mName) : '')+'</span>';
-    if(p.reason && p.reason!=="-") meta += '<span class="dm-sep">|</span><span class="dm-reason">'+esc(p.reason)+'</span>';
-    // 자세히(펼침) = [재고 차이 · 재고 차이 사유 · 처리] 묶음 카드 (+ 반려 시 반려 사유)
-    var rows = "";
-    if(p.only==null){
-      var d = p.to - p.from;
-      var diff = d<0 ? ("−"+Math.abs(d)+"개") : (d>0 ? ("+"+d+"개") : "0개");
-      rows += '<div class="dg-row"><span class="dg-lb">재고 차이</span><span class="dg-v">'+diff+'</span></div>';
-    }
-    rows += '<div class="dg-row"><span class="dg-lb">재고 차이 사유</span><span class="dg-v">'+esc(p.reason||"-")+'</span></div>';
-    rows += '<div class="dg-row"><span class="dg-lb">처리</span><span class="dg-v">'+(handler ? esc(handler) : '<span class="dg-mut">반영 전이라 처리 전</span>')+'</span></div>';
-    if(p.reject){
-      rows += '<div class="dg-row"><span class="dg-lb">반려 사유</span><span class="dg-v">'+esc(p.reject)+'</span></div>';
-    }
+    var procHtml = handler
+      ? '<div class="dg-proc"><span class="dg-badge">처리</span><span>'+esc(SUB_DATE+" "+handler)+'</span></div>'
+      : '<div class="dg-proc mut"><span class="dg-badge">처리</span><span>반영 전 · 처리 전</span></div>';
+    // 펼침 = 제출자 입력 내용 그룹 박스 (재고 차이 사유 + 처리, 반려 시 반려 사유)
+    var group = '<div class="dg-reason'+(hasReason?"":" mut")+'">'+reasonVal+'</div>'+
+                procHtml+
+                (p.reject ? '<div class="dg-reject"><b>반려 사유</b> · '+esc(p.reject)+'</div>' : '');
     return '<details class="drow" data-status="'+p.status+'">'+
         '<summary>'+
           '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
             '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
           qtyHtml(p)+
-          '<div class="drow-foot"><span class="dmeta">'+meta+'</span><span class="chev">'+CHEV_DOWN+'</span></div>'+
+          '<div class="drow-foot"><span class="dm-lb">재고 차이 사유</span>'+
+            '<span class="dm-reason'+(hasReason?"":" mut")+'">'+reasonVal+'</span>'+
+            '<span class="chev">'+CHEV_RIGHT+'</span></div>'+
         '</summary>'+
-        '<div class="ddetail"><div class="dgroup">'+rows+'</div></div>'+
+        '<div class="ddetail"><div class="dgroup">'+group+'</div></div>'+
       '</details>';
   }
   // ── 반영상태 필터(Bottom Sheet) — 아코디언 목록 연동 ──
