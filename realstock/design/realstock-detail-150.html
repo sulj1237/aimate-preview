@@ -96,19 +96,22 @@
   /* 제출자 입력 내용 = 더보기 없이 항상 노출 (제목행 아래 구분선) */
   .drow-body{border-top:1px solid var(--g-150,#eceef1);margin-top:calc(12px*var(--k));padding-top:calc(6px*var(--k))}
 
-  /* 제출자 입력 내용 그룹 박스 (재고 차이 사유 + 처리) — 항상 노출 */
-  .dgroup{background:var(--g-50);border:1px solid var(--g-200);border-radius:calc(12px*var(--k));padding:calc(13px*var(--k));margin-top:calc(12px*var(--k))}
-  .dm-lb{display:block;font-size:calc(12px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(6px*var(--k));letter-spacing:var(--tracking)}
+  /* 재고 차이 사유(선택값) + 처리 — 박스 없이 flat */
+  .dsrc{margin-top:calc(13px*var(--k))}
+  .dm-lb{display:block;font-size:calc(12px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(5px*var(--k));letter-spacing:var(--tracking)}
   .dg-reason{font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
-  .dg-reason.mut{color:var(--g-400)}
-  .dg-proc{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(11px*var(--k));padding-top:calc(11px*var(--k));
-    border-top:1px solid var(--g-200);font-size:calc(12.5px*var(--k));color:var(--g-600);letter-spacing:var(--tracking)}
+  .dg-proc{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(13px*var(--k));
+    font-size:calc(12.5px*var(--k));color:var(--g-600);letter-spacing:var(--tracking)}
   .dg-proc.mut{color:var(--g-400)}
-  .dg-badge{flex:none;background:var(--g-200);color:var(--g-700);font-size:calc(11px*var(--k));font-weight:700;
+  .dg-badge{flex:none;background:var(--g-150,#eceef1);color:var(--g-600);font-size:calc(11px*var(--k));font-weight:700;
     padding:calc(3px*var(--k)) calc(9px*var(--k));border-radius:999px}
-  .dg-reject{margin-top:calc(10px*var(--k));padding-top:calc(10px*var(--k));border-top:1px dashed var(--g-300);
-    font-size:calc(12.5px*var(--k));color:var(--sys-red);line-height:1.5;word-break:break-word}
-  .dg-reject b{font-weight:700}
+  /* 반영전·반영반려 수량 = 전산(앱 기준) 재고 · 제출 ('반영 후' 없음) */
+  .dqty2{display:flex;align-items:baseline;gap:calc(9px*var(--k));margin-top:calc(10px*var(--k));flex-wrap:wrap}
+  .q-sys{font-size:calc(13px*var(--k));color:var(--g-500);font-weight:600}
+  .q-sys b{font-size:calc(18px*var(--k));color:var(--g-700);font-weight:800;letter-spacing:-.01em}
+  .q-dot{color:var(--g-300);font-weight:700}
+  .q-sub{font-size:calc(13px*var(--k));color:var(--g-600);font-weight:600}
+  .q-sub b{font-size:calc(22px*var(--k));color:var(--g-900);font-weight:800;letter-spacing:-.01em}
 
   /* 빈 상태(필터로 표시할 항목 없음) */
   .gempty{padding:calc(48px*var(--k)) calc(24px*var(--k));text-align:center;color:var(--g-500);font-size:calc(13.5px*var(--k));font-weight:600}
@@ -215,9 +218,8 @@
         {bc:"8806666000077", nm:"컨디션환", from:12, to:24, status:"done",
           reason:"창고 이월 재고 합산", handler:"10:20 · 정약사(PC DESKTOP-QALLC7M)"},
         {bc:"8803333000044", nm:"겔포스엠현탁액", from:38, to:40, status:"rej",
-          reason:"입고 검수 중 수량 오차 발견", handler:"10:35 · 정약사(PC DESKTOP-ENFJ2GD)",
-          reject:"근거 자료 부족 — 재실사 후 재제출 요청"},
-        {bc:"8801111000022", nm:"훼스탈플러스정", only:30, status:"wait",
+          reason:"입고 검수 중 수량 오차 발견", handler:"10:35 · 정약사(PC DESKTOP-ENFJ2GD)"},
+        {bc:"8801111000022", nm:"훼스탈플러스정", from:28, to:30, status:"wait",
           reason:"-", handler:null}
       ]
     },
@@ -230,8 +232,7 @@
         {bc:"8809999000011", nm:"마데카솔케어연고", from:22, to:20, status:"done",
           reason:"진열 파손 2개 폐기", handler:"09:23 · 정약사(PC DESKTOP-ENFJ2GD)"},
         {bc:"8801212000034", nm:"신신파스 아렉스", from:60, to:48, status:"rej",
-          reason:"실사 수량 차이 정정", handler:"09:30 · 정약사(PC DESKTOP-ENFJ2GD)",
-          reject:"제출 수량과 실물 재고 불일치 — 재확인 요청"}
+          reason:"실사 수량 차이 정정", handler:"09:30 · 정약사(PC DESKTOP-ENFJ2GD)"}
       ]
     }
   ];
@@ -316,37 +317,38 @@
 
   // ── 상세: 한 기기의 상품 목록 ──
   function qtyHtml(p){
-    if(p.only!=null){
-      return '<div class="dqty"><span class="only">제출 '+p.only+'</span><span class="unit">개</span></div>';
+    // 반영완료: 반영 전(앱 기준) → 반영 후 + 증감
+    if(p.status==="done"){
+      var d = p.to - p.from;
+      var cls = d<0 ? "down" : "up";
+      var sign = d<0 ? "−"+Math.abs(d) : "+"+d;
+      return '<div class="dqty"><span class="from num">'+p.from+'</span><span class="arw">→</span>'+
+             '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
+             '<span class="delta '+cls+' num">'+sign+'</span></div>';
     }
-    var d = p.to - p.from;
-    var cls = d<0 ? "down" : "up";
-    var sign = d<0 ? "−"+Math.abs(d) : "+"+d;
-    return '<div class="dqty"><span class="from num">'+p.from+'</span><span class="arw">→</span>'+
-           '<span class="to num">'+p.to+'</span><span class="unit">개</span>'+
-           '<span class="delta '+cls+' num">'+sign+'</span></div>';
+    // 반영전·반영반려: 반영 후 없음 → 전산상(앱 기준) 재고 · 제출
+    return '<div class="dqty2"><span class="q-sys">전산상(앱 기준) 재고 <b class="num">'+p.from+'</b>개</span>'+
+           '<span class="q-dot">·</span><span class="q-sub">제출 <b class="num">'+p.to+'</b>개</span></div>';
   }
   function productHtml(p, user){
     var sub = p.sub ? '<div class="dsub">'+esc(p.sub)+'</div>' : '';
     var hasReason = p.reason && p.reason!=="-";
-    var reasonVal = hasReason ? esc(p.reason) : "-";
     // 처리 — PC id 제거 + 날짜 병기 (예: '10:31 · 정약사(PC …)' → '2026-07-02 10:31 · 정약사')
     var handler = p.handler ? p.handler.replace(/\s*\(PC[^)]*\)/, "") : "";
     var procHtml = handler
       ? '<div class="dg-proc"><span class="dg-badge">처리</span><span>'+esc(SUB_DATE+" "+handler)+'</span></div>'
       : '<div class="dg-proc mut"><span class="dg-badge">처리</span><span>반영 전 · 처리 전</span></div>';
-    // 제출자 입력 내용 = 더보기 없이 항상 노출 (재고 차이 사유 + 처리, 반려 시 반려 사유)
+    // 재고 차이 사유 = 선택값 → 없으면 블록 자체를 노출하지 않음 (박스 없이 flat)
+    var reasonBlock = hasReason
+      ? '<div class="dsrc"><div class="dm-lb">재고 차이 사유</div><div class="dg-reason">'+esc(p.reason)+'</div></div>'
+      : '';
     return '<div class="drow" data-status="'+p.status+'">'+
         '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
           '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
         '<div class="drow-body">'+
           qtyHtml(p)+
-          '<div class="dgroup">'+
-            '<div class="dm-lb">재고 차이 사유</div>'+
-            '<div class="dg-reason'+(hasReason?"":" mut")+'">'+reasonVal+'</div>'+
-            procHtml+
-            (p.reject ? '<div class="dg-reject"><b>반려 사유</b> · '+esc(p.reject)+'</div>' : '')+
-          '</div>'+
+          reasonBlock+
+          procHtml+
         '</div>'+
       '</div>';
   }
