@@ -93,22 +93,16 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 재고 차이 사유 요약 행: 라벨 + 값(우측 말줄임) + chevron */
-  .drow-foot{display:flex;align-items:center;gap:calc(10px*var(--k));margin-top:calc(12px*var(--k));padding-top:calc(12px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
-  .dm-lb{flex:none;font-size:calc(12.5px*var(--k));font-weight:700;color:var(--g-500);letter-spacing:var(--tracking)}
-  .dm-reason{flex:1;min-width:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(12.5px*var(--k));color:var(--g-700)}
-  .dm-reason.mut{color:var(--g-400)}
-  .chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
-  .drow[open] .chev{transform:rotate(90deg)}
+  /* 제출자 입력 내용 = 더보기 없이 항상 노출 (제목행 아래 구분선) */
+  .drow-body{border-top:1px solid var(--g-150,#eceef1);margin-top:calc(12px*var(--k));padding-top:calc(6px*var(--k))}
 
-  /* 펼침 = 제출자가 입력한 내용(재고 차이 사유 + 처리)을 하나로 묶은 그룹 박스 */
-  .ddetail{margin-top:calc(12px*var(--k))}
-  .dgroup{background:var(--g-50);border:1px solid var(--g-200);border-radius:calc(12px*var(--k));padding:calc(12px*var(--k))}
-  .dg-reason{background:#fff;border:1px solid var(--g-150,#eceef1);border-radius:calc(9px*var(--k));
-    padding:calc(11px*var(--k)) calc(13px*var(--k));font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
+  /* 제출자 입력 내용 그룹 박스 (재고 차이 사유 + 처리) — 항상 노출 */
+  .dgroup{background:var(--g-50);border:1px solid var(--g-200);border-radius:calc(12px*var(--k));padding:calc(13px*var(--k));margin-top:calc(12px*var(--k))}
+  .dm-lb{display:block;font-size:calc(12px*var(--k));font-weight:700;color:var(--g-500);margin-bottom:calc(6px*var(--k));letter-spacing:var(--tracking)}
+  .dg-reason{font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
   .dg-reason.mut{color:var(--g-400)}
-  .dg-proc{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(10px*var(--k));
-    font-size:calc(12.5px*var(--k));color:var(--g-600);letter-spacing:var(--tracking)}
+  .dg-proc{display:flex;align-items:center;gap:calc(8px*var(--k));margin-top:calc(11px*var(--k));padding-top:calc(11px*var(--k));
+    border-top:1px solid var(--g-200);font-size:calc(12.5px*var(--k));color:var(--g-600);letter-spacing:var(--tracking)}
   .dg-proc.mut{color:var(--g-400)}
   .dg-badge{flex:none;background:var(--g-200);color:var(--g-700);font-size:calc(11px*var(--k));font-weight:700;
     padding:calc(3px*var(--k)) calc(9px*var(--k));border-radius:999px}
@@ -341,21 +335,20 @@
     var procHtml = handler
       ? '<div class="dg-proc"><span class="dg-badge">처리</span><span>'+esc(SUB_DATE+" "+handler)+'</span></div>'
       : '<div class="dg-proc mut"><span class="dg-badge">처리</span><span>반영 전 · 처리 전</span></div>';
-    // 펼침 = 제출자 입력 내용 그룹 박스 (재고 차이 사유 + 처리, 반려 시 반려 사유)
-    var group = '<div class="dg-reason'+(hasReason?"":" mut")+'">'+reasonVal+'</div>'+
-                procHtml+
-                (p.reject ? '<div class="dg-reject"><b>반려 사유</b> · '+esc(p.reject)+'</div>' : '');
-    return '<details class="drow" data-status="'+p.status+'">'+
-        '<summary>'+
-          '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
-            '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
+    // 제출자 입력 내용 = 더보기 없이 항상 노출 (재고 차이 사유 + 처리, 반려 시 반려 사유)
+    return '<div class="drow" data-status="'+p.status+'">'+
+        '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div>'+sub+'</div>'+
+          '<span class="stb '+p.status+'">'+ST_LABEL[p.status]+'</span></div>'+
+        '<div class="drow-body">'+
           qtyHtml(p)+
-          '<div class="drow-foot"><span class="dm-lb">재고 차이 사유</span>'+
-            '<span class="dm-reason'+(hasReason?"":" mut")+'">'+reasonVal+'</span>'+
-            '<span class="chev">'+CHEV_RIGHT+'</span></div>'+
-        '</summary>'+
-        '<div class="ddetail"><div class="dgroup">'+group+'</div></div>'+
-      '</details>';
+          '<div class="dgroup">'+
+            '<div class="dm-lb">재고 차이 사유</div>'+
+            '<div class="dg-reason'+(hasReason?"":" mut")+'">'+reasonVal+'</div>'+
+            procHtml+
+            (p.reject ? '<div class="dg-reject"><b>반려 사유</b> · '+esc(p.reject)+'</div>' : '')+
+          '</div>'+
+        '</div>'+
+      '</div>';
   }
   // ── 반영상태 필터(Bottom Sheet) — 아코디언 목록 연동 ──
   function openSheet(){ pending={done:applied.done,rej:applied.rej,wait:applied.wait}; renderPending(); backdrop.classList.add("open"); }
