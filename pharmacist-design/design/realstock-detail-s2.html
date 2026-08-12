@@ -154,7 +154,7 @@
   .subc{margin-bottom:calc(20px*var(--k))}
   .subc:last-child{margin-bottom:0}
   .subc-h{display:flex;align-items:center;gap:calc(10px*var(--k));width:100%;border:0;font-family:inherit;text-align:left;cursor:pointer;padding:calc(10px*var(--k)) calc(2px*var(--k));
-    position:sticky;top:0;z-index:3;background:#fff;border-bottom:1px solid var(--g-200)}
+    position:sticky;top:0;z-index:3;background:var(--g-50);border-bottom:1px solid var(--g-200)}
   .subc-h:active{background:var(--g-50)}
   .subc-hl{flex:1;min-width:0}
   .subc-nm{display:flex;align-items:baseline;gap:calc(7px*var(--k))}
@@ -183,8 +183,12 @@
   .gc.wait .gc-h{color:var(--g-600)}
   .gc-lb{font-size:calc(12.5px*var(--k));font-weight:800}
   .gc-cnt{font-size:calc(11.5px*var(--k));font-weight:700;opacity:.75}
-  .irow{display:flex;align-items:center;gap:calc(9px*var(--k));padding:calc(10px*var(--k)) 0;border-bottom:1px solid var(--g-100)}
+  .irow{padding:calc(11px*var(--k)) 0;border-bottom:1px solid var(--g-100)}
   .irow:last-child{border-bottom:0}
+  .ir-top{display:flex;align-items:center;gap:calc(9px*var(--k))}
+  .ir-rsn{display:flex;gap:calc(6px*var(--k));margin-top:calc(6px*var(--k))}
+  .ir-rsn-ic{flex:none;color:var(--g-400);display:inline-flex;margin-top:calc(1px*var(--k))}
+  .ir-rsn-tx{flex:1;min-width:0;font-size:calc(12px*var(--k));color:var(--g-600);line-height:1.45;word-break:break-word}
   .ir-l{flex:1;min-width:0}
   .ir-nm{font-size:calc(13px*var(--k));font-weight:700;color:var(--g-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ir-bc{font-family:ui-monospace,Menlo,monospace;font-size:calc(10px*var(--k));color:var(--g-400);margin-top:calc(1px*var(--k))}
@@ -331,9 +335,9 @@
       : '<span class="ir-from num">'+p.from+'</span><span class="ir-ar">→</span><span class="ir-to num">'+p.to+'</span><span class="ir-u">개</span>';
     var delta = "";
     if(p.from!=null){ var d=p.to-p.from; delta='<span class="ir-d '+(d<0?'down':'up')+' num">'+(d<0?'−'+Math.abs(d):'+'+d)+'</span>'; }
-    var memo = (p.reason&&p.reason!=='-') ? '<span class="ir-memo" title="'+esc(p.reason)+'">'+MEMO_IC+'</span>' : '';
-    return '<div class="irow"><div class="ir-l"><div class="ir-nm">'+esc(p.nm)+'</div><div class="ir-bc">#'+esc(p.bc)+'</div></div>'+
-      '<div class="ir-q">'+qty+delta+'</div>'+memo+'</div>';
+    var reason = (p.reason&&p.reason!=='-') ? '<div class="ir-rsn"><span class="ir-rsn-ic">'+MEMO_IC+'</span><span class="ir-rsn-tx">'+esc(p.reason)+'</span></div>' : '';
+    return '<div class="irow"><div class="ir-top"><div class="ir-l"><div class="ir-nm">'+esc(p.nm)+'</div><div class="ir-bc">#'+esc(p.bc)+'</div></div>'+
+      '<div class="ir-q">'+qty+delta+'</div></div>'+reason+'</div>';
   }
   function grpCard(st, items){
     return '<div class="gc '+st+'"><div class="gc-h">'+STAT_IC[st]+'<span class="gc-lb">'+ST_LABEL[st]+'</span>'+
