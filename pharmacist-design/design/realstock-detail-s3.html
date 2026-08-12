@@ -162,8 +162,8 @@
   .subc-meta{font-size:calc(11.5px*var(--k));color:var(--g-400);font-weight:600;margin-top:calc(4px*var(--k))}
   .subc-meta .sm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
   .subc-meta .mut{color:var(--g-400)}
-  .subc-meta .m-lb{color:var(--g-400);font-weight:600}
-  .subc-meta .m-v{color:var(--g-700);font-weight:700}
+  .subc-meta .m-lb{color:var(--g-400)}
+  .subc-meta .m-v{color:var(--g-700)}
   .subc-sum{flex:none;display:flex;gap:calc(4px*var(--k));flex-wrap:wrap;justify-content:flex-end}
   .sm-chip{font-size:calc(10.5px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(7px*var(--k));border-radius:999px;white-space:nowrap}
   .sm-chip.done{background:#e2f3ee;color:#1d8a76}
@@ -207,8 +207,10 @@
   .gc.done{background:#fff;border-color:#bfe6d5}
   .gc.rej{background:#fff;border-color:#f0c8c1}
   .gc.wait{background:#fff;border-color:var(--g-200)}
-  .gc .irow{display:block;background:transparent;border-radius:0;padding:calc(10px*var(--k)) calc(2px*var(--k));margin-top:0;border-bottom:1px solid var(--g-100)}
+  .gc .irow{display:block;background:transparent;border-radius:0;padding:calc(11px*var(--k)) calc(2px*var(--k));margin-top:0;border-bottom:1px solid var(--g-100)}
   .gc .irow:last-child{border-bottom:0}
+  .gc .ir-q{margin-top:calc(6px*var(--k))}
+  .gc .ir-d{margin-left:auto}
   .ir-top{display:flex;align-items:center;gap:calc(9px*var(--k))}
   .ir-rsn{display:flex;gap:calc(6px*var(--k));margin-top:calc(6px*var(--k))}
   .ir-rsn-ic{flex:none;color:var(--g-400);display:inline-flex;margin-top:calc(1px*var(--k))}
@@ -355,12 +357,14 @@
     var delta = "";
     if(p.from!=null){ var d=p.to-p.from; delta='<span class="ir-d '+(d<0?'down':'up')+' num">'+(d<0?'−'+Math.abs(d):'+'+d)+'</span>'; }
     var reason = (p.reason&&p.reason!=='-') ? '<div class="ir-rsn"><span class="ir-rsn-ic">'+MEMO_IC+'</span><span class="ir-rsn-tx">'+esc(p.reason)+'</span></div>' : '';
-    return '<div class="irow"><div class="ir-top"><div class="ir-l"><div class="ir-nm">'+esc(p.nm)+'</div><div class="ir-bc">#'+esc(p.bc)+'</div></div>'+
-      '<div class="ir-q">'+qty+delta+'</div></div>'+reason+'</div>';
+    return '<div class="irow">'+
+      '<div class="ir-nm">'+esc(p.nm)+'</div><div class="ir-bc">#'+esc(p.bc)+'</div>'+
+      '<div class="ir-q">'+qty+delta+'</div>'+
+      reason+'</div>';
   }
   function grpCard(st, items){
-    return '<div class="gc '+st+'" data-open="1"><button type="button" class="gc-h">'+STAT_IC[st]+'<span class="gc-lb">'+ST_LABEL[st]+'</span>'+
-      '<span class="gc-cnt">'+items.length+'건</span><span class="gc-chev">'+CHEV_DOWN+'</span></button>'+
+    return '<div class="gc '+st+'"><div class="gc-h">'+STAT_IC[st]+'<span class="gc-lb">'+ST_LABEL[st]+'</span>'+
+      '<span class="gc-cnt">'+items.length+'건</span></div>'+
       '<div class="gc-b">'+items.map(itemRow).join('')+'</div></div>';
   }
   function summaryChips(sub){
@@ -397,12 +401,6 @@
       b.addEventListener('click',function(){
         var i=+b.getAttribute('data-i'); OPEN[i]=!OPEN[i];
         var c=b.parentNode; c.classList.toggle('open',OPEN[i]); c.querySelector('.subc-b').hidden=!OPEN[i];
-      });
-    });
-    host.querySelectorAll('.gc-h').forEach(function(b){
-      b.addEventListener('click',function(){
-        var g=b.parentNode, open=g.getAttribute('data-open')==='1';
-        g.setAttribute('data-open',open?'0':'1'); g.querySelector('.gc-b').hidden=open;
       });
     });
     document.getElementById("fcnt").textContent=total;
