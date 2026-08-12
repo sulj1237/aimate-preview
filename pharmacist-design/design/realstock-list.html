@@ -21,7 +21,7 @@
     display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--g-300);color:var(--g-600)}
   .si-btn svg{width:14px;height:14px}
   .si-btn:active{background:var(--g-50)}
-  /* 재고 차이 사유 — 라벨+값 한 줄(초과 시 말줄임). 없으면 줄 자체를 표시하지 않음 */
+  /* 재고 보정 사유 — 라벨+값 한 줄(초과 시 말줄임). 없으면 줄 자체를 표시하지 않음 */
   .si-rs{margin-top:7px;font-size:12.5px;line-height:1.45;display:flex;gap:7px;align-items:baseline;min-width:0}
   .si-rs .lb{flex-shrink:0;font-weight:600;color:var(--g-500)}
   .si-rs .vv{color:var(--g-700);font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -89,7 +89,7 @@
     document.getElementById('list').innerHTML = ITEMS.map(function(it){
       return '<div class="sitem">'+
         '<div class="si-top"><div class="si-nm">'+it.nm+'</div><span class="si-qy num">'+it.qy+'<small>개</small></span></div>'+
-        (it.rs ? '<div class="si-rs"><span class="lb">재고 차이 사유</span><span class="vv" title="'+it.rs+'">'+it.rs+'</span></div>' : '')+
+        (it.rs ? '<div class="si-rs"><span class="lb">재고 보정 사유</span><span class="vv" title="'+it.rs+'">'+it.rs+'</span></div>' : '')+
         '<div class="si-sub"><span class="si-bc">'+it.bc+'</span>'+
         '<span class="si-acts">'+
         '<button class="si-btn" onclick="location.href=\'realstock-input.html?rs=\'+encodeURIComponent(it.rs||\'\')">'+EDIT+'편집</button>'+

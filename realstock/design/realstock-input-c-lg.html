@@ -9,7 +9,7 @@
 <style>
   /* ── 시안 C · 계산기 느낌(시안2) + 정보 집중(시안3) 결합 ──
      정보 밀도↓·여백↑·숫자 우선. 상단 상품정보는 세로로 여유있게, 입력은 진열/창고 2카드,
-     총 수량은 보조 표시, 재고 차이 사유는 총 수량 아래 한 줄. Apple/Samsung Health·Square 지향. */
+     총 수량은 보조 표시, 재고 보정 사유는 총 수량 아래 한 줄. Apple/Samsung Health·Square 지향. */
 
   /* 1) 상단 상품 정보 — 한 줄 압축 X, 세로로 충분한 여백 */
   .pinfo{padding:14px 2px 4px}
@@ -39,7 +39,7 @@
   .cell .cv small{font-size:15px;font-weight:600;color:var(--g-400);margin-left:2px}
   .cell .cv .ph{color:var(--g-300)}
 
-  /* 3) 재고 차이 사유 — 화면(스크롤)에 위치. 총≠앱 조회 재고일 때 노출. 카드 + N/30 */
+  /* 3) 재고 보정 사유 — 화면(스크롤)에 위치. 총≠앱 조회 재고일 때 노출. 카드 + N/30 */
   .rsbox{margin-top:16px;background:#fff;border:1px solid var(--g-200);border-radius:14px;padding:12px 16px;display:none}
   .rsbox.show{display:block}
   .rsbox .rl{font-size:12.5px;font-weight:600;color:var(--g-700)}
@@ -68,7 +68,7 @@
 <link href="ds-large.css" rel="stylesheet" />
 <style>
   /* ── 큰 글씨 최대(200%) — 시안 C 전용 ──
-     상품 정보·재고 차이 사유는 스크롤, 입력 카드·총 수량·키패드·CTA는 하단 고정(레이아웃 유지). */
+     상품 정보·재고 보정 사유는 스크롤, 입력 카드·총 수량·키패드·CTA는 하단 고정(레이아웃 유지). */
   .appbar{min-height:80px}
   .appbar h1{font-size:32px}
   .ico-btn{width:56px;height:56px}
@@ -80,7 +80,7 @@
   .fact .fv{font-size:27px}
   .fact .fv small{font-size:18px}
   .fact.time .fv{font-size:22px}
-  /* 재고 차이 사유(스크롤) */
+  /* 재고 보정 사유(스크롤) */
   .rsbox{margin-top:18px;padding:14px 16px}
   .rsbox .rl{font-size:17px}
   .rsbox .rin{height:52px;font-size:19px}
@@ -116,7 +116,7 @@
       <h1>실재고 입력</h1>
     </div>
 
-    <!-- [큰글씨] 상품 정보 + 재고 차이 사유 — 스크롤 -->
+    <!-- [큰글씨] 상품 정보 + 재고 보정 사유 — 스크롤 -->
     <div class="scroll pad" style="flex:1">
       <div class="pinfo">
         <span class="bc-chip">8801234567890</span>
@@ -127,9 +127,9 @@
         </div>
       </div>
 
-      <!-- 3) 재고 차이 사유 — 화면(스크롤)에 위치, 총≠앱 조회 재고일 때 노출 -->
+      <!-- 3) 재고 보정 사유 — 화면(스크롤)에 위치, 총≠앱 조회 재고일 때 노출 -->
       <div class="rsbox" id="rsrow">
-        <label class="rl" for="rsInp">재고 차이 사유<span class="opt">선택</span></label>
+        <label class="rl" for="rsInp">재고 보정 사유<span class="opt">선택</span></label>
         <input class="rin" id="rsInp" type="text" maxlength="30" placeholder="앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요." />
         <div class="rcount"><span id="rcnt">0</span>/30</div>
       </div>
@@ -166,7 +166,7 @@
     document.getElementById('v-tot').textContent = tot;
     document.getElementById('c-disp').classList.toggle('on', active==='disp');
     document.getElementById('c-wh').classList.toggle('on', active==='wh');
-    // 재고 차이 사유: 총≠앱 조회 시점 재고일 때만 노출(총 수량 아래 한 줄)
+    // 재고 보정 사유: 총≠앱 조회 시점 재고일 때만 노출(총 수량 아래 한 줄)
     document.getElementById('rsrow').classList.toggle('show', tot!==BASE && (inv.disp!==""||inv.wh!==""));
   }
   function pick(f){ active=f; reasonInp.blur(); setKeypad(true); render(); }

@@ -87,7 +87,7 @@
     document.getElementById('list').innerHTML = ITEMS.map(function(it){
       return '<div class="sitem">'+
         '<div class="si-top"><div class="si-nm">'+it.nm+'</div><span class="si-qy num">'+it.qy+'<small>개</small></span></div>'+
-        (it.rs ? '<div class="si-rs"><span class="lb">재고 차이 사유</span><span class="vv" title="'+it.rs+'">'+it.rs+'</span></div>' : '')+
+        (it.rs ? '<div class="si-rs"><span class="lb">재고 보정 사유</span><span class="vv" title="'+it.rs+'">'+it.rs+'</span></div>' : '')+
         '<div class="si-sub"><span class="si-bc">'+it.bc+'</span>'+
         '<span class="si-acts">'+
         '<button class="si-btn" onclick="location.href=\'realstock-input.html?rs=\'+encodeURIComponent(it.rs||\'\')">'+EDIT+'편집</button>'+

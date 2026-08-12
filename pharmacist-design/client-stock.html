@@ -96,7 +96,7 @@
   .failrow td{background:#fef7f5}
   .failreason{margin-top:3px;font-size:10.5px;color:var(--red);white-space:normal;max-width:200px}
   .dim{color:#b3b8bd}
-  /* 재고 차이 사유 — 앱 제출 시 입력값(선택, 최대 30자). 미입력은 '-'. 안쪽 .rs-clamp에서 2줄 clamp */
+  /* 재고 보정 사유 — 앱 제출 시 입력값(선택, 최대 30자). 미입력은 '-'. 안쪽 .rs-clamp에서 2줄 clamp */
   .rs-cell{width:210px;vertical-align:middle}
   .rs-clamp{color:#5a6066;line-height:1.4;white-space:normal;word-break:break-word;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -157,7 +157,7 @@
           <th class="c" style="width:34px"></th>
           <th>상품명</th><th>바코드</th>
           <th class="num">전산</th><th class="num">창고</th><th class="num">진열</th><th class="num">총 수량</th><th class="num">차이</th>
-          <th>입력자</th><th>재고 차이 사유</th><th>입력일시</th>
+          <th>입력자</th><th>재고 보정 사유</th><th>입력일시</th>
         </tr></thead>
         <tbody id="mainBody"></tbody>
       </table>
@@ -223,7 +223,7 @@
           <thead><tr>
             <th>처리일시</th><th>상품명</th><th>바코드</th>
             <th class="num">전산</th><th class="num">창고</th><th class="num">진열</th><th class="num">총 수량</th><th class="num">차이</th>
-            <th>입력자</th><th>재고 차이 사유</th><th class="c">처리결과</th><th>처리자</th>
+            <th>입력자</th><th>재고 보정 사유</th><th class="c">처리결과</th><th>처리자</th>
           </tr></thead>
           <tbody id="recBody"></tbody>
         </table>
@@ -264,7 +264,7 @@
 
   var $=function(id){return document.getElementById(id)};
   function n2(v){return (v===null||v===undefined)?'<span class="dim">-</span>':v}
-  function rsn(v){return (v&&(''+v).trim())?v:'<span class="dim">-</span>';}   // 재고 차이 사유 미입력은 '-'
+  function rsn(v){return (v&&(''+v).trim())?v:'<span class="dim">-</span>';}   // 재고 보정 사유 미입력은 '-'
   function fmtNow(){var d=new Date();function p(n){return(n<10?'0':'')+n}
     return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
   function diffHtml(t,b){var d=t-b;return '<span class="diff-'+(d>0?'pos':d<0?'neg':'zero')+'">'+(d>0?'+':'')+d+'</span>'}

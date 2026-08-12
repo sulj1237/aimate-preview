@@ -562,7 +562,7 @@
                 <div class="hot cell act" data-n="2"><span class="num">2</span><div class="cl">진열 수량</div><div class="cv">10</div></div>
                 <div class="hot cell" data-n="3"><span class="num">3</span><div class="cl">창고 수량</div><div class="cv">14</div></div>
               </div>
-              <div class="hot" data-n="4" style="margin-top:10px"><span class="num">4</span><div style="font-size:9.5px;font-weight:800;color:var(--ink);margin-bottom:3px">재고 차이 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx" style="height:26px;font-size:9.5px;color:#3a424c;justify-content:flex-start">정기 실사 중 진열·창고 차이 확인</div><div style="text-align:right;font-size:8px;color:var(--faint);margin-top:2px">19/30</div></div>
+              <div class="hot" data-n="4" style="margin-top:10px"><span class="num">4</span><div style="font-size:9.5px;font-weight:800;color:var(--ink);margin-bottom:3px">재고 보정 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx" style="height:26px;font-size:9.5px;color:#3a424c;justify-content:flex-start">정기 실사 중 진열·창고 차이 확인</div><div style="text-align:right;font-size:8px;color:var(--faint);margin-top:2px">19/30</div></div>
             </div>
             <div class="ph-foot" style="padding:11px 13px;border-top:1px solid var(--line);background:#fafbfc">
               <div class="hot totbox" data-n="5" style="margin:0 0 8px"><span class="num">5</span><span class="tl">총 수량 <span class="autob">자동</span></span><span class="tv">24 <span style="font-size:10px;font-weight:700">개</span></span></div>
@@ -578,7 +578,7 @@
           <li data-n="1"><span class="di">1</span><span class="dt"><b>상품 식별 헤더</b> — 바코드는 앱바(제목 옆). 본문에 <b>상품명·앱 조회 시점 재고</b>(읽기 전용) + <b>앱 동기화 시각</b> 캡션.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>진열 수량 셀</b> — 탭 시 활성(강조). 미입력 `입력` 표시.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>창고 수량 셀</b> — 탭 시 활성.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 차이 사유(선택)</b> — <b>수량(진열/창고) 입력 후 총 수량 ≠ 앱 조회 시점 재고</b>일 때만 노출. 1줄·30자(N/30). placeholder `앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.` 입력값은 제출 목록·제출 상세·클라이언트 실재고 관리에도 함께 노출.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 보정 사유(선택)</b> — <b>수량(진열/창고) 입력 후 총 수량 ≠ 앱 조회 시점 재고</b>일 때만 노출. 1줄·30자(N/30). placeholder `앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.` 입력값은 제출 목록·제출 상세·클라이언트 실재고 관리에도 함께 노출.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b>총 수량(자동 · 읽기 전용)</b> — <b>키패드 위</b>에 상시 표시. `총 수량 = 진열 + 창고`. 직접 입력 없음.</span></li>
           <li data-n="6"><span class="di">6</span><span class="dt"><b>숫자 키패드(상시 노출)</b> — 1~9 · `00` · `0` · `⌫`. 탭 없이 바로 입력.</span></li>
           <li data-n="7"><span class="di">7</span><span class="dt"><b>목록에 담기</b> — 진열·창고 중 하나라도 값 있어야 활성 → APP-02-003.</span></li>
@@ -589,13 +589,13 @@
         <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
           <tr><td><span class="cb info">최초 진입</span></td><td>APP-02-001 인식</td><td>진열·창고 `입력` · 총 수량 `0` · 담기 <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
           <tr><td><span class="cb ok">진열/창고 입력</span></td><td>셀 값 입력</td><td>총 수량(키패드 위) 실시간 합산 · 담기 활성</td><td class="nx">—</td></tr>
-          <tr><td><span class="cb info">재고 차이 사유 노출</span></td><td>수량 입력 시 총 수량 ≠ 앱 조회 시점 재고</td><td>사유 입력란 노출(선택·30자)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb info">재고 보정 사유 노출</span></td><td>수량 입력 시 총 수량 ≠ 앱 조회 시점 재고</td><td>사유 입력란 노출(선택·30자)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb ok">목록 담기</span></td><td>담기 클릭</td><td>제출 목록에 추가</td><td class="nx">APP-02-003</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
           <div class="mini"><div class="mh"><span class="cb info">최초 진입</span></div><div class="mb" style="align-items:stretch"><div class="cells" style="margin:0"><div class="cell"><div class="cl">진열</div><div class="cv" style="color:var(--muted)">입력</div></div><div class="cell"><div class="cl">창고</div><div class="cv" style="color:var(--muted)">입력</div></div></div><div style="font-size:9.5px;color:var(--faint)">총 수량 <b>0</b> · 담기 <span class="cb dis">Disabled</span></div></div></div>
           <div class="mini"><div class="mh"><span class="cb ok">진열/창고 입력</span></div><div class="mb" style="align-items:stretch"><div class="cells" style="margin:0"><div class="cell act"><div class="cl">진열</div><div class="cv">10</div></div><div class="cell"><div class="cl">창고</div><div class="cv">14</div></div></div><div style="font-size:9.5px">총 수량(키패드 위) <b>24</b> 자동 합산 · 담기 활성</div></div></div>
-          <div class="mini"><div class="mh"><span class="cb info">재고 차이 사유 노출</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;font-weight:800">재고 차이 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx sel" style="height:24px;font-size:8.5px;justify-content:flex-start">앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.</div><div style="font-size:9px;color:var(--faint)">총 수량 ≠ 앱 조회 시점 재고일 때만 노출</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">재고 보정 사유 노출</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;font-weight:800">재고 보정 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx sel" style="height:24px;font-size:8.5px;justify-content:flex-start">앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.</div><div style="font-size:9px;color:var(--faint)">총 수량 ≠ 앱 조회 시점 재고일 때만 노출</div></div></div>
         </div>
       </div>
       <div class="flow"><span class="fh">흐름</span><code>APP-02-001</code><span class="ar">→</span><code>APP-02-002</code><span class="ar">→</span><code>APP-02-003</code></div>
@@ -613,7 +613,7 @@
                   <div class="hot" data-n="1"><span class="num">1</span>
                     <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
                       <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</div><span style="font-weight:800;white-space:nowrap"><b>24</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
-                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 차이 사유</b> 정기 실사 중 차이 확인</div>
+                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 보정 사유</b> 정기 실사 중 차이 확인</div>
                       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8801234567890</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
                     </div>
                     <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
@@ -622,7 +622,7 @@
                     </div>
                     <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px">
                       <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">겔포스엠현탁액</div><span style="font-weight:800;white-space:nowrap"><b>40</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
-                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 차이 사유</b> 파손 2개 폐기 처리</div>
+                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 보정 사유</b> 파손 2개 폐기 처리</div>
                       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8803333000044</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
                     </div>
                   </div>
@@ -640,7 +640,7 @@
         </div>
         <ol class="desc">
           <div class="dh">APP-02-003 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 차이 사유(있을 때)·바코드. 건별 `편집`/`삭제`. <b>`편집` → APP-02-002(실재고 입력)로 이동</b>해 해당 건의 진열·창고 수량을 다시 입력·수정한다. <b>`삭제` → `제출 상품 삭제` 확인 모달</b>(`해당 항목을 삭제하시겠습니까?` · 취소/삭제).</span></li>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 보정 사유(있을 때)·바코드. 건별 `편집`/`삭제`. <b>`편집` → APP-02-002(실재고 입력)로 이동</b>해 해당 건의 진열·창고 수량을 다시 입력·수정한다. <b>`삭제` → `제출 상품 삭제` 확인 모달</b>(`해당 항목을 삭제하시겠습니까?` · 취소/삭제).</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>제출하기 (N건)</b> — Confirm 후 제출 → APP-02-004. 0건이면 <b>Disabled</b>.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>상품 더 추가</b> — APP-02-001 스캔 복귀.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>Empty</b> — 담은 건 없음 안내.</span></li>
@@ -772,7 +772,7 @@
                       <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)">
                         <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafbfc">
                           <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이</span><span style="flex:1">+8개</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이 사유</span><span style="flex:1;color:var(--faint)">-</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 보정 사유</span><span style="flex:1;color:var(--faint)">-</span></div>
                           <div style="display:flex;gap:8px;padding:7px 10px;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">처리</span><span style="flex:1">10:31 · 정약사</span></div>
                         </div>
                       </div>
@@ -785,7 +785,7 @@
                       <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)">
                         <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafbfc">
                           <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이</span><span style="flex:1">+2개</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이 사유</span><span style="flex:1">입고 검수 중 수량 오차 발견</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 보정 사유</span><span style="flex:1">입고 검수 중 수량 오차 발견</span></div>
                           <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">처리</span><span style="flex:1">10:35 · 정약사</span></div>
                           <div style="display:flex;gap:8px;padding:7px 10px;font-size:9.5px"><span style="flex:none;width:64px;color:var(--danger);font-weight:700">반려 사유</span><span style="flex:1;color:var(--danger)">근거 자료 부족 — 재실사 후 재제출 요청</span></div>
                         </div>
@@ -808,8 +808,8 @@
           <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — 메인은 `제출 상세` + 제출일자(제목 옆). 기기 카드 클릭 시 <b>제목이 제출자(`김약사 SM-S911`)로 바뀌고</b> 뒤로가기는 메인 복귀. 상단 별도 기기 헤더 없음.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>전체 건수 + 반영상태 필터</b> — 좌측 `전체 N건`(필터 적용 시 `선택 N건`) · 우측 <b>`▽ 반영상태` 버튼</b> → Bottom Sheet(다중선택 체크박스: 전체·반영완료·반영반려·반영전). 필터는 <b>기기 요약·기기 상세 양쪽에 연동</b>(선택 상태 없는 기기는 메인에서 숨김).</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>기기별 요약 카드(카드 전체 클릭)</b> — 1행 `사용자 · 기기ID(SM-S911)`, 2행 `마지막 제출 HH:MM · 완료 D · 반려 R · 반영전 W`, 우측 `N건 ›`. 클릭 → 해당 기기 상세.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>상품 카드(개별 카드·아코디언)</b> — 바코드(#)·상품명(2줄)·부제 + <b>수량 `48 → 24개`(결과 강조) + 증감 배지</b>(감소 <span style="color:#e5484d;font-weight:800">−N</span>·red / 증가 <span style="color:#1d8a76;font-weight:800">+N</span>·green) + 상태 배지(반영완료/반영반려/반영전). 구분선 아래 <b>메타 프리뷰 라인</b> `HH:MM | 제출자 → 처리자 | 재고 차이 사유(말줄임) ˅`. 반영전은 `제출 N개`·증감 배지 없음.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b>자세히(펼침)</b> — <b>[재고 차이 · 재고 차이 사유 · 처리]</b> 묶음 카드. 처리는 <b>PC id 제거</b>(`10:31 · 정약사`). 반영반려는 <b>반려 사유</b> 행 추가. 반영전은 처리 `반영 전이라 처리 전`.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>상품 카드(개별 카드·아코디언)</b> — 바코드(#)·상품명(2줄)·부제 + <b>수량 `48 → 24개`(결과 강조) + 증감 배지</b>(감소 <span style="color:#e5484d;font-weight:800">−N</span>·red / 증가 <span style="color:#1d8a76;font-weight:800">+N</span>·green) + 상태 배지(반영완료/반영반려/반영전). 구분선 아래 <b>메타 프리뷰 라인</b> `HH:MM | 제출자 → 처리자 | 재고 보정 사유(말줄임) ˅`. 반영전은 `제출 N개`·증감 배지 없음.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>자세히(펼침)</b> — <b>[재고 차이 · 재고 보정 사유 · 처리]</b> 묶음 카드. 처리는 <b>PC id 제거</b>(`10:31 · 정약사`). 반영반려는 <b>반려 사유</b> 행 추가. 반영전은 처리 `반영 전이라 처리 전`.</span></li>
         </ol>
       </div>
       <div class="cases">
@@ -1071,7 +1071,7 @@
                 <span class="inp w" style="max-width:280px">검색어를 입력해주세요</span>
                 <span><span class="hot" data-n="6" style="display:inline-block"><span class="num">6</span><span class="bn g">변경 내용 보기</span></span> <span style="font-size:10px;color:var(--faint)">선택 1건</span> <span class="hot" data-n="5" style="display:inline-block"><span class="num">5</span><span class="bn">반영</span></span></span>
               </div>
-              <div class="tscroll"><table class="m" style="margin-top:4px"><thead><tr><th style="width:22px"></th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 차이 사유</th><th>입력일시</th></tr></thead>
+              <div class="tscroll"><table class="m" style="margin-top:4px"><thead><tr><th style="width:22px"></th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 보정 사유</th><th>입력일시</th></tr></thead>
               <tbody>
                 <tr class="hot" data-n="2" style="display:table-row"><td colspan="2"><span class="num" style="left:2px">2</span>▾ 판콜에이 30ml <span class="badge nb">제출 2건</span></td><td>8806789012345</td><td colspan="8" style="color:var(--faint);font-size:10px">기본: 최신 제출 선택 · 묶음 내 1건만</td></tr>
                 <tr><td style="text-align:center">☑</td><td>└ 제출 (김약사)</td><td>8806789012345</td><td class="num-c">52</td><td class="num-c">60</td><td class="num-c">0</td><td class="num-c">60</td><td class="num-c hot" data-n="3" style="position:relative"><span class="num" style="top:-8px;left:-6px">3</span><span class="diff-pos">+8</span></td><td class="hot" data-n="4" style="position:relative"><span class="num" style="top:-8px;left:-6px">4</span>김약사(A21)</td><td>정기 실사 중 차이 확인</td><td>07-02 10:31</td></tr>
@@ -1087,7 +1087,7 @@
           <li data-n="2"><span class="di">2</span><span class="dt"><b>동일 바코드 그룹핑</b> — `제출 N건`·펼치기·`└ 제출 (입력자)`. <b>최신 제출 상단</b>·기본 체크·묶음 내 1건만.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>차이</b> — 총 수량 − 전산(`+`파랑/`−`빨강/`0`회색). 미입력 `-` vs 입력값 `0` 구분.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>입력자</b> — `이름(단말ID)`.</span></li>
-          <li><span class="di">＋</span><span class="dt"><b>재고 차이 사유</b> — 앱 실재고 입력 시 함께 제출된 사유. 미입력 시 `-`.</span></li>
+          <li><span class="di">＋</span><span class="dt"><b>재고 보정 사유</b> — 앱 실재고 입력 시 함께 제출된 사유. 미입력 시 `-`.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b>반영(덮어쓰기)</b> — 선택 0이면 <b>Disabled</b>. 클릭 → CNT-02-002.</span></li>
           <li data-n="6"><span class="di">6</span><span class="dt"><b>변경 내용 보기</b> — 반영 기록 CNT-02-004.</span></li>
         </ol>
@@ -1161,7 +1161,7 @@
               <div class="hot srow" data-n="1"><span class="num">1</span><span class="inp">2026-06-03</span><span>~</span><span class="inp">2026-07-03</span><span class="bn" style="height:22px">1개월</span><span class="bn g" style="height:22px">3개월</span><span class="bn g" style="height:22px">6개월</span><span class="bn g" style="height:22px">전체</span></div>
               <div class="hot srow" data-n="2"><span class="num">2</span><span class="inp">상품명 ▾</span><span class="inp w" style="max-width:200px">검색어를 입력해주세요</span><span class="inp">처리결과 전체 ▾</span><span style="font-size:10px;color:var(--faint)">조회 3건</span></div>
               <div class="hot" data-n="3"><span class="num">3</span><div class="tscroll">
-                <table class="m"><thead><tr><th>처리일시</th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 차이 사유</th><th>처리결과</th><th>처리자</th></tr></thead>
+                <table class="m"><thead><tr><th>처리일시</th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 보정 사유</th><th>처리결과</th><th>처리자</th></tr></thead>
                 <tbody>
                   <tr><td>07-02 10:32</td><td>타이레놀 500mg</td><td>8801234567890</td><td class="num-c">48</td><td class="num-c">14</td><td class="num-c">10</td><td class="num-c">24</td><td class="num-c"><span class="diff-neg">−24</span></td><td>김약사(A21)</td><td>파손 2개 폐기 처리</td><td><span class="stt ok">반영완료</span></td><td>정OO</td></tr>
                   <tr><td>07-02 10:33</td><td>겔포스엠</td><td>8803333000044</td><td class="num-c">38</td><td class="num-c">0</td><td class="num-c">40</td><td class="num-c">40</td><td class="num-c"><span class="diff-pos">+2</span></td><td>이약사(B07)</td><td>입고 검수 중 수량 오차</td><td><span class="stt rej">반영반려</span></td><td>정OO</td></tr>
@@ -1176,7 +1176,7 @@
           <div class="dh">CNT-02-004 · 컴포넌트</div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>기간 필터</b> — 데이터피커 + 빠른 버튼 `1개월`(기본)/3/6개월/전체.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>검색 · 처리결과 필터</b> — 상품명/바코드 + `처리결과 전체/반영완료/반영실패/반영반려`.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>반영 기록 테이블</b> — 처리일시·상품명·바코드·전산·창고·진열·총 수량·차이·입력자·재고 차이 사유·처리결과·처리자(제출 시점 스냅샷). 재고 차이 사유 미입력 시 `-`. <span class="tbu">TBU</span> 반영실패 사유 노출 여부.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>반영 기록 테이블</b> — 처리일시·상품명·바코드·전산·창고·진열·총 수량·차이·입력자·재고 보정 사유·처리결과·처리자(제출 시점 스냅샷). 재고 보정 사유 미입력 시 `-`. <span class="tbu">TBU</span> 반영실패 사유 노출 여부.</span></li>
         </ol>
       </div>
       <div class="cases">

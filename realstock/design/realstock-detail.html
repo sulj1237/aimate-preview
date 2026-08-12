@@ -91,27 +91,17 @@
   .delta.down{background:#fbe3e0;color:#e5484d}
   .delta.up{background:#e2f3ee;color:#1d8a76}
 
-  /* 제출자 메타(제출자명·제출일시) + 재고 입력 사유(선택·자세히보기) */
+  /* 제출자 메타(제출자명·제출일시) + 재고 보정 사유(선택·자세히보기) */
   .drow-foot{margin-top:calc(13px*var(--k));padding-top:calc(12px*var(--k));border-top:1px solid var(--g-150,#eceef1)}
   .pmeta{font-size:calc(12.5px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
   .pmeta .pm-lb{font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);margin-right:calc(8px*var(--k))}
   .pmeta .pm-name{color:var(--g-900);font-weight:700}
   .pmeta .pm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
 
-  /* 재고 입력 사유(선택값) — 일부 노출 + 자세히보기(펼침) */
-  .rsn{margin-top:calc(10px*var(--k))}
-  .rsn>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:calc(7px*var(--k))}
-  .rsn>summary::-webkit-details-marker{display:none}
-  .rsn-lb{flex:none;font-size:calc(11.5px*var(--k));font-weight:700;color:var(--g-500);letter-spacing:var(--tracking)}
-  .rsn-prev{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    font-size:calc(12.5px*var(--k));color:var(--g-700)}
-  .rsn-more{flex:none;display:inline-flex;align-items:center;gap:calc(3px*var(--k));
-    font-size:calc(11.5px*var(--k));font-weight:600;color:var(--g-500)}
-  .rsn-chev{display:inline-flex;transition:transform .2s ease}
-  .rsn[open] .rsn-chev{transform:rotate(180deg)}
-  .rsn[open] .rsn-prev{display:none}
-  .rsn[open] .rsn-more .rsn-txt{display:none}
-  .rsn-full{margin-top:calc(9px*var(--k));font-size:calc(13px*var(--k));color:var(--g-800);line-height:1.55;word-break:break-word}
+  /* 재고 보정 사유(선택값) — 메모 아이콘 + 내용 바로 노출(자세히보기 없음) */
+  .rsn{display:flex;gap:calc(7px*var(--k));margin-top:calc(9px*var(--k))}
+  .rsn-ic{flex:none;color:var(--g-400);margin-top:calc(1px*var(--k))}
+  .rsn-full{flex:1;min-width:0;font-size:calc(12.5px*var(--k));color:var(--g-700);line-height:1.5;word-break:break-word}
   /* 반영전·반영반려 수량 = 전산(앱 기준) 재고 · 제출 ('반영 후' 없음) */
   .dqty2{display:flex;align-items:baseline;gap:calc(9px*var(--k));margin-top:calc(10px*var(--k));flex-wrap:wrap}
   .q-sys{font-size:calc(13px*var(--k));color:var(--g-500);font-weight:600}
@@ -263,6 +253,7 @@
   function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   var CHEV_DOWN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  var MEMO_IC = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h12l4 4V20H4z"/><line x1="8" y1="10" x2="15" y2="10"/><line x1="8" y1="14" x2="15" y2="14"/><line x1="8" y1="17.5" x2="12" y2="17.5"/></svg>';
   var CHEV_RIGHT = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
   var CHEV_UP = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
 
@@ -330,15 +321,10 @@
     var meta = '<div class="pmeta"><span class="pm-lb">처리자</span>'+
                '<span class="pm-name">'+esc(user)+'</span>'+
                '<span class="pm-sep">·</span>'+esc((dateShort+" "+(p.t||"")).trim())+'</div>';
-    // 재고 입력 사유 = 선택값 → 있을 때만 일부 노출 + 자세히보기(펼침)
+    // 재고 보정 사유 = 선택값 → 있을 때만 메모 아이콘 + 내용 바로 노출(자세히보기 없음)
     var reason = hasReason
-      ? '<details class="rsn"><summary>'+
-          '<span class="rsn-lb">재고 입력 사유</span>'+
-          '<span class="rsn-prev">'+esc(p.reason)+'</span>'+
-          '<span class="rsn-more"><span class="rsn-txt">자세히보기</span><span class="rsn-chev">'+CHEV_DOWN+'</span></span>'+
-        '</summary>'+
-        '<div class="rsn-full">'+esc(p.reason)+'</div>'+
-        '</details>'
+      ? '<div class="rsn" title="재고 보정 사유"><span class="rsn-ic">'+MEMO_IC+'</span>'+
+        '<span class="rsn-full">'+esc(p.reason)+'</span></div>'
       : '';
     return '<div class="drow" data-status="'+p.status+'">'+
         '<div class="drow-top"><div class="dtitle"><span class="dbc">#'+esc(p.bc)+'</span><div class="dnm">'+esc(p.nm)+'</div></div>'+

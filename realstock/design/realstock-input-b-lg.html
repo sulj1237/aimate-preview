@@ -45,7 +45,7 @@
   .totbar .tv{margin-left:auto;font-size:26px;font-weight:800;color:var(--brand-700);letter-spacing:var(--tracking-title);line-height:1}
   .totbar .tv small{font-size:14px;font-weight:700;color:var(--brand-500);margin-left:2px}
 
-  /* 재고 차이 사유 — Bottom Sheet 트리거(총≠전산 일 때만·공간 최소) */
+  /* 재고 보정 사유 — Bottom Sheet 트리거(총≠전산 일 때만·공간 최소) */
   .rsbtn{width:100%;height:42px;margin-bottom:10px;border:1px dashed var(--g-300);border-radius:11px;background:#fff;
     font-family:inherit;font-size:13.5px;font-weight:600;color:var(--g-600);cursor:pointer;align-items:center;justify-content:center;gap:6px;display:none;padding:0 14px}
   .rsbtn.show{display:flex}
@@ -152,8 +152,8 @@
         <span class="tv num"><span id="v-tot">0</span><small>개</small></span>
       </div>
 
-      <!-- 재고 차이 사유 — Bottom Sheet 트리거(총≠전산 일 때만) -->
-      <button class="rsbtn" id="rsbtn" onclick="openSheet()"><span class="rtxt" id="rsbtnTxt">재고 차이 사유 남기기</span><span class="rplus" id="rsbtnPlus">＋</span></button>
+      <!-- 재고 보정 사유 — Bottom Sheet 트리거(총≠전산 일 때만) -->
+      <button class="rsbtn" id="rsbtn" onclick="openSheet()"><span class="rtxt" id="rsbtnTxt">재고 보정 사유 남기기</span><span class="rplus" id="rsbtnPlus">＋</span></button>
 
       <div class="keypad" id="keypad"></div>
       <button class="kp-confirm" onclick="location.href='realstock-list.html'">목록에 담기</button>
@@ -162,7 +162,7 @@
     <!-- Bottom Sheet -->
     <div class="scrim" id="scrim">
       <div class="sheet">
-        <h4>재고 차이 사유 <span style="font-size:12px;font-weight:500;color:var(--g-400)">선택</span></h4>
+        <h4>재고 보정 사유 <span style="font-size:12px;font-weight:500;color:var(--g-400)">선택</span></h4>
         <p>앱 조회 시점 재고와 실물 수량이 다를 때, 그 사유를 남겨 주세요.</p>
         <input class="rin" id="rsInp" type="text" maxlength="30" placeholder="예: 정기 실사 중 차이 확인, 실물 기준 정정" oninput="document.getElementById('rc').textContent=this.value.length" />
         <div class="rcount"><span id="rc">0</span>/30</div>
@@ -198,7 +198,7 @@
     const btn=document.getElementById('rsbtn');
     btn.classList.toggle('show', diff);
     btn.classList.toggle('filled', !!reason);
-    document.getElementById('rsbtnTxt').textContent = reason ? ('재고 차이 사유 · '+reason) : '재고 차이 사유 남기기';
+    document.getElementById('rsbtnTxt').textContent = reason ? ('재고 보정 사유 · '+reason) : '재고 보정 사유 남기기';
     document.getElementById('rsbtnPlus').textContent = reason ? '✎' : '＋';
   }
   function pick(f){ active=f; render(); }

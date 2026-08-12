@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AI mate 영양소 상담 추천 · 화면설계서(스토리보드)</title>
+<title>굿팜 약사님용앱 상품 등록·수정 및 실재고 입력 · 화면설계서(스토리보드)</title>
 <style>
   :root{
     --teal:#16b8a3; --teal-d:#0e9e8c; --teal-soft:#e6f7f4; --teal-line:#bfe8e1;
     --ink:#28303a; --muted:#7b8794; --faint:#9aa4af; --line:#e6e9ee; --bg:#f1f3f6;
-    --amber:#c98a12; --blue:#2a6fc0; --danger:#d8453a; --hl:#fff3d6; --hlb:#e8b84b;
+    --amber:#c98a12; --blue:#2a6fc0; --blue-soft:#e4eefb; --danger:#d8453a; --hl:#fff3d6; --hlb:#e8b84b;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
@@ -29,16 +29,19 @@
 
   /* 스크린 카드 */
   .screen{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px;box-shadow:0 6px 20px -14px rgba(0,0,0,.2)}
-  .sc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
   .sc-head .sid{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:7px;padding:4px 10px}
   .sc-head .nm{font-size:15px;font-weight:800}
   .sc-head .pf{margin-left:auto;font-size:11.5px;color:var(--faint);font-weight:700}
   .sc-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+  .sc-grid.stack{grid-template-columns:1fr}
   @media(max-width:900px){.sc-grid{grid-template-columns:1fr}}
+  /* 데스크탑 목업: 컴포넌트 번호를 창 '바깥' 왼쪽 거터로 배치(표·박스에 겹치지 않게) */
+  .mock.deskgut{margin-left:52px}
+  .deskgut .win .hot > .num{left:-36px}
 
-  /* 목업 공통 — 번호 배지가 잘리지 않도록 테두리 제거 + overflow 보이게 + 좌측 여백 크게 */
-  .mock{border:none;background:transparent;position:relative;overflow:visible;
-    padding:4px;margin:16px 0 4px 26px}
+  /* 목업 공통 */
+  .mock{border:none;background:transparent;position:relative;overflow:visible;padding:4px;margin:16px 0 4px 26px}
   .hot{position:relative;cursor:pointer;transition:box-shadow .12s,background .12s}
   .hot .num{position:absolute;z-index:5;top:-7px;left:-13px;width:21px;height:21px;border-radius:50%;
     background:var(--teal);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;
@@ -55,286 +58,1224 @@
   .desc li .dt{font-size:12.5px;color:#3a424c}.desc li .dt b{color:var(--ink)}
   .desc li.active{background:var(--hl);border-color:var(--hlb)}
   .desc li.active .di{background:var(--amber);color:#fff}
+  .desc .tbu{color:var(--danger);font-weight:800}
   .desc .asis-note{display:block;font-size:10.5px;font-weight:600;color:var(--faint);text-transform:none;letter-spacing:0;margin-top:4px}
-  /* as-is(기존 화면) 영역 — 흐리게 표시, 번호 없음 */
-  .asis{opacity:.62;filter:saturate(.85)}
-  .asis-tag{font-size:9px;font-weight:700;color:var(--faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px}
 
-  /* ── 목업 부품 ── */
-  .win{font-size:12px}
-  .win .bar{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--line);background:#fafbfc}
+  /* 케이스·상태 표 */
+  .cases{margin:16px 0 0}
+  .cases-h{font-size:11px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px}
+  .tscroll{overflow-x:auto}
+  table.cs{width:100%;border-collapse:collapse;font-size:11.5px;min-width:560px}
+  table.cs th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:7px 9px;border:1px solid var(--line);white-space:nowrap}
+  table.cs td{padding:7px 9px;border:1px solid var(--line);color:#3a424c;vertical-align:top}
+  table.cs td:first-child{white-space:nowrap;font-weight:700}
+  table.cs .nx{color:var(--teal-d);font-weight:700;white-space:nowrap}
+  .cb{font-size:9.5px;font-weight:800;border-radius:6px;padding:2px 7px;display:inline-block;white-space:nowrap}
+  .cb.ok{background:#e7f6ee;color:#16a34a}.cb.err{background:#fbe9e7;color:var(--danger)}.cb.warn{background:#fbf1dd;color:var(--amber)}
+  .cb.dis{background:#eef0f2;color:#8b8b97}.cb.empty{background:#eef2f6;color:#5c6671}.cb.load{background:var(--blue-soft);color:var(--blue)}.cb.info{background:var(--teal-soft);color:var(--teal-d)}
+
+  /* 화면 흐름 */
+  .flow{margin-top:12px;font-size:11.5px;color:#41505d;background:#fafbfc;border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+  .flow .fh{font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;font-size:10px;margin-right:8px}
+  .flow code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:5px;padding:1px 6px;color:var(--teal-d);font-weight:700}
+  .flow .ar{color:var(--faint);margin:0 3px}
+
+  /* 상태 미니 카드(변형 화면) */
+  .states-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+  .mini{flex:1;min-width:172px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+  .mini .mh{font-size:10px;font-weight:800;padding:7px 10px;background:#fafbfc;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px}
+  .mini .mb{padding:12px 11px;font-size:10.5px;color:#41505d;min-height:96px;display:flex;flex-direction:column;gap:6px;justify-content:center;align-items:center;text-align:center}
+  .rico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800}
+  .rico.ok{background:#e7f6ee;color:#16a34a}.rico.err{background:#fbe9e7;color:var(--danger)}.rico.warn{background:#fbf1dd;color:var(--amber)}.rico.empty{background:#eef2f6;color:#98a2ad}.rico.load{background:var(--blue-soft);color:var(--blue)}
+  .pill{font-size:9px;font-weight:800;border-radius:999px;padding:2px 9px;display:inline-block}
+  .pill.pre{background:#eef0f2;color:#8b8b97}.pill.mid{background:#fbf1dd;color:var(--amber)}.pill.done{background:#e7f6ee;color:#16a34a}.pill.auto{background:var(--teal-soft);color:var(--teal-d)}
+  .toast{background:#28303a;color:#fff;border-radius:9px;padding:8px 12px;font-size:10.5px;font-weight:600;display:inline-block}
+  .spin{width:20px;height:20px;border:2.5px solid var(--blue-soft);border-top-color:var(--blue);border-radius:50%}
+
+  /* ── 목업 부품(데스크탑 창) ── */
+  .win{font-size:12px;border:1px solid var(--line);border-radius:10px;overflow:visible;background:#fff}
+  .win .bar{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--line);background:#fafbfc;border-radius:10px 10px 0 0}
   .win .dotm{width:13px;height:13px;border-radius:5px 5px 5px 2px;background:var(--teal)}
   .win .wt{font-weight:800;font-size:13px}
   .win .x{margin-left:auto;color:#b8c0c9}
-  .tabrow{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 12px}
-  .tabrow .t{padding:11px 13px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent}
+  .tabrow{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 12px;flex-wrap:wrap}
+  .tabrow .t{padding:10px 11px;font-size:11.5px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
   .tabrow .t.on{color:var(--teal-d);border-bottom-color:var(--teal)}
   .pad{padding:13px}
-  .htitle{font-size:14px;font-weight:800;margin:0 0 6px}
+  .htitle{font-size:14px;font-weight:800;margin:0 0 4px}
   .sub{font-size:11px;color:var(--muted);margin:0 0 10px}
-  .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
-  .chip{font-size:11px;font-weight:700;border:1px solid var(--teal-line);color:var(--teal-d);border-radius:7px;padding:5px 11px;background:#fff}
-  .chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
-  table.m{width:100%;border-collapse:collapse;font-size:11px}
-  table.m th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:7px 8px;border:1px solid var(--line)}
-  table.m td{padding:7px 8px;border:1px solid var(--line);color:#3a424c}
-  .reco-box{border:1.5px solid var(--teal-line);border-radius:10px;overflow:visible;margin-top:6px}
-  .reco-top{display:flex;align-items:flex-start;gap:8px;background:var(--teal-soft);padding:10px 12px;border-bottom:1px solid var(--teal-line)}
-  .reco-top .rt{flex:1}.reco-top .rtt{font-weight:800;color:#0c7a6c;font-size:12.5px}
-  .reco-top .rg{font-size:10.5px;color:#4f6f69;margin-top:3px}
-  .cta-b{background:var(--teal);color:#fff;border-radius:7px;font-size:11px;font-weight:800;padding:7px 10px;white-space:nowrap}
-  .setb{font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px}
-  .setb.base{background:#eef2f6;color:#5c6671}.setb.store{background:#e6f7f4;color:var(--teal-d)}
-  .btabs{display:flex;gap:5px;margin-top:10px}
-  .btabs .b{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:var(--faint);border:1px solid var(--line);border-radius:7px 7px 0 0;padding:8px 4px;background:#fafbfc}
-  .btabs .b.on{color:var(--teal-d);background:#fff;box-shadow:inset 0 2px 0 var(--teal)}
-
-  /* 사이드 셸 */
-  .shell{display:flex;min-height:300px}
-  .side{width:120px;flex:none;border-right:1px solid var(--line);background:#fafbfc;padding:10px 8px}
-  .side .br{font-weight:800;font-size:12px;color:var(--teal);padding:2px 4px 8px}
-  .side .ni{font-size:11px;color:#5c6671;padding:6px 7px;border-radius:6px;font-weight:600}
-  .side .ni.on{background:var(--teal-soft);color:var(--teal-d);font-weight:800}
-  .scol{flex:1;min-width:0}
-  .stop{display:flex;align-items:center;padding:10px 13px;border-bottom:1px solid var(--line);font-weight:800;font-size:13px}
-  .stop .me{margin-left:auto;font-size:10px;color:var(--faint);font-weight:600}
+  table.m{width:100%;border-collapse:collapse;font-size:11px;min-width:640px}
+  table.m th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:7px 8px;border:1px solid var(--line);white-space:nowrap}
+  table.m td{padding:7px 8px;border:1px solid var(--line);color:#3a424c;vertical-align:middle}
+  .num-c{text-align:right}
   .srow{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
   .inp{height:26px;border:1px solid var(--line);border-radius:6px;font-size:10.5px;color:var(--muted);padding:0 8px;display:flex;align-items:center;background:#fff}
   .inp.w{flex:1;min-width:80px}
-  .bn{height:26px;border-radius:6px;font-size:10.5px;font-weight:700;padding:0 11px;display:flex;align-items:center;background:var(--teal);color:#fff}
+  .bn{height:26px;border-radius:6px;font-size:10.5px;font-weight:700;padding:0 11px;display:inline-flex;align-items:center;background:var(--teal);color:#fff;white-space:nowrap}
   .bn.g{background:#fff;border:1px solid var(--line);color:#5c6671}
-  .onoff{font-size:9.5px;font-weight:800;border-radius:5px;padding:2px 7px}.onoff.on{background:#e7f6ee;color:#16a34a}.onoff.off{background:#f0eef2;color:#8b8b97}
-  .stt{font-size:9.5px;font-weight:800;border-radius:999px;padding:2px 8px}
-  .stt.ok{background:#e7f6ee;color:#16a34a}.stt.need{background:#fbf1dd;color:var(--amber)}.stt.exp{background:#f3eef9;color:#6f5fae}.stt.hide{background:#eef0f2;color:#8b8b97}
-  /* 드로어 목업 */
-  .drw{border:1px solid var(--line);border-radius:10px;overflow:visible}
-  .drw-h{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:800;font-size:12.5px;background:#fafbfc}
-  .blk{padding:10px 12px;border-bottom:1px solid var(--line)}
-  .blk:last-child{border:none}
-  .blk .bh{font-size:11px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-  .ro{font-size:9px;font-weight:700;color:var(--faint);background:#f4f6f8;border-radius:4px;padding:1px 6px}
-  .kvm{font-size:10.5px;color:#566;line-height:1.7}
-  .pitem{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:10.5px;margin-bottom:6px}
-  .pitem .nm{flex:1;font-weight:700}
-  .tg{width:30px;height:17px;border-radius:999px;background:var(--teal);position:relative;flex:none}
-  .tg::after{content:"";position:absolute;top:2px;left:15px;width:13px;height:13px;border-radius:50%;background:#fff}
-  .footb{display:flex;gap:6px;padding:10px 12px}
+  .bn.r{background:#fff;border:1px solid #f0c9c4;color:var(--danger)}
+  .bn.dis{background:#eef0f2;color:#a7afb8;border:1px solid var(--line)}
+  .info-i{width:16px;height:16px;border-radius:50%;background:#eef2f6;color:#5c6671;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .badge{font-size:9.5px;font-weight:800;border-radius:999px;padding:2px 8px;display:inline-block}
+  .badge.app{background:var(--teal-soft);color:#0a6a63}
+  .badge.pos{background:var(--blue-soft);color:var(--blue)}
+  .badge.nb{background:#eef2f6;color:#5c6671;border-radius:6px}
+  .stt{font-size:9.5px;font-weight:800;border-radius:999px;padding:2px 8px;display:inline-block}
+  .stt.ok{background:#e7f6ee;color:#16a34a}.stt.rej{background:#f3eef9;color:#6f5fae}.stt.fail{background:#fbe9e7;color:var(--danger)}.stt.wait{background:#eef0f2;color:#8b8b97}
+  .diff-pos{color:var(--blue);font-weight:700}.diff-neg{color:var(--danger);font-weight:700}.diff-zero{color:var(--faint)}
+  .before{color:#98a2ad;text-decoration:line-through}.after{color:var(--teal-d);font-weight:700}
+  .footb{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
   .footb .bn{flex:1;justify-content:center}
+  .drw{border:1px solid var(--line);border-radius:10px;overflow:visible;background:#fff}
+  .drw-h{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:800;font-size:12.5px;background:#fafbfc}
+  .kvm{font-size:10.5px;color:#566;line-height:1.7}
+  .ro{font-size:9px;font-weight:700;color:var(--faint);background:#f4f6f8;border-radius:4px;padding:1px 6px}
+  /* 중앙 모달 */
+  .cmodal{border:1px solid var(--line);border-radius:12px;background:#fff;max-width:340px;box-shadow:0 14px 40px -18px rgba(0,0,0,.4);overflow:hidden}
+  .cmodal .cm-b{padding:18px 16px;text-align:center}
+  .cmodal .cm-t{font-weight:800;font-size:13px;margin:8px 0 4px}
+  .cmodal .cm-d{font-size:11px;color:var(--muted);line-height:1.6}
+
+  /* ── 폰(모바일 앱) ── */
+  .phone{width:290px;border:1px solid var(--line);border-radius:22px;background:#fff;overflow:visible;box-shadow:0 10px 30px -18px rgba(0,0,0,.4)}
+  .ph-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);background:#fafbfc;border-radius:22px 22px 0 0}
+  .ph-bar .bk{color:#b0b8c0;font-weight:800}
+  .ph-bar .tt{font-weight:800;font-size:13px}
+  .ph-bar .rt{margin-left:auto;font-size:10.5px;color:var(--teal-d);font-weight:700}
+  .ph-body{padding:13px}
+  .chipbc{display:inline-flex;align-items:center;gap:6px;font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#f5f7f9;border:1px solid var(--line);border-radius:8px;padding:5px 9px;margin-bottom:10px}
+  .tag{font-size:9px;font-weight:800;border-radius:5px;padding:1px 6px}
+  .tag.reg{background:#eef2f6;color:#5c6671}.tag.new{background:#fbf1dd;color:var(--amber)}
+  .fld{margin-bottom:9px}
+  .fld .lb{font-size:10.5px;color:var(--muted);font-weight:700;margin-bottom:3px;display:block}
+  .fld .bx{height:30px;border:1px solid var(--line);border-radius:7px;display:flex;align-items:center;padding:0 9px;font-size:11.5px;color:#3a424c;background:#fff;justify-content:space-between}
+  .fld .bx.sel{color:var(--muted)}
+  .fld .bx.bad{border-color:#f0c9c4;background:#fdf5f4}
+  .fld .er{font-size:9.5px;color:var(--danger);font-weight:700;margin-top:3px}
+  .fld .chg{font-size:9px;font-weight:800;color:var(--amber);background:#fbf1dd;border-radius:5px;padding:1px 6px;margin-left:4px}
+  .kv{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:1px dashed var(--line)}
+  .kv .k{color:var(--muted)}
+  .totbox{border:1.5px solid var(--teal-line);background:var(--teal-soft);border-radius:10px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;margin:10px 0}
+  .totbox .tl{font-size:11px;font-weight:800;color:#0c7a6c;display:flex;align-items:center;gap:6px}
+  .totbox .autob{font-size:9px;font-weight:800;background:#fff;color:var(--teal-d);border:1px solid var(--teal-line);border-radius:999px;padding:1px 7px}
+  .totbox .tv{font-size:16px;font-weight:800;color:#0c7a6c}
+  .cells{display:flex;gap:8px}
+  .cell{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 9px;text-align:center}
+  .cell.act{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-soft)}
+  .cell .cl{font-size:10px;color:var(--muted);font-weight:700}
+  .cell .cv{font-size:15px;font-weight:800;margin-top:2px}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:9px}
+  .keypad .k{border:1px solid var(--line);border-radius:7px;text-align:center;padding:7px 0;font-size:13px;font-weight:700;background:#fafbfc}
+  .padhint{border:1px dashed var(--teal-line);background:#f7fdfc;border-radius:9px;padding:14px 12px;margin-top:9px;font-size:10.5px;color:var(--teal-d);text-align:center;font-weight:600}
+  .two-state{display:flex;gap:16px;flex-wrap:wrap}
+  .state-col{flex:1;min-width:250px}
+  .state-cap{font-size:10.5px;font-weight:800;color:var(--muted);margin-bottom:7px;padding-left:2px;display:flex;align-items:center;gap:6px}
+  .two-state .phone{width:100%}
+  .anb{font-size:10px;font-weight:800;color:#fff;border-radius:6px;padding:2px 8px}
+  .anb.a{background:var(--teal)}.anb.b{background:var(--blue)}
+  .idhead .pname{font-size:13px;font-weight:800;margin-top:-2px}
+  .idhead .synced-sm{font-size:9.5px;color:var(--faint);margin-top:2px}
+  .cells3{display:flex;gap:7px;margin:11px 0 0}
+  .cells3 .cell{flex:1;padding:8px 6px}
+  .cells3 .cell .cl{font-size:9.5px}
+  .cell.tot{border:1.5px solid var(--teal-line);background:var(--teal-soft)}
+  .cell.tot .cl{color:#0c7a6c;font-weight:800}
+  .cell.tot .cv{color:#0c7a6c}
+  .cell.tot .autob{font-size:8px;font-weight:800;background:#fff;color:var(--teal-d);border:1px solid var(--teal-line);border-radius:999px;padding:0 5px;margin-left:2px}
+  .lrow{display:flex;align-items:center;justify-content:space-between;padding:9px 2px;border-bottom:1px solid var(--line);font-size:11.5px}
+  .lrow .ln{font-weight:700}.lrow .lb2{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)}
+  .filt{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
+  .filt .f{font-size:10px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+  .filt .f.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .cardh{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .cardh .c1{display:flex;justify-content:space-between;align-items:center}
+  .drow{display:flex;flex-direction:column;gap:2px;padding:9px 2px;border-bottom:1px solid var(--line)}
+  .drow .r1{display:flex;justify-content:space-between;align-items:center}
+  .drow .dnm{font-weight:700;font-size:11.5px}
+  .drow .dbc{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)}
+  .drow .dchg{font-size:10.5px;color:#3a424c}
+  .drow .dmeta{font-size:9.5px;color:var(--faint)}
+  .empty-ph{border:1px dashed var(--line);border-radius:10px;padding:22px 12px;text-align:center;color:var(--faint);font-size:11px;margin-top:6px}
+  .pcard2{border:1px solid #e3e6ea;border-radius:8px;background:#fafbfc;padding:11px 13px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto 1fr;gap:7px 16px;align-items:center;font-size:11px}
+  .pcard2 .pk{color:#8a9099;font-weight:700;white-space:nowrap}
+  .pcard2 .pv{color:#28303a;font-weight:700}
 </style>
 </head>
 <body>
 <div class="doc">
   <div class="doc-head">
-    <h1>AI mate 영양소 상담 추천 · 화면설계서 (스토리보드)</h1>
-    <p>플랫폼별 화면 — 화면번호 + 컴포넌트 번호 + 디스크립션. 화면의 <b>번호(컴포넌트)</b>나 우측 <b>디스크립션</b>에 마우스를 올리면 짝이 하이라이트되고, 클릭하면 고정됩니다.</p>
+    <h1>굿팜 약사님용앱 상품 등록·수정 및 실재고 입력 · 화면설계서 (스토리보드)</h1>
+    <p>플랫폼별 화면 — 화면번호 + 컴포넌트 번호 + 디스크립션 + <b>케이스·상태·예외</b> + <b>화면 흐름</b>. 컴포넌트 번호(①②③…)나 디스크립션에 hover=하이라이트 / click=고정. <b style="color:var(--danger)">TBU</b>=미확정(정책 확정 필요).</p>
   </div>
 
   <div class="ptabs">
-    <div class="ptab on" data-p="client" onclick="pickP(this)"><span class="pn">P1</span>클라이언트 · POS AI mate</div>
-    <div class="ptab" data-p="pharm" onclick="pickP(this)"><span class="pn">P2</span>약국 어드민 · 약사웹</div>
-    <div class="ptab" data-p="super" onclick="pickP(this)"><span class="pn">P3</span>슈퍼어드민 · 추천 관리</div>
+    <div class="ptab on" data-p="app" onclick="pickP(this)"><span class="pn">P1</span>굿팜 약사님용앱</div>
+    <div class="ptab" data-p="product" onclick="pickP(this)"><span class="pn">P2</span>클라이언트 · 상품 관리 통합</div>
+    <div class="ptab" data-p="stock" onclick="pickP(this)"><span class="pn">P3</span>클라이언트 · 실재고 반영</div>
+    <div class="ptab" data-p="super" onclick="pickP(this)"><span class="pn">P4</span>슈퍼어드민 · 바코드 상세</div>
+    <div class="ptab" data-p="common" onclick="pickP(this)"><span class="pn">P0</span>공통 · 상태/예외</div>
   </div>
-  <div class="hint-bar">💡 컴포넌트 번호(①②③…) 또는 디스크립션 항목에 <b>hover</b> = 미리보기 하이라이트 · <b>click</b> = 고정(다시 클릭 해제). 화면별로 독립 동작합니다.</div>
+  <div class="hint-bar">💡 각 화면 카드 = <b>목업(번호)</b> + <b>디스크립션</b> + <b>케이스·상태·예외 표</b> + <b>화면 흐름(→)</b>. 상태별 처리·다음 화면·Validation·Empty·Loading·Error·Confirm·Disabled·권한을 표에 정의합니다.</div>
 
-  <!-- ════════ P1 클라이언트 ════════ -->
-  <div class="platform" data-p="client">
-    <section class="screen" data-sid="AIM-C-01">
-      <div class="sc-head"><span class="sid">AIM-C-01</span><span class="nm">처방 상세 분석 · 영양소 상담 추천 영역</span><span class="pf">클라이언트 POS · AI mate</span></div>
+  <!-- ════════════════════ P1 굿팜 약사님용앱 ════════════════════ -->
+  <div class="platform" data-p="app">
+
+    <!-- APP-01-001 상품관리 진입 -->
+    <section class="screen" data-sid="APP-01-001">
+      <div class="sc-head"><span class="sid">APP-01-001</span><span class="nm">상품관리 진입 (스캔 / 검색)</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
       <div class="sc-grid">
-        <!-- 목업 (추천 영역만 번호 표기 · 그 외 기존 화면 as-is) -->
-        <div class="mock win">
-          <div class="bar"><span class="dotm"></span><span class="wt">굿팜 AI MATE</span><span class="x">✕</span></div>
-          <div class="asis">
-            <div class="tabrow"><span class="t">고객 종합 분석</span><span class="t on">처방 상세 분석</span></div>
-          </div>
-          <div class="pad">
-            <div class="asis"><div class="htitle">AI 처방전 분석</div><div class="sub">유형별 복약안내서를 생성해드립니다. <span class="asis-tag">기존 화면 · as-is</span></div></div>
-            <div class="asis" style="margin:8px 0"><div class="chips"><span class="chip on">한국어</span><span class="chip">영어</span><span class="chip">중국어</span><span class="chip">인쇄 ⬇</span></div></div>
-            <div class="asis" style="display:flex;align-items:center;gap:8px">
-              <div class="htitle" style="font-size:13px">처방 약물 정보표</div>
-              <div class="hot" data-n="1" style="margin-left:auto"><span class="num" style="top:-10px;right:-10px;left:auto">1</span><span class="cta-b">⚙ 추천 상품 설정</span></div>
+        <div class="mock">
+          <div class="phone">
+            <div class="ph-bar"><span class="bk">‹</span><span class="tt">상품관리</span></div>
+            <div class="ph-body">
+              <div class="hot" data-n="1" style="margin-bottom:10px"><span class="num">1</span><div class="fld" style="margin:0"><div class="bx sel">상품명으로 검색</div></div></div>
+              <div class="hot" data-n="2"><span class="num">2</span>
+                <div style="border:1px solid var(--line);border-radius:12px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#0e1418;color:#cfe">
+                  <div style="width:120px;height:70px;border:2px solid var(--teal);border-radius:8px"></div>
+                  <div style="font-size:10px;color:#9fb">바코드를 비추면 자동으로 인식합니다</div>
+                </div>
+              </div>
             </div>
-            <div class="hot" data-n="2" style="margin-top:6px"><span class="num">2</span>
-              <table class="m"><thead><tr><th>약물명</th><th>성분명</th><th>효능</th><th>복용법</th><th>추천 Tip</th></tr></thead>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-01-001 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>검색 영역</b> — `상품명으로 검색`. 검색 실행 시 APP-01-002.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>바코드 스캔 뷰</b> — 카메라 상시 인식. 안내문구 `바코드를 비추면 자동으로 인식합니다`. 등록/미등록 분기.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb info">최초 진입</span></td><td>메뉴 진입</td><td>카메라 상시 활성 · 검색창 노출</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb ok">등록 상품 인식</span></td><td>바코드 매칭</td><td>기존 상품으로 판단</td><td class="nx">APP-01-004</td></tr>
+          <tr><td><span class="cb warn">미등록 인식</span></td><td>바코드 미매칭</td><td>신규 등록 유도</td><td class="nx">APP-01-006</td></tr>
+          <tr><td><span class="cb err">인식 실패</span></td><td>초점/조도 불량</td><td>인식 뷰 유지 · 재시도 안내</td><td class="nx">APP-01-001</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb info">최초 진입</span></div><div class="mb"><div style="width:80px;height:46px;border:2px solid var(--teal);border-radius:6px;background:#0e1418"></div><div style="font-size:9.5px">카메라 상시 활성 · 바코드를 비추면 자동 인식</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb ok">등록 상품 인식</span></div><div class="mb"><div class="rico ok">✓</div><div style="font-weight:800">등록된 상품</div><div style="font-size:9.5px">안내 모달 없이 <b>APP-01-004(수정) 직행</b></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb warn">미등록 인식</span></div><div class="mb"><div class="rico warn">!</div><div style="font-weight:800">미등록 상품</div><div style="font-size:9.5px">신규 등록 유도(APP-01-006)</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb err">인식 실패</span></div><div class="mb"><div class="rico err">!</div><div style="font-weight:800">인식하지 못했습니다</div><div style="font-size:9.5px">바코드를 화면 안에 맞춰 다시 비춰 주세요</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-01-001</code><span class="ar">→</span> 검색 <code>APP-01-002</code> · 등록 상품 <code>APP-01-004</code>(직행) · 미등록 <code>APP-01-006</code></div>
+    </section>
+
+    <!-- APP-01-002 검색 결과 -->
+    <section class="screen" data-sid="APP-01-002">
+      <div class="sc-head"><span class="sid">APP-01-002</span><span class="nm">상품 검색 결과 (있음 / 없음)</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <div class="state-col"><div class="state-cap"><span class="cb ok">결과 있음</span></div>
+              <div class="phone"><div class="ph-bar"><span class="bk">‹</span><span class="tt">검색 결과</span></div>
+                <div class="ph-body">
+                  <div class="hot" data-n="1"><span class="num">1</span><div class="fld" style="margin-bottom:8px"><div class="bx">타이레놀</div></div></div>
+                  <div class="hot" data-n="2"><span class="num">2</span>
+                    <div class="lrow"><span><div class="ln">타이레놀 500mg</div><div class="lb2">8801234567890 · 한국얀센</div></span><span style="color:var(--faint)">›</span></div>
+                    <div class="lrow"><span><div class="ln">타이레놀 이알 서방정 650mg</div><div class="lb2">8801234567891 · 한국얀센</div></span><span style="color:var(--faint)">›</span></div>
+                    <div class="lrow"><span><div class="ln">타이레놀콜드-에스정</div><div class="lb2">8801234567892 · 한국얀센</div></span><span style="color:var(--faint)">›</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="state-col"><div class="state-cap"><span class="cb empty">결과 없음</span></div>
+              <div class="phone"><div class="ph-bar"><span class="bk">‹</span><span class="tt">검색 결과</span></div>
+                <div class="ph-body">
+                  <div class="fld" style="margin-bottom:8px"><div class="bx">타이레놀정500</div></div>
+                  <div class="hot empty-ph" data-n="3"><span class="num">3</span>검색 결과가 없습니다<br><span style="font-size:10px">다른 상품명으로 다시 검색해 주세요.</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-01-002 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>검색어</b> — 상품명. 재검색 시 목록 갱신.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>결과 리스트</b> — 상품명 / 바코드 · 제조사. 행 선택 시 상품 정보(APP-01-004) 진입.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>Empty</b> — `검색 결과가 없습니다` · `다른 상품명으로 다시 검색해 주세요.`</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb ok">결과 있음</span></td><td>매칭 1건 이상</td><td>리스트 출력 · 행 선택</td><td class="nx">APP-01-004</td></tr>
+          <tr><td><span class="cb empty">결과 없음</span></td><td>매칭 0건</td><td>Empty 문구 · 재검색</td><td class="nx">APP-01-001</td></tr>
+          <tr><td><span class="cb load">로딩</span></td><td>조회 지연</td><td>스켈레톤/스피너</td><td class="nx">—</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb ok">결과 있음</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9.5px;font-weight:700">타이레놀 500mg<div style="font-weight:400;color:var(--faint);font-size:8.5px;font-family:ui-monospace,Menlo,monospace">8801234567890 · 한국얀센</div></div><div style="font-size:9px;color:var(--faint)">행 선택 → APP-01-004</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb empty">결과 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">검색 결과가 없습니다</div><div style="font-size:9.5px">다른 상품명으로 다시 검색해 주세요.</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-01-001</code><span class="ar">→</span><code>APP-01-002</code><span class="ar">→</span> 선택 <code>APP-01-004</code>(상품 정보)</div>
+    </section>
+
+    <!-- APP-01-003 상품 정보 수정 (기존 상품 진입) -->
+    <section class="screen" data-sid="APP-01-003">
+      <div class="sc-head"><span class="sid">APP-01-003</span><span class="nm">상품 정보 수정 (기존 상품 진입)</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="phone">
+            <div class="ph-bar"><span class="bk">‹</span><span class="tt">정보 수정</span><span class="hot" data-n="1" style="display:inline-flex;align-items:center;gap:5px;margin-left:6px"><span class="num">1</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700">8801234567890</span></span></div>
+            <div class="ph-body">
+              <div class="fld"><span class="lb">상품명 <span style="color:var(--danger)">*</span></span><div class="bx">타이레놀 500mg</div></div>
+              <div class="hot fld" data-n="2"><span class="num">2</span><span class="lb">분류 <span style="color:var(--danger)">*</span></span><div class="bx">일반의약품 ▾</div></div>
+              <div class="fld"><span class="lb">제조사</span><div class="bx">한국얀센 ▸</div></div>
+              <div class="fld"><span class="lb">판매가 (원) <span style="color:var(--danger)">*</span></span><div class="bx">4,500</div></div>
+              <div class="fld"><span class="lb">단위</span><div class="bx">정 ▾</div></div>
+              <div class="fld"><span class="lb">상품 상세위치</span><div class="bx">A-3 선반</div></div>
+              <div style="font-size:9.5px;color:var(--muted);margin-top:4px">상품 정보 <b>수정 시에는 재고 수량을 입력하지 않습니다.</b> 실재고는 <b>실재고 관리</b>에서 입력합니다.</div>
+            </div>
+            <div class="ph-foot hot" data-n="3" style="padding:11px 13px;border-top:1px solid var(--line)"><span class="num">3</span><span class="bn" style="width:100%;justify-content:center;height:34px">저장</span></div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-01-003 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>기존 상품 진입</b> — 기존 등록한 상품일 경우 <b>상품 수정 페이지</b>로 이동하여 상품 정보를 확인하고, 정보를 수정하거나 그대로 저장한다. 앱바 헤더 `정보 수정  8801234567890`(바코드 수정 불가).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>필수(*)</b> — 상품명·분류·판매가. <b>재고 수량 필드는 없음</b>(수정 시 재고 미입력).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>저장</b> — 변경분 저장 → APP-01-005 저장 결과. 변경 없이 그대로 저장도 가능.</span></li>
+        </ol>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-01-001/APP-01-002</code><span class="ar">→</span> (등록 상품) <code>APP-01-003</code> 상품 정보 수정 <span class="ar">→</span><code>APP-01-005</code></div>
+    </section>
+
+    <!-- APP-01-004 상품 정보 (신규 / 수정) -->
+    <section class="screen" data-sid="APP-01-004">
+      <div class="sc-head"><span class="sid">APP-01-004</span><span class="nm">상품 정보 — 신규 등록 / 정보 수정</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <!-- 신규 등록 -->
+            <div class="state-col"><div class="state-cap"><span class="cb ok">신규 등록</span></div>
+              <div class="phone">
+                <div class="ph-bar"><span class="bk">‹</span><span class="tt">신규 등록</span><span class="hot" data-n="1" style="display:inline-flex;align-items:center;gap:5px;margin-left:6px"><span class="num">1</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700">8809999999999</span></span></div>
+                <div class="ph-body">
+                  <div class="fld"><span class="lb">상품명 <span style="color:var(--danger)">*</span></span><div class="bx sel">상품명 입력</div></div>
+                  <div class="hot fld" data-n="2"><span class="num">2</span><span class="lb">분류 <span style="color:var(--danger)">*</span></span><div class="bx sel">선택 ▾</div></div>
+                  <div class="hot fld" data-n="3"><span class="num">3</span><span class="lb">제조사</span><div class="bx sel">제조사 선택 ▸</div></div>
+                  <div class="fld"><span class="lb">판매가 (원) <span style="color:var(--danger)">*</span></span><div class="bx sel">0</div></div>
+                  <div class="fld"><span class="lb">단위</span><div class="bx sel">선택 ▾</div></div>
+                  <div class="hot fld" data-n="4"><span class="num">4</span><span class="lb">재고 수량</span><div class="bx sel">0</div></div>
+                  <div class="fld"><span class="lb">상품 상세위치</span><div class="bx sel">예: A-3 선반</div></div>
+                  <div style="font-size:9.5px;color:var(--muted);margin-top:4px">신규 등록 시 <b>초기 재고 수량</b>을 입력합니다. 이후 실재고는 <b>실재고 관리</b>에서 관리합니다.</div>
+                </div>
+                <div class="ph-foot hot" data-n="6" style="padding:11px 13px;border-top:1px solid var(--line)"><span class="num">6</span><span class="bn" style="width:100%;justify-content:center;height:34px">등록</span></div>
+              </div>
+            </div>
+            <!-- 정보 수정 -->
+            <div class="state-col"><div class="state-cap"><span class="cb warn">정보 수정</span></div>
+              <div class="phone">
+                <div class="ph-bar"><span class="bk">‹</span><span class="tt">정보 수정</span><span class="hot" data-n="1b" style="display:inline-flex;align-items:center;gap:5px;margin-left:6px"><span class="num">1</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700">8801234567890</span></span></div>
+                <div class="ph-body">
+                  <div class="fld"><span class="lb">상품명 <span style="color:var(--danger)">*</span></span><div class="bx">타이레놀 500mg</div></div>
+                  <div class="hot fld" data-n="2"><span class="num">2</span><span class="lb">분류 <span style="color:var(--danger)">*</span></span><div class="bx">일반의약품 ▾</div></div>
+                  <div class="hot fld" data-n="3"><span class="num">3</span><span class="lb">제조사</span><div class="bx">한국얀센 ▸</div></div>
+                  <div class="hot fld" data-n="5"><span class="num">5</span><span class="lb">판매가 (원) <span style="color:var(--danger)">*</span></span><div class="bx">4,500</div></div>
+                  <div class="fld"><span class="lb">단위</span><div class="bx">정 ▾</div></div>
+                  <div class="fld"><span class="lb">상품 상세위치</span><div class="bx">A-3 선반</div></div>
+                  <div style="font-size:9.5px;color:var(--muted);margin-top:4px">상품 정보 <b>수정 시에는 재고 수량을 입력하지 않습니다.</b> 실재고는 <b>실재고 관리</b>에서 입력합니다.</div>
+                </div>
+                <div class="ph-foot hot" data-n="6b" style="padding:11px 13px;border-top:1px solid var(--line)"><span class="num">6</span><span class="bn" style="width:100%;justify-content:center;height:34px">저장</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-01-004 · 컴포넌트 <span class="asis-note">신규/수정 공통 폼 · 수정은 재고 수량 필드 없음</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>앱바 헤더(제목 옆 바코드)</b> — 상태별 제목: 신규 `신규 등록  8809999999999`, 수정 `정보 수정  8801234567890`. <b>바코드 수정 불가</b>.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>분류(select)</b> — 일반의약품 / 의약외품. 필수(*).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>제조사(제조사 선택 팝업 APP-01-007)</b> — 코드 저장 / 제조사명 표시.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 수량</b> — <b>신규 등록에서만</b> 노출(정보 수정엔 없음).</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>판매가 (원)</b> — 숫자만 입력, 필수(*). 상품명·판매가 등 편집 항목.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>등록 / 저장</b> — 필수·형식 통과 시 활성 → APP-01-005. <b>신규 등록</b>은 상품 마스터에 반영, <b>정보 수정</b>은 클라이언트 `앱 상품 수정 요청`에서 <b>선택 반영</b>(자동 반영 아님). 클라이언트 3.0 상품 관리에서 `앱 데이터 동기화` 후 확인.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외 (등록·수정 공통)</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb info">신규 · 최초</span></td><td>미등록 바코드 진입</td><td>빈 폼 · 재고 수량 노출 · 저장 버튼 <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
+          <tr><td><span class="cb info">수정 · 최초</span></td><td>등록 상품 진입</td><td>현재값 채움 · 재고 수량 필드 없음 · 저장 <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
+          <tr><td><span class="cb dis">변경 없음</span></td><td>값 그대로</td><td>저장 <span class="cb dis">Disabled</span> 유지(불필요 제출 방지)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb ok">저장 가능</span></td><td>필수·형식 OK</td><td>저장 버튼 활성</td><td class="nx">APP-01-005</td></tr>
+          <tr><td><span class="cb warn">Validation</span></td><td>필수 누락·판매가 비숫자</td><td>해당 필드 `숫자만 입력하세요` · 저장 <span class="cb dis">Disabled</span></td><td class="nx">APP-01-005(검증 실패)</td></tr>
+          <tr><td><span class="cb err">전송 실패</span></td><td>네트워크/서버 오류</td><td>실패 안내 · 입력값 보존 · 재시도</td><td class="nx">APP-01-005(전송 실패)</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb info">신규 · 최초</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;color:var(--faint);font-family:ui-monospace,Menlo,monospace">신규 등록 · 8809999999999</div><div style="font-size:9.5px">빈 폼 · <b>재고 수량 노출</b> · 등록 <span class="cb dis">Disabled</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">수정 · 최초</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;color:var(--faint);font-family:ui-monospace,Menlo,monospace">정보 수정 · 8801234567890</div><div style="font-size:9.5px">현재값 채움 · <b>재고 수량 필드 없음</b> · 저장 <span class="cb dis">Disabled</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb warn">Validation</span></div><div class="mb" style="align-items:stretch"><div class="fld" style="margin:0;text-align:left"><span class="lb">판매가 (원) *</span><div class="bx bad sel">0</div><div class="er">숫자만 입력하세요</div></div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span> 신규 <code>APP-01-001/APP-01-006</code> · 수정 <code>APP-01-001/APP-01-002</code>(직행) <span class="ar">→</span><code>APP-01-004</code><span class="ar">→</span> 제조사 <code>APP-01-007</code> <span class="ar">→</span> 저장 <code>APP-01-005</code></div>
+    </section>
+
+    <!-- APP-01-005 저장 결과 -->
+    <section class="screen" data-sid="APP-01-005">
+      <div class="sc-head"><span class="sid">APP-01-005</span><span class="nm">저장 결과 (성공 / 검증 실패 / 전송 실패)</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="states-row">
+            <div class="mini"><div class="mh"><span class="cb ok">성공</span></div><div class="mb"><div class="rico ok">✓</div><div style="font-weight:800">상품 정보가 저장되었습니다</div><div style="font-size:9.5px">클라이언트 3.0 › 상품 관리에서 `앱 데이터 동기화` 실행 후 확인</div><span class="bn g" style="height:22px">상품 상세로</span></div></div>
+            <div class="mini"><div class="mh"><span class="cb warn">검증 실패</span></div><div class="mb"><div class="rico warn">!</div><div style="font-weight:800">입력한 정보를 확인해 주세요</div><div style="font-size:9.5px">필수 항목·입력 형식을 다시 확인한 뒤 저장</div><span class="bn g" style="height:22px">상품 정보 수정</span></div></div>
+            <div class="mini"><div class="mh"><span class="cb err">전송 실패</span></div><div class="mb"><div class="rico err">!</div><div style="font-weight:800">전송하지 못했습니다</div><div style="font-size:9.5px">네트워크 연결이 불안정합니다. 잠시 후 다시 시도</div><span class="bn" style="height:22px">다시 시도</span></div></div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-01-005 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>성공</b> — `상품 정보가 저장되었습니다`. 클라이언트 3.0 상품 관리에서 `앱 데이터 동기화` 실행 후 확인. → `상품 상세로`.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>검증 실패</b> — `입력한 정보를 확인해 주세요`. → APP-01-004 `상품 정보 수정`.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>전송 실패</b> — `전송하지 못했습니다`. 입력값 보존 · `다시 시도`.</span></li>
+        </ol>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-01-004</code><span class="ar">→</span><code>APP-01-005</code><span class="ar">→</span> 성공 상세/목록 · 실패 <code>APP-01-004</code> · 반영결과 <code>CNT-01-001</code>·<code>SA-01-001</code></div>
+    </section>
+
+    <!-- APP-01-006 미등록 안내 / APP-01-007 제조사 팝업 -->
+    <section class="screen" data-sid="APP-01-006">
+      <div class="sc-head"><span class="sid">APP-01-006 · APP-01-007</span><span class="nm">미등록 상품 안내 · 제조사 선택 팝업</span><span class="pf">굿팜 약사님용앱 · 상품관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <div class="state-col"><div class="state-cap"><span class="sid" style="font-size:11px">APP-01-006</span> 미등록 상품 안내 (모달)</div>
+              <div class="phone"><div class="ph-bar"><span class="tt" style="color:var(--faint)">실재고 스캔</span></div>
+                <div class="ph-body" style="background:#0e1418;padding:16px">
+                  <div class="cmodal" style="max-width:100%">
+                    <div class="cm-b" style="text-align:left">
+                      <div class="hot" data-n="1" style="display:block"><span class="num">1</span><div class="cm-t" style="font-size:14px;margin:0 0 8px">상품을 먼저 등록해 주세요</div></div>
+                      <div class="cm-d" style="text-align:left">스캔한 상품이 아직 등록되어 있지 않아 실재고를 입력할 수 없어요. 상품을 등록하면 바로 입력할 수 있어요.</div>
+                      <div style="margin-top:14px;background:var(--teal-soft);border-radius:10px;padding:10px 12px">
+                        <div style="font-size:9.5px;font-weight:700;color:var(--teal-d);margin-bottom:3px">스캔한 바코드</div>
+                        <div style="font-family:ui-monospace,Menlo,monospace;font-size:14px;font-weight:800;color:var(--ink);letter-spacing:.04em">8809999999999</div>
+                      </div>
+                    </div>
+                    <div class="footb"><span class="hot bn g" data-n="3" style="flex:1;justify-content:center"><span class="num">3</span>계속 스캔</span><span class="hot bn" data-n="2" style="flex:1;justify-content:center"><span class="num">2</span>상품 등록</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="state-col"><div class="state-cap"><span class="sid" style="font-size:11px">APP-01-007</span> 제조사 선택 팝업</div>
+              <div class="phone"><div class="ph-bar"><span class="tt">제조사 선택</span><span class="rt">✕</span></div>
+                <div class="ph-body">
+                  <div class="hot fld" data-n="4" style="margin-bottom:8px"><span class="num">4</span><div class="bx sel">제조사명 검색</div></div>
+                  <div class="hot" data-n="5"><span class="num">5</span>
+                    <div class="lrow"><span><div class="ln">한국얀센</div><div class="lb2">코드 J0001</div></span><span style="color:var(--faint)">›</span></div>
+                    <div class="lrow"><span><div class="ln">동아제약</div><div class="lb2">코드 D0007</div></span><span style="color:var(--faint)">›</span></div>
+                    <div class="lrow"><span><div class="ln">유한양행</div><div class="lb2">코드 Y0003</div></span><span style="color:var(--faint)">›</span></div>
+                    <div class="lrow"><span><div class="ln">대웅제약</div><div class="lb2">코드 D0011</div></span><span style="color:var(--faint)">›</span></div>
+                    <div class="lrow"><span><div class="ln">종근당</div><div class="lb2">코드 C0004</div></span><span style="color:var(--faint)">›</span></div>
+                  </div>
+                  <div style="font-size:9.5px;color:var(--faint);text-align:center;margin-top:10px">목록을 스크롤하거나 검색해 제조사를 선택해 주세요.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-01-006 · APP-01-007 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>미등록 안내(모달)</b> — `상품을 먼저 등록해 주세요`. 스캔 배경 위 다이얼로그. 스캔한 바코드는 <b>라벨(위) · 번호(아래) 전체 표시</b>.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>상품 등록</b> — `상품 등록` → APP-01-004 신규(바코드 프리필).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>계속 스캔</b> — APP-02-001/APP-01-001 스캔 복귀.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>제조사 검색</b> — `제조사명 검색`.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>제조사 선택</b> — 명+코드. 선택 시 <b>코드 저장·명 표시</b> 후 APP-01-004 복귀.</span></li>
+        </ol>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-01-006</code><span class="ar">→</span><code>APP-01-004</code>(신규) · <code>APP-01-004</code><span class="ar">→</span><code>APP-01-007</code><span class="ar">→</span><code>APP-01-004</code></div>
+    </section>
+
+    <!-- APP-02-001 실재고 스캔 -->
+    <section class="screen" data-sid="APP-02-001">
+      <div class="sc-head"><span class="sid">APP-02-001</span><span class="nm">실재고 스캔 (최초 0건 / 담김 / 인식 실패)</span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <div class="state-col"><div class="state-cap"><span class="cb info">최초 · 0건</span></div>
+              <div class="phone"><div class="ph-bar"><span class="tt">실재고 스캔</span><span class="rt">제출 이력</span></div>
+                <div class="ph-body">
+                  <div class="hot" data-n="1"><span class="num">1</span>
+                    <div style="border:1px solid var(--line);border-radius:12px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#0e1418;color:#cfe">
+                      <div style="width:120px;height:70px;border:2px solid var(--teal);border-radius:8px"></div>
+                      <div style="font-size:10px;color:#9fb">바코드를 비추면 자동으로 인식합니다</div>
+                    </div>
+                  </div>
+                  <div class="hot" data-n="5" style="font-size:8.5px;color:var(--muted);background:#f7f8fa;border-radius:6px;padding:5px 7px;margin-top:6px"><span class="num">5</span>ⓘ 앱에 표시된 재고는 현재 전산 재고와 다를 수 있어요. 정확한 재고는 PC 클라이언트 › 재고관리 › '상품 데이터 올리기' 후 확인. <span class="tbu">(노출 방식 TBU)</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="state-col"><div class="state-cap"><span class="cb ok">담김 · 2건</span> / <span class="cb err">인식 실패</span></div>
+              <div class="phone"><div class="ph-bar"><span class="tt">실재고 스캔</span><span class="rt">제출 이력</span></div>
+                <div class="ph-body">
+                  <div class="hot" data-n="4"><span class="num">4</span>
+                    <div style="border:1px solid #f0c9c4;border-radius:12px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#1a1113;color:#fbb">
+                      <div style="width:120px;height:70px;border:2px solid var(--danger);border-radius:8px"></div>
+                      <div style="font-size:10px;color:#f99;text-align:center">인식하지 못했습니다<br><span style="color:#cfe">바코드를 화면 안에 맞춰 다시 비춰 주세요</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ph-foot hot" data-n="2" style="padding:11px 13px;border-top:1px solid var(--line)"><span class="num">2</span><span class="bn" style="width:100%;justify-content:center;height:34px">제출 목록 (2건)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-02-001 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>스캔 뷰</b> — 안내문구 `바코드를 비추면 자동으로 인식합니다`. 등록 상품 APP-02-002, 미등록 APP-01-006.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>제출 목록 (N건)</b> — 담은 건이 있을 때만 하단 노출 → APP-02-003.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>제출 이력</b> — 앱바 우측 아이콘 → APP-02-005.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>인식 실패</b> — `인식하지 못했습니다` · `바코드를 화면 안에 맞춰 다시 비춰 주세요`.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>재고 안내</b>(문구 확정 · 노출 방식 <b class="tbu">TBU</b>) — `앱에 표시된 재고는 현재 전산 재고와 다를 수 있습니다. 더 정확한 재고를 확인하려면 먼저 PC 클라이언트 > 재고관리 > '상품 데이터 올리기'를 실행해 주세요.` 노출 방식(최초 진입 모달 / 상단 배너)은 확정 전.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb info">최초 · 0건</span></td><td>진입</td><td>스캔 뷰 · 하단 버튼 없음</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb ok">등록 상품</span></td><td>바코드 매칭</td><td>수량 입력 이동</td><td class="nx">APP-02-002</td></tr>
+          <tr><td><span class="cb warn">미등록</span></td><td>바코드 미매칭</td><td>신규 등록 유도</td><td class="nx">APP-01-006</td></tr>
+          <tr><td><span class="cb ok">담김 N건</span></td><td>1건 이상 담김</td><td>하단 `제출 목록 (N건)`</td><td class="nx">APP-02-003</td></tr>
+          <tr><td><span class="cb err">인식 실패</span></td><td>초점/조도</td><td>실패 안내 · 재시도</td><td class="nx">APP-02-001</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb info">최초 · 0건</span></div><div class="mb"><div style="width:80px;height:46px;border:2px solid var(--teal);border-radius:6px;background:#0e1418"></div><div style="font-size:9.5px">스캔 뷰 · 하단 버튼 없음</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb ok">담김 · 2건</span></div><div class="mb"><span class="bn" style="height:24px">제출 목록 (2건)</span><div style="font-size:9.5px;color:var(--faint)">1건 이상 담기면 하단 노출 → APP-02-003</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb err">인식 실패</span></div><div class="mb"><div class="rico err">!</div><div style="font-weight:800">인식하지 못했습니다</div><div style="font-size:9.5px">바코드를 화면 안에 맞춰 다시 비춰 주세요</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-001</code><span class="ar">→</span> 등록 <code>APP-02-002</code> · 미등록 <code>APP-01-006</code> · 담김 <code>APP-02-003</code> · 이력 <code>APP-02-005</code></div>
+    </section>
+
+    <!-- APP-02-002 실재고 입력 -->
+    <section class="screen" data-sid="APP-02-002">
+      <div class="sc-head"><span class="sid">APP-02-002</span><span class="nm">실재고 입력 (진열·창고 셀 · 상시 키패드)</span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="phone" style="max-width:300px;margin:0 auto">
+            <div class="ph-bar"><span class="bk">‹</span><span class="tt">실재고 입력</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint);font-weight:700;margin-left:6px">8801234567890</span></div>
+            <div class="ph-body">
+              <div class="hot" data-n="1"><span class="num">1</span>
+                <div class="kv"><span class="k">상품명</span><span style="text-align:right;max-width:180px">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</span></div>
+                <div class="kv"><span class="k">앱 조회 시점 재고</span><span>48 개</span></div>
+                <div class="synced-sm" style="margin-top:4px">앱 동기화 · 2026-06-26 09:10</div>
+              </div>
+              <div class="cells" style="margin-top:12px">
+                <div class="hot cell act" data-n="2"><span class="num">2</span><div class="cl">진열 수량</div><div class="cv">10</div></div>
+                <div class="hot cell" data-n="3"><span class="num">3</span><div class="cl">창고 수량</div><div class="cv">14</div></div>
+              </div>
+              <div class="hot" data-n="4" style="margin-top:10px"><span class="num">4</span><div style="font-size:9.5px;font-weight:800;color:var(--ink);margin-bottom:3px">재고 보정 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx" style="height:26px;font-size:9.5px;color:#3a424c;justify-content:flex-start">정기 실사 중 진열·창고 차이 확인</div><div style="text-align:right;font-size:8px;color:var(--faint);margin-top:2px">19/30</div></div>
+            </div>
+            <div class="ph-foot" style="padding:11px 13px;border-top:1px solid var(--line);background:#fafbfc">
+              <div class="hot totbox" data-n="5" style="margin:0 0 8px"><span class="num">5</span><span class="tl">총 수량 <span class="autob">자동</span></span><span class="tv">24 <span style="font-size:10px;font-weight:700">개</span></span></div>
+              <div class="hot" data-n="6"><span class="num">6</span>
+                <div class="keypad"><span class="k">1</span><span class="k">2</span><span class="k">3</span><span class="k">4</span><span class="k">5</span><span class="k">6</span><span class="k">7</span><span class="k">8</span><span class="k">9</span><span class="k">00</span><span class="k">0</span><span class="k">⌫</span></div>
+              </div>
+              <div class="hot" data-n="7" style="margin-top:8px"><span class="num">7</span><span class="bn" style="width:100%;justify-content:center;height:34px">목록에 담기</span></div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-02-002 · 컴포넌트 <span class="asis-note">헤더 바코드 + 진열·창고 2셀 + 상시 키패드(총 수량은 키패드 위)</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>상품 식별 헤더</b> — 바코드는 앱바(제목 옆). 본문에 <b>상품명·앱 조회 시점 재고</b>(읽기 전용) + <b>앱 동기화 시각</b> 캡션.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>진열 수량 셀</b> — 탭 시 활성(강조). 미입력 `입력` 표시.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>창고 수량 셀</b> — 탭 시 활성.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 보정 사유(선택)</b> — <b>수량(진열/창고) 입력 후 총 수량 ≠ 앱 조회 시점 재고</b>일 때만 노출. 1줄·30자(N/30). placeholder `앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.` 입력값은 제출 목록·제출 상세·클라이언트 실재고 관리에도 함께 노출.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>총 수량(자동 · 읽기 전용)</b> — <b>키패드 위</b>에 상시 표시. `총 수량 = 진열 + 창고`. 직접 입력 없음.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>숫자 키패드(상시 노출)</b> — 1~9 · `00` · `0` · `⌫`. 탭 없이 바로 입력.</span></li>
+          <li data-n="7"><span class="di">7</span><span class="dt"><b>목록에 담기</b> — 진열·창고 중 하나라도 값 있어야 활성 → APP-02-003.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb info">최초 진입</span></td><td>APP-02-001 인식</td><td>진열·창고 `입력` · 총 수량 `0` · 담기 <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
+          <tr><td><span class="cb ok">진열/창고 입력</span></td><td>셀 값 입력</td><td>총 수량(키패드 위) 실시간 합산 · 담기 활성</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb info">재고 보정 사유 노출</span></td><td>수량 입력 시 총 수량 ≠ 앱 조회 시점 재고</td><td>사유 입력란 노출(선택·30자)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb ok">목록 담기</span></td><td>담기 클릭</td><td>제출 목록에 추가</td><td class="nx">APP-02-003</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb info">최초 진입</span></div><div class="mb" style="align-items:stretch"><div class="cells" style="margin:0"><div class="cell"><div class="cl">진열</div><div class="cv" style="color:var(--muted)">입력</div></div><div class="cell"><div class="cl">창고</div><div class="cv" style="color:var(--muted)">입력</div></div></div><div style="font-size:9.5px;color:var(--faint)">총 수량 <b>0</b> · 담기 <span class="cb dis">Disabled</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb ok">진열/창고 입력</span></div><div class="mb" style="align-items:stretch"><div class="cells" style="margin:0"><div class="cell act"><div class="cl">진열</div><div class="cv">10</div></div><div class="cell"><div class="cl">창고</div><div class="cv">14</div></div></div><div style="font-size:9.5px">총 수량(키패드 위) <b>24</b> 자동 합산 · 담기 활성</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">재고 보정 사유 노출</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;font-weight:800">재고 보정 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx sel" style="height:24px;font-size:8.5px;justify-content:flex-start">앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.</div><div style="font-size:9px;color:var(--faint)">총 수량 ≠ 앱 조회 시점 재고일 때만 노출</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-001</code><span class="ar">→</span><code>APP-02-002</code><span class="ar">→</span><code>APP-02-003</code></div>
+    </section>
+
+    <!-- APP-02-003 제출 목록 -->
+    <section class="screen" data-sid="APP-02-003">
+      <div class="sc-head"><span class="sid">APP-02-003</span><span class="nm">실재고 제출 목록 (있음 / 없음 / 제출 확인)</span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <div class="state-col"><div class="state-cap"><span class="cb ok">제출 건 있음</span></div>
+              <div class="phone"><div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 목록 · 3건</span></div>
+                <div class="ph-body">
+                  <div class="hot" data-n="1"><span class="num">1</span>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
+                      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</div><span style="font-weight:800;white-space:nowrap"><b>24</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
+                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 보정 사유</b> 정기 실사 중 차이 확인</div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8801234567890</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
+                    </div>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
+                      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">판콜에이내복액 30ml</div><span style="font-weight:800;white-space:nowrap"><b>60</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8806789012345</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
+                    </div>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px">
+                      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">겔포스엠현탁액</div><span style="font-weight:800;white-space:nowrap"><b>40</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
+                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 보정 사유</b> 파손 2개 폐기 처리</div>
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8803333000044</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="footb"><span class="hot bn g" data-n="3" style="flex:1;justify-content:center"><span class="num">3</span>상품 더 추가</span><span class="hot bn" data-n="2" style="flex:1;justify-content:center"><span class="num">2</span>제출하기 (3건)</span></div>
+              </div>
+            </div>
+            <div class="state-col"><div class="state-cap"><span class="cb empty">제출 건 없음</span></div>
+              <div class="phone"><div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 목록 · 0건</span></div>
+                <div class="ph-body"><div class="hot empty-ph" data-n="4"><span class="num">4</span>담은 실재고가 없습니다<br><span style="font-size:10px">스캔해서 수량을 담아주세요</span></div></div>
+                <div class="footb"><span class="bn g" style="flex:1;justify-content:center">상품 더 추가</span><span class="bn dis" style="flex:1;justify-content:center">제출하기 (0건)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-02-003 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 보정 사유(있을 때)·바코드. 건별 `편집`/`삭제`. <b>`편집` → APP-02-002(실재고 입력)로 이동</b>해 해당 건의 진열·창고 수량을 다시 입력·수정한다. <b>`삭제` → `제출 상품 삭제` 확인 모달</b>(`해당 항목을 삭제하시겠습니까?` · 취소/삭제).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>제출하기 (N건)</b> — Confirm 후 제출 → APP-02-004. 0건이면 <b>Disabled</b>.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>상품 더 추가</b> — APP-02-001 스캔 복귀.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>Empty</b> — 담은 건 없음 안내.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb empty">건 없음</span></td><td>담긴 항목 0</td><td>Empty · 제출 <span class="cb dis">Disabled</span></td><td class="nx">APP-02-001</td></tr>
+          <tr><td><span class="cb ok">건 있음</span></td><td>1건 이상</td><td>목록·건수·제출 활성</td><td class="nx">APP-02-004</td></tr>
+          <tr><td><span class="cb info">건 편집</span></td><td>카드 `편집`</td><td>APP-02-002 실재고 입력으로 이동(값 재입력)</td><td class="nx">APP-02-002</td></tr>
+          <tr><td><span class="cb err">건 삭제</span></td><td>카드 `삭제`</td><td>`제출 상품 삭제` 확인 모달(`해당 항목을 삭제하시겠습니까?` · 취소/삭제)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb warn">제출 확인</span></td><td>제출하기 클릭</td><td>Confirm 모달 `실재고를 제출할까요?` · `제출 후 PC 클라이언트의 실재고 관리에서 재고 반영을 진행해주세요`</td><td class="nx">APP-02-004</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb ok">건 있음</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9.5px;font-weight:700;display:flex;justify-content:space-between;gap:6px">타이레놀콜드-에스정<span style="white-space:nowrap">24 개</span></div><span class="bn" style="height:24px">제출하기 (3건)</span></div></div>
+          <div class="mini"><div class="mh"><span class="cb empty">건 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">담은 실재고가 없습니다</div><div style="font-size:9.5px">스캔해서 수량을 담아주세요 · 제출 <span class="cb dis">Disabled</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb warn">제출 확인</span></div><div class="mb"><div style="font-weight:800;font-size:10px">실재고를 제출할까요?</div><div style="font-size:9px;color:var(--faint);line-height:1.5">제출 후 PC 클라이언트의 실재고 관리에서 재고 반영을 진행해주세요</div><div style="display:flex;gap:5px"><span class="bn g" style="height:22px">취소</span><span class="bn" style="height:22px">제출</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb err">삭제 확인</span></div><div class="mb"><div style="font-weight:800;font-size:10px">제출 상품 삭제</div><div style="font-size:9.5px">해당 항목을 삭제하시겠습니까?</div><div style="display:flex;gap:5px"><span class="bn g" style="height:22px">취소</span><span class="bn r" style="height:22px">삭제</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">건 편집</span></div><div class="mb"><div style="font-size:9.5px">카드 `편집` → <b>APP-02-002</b>(실재고 입력)</div><div style="font-size:9px;color:var(--faint)">진열·창고 수량 재입력·수정</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-002</code><span class="ar">→</span><code>APP-02-003</code><span class="ar">→</span> 제출 <code>APP-02-004</code> · 추가 <code>APP-02-001</code></div>
+    </section>
+
+    <!-- APP-02-004 제출 결과 -->
+    <section class="screen" data-sid="APP-02-004">
+      <div class="sc-head"><span class="sid">APP-02-004</span><span class="nm">제출 결과 (성공 / 전송 실패)</span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="states-row">
+            <div class="mini"><div class="mh"><span class="cb ok">성공</span></div><div class="mb"><div class="rico ok">✓</div><div style="font-weight:800">3건이 제출되었습니다</div><span class="pill pre">반영전</span><div style="font-size:9.5px">클라이언트 3.0 › 재고 운영에서 `앱 데이터 동기화` 실행 후 확인</div><span style="display:flex;gap:5px"><span class="bn g" style="height:22px">계속 스캔</span><span class="bn" style="height:22px">제출 이력 보기</span></span></div></div>
+            <div class="mini"><div class="mh"><span class="cb err">전송 실패</span></div><div class="mb"><div class="rico err">!</div><div style="font-weight:800">전송하지 못했습니다</div><div style="font-size:9.5px">네트워크 연결이 불안정합니다. 잠시 후 다시 시도</div><span style="display:flex;gap:5px"><span class="bn g" style="height:22px">제출 목록으로</span><span class="bn" style="height:22px">다시 시도</span></span></div></div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-02-004 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>성공</b> — `N건이 제출되었습니다` + `반영전`. <b>즉시 반영 아님</b> · 클라이언트 3.0 재고 운영에서 `앱 데이터 동기화` 실행 후 확인. → `계속 스캔` / `제출 이력 보기`(APP-02-005).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>전송 실패</b> — `전송하지 못했습니다`. 전체 실패(원자적 배치, 부분 실패 없음) · `제출 목록으로` / `다시 시도`.</span></li>
+        </ol>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-003</code><span class="ar">→</span><code>APP-02-004</code><span class="ar">→</span> 이력 <code>APP-02-005</code> · 실패 <code>APP-02-003</code> · (클라이언트) <code>CNT-02-001</code></div>
+    </section>
+
+    <!-- APP-02-005 제출 이력 -->
+    <section class="screen" data-sid="APP-02-005">
+      <div class="sc-head"><span class="sid">APP-02-005</span><span class="nm">제출 이력 (제출일자 단위 · 반영전/중/완료)</span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="phone">
+            <div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 이력</span></div>
+            <div class="ph-body">
+              <div class="hot cardh" data-n="1"><div class="c1"><b style="font-size:13px">2026-07-02</b><span class="pill mid">반영중</span></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><b style="font-size:11px">전체 17건</b><span style="font-size:9.5px;color:var(--muted)">완료 14 · 반려 2 · 반영전 1</span><span style="margin-left:auto;color:var(--faint)">›</span></div></div>
+              <div class="cardh"><div class="c1"><b style="font-size:13px">2026-07-01</b><span class="pill pre">반영전</span></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><b style="font-size:11px">전체 3건</b><span style="font-size:9.5px;color:var(--muted)">완료 0 · 반려 0 · 반영전 3</span><span style="margin-left:auto;color:var(--faint)">›</span></div></div>
+              <div class="hot" data-n="2" style="font-size:9px;color:var(--faint);text-align:center;margin-top:8px"><span class="num">2</span>스크롤하면 이전 이력이 계속 표시됩니다 (무한 스크롤 · 더보기 버튼 없음)</div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-02-005 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출일자 카드</b> — 날짜 + 반영 상태 배지(반영전/중/완료) + `전체 N건 · 완료 D · 반려 R · 반영전 W` 요약. 클릭 → APP-02-006.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>무한 스크롤</b> — 스크롤로 이전 이력 확인(더보기 버튼 없음). <span class="tbu">TBU</span> 기본 조회 기간 확정.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="pill pre">반영전</span></td><td>전 건 반영전</td><td>회색 Badge</td><td class="nx">APP-02-006</td></tr>
+          <tr><td><span class="pill mid">반영중</span></td><td>일부 반영/반려</td><td>amber Badge</td><td class="nx">APP-02-006</td></tr>
+          <tr><td><span class="pill done">반영완료</span></td><td>전 건 처리(완료+반려)</td><td>green Badge</td><td class="nx">APP-02-006</td></tr>
+          <tr><td><span class="cb empty">이력 없음</span></td><td>제출 0</td><td>Empty 안내</td><td class="nx">APP-02-001</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb ok">카드 있음</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:6px 8px;text-align:left"><div style="display:flex;align-items:center;gap:6px"><b style="font-size:11px">2026-07-02</b><span class="pill mid">반영중</span></div><div style="font-size:9px;color:var(--muted);margin-top:3px">전체 17건 · 완료 14 · 반려 2 · 반영전 1</div></div><div style="font-size:9px;color:var(--faint)">카드 클릭 → APP-02-006</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb empty">이력 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">제출 이력이 없습니다</div><div style="font-size:9.5px">실재고를 제출하면 이력이 표시됩니다</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-001/APP-02-004</code><span class="ar">→</span><code>APP-02-005</code><span class="ar">→</span> 카드 <code>APP-02-006</code></div>
+    </section>
+
+    <!-- APP-02-006 제출 상세 (기기별 요약 → 상품 상세) -->
+    <section class="screen" data-sid="APP-02-006">
+      <div class="sc-head"><span class="sid">APP-02-006</span><span class="nm">제출 상세 (기기별 요약 → 상품 상세) <span class="tbu" style="font-size:11px">화면 TBU</span></span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <!-- ① 메인 = 기기별 요약 카드 -->
+            <div class="state-col"><div class="state-cap"><span class="cb info">① 기기별 요약</span> 메인</div>
+              <div class="phone">
+                <div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 상세</span><span class="hot" data-n="1" style="display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span class="num">1</span><span style="font-size:10px;color:var(--faint);font-weight:700">2026-07-02</span></span></div>
+                <div class="ph-body">
+                  <div class="hot" data-n="2" style="display:flex;align-items:center;gap:6px;margin:2px 0 8px"><span class="num">2</span><span style="font-size:9.5px;font-weight:800;color:var(--ink)">전체 <b>12</b>건</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:9px;font-weight:700;color:#3a424c">▽ 반영상태</span></div>
+                  <div class="hot" data-n="3"><span class="num">3</span>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+                      <div style="flex:1;min-width:0">
+                        <div style="display:flex;align-items:baseline;gap:5px"><b style="font-size:12.5px">김약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-S911</span></div>
+                        <div style="font-size:9px;color:var(--muted);margin-top:4px">마지막 제출 10:31 <span style="color:#c0c6cd">·</span> <span style="color:#1d8a76;font-weight:700">완료 6</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--danger);font-weight:700">반려 1</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--muted);font-weight:700">반영전 1</span></div>
+                      </div>
+                      <span style="flex:none;display:flex;align-items:center;gap:3px"><b style="font-size:14px">8</b><span style="font-size:10px;color:var(--muted)">건</span><span style="color:var(--faint)">›</span></span>
+                    </div>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:8px">
+                      <div style="flex:1;min-width:0">
+                        <div style="display:flex;align-items:baseline;gap:5px"><b style="font-size:12.5px">이약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-A21</span></div>
+                        <div style="font-size:9px;color:var(--muted);margin-top:4px">마지막 제출 09:22 <span style="color:#c0c6cd">·</span> <span style="color:#1d8a76;font-weight:700">완료 3</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--danger);font-weight:700">반려 1</span></div>
+                      </div>
+                      <span style="flex:none;display:flex;align-items:center;gap:3px"><b style="font-size:14px">4</b><span style="font-size:10px;color:var(--muted)">건</span><span style="color:var(--faint)">›</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ② 기기 상세 = 상품 카드 목록 -->
+            <div class="state-col"><div class="state-cap"><span class="cb ok">② 기기 상세</span> 카드 클릭 → 상품 상세</div>
+              <div class="phone">
+                <div class="ph-bar"><span class="bk">‹</span><span class="tt">김약사 SM-S911</span></div>
+                <div class="ph-body">
+                  <div class="hot" data-n="4"><span class="num">4</span>
+                    <!-- 반영완료 · 감소(접힘) -->
+                    <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px">
+                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8801234567890</span><div class="dnm" style="margin-top:1px">타이레놀콜드-에스정</div><div style="font-size:8.5px;color:var(--muted)">아세트아미노펜·클로르페니라민 복합제</div></span><span class="stt ok">반영완료</span></div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:14px;color:var(--muted);font-weight:600">48</span><span style="color:#c0c6cd">→</span><span style="font-size:20px;font-weight:800;color:#28303a">24</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#fbe3e0;color:#e5484d;border-radius:6px;padding:2px 7px">−24</span></div>
+                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">10:31</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사 <span style="color:var(--faint)">→</span> 정약사</span><span style="color:#c0c6cd">|</span><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정</span><span style="flex:none;color:var(--faint)">˅</span></div>
+                    </div>
+                    <!-- 반영완료 · 증가(펼침 = 자세히 노출) -->
+                    <div class="hot" data-n="5" style="border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px"><span class="num">5</span>
+                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8806789012345</span><div class="dnm" style="margin-top:1px">판콜에이내복액 30ml</div></span><span class="stt ok">반영완료</span></div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:14px;color:var(--muted);font-weight:600">52</span><span style="color:#c0c6cd">→</span><span style="font-size:20px;font-weight:800;color:#28303a">60</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#e2f3ee;color:#1d8a76;border-radius:6px;padding:2px 7px">+8</span></div>
+                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">10:31</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사 <span style="color:var(--faint)">→</span> 정약사</span><span style="flex:1"></span><span style="flex:none;color:var(--faint)">˄</span></div>
+                      <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)">
+                        <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafbfc">
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이</span><span style="flex:1">+8개</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 보정 사유</span><span style="flex:1;color:var(--faint)">-</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">처리</span><span style="flex:1">10:31 · 정약사</span></div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- 반영반려(펼침 = 반려 사유 포함) -->
+                    <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px">
+                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8803333000044</span><div class="dnm" style="margin-top:1px">겔포스엠현탁액</div></span><span class="stt rej">반영반려</span></div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:14px;color:var(--muted);font-weight:600">38</span><span style="color:#c0c6cd">→</span><span style="font-size:20px;font-weight:800;color:#28303a">40</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#e2f3ee;color:#1d8a76;border-radius:6px;padding:2px 7px">+2</span></div>
+                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">10:35</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사 <span style="color:var(--faint)">→</span> 정약사</span><span style="flex:1"></span><span style="flex:none;color:var(--faint)">˄</span></div>
+                      <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)">
+                        <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafbfc">
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이</span><span style="flex:1">+2개</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 보정 사유</span><span style="flex:1">입고 검수 중 수량 오차 발견</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">처리</span><span style="flex:1">10:35 · 정약사</span></div>
+                          <div style="display:flex;gap:8px;padding:7px 10px;font-size:9.5px"><span style="flex:none;width:64px;color:var(--danger);font-weight:700">반려 사유</span><span style="flex:1;color:var(--danger)">근거 자료 부족 — 재실사 후 재제출 요청</span></div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- 반영전(접힘 · 제출 수량만) -->
+                    <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px">
+                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8801111000022</span><div class="dnm" style="margin-top:1px">훼스탈플러스정</div></span><span class="stt wait">반영전</span></div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:16px;font-weight:800;color:#28303a">제출 30</span><span style="font-size:9.5px;color:var(--muted)">개</span></div>
+                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">09:22</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사</span><span style="flex:1"></span><span style="flex:none;color:var(--faint)">˅</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">APP-02-006 · 컴포넌트 <span class="asis-note">① 기기별 요약 → ② 기기 상세(상품 카드) → 상품 자세히 3단, 필터는 양쪽 연동</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — 메인은 `제출 상세` + 제출일자(제목 옆). 기기 카드 클릭 시 <b>제목이 제출자(`김약사 SM-S911`)로 바뀌고</b> 뒤로가기는 메인 복귀. 상단 별도 기기 헤더 없음.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>전체 건수 + 반영상태 필터</b> — 좌측 `전체 N건`(필터 적용 시 `선택 N건`) · 우측 <b>`▽ 반영상태` 버튼</b> → Bottom Sheet(다중선택 체크박스: 전체·반영완료·반영반려·반영전). 필터는 <b>기기 요약·기기 상세 양쪽에 연동</b>(선택 상태 없는 기기는 메인에서 숨김).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>기기별 요약 카드(카드 전체 클릭)</b> — 1행 `사용자 · 기기ID(SM-S911)`, 2행 `마지막 제출 HH:MM · 완료 D · 반려 R · 반영전 W`, 우측 `N건 ›`. 클릭 → 해당 기기 상세.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>상품 카드(개별 카드·아코디언)</b> — 바코드(#)·상품명(2줄)·부제 + <b>수량 `48 → 24개`(결과 강조) + 증감 배지</b>(감소 <span style="color:#e5484d;font-weight:800">−N</span>·red / 증가 <span style="color:#1d8a76;font-weight:800">+N</span>·green) + 상태 배지(반영완료/반영반려/반영전). 구분선 아래 <b>메타 프리뷰 라인</b> `HH:MM | 제출자 → 처리자 | 재고 보정 사유(말줄임) ˅`. 반영전은 `제출 N개`·증감 배지 없음.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>자세히(펼침)</b> — <b>[재고 차이 · 재고 보정 사유 · 처리]</b> 묶음 카드. 처리는 <b>PC id 제거</b>(`10:31 · 정약사`). 반영반려는 <b>반려 사유</b> 행 추가. 반영전은 처리 `반영 전이라 처리 전`.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 (3단 · 필터)</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>단계 / 상태</th><th>수량 표기</th><th>증감 배지 · 자세히</th></tr></thead><tbody>
+          <tr><td><span class="cb info">① 기기 요약</span></td><td>기기별 `N건` · 완료/반려/반영전 건수</td><td>카드 전체 클릭 → ② 기기 상세</td></tr>
+          <tr><td><span class="stt ok">반영완료</span></td><td>반영 전 → 반영 후 `48 → 24개`</td><td>감소 <span class="diff-neg">−24</span> / 증가 <span style="color:#1d8a76;font-weight:800">+8</span> · 자세히: 재고 차이·사유·처리</td></tr>
+          <tr><td><span class="stt rej">반영반려</span></td><td>전산상 재고 → 제출 `38 → 40개`</td><td>제출-전산 차이 배지 · 자세히에 <b>반려 사유</b> 추가</td></tr>
+          <tr><td><span class="stt wait">반영전</span></td><td>`제출 30개`(전산상 재고 미제공 시)</td><td>배지 없음 · 처리 `반영 전이라 처리 전`</td></tr>
+          <tr><td><span class="cb empty">결과 없음</span></td><td>필터 결과 0</td><td>`선택한 상태의 제출 내역이 없습니다.`</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-005</code><span class="ar">→</span><code>APP-02-006</code>(① 기기 요약)<span class="ar">→</span> 기기 카드 <code>APP-02-006</code>(② 기기 상세) <span class="ar">→</span> 상품 카드 펼침(자세히)</div>
+    </section>
+  </div>
+
+  <!-- ════════════════════ P2 클라이언트 상품 관리 통합 ════════════════════ -->
+  <div class="platform" data-p="product" hidden>
+    <section class="screen" data-sid="CNT-01-001">
+      <div class="sc-head"><span class="sid">CNT-01-001 · CNT-01-002</span><span class="nm">상품 관리 통합 (동기화 + 상품 상세)</span><span class="pf">굿팜 클라이언트 3.0 · 상품 관리</span></div>
+      <div class="sc-grid stack">
+        <div class="mock deskgut">
+          <div class="win">
+            <div class="bar"><span class="dotm"></span><span class="wt">상품 관리</span><span class="x">✕</span></div>
+            <div class="tabrow"><span class="t on">상품 목록</span><span class="t">다빈도/세트 상품</span><span class="t">가격태그</span><span class="t">ESL</span></div>
+            <div class="pad">
+              <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:start">
+                <!-- 좌: 상품 목록 -->
+                <div>
+                  <div class="hot srow" data-n="1"><span class="num">1</span>
+                    <span class="inp">상품명 ▾</span><span class="inp w">검색 기준 선택 후 검색어를 입력해 주세요.</span><span class="bn">검색</span>
+                    <span class="bn" style="margin-left:auto">상품 데이터 올리기</span><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);color:var(--muted);font-size:9px;font-weight:800;margin-left:4px" title="기준이 되는 최신 상품 데이터를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/삭제할 수 있습니다.">i</span><span class="bn" style="margin-left:6px;position:relative">앱 데이터 동기화<span style="position:absolute;top:-6px;right:-6px;min-width:15px;height:15px;padding:0 4px;border-radius:99px;background:#ee4a3a;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px #fff">3</span></span><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);color:var(--muted);font-size:9px;font-weight:800;margin-left:6px" title="굿팜 약사님용앱에서 수정한 상품 정보를 '앱 상품 수정 요청'에서 확인해 반영/삭제합니다. 미처리 건수가 배지로 표시됩니다.">i</span><span style="font-size:9.5px;color:var(--faint)">마지막 동기화 2026-07-03 09:12</span>
+                  </div>
+                  <div class="hot srow" data-n="2" style="margin-bottom:6px"><span class="num">2</span><span style="font-size:11px">☑ 사용 약품만 조회　☑ 재고 0이상 조회</span></div>
+                  <div class="tscroll"><div class="hot" data-n="3"><span class="num">3</span>
+                    <table class="m" style="min-width:0"><thead><tr><th>상품명</th><th>바코드</th><th>단위</th><th class="num-c">판매가</th><th class="num-c">재고</th></tr></thead>
+                    <tbody>
+                      <tr style="background:var(--teal-soft)"><td>[2+1]비타리움 프로폴리스…</td><td>9343202002627</td><td>회</td><td class="num-c">26,500</td><td class="num-c">6</td></tr>
+                      <tr><td>판콜에이 30ml</td><td>8806789012345</td><td>개</td><td class="num-c">1,100</td><td class="num-c">12</td></tr>
+                      <tr><td>베아제정</td><td>8802223…</td><td>개</td><td class="num-c">1,300</td><td class="num-c">13</td></tr>
+                    </tbody></table>
+                  </div></div>
+                </div>
+                <!-- 우: 상품 상세 정보 (버튼 상단) -->
+                <div>
+                  <div class="hot srow" data-n="4" style="justify-content:space-between;align-items:center"><span class="num" style="left:-13px">4</span>
+                    <span style="font-weight:800;font-size:12px">상품 상세 정보</span>
+                    <span><span class="bn">변경 내용 보기</span> <span class="bn r">삭제</span> <span class="bn g">저장</span></span>
+                  </div>
+                  <div style="border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-top:2px">
+                    <div class="kv"><span class="k">상품명 *</span><span>[2+1]비타리움…</span></div>
+                    <div class="kv"><span class="k">제조업체</span><span>헥사곤</span></div>
+                    <div class="kv"><span class="k">중분류 / 단위</span><span>의약외품 / 회</span></div>
+                    <div class="kv"><span class="k">바코드</span><span>9343202002627</span></div>
+                    <div class="kv"><span class="k">사입가 / 판매가</span><span>6,750 / 26,500</span></div>
+                    <div class="kv" style="border:none"><span class="k">재고 / 안전재고</span><span>6 / 0</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc" style="max-width:820px">
+          <div class="dh">CNT-01-001 · CNT-01-002 · 컴포넌트 <span class="asis-note">좌 상품 목록 / 우 상품 상세 정보(액션 버튼 상단) — 프로토타입 2단 구성</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>검색 · 동기화</b> — 상품명/바코드 검색(Enter·검색 버튼). <b>`상품 데이터 올리기`</b>(기준 상품 데이터를 서버에 먼저 올림) + <b>`앱 데이터 동기화` 버튼에 미처리 건수 Badge</b>(0건이면 미노출). 클릭 시 <b>`앱 상품 수정 요청`</b> 모달(CNT-01-004)에서 <b>선택 반영</b>. 툴팁 `굿팜 약사님용앱에서 수정한 상품 정보를 '앱 상품 수정 요청'에서 확인해 반영/삭제합니다.`</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>조회 필터</b> — 사용 약품만 / 재고 0이상(기본 체크).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>상품 목록</b> — 상품명·바코드·단위·사입가·판매가·재고. <b>앱 수정분은 목록에 직접 노출하지 않고</b> `앱 상품 수정 요청`에서 반영(승인 후 최신값 반영). 선택 시 우측 상세 갱신.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>상품 상세 정보 · 액션(상단)</b> — 상세 패널 상단에 <b>변경 내용 보기 · 삭제 · 저장</b>. `변경 내용 보기` 클릭 → CNT-01-003. 상품 정보는 <b>최신 정보 기준 덮어씀</b>.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>앱 상품 수정 요청(CNT-01-004)</b> — <b>선택 반영으로 확정</b>: 앱 수정분을 목록에 직접 노출하지 않고, 동기화 시 열리는 요청 모달에서 <b>체크박스로 선택한 요청을 `반영` 또는 `삭제`</b>한다(<b>전체 삭제</b>도 가능 · 반려 개념 없음 · 미반영 요청은 누적). <b class="tbu">UI 세부 시안(카드형/리스트/기기별 드로어)은 (TBU)</b>.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb ok">동기화 완료</span></td><td>성공</td><td>목록 갱신 · Toast `N건 반영` · 마지막 동기화 일시</td><td class="nx">CNT-01-002</td></tr>
+          <tr><td><span class="cb err">동기화 실패</span></td><td>네트워크/서버</td><td>실패 안내 · 재시도 (<span class="tbu">TBU</span> 문구)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb empty">검색 결과 없음</span></td><td>매칭 0</td><td>빈 목록 안내</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb dis">미처리 0건</span></td><td>앱 상품 수정 요청 없음</td><td>`앱 데이터 동기화` 버튼 Badge 미노출</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb warn">앱 상품 수정 요청 있음</span></td><td>미처리 N건</td><td>동기화 버튼에 빨간 Badge N · 클릭 시 요청 모달</td><td class="nx">CNT-01-004</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:10px">
+          <div class="mini"><div class="mh"><span class="cb ok">동기화 완료</span></div><div class="mb"><div class="rico ok">✓</div><div style="font-weight:800">3건 반영되었습니다</div><div style="font-size:9.5px;color:var(--faint)">마지막 동기화 2026-07-03 09:12</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb empty">검색 결과 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">검색 결과가 없습니다</div><div style="font-size:9.5px">검색 기준·검색어를 다시 확인해 주세요</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb dis">미처리 0건</span></div><div class="mb"><span class="bn">앱 데이터 동기화</span><div style="font-size:9.5px">앱 상품 수정 요청 없음 · 버튼 <b>Badge 미노출</b></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb warn">앱 상품 수정 요청 있음</span></div><div class="mb"><span class="bn" style="position:relative">앱 데이터 동기화<span style="position:absolute;top:-6px;right:-6px;min-width:15px;height:15px;padding:0 4px;border-radius:99px;background:#ee4a3a;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px #fff">3</span></span><div style="font-size:9.5px">미처리 <b>3건</b> · 클릭 시 요청 모달(CNT-01-004)</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>CNT-01-001</code><span class="ar">→</span> 행 선택 <code>CNT-01-002</code><span class="ar">→</span> 수정 기록 <code>CNT-01-003</code></div>
+    </section>
+
+
+    <section class="screen" data-sid="CNT-01-004">
+      <div class="sc-head"><span class="sid">CNT-01-004</span><span class="nm">앱 상품 수정 요청 (동기화 → 선택 반영·삭제) <span style="font-size:11px;color:var(--teal-d);font-weight:700">시안 A 확정</span></span><span class="pf">굿팜 클라이언트 3.0 · 상품 관리</span></div>
+      <div class="sc-grid stack">
+        <div class="mock deskgut">
+          <!-- 트리거: 앱 데이터 동기화 버튼(미처리 배지) -->
+          <div class="hot srow" data-n="1" style="margin-bottom:10px"><span class="num">1</span>
+            <span class="bn" style="position:relative">앱 데이터 동기화<span style="position:absolute;top:-6px;right:-6px;min-width:15px;height:15px;padding:0 4px;border-radius:99px;background:#ee4a3a;color:#fff;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px #fff">6</span></span>
+            <span style="font-size:10px;color:var(--faint)">클릭 시 아래 `앱 상품 수정 요청` 모달이 열립니다 · 미처리 6건</span>
+          </div>
+          <!-- 앱 상품 수정 요청 모달 (시안 A · 기기별 묶음 + 상세 내용 플로팅 팝업) -->
+          <div style="position:relative">
+            <div class="drw" style="max-width:560px">
+              <div class="hot drw-h" data-n="2" style="text-align:center;justify-content:center"><span class="num">2</span>앱 상품 수정 요청 <span style="font-size:10px;font-weight:600;color:var(--faint);margin-left:6px">시안 A</span></div>
+              <div style="padding:12px">
+                <!-- 기기 그룹 1 (펼침) -->
+                <div class="hot" data-n="3" style="border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px"><span class="num">3</span>
+                  <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f7f9fa">
+                    <span style="color:var(--muted);font-size:10px">▾</span>
+                    <span style="width:20px;height:20px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                    <b style="font-size:12.5px">김약사</b><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 6px">A21</span>
+                    <span style="font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 8px">4건</span>
+                    <span style="margin-left:auto;font-size:10px;color:var(--faint)">마지막 제출 08.10 09:31</span>
+                  </div>
+                  <div style="padding:8px 12px 10px">
+                    <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:#4b5158;padding:0 2px 8px;border-bottom:1px solid #eef0f3;margin-bottom:6px"><input type="checkbox" checked style="width:14px;height:14px"> 전체 선택</div>
+                    <!-- item: 수정 -->
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft)">
+                      <input type="checkbox" checked style="width:14px;height:14px">
+                      <span class="hot" data-n="4" style="flex:1;min-width:0;display:block"><span class="num" style="left:-13px">4</span><span style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:var(--teal-d);background:#fff;border:1px solid #cdeee8;border-radius:5px;padding:1px 6px">수정</span><b style="font-size:12px">타이레놀 500mg</b></span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)">8801234567890</span></span>
+                      <span class="bn g" style="height:22px">상세 내용</span><span class="bn r" style="height:22px">삭제</span>
+                    </div>
+                    <!-- item: 신규 -->
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft);margin-top:3px">
+                      <input type="checkbox" checked style="width:14px;height:14px">
+                      <span style="flex:1;min-width:0"><span style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:var(--amber);background:#fbeecb;border:1px solid #f0dca6;border-radius:5px;padding:1px 6px">신규</span><b style="font-size:12px">뉴트리원 마그네슘 240</b></span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)">8809111222333</span></span>
+                      <span class="bn g" style="height:22px">상세 내용</span><span class="bn r" style="height:22px">삭제</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- 기기 그룹 2 (접힘) -->
+                <div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f7f9fa">
+                    <span style="color:var(--muted);font-size:10px">▸</span>
+                    <span style="width:20px;height:20px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                    <b style="font-size:12.5px">이약사</b><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 6px">B07</span>
+                    <span style="font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 8px">2건</span>
+                    <span style="margin-left:auto;font-size:10px;color:var(--faint)">마지막 제출 08.10 09:18</span>
+                  </div>
+                </div>
+              </div>
+              <div class="footb hot" data-n="6" style="justify-content:flex-end;align-items:center"><span class="num">6</span><span class="bn r" style="margin-right:auto;justify-content:center">전체 삭제</span><span class="bn g" style="justify-content:center">닫기</span><span class="bn" style="justify-content:center">선택 반영</span></div>
+            </div>
+            <!-- 상세 내용 = 모달 옆에 붙는 플로팅 팝업 -->
+            <div class="hot" data-n="5" style="position:absolute;top:44px;left:576px;width:250px;border:1px solid #d5d9df;border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 20px 50px -20px rgba(0,0,0,.4)"><span class="num">5</span>
+              <div style="padding:10px 12px;border-bottom:1px solid var(--line);background:#f7f8fa">
+                <div style="font-size:12px;font-weight:800">타이레놀 500mg</div>
+                <div style="font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:var(--faint);margin-top:2px">8801234567890</div>
+                <span style="display:inline-block;margin-top:6px;font-size:9.5px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:5px;padding:1px 7px">수정</span>
+              </div>
+              <div style="padding:8px 10px">
+                <table style="width:100%;border-collapse:collapse;font-size:10px">
+                  <thead><tr><th style="text-align:left;color:var(--muted);font-weight:700;padding:4px 4px;border-bottom:1px solid #e3e6ea">항목</th><th style="text-align:left;color:var(--muted);font-weight:700;padding:4px 4px;border-bottom:1px solid #e3e6ea">현재값</th><th style="width:14px"></th><th style="text-align:left;color:var(--muted);font-weight:700;padding:4px 4px;border-bottom:1px solid #e3e6ea">앱 제출값</th></tr></thead>
+                  <tbody>
+                    <tr><td style="padding:5px 4px;font-weight:700;color:#4b5158">판매가</td><td style="padding:5px 4px;color:var(--muted)">2,000원</td><td style="text-align:center;color:#c0c6cd">→</td><td style="padding:5px 4px;color:var(--teal-d);font-weight:800">2,200원</td></tr>
+                    <tr><td style="padding:5px 4px;font-weight:700;color:#4b5158">위치</td><td style="padding:5px 4px;color:var(--muted)">A-3</td><td style="text-align:center;color:#c0c6cd">→</td><td style="padding:5px 4px;color:var(--teal-d);font-weight:800">B-1</td></tr>
+                    <tr><td style="padding:5px 4px;font-weight:700;color:#4b5158">단위(포장)</td><td style="padding:5px 4px;color:var(--muted)">정</td><td style="text-align:center;color:#c0c6cd">→</td><td style="padding:5px 4px;color:var(--teal-d);font-weight:800">박스</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc" style="max-width:820px">
+          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정 · 시안 B(리스트/표) 미채택</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>진입 = 앱 데이터 동기화</b> — 상품 관리(CNT-01-001)의 `앱 데이터 동기화` 버튼(미처리 건수 Badge, 0건 미노출) 클릭 시 <b>`앱 상품 수정 요청` 모달</b>이 열린다.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>모달 제목(가운데)</b> — `앱 상품 수정 요청`. 굿팜 약사님용앱에서 제출한 상품 수정/신규 요청을 확인해 <b>선택 반영</b>한다.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 기기 그룹 헤더 `사용자 · 기기ID · N건 · 마지막 제출`. 펼치면 `전체 선택` + 상품 요청 목록. 최근 제출 그룹 기본 펼침.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b> · <b>`삭제`</b>(항목별). 동일 상품은 최신 요청 1건만 노출.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). 삭제는 <b>항목별 `삭제`</b>·푸터 <b>`전체 삭제`</b>. <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(항목별/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
+          <li><span class="di" style="background:var(--muted);color:#fff">B</span><span class="dt"><b>[시안 B · 미채택]</b> <b>리스트(표) 결재함</b> — 열: ☐·제출일시·상품명·제조사·바코드·변경 항목·이전값·변경값·제출자(변경 항목 다수 rowspan·동일 상품 `수정 N건` 묶음). <b>시안 A(기기별 묶음·상세 팝업)로 확정</b>되어 참고용으로만 남긴다.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb warn">요청 있음</span></td><td>미처리 N건</td><td>동기화 버튼 Badge N · 클릭 시 요청 모달</td><td class="nx">CNT-01-004</td></tr>
+          <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>상품 정보 반영 · 목록에서 제거 · 이력 생성 · Toast `반영 완료 · N건`</td><td class="nx">CNT-01-003</td></tr>
+          <tr><td><span class="cb dis">미선택</span></td><td>선택 0</td><td>`선택 반영` <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / 푸터 `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb empty">요청 없음</span></td><td>미처리 0</td><td>`반영할 수정 요청이 없습니다.` · Badge 미노출</td><td class="nx">—</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb info">시안 A</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9px"><b>김약사</b> <span style="font-family:ui-monospace,Menlo,monospace;background:#eceff2;border-radius:4px;padding:0 4px">A21</span> <span style="color:var(--teal-d);font-weight:800">4건</span></div><div style="font-size:9px;color:var(--faint)">기기별 묶음 · 상세 내용 플로팅 팝업</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">시안 B</span></div><div class="mb" style="align-items:stretch;padding:8px"><div class="tscroll"><table class="m" style="font-size:8px;min-width:0"><thead><tr><th>☐</th><th>상품명</th><th>항목</th><th>이전</th><th>변경</th></tr></thead><tbody><tr><td>☑</td><td>타이레놀서방정</td><td>판매가</td><td class="before">4,500</td><td class="after">5,000</td></tr></tbody></table></div><div style="font-size:9px;color:var(--faint)">리스트(표) · rowspan · 수정 N건 묶음</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb empty">요청 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">반영할 수정 요청이 없습니다</div><div style="font-size:9.5px">동기화 버튼 Badge 미노출</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span> (앱)<code>APP-01-005</code><span class="ar">→</span><code>CNT-01-001</code> 동기화 <span class="ar">→</span><code>CNT-01-004</code> 요청 모달 <span class="ar">→</span> 선택 반영 <code>CNT-01-003</code>(변경 내용 보기 이력)</div>
+    </section>
+    <section class="screen" data-sid="CNT-01-003">
+      <div class="sc-head"><span class="sid">CNT-01-003</span><span class="nm">변경 내용 보기 모달 (있음 / 없음)</span><span class="pf">굿팜 클라이언트 3.0 · 상품 관리</span></div>
+      <div class="sc-grid stack">
+        <div class="mock deskgut">
+          <div class="drw">
+            <div class="hot drw-h" data-n="1" style="text-align:center;justify-content:center"><span class="num">1</span>변경 내용 보기</div>
+            <div style="padding:12px">
+              <div class="hot pcard2" data-n="2"><span class="num">2</span>
+                <span class="pk">상품명</span><span class="pv">[2+1]비타리움 프로폴리스…</span>
+                <span class="pk">바코드</span><span class="pv" style="font-family:ui-monospace,Menlo,monospace">9343202002627</span>
+                <span class="pk">총 수정</span><span class="pv">7건</span>
+              </div>
+              <div class="tscroll"><div class="hot" data-n="3"><span class="num">3</span>
+                <table class="m" style="border:1px solid #e3e6ea;border-radius:8px;overflow:hidden"><thead><tr><th style="position:relative">수정일시<span style="position:absolute;right:8px;color:#aab0b8">⇅</span></th><th>변경항목</th><th>변경 전</th><th>변경 후</th><th>수정자</th><th>기기</th></tr></thead>
+                <tbody>
+                  <tr><td rowspan="2" style="vertical-align:middle">2026-07-02 10:20</td><td><b>판매가</b></td><td class="before">25,000</td><td class="after">26,500</td><td rowspan="2" style="vertical-align:middle">김약사</td><td rowspan="2" style="vertical-align:middle"><span class="hot" data-n="4" style="display:inline-block"><span class="num" style="top:-9px;left:-9px">4</span><span style="color:var(--teal-d);font-weight:700">굿팜 약사님용앱 · A21</span></span></td></tr>
+                  <tr><td><b>중분류</b></td><td class="before">(없음)</td><td class="after">의약외품</td></tr>
+                  <tr><td>2026-06-30 14:05</td><td><b>제조업체</b></td><td class="before">-</td><td class="after">헥사곤</td><td>정OO</td><td><span style="color:var(--blue);font-weight:700">PC · POS-01</span></td></tr>
+                </tbody></table>
+              </div></div>
+            </div>
+            <div class="footb hot" data-n="5" style="justify-content:flex-end"><span class="num">5</span><span class="bn g" style="justify-content:center">취소</span><span class="bn" style="justify-content:center">닫기</span></div>
+          </div>
+        </div>
+        <ol class="desc" style="max-width:760px">
+          <div class="dh">CNT-01-003 · 컴포넌트 <span class="asis-note">클라이언트 기본 디자인 시스템(가운데 제목 · 정보 카드 · 그리드 테이블 · 푸터) 정합</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>모달 제목(가운데)</b> — <b>`변경 내용 보기`</b>. 상품명·바코드는 제목이 아니라 아래 정보 카드로 분리(디자인 시스템 규칙).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>상품 정보 카드</b> — 상품명·바코드·총 수정 건수를 label-value로. 없으면 표에 `데이터가 존재하지 않습니다.`</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>이력 테이블(6열)</b> — 수정일시(정렬 ⇅)·변경항목·변경 전(취소선)·변경 후(강조)·수정자·기기. 둥근 테두리 컨테이너·열 구분 그리드. 같은 시각·같은 사람 다항목은 <b>rowspan 묶음</b>.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>기기 표기(색상 텍스트)</b> — 배지 디자인 없이 폰트 색상만: 앱=<b style="color:var(--teal-d)">굿팜 약사님용앱 · 단말ID</b>(teal), 클라이언트=<b style="color:var(--blue)">PC · PC명</b>(blue). 수정자 컬럼은 이름만.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>푸터 버튼</b> — 하단 우측 `취소`(라인)·`닫기`(teal). 읽기 전용이라 실제 동작은 모두 닫기.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건</th><th>화면 처리</th></tr></thead><tbody>
+          <tr><td><span class="cb ok">이력 있음</span></td><td>수정 1건 이상</td><td>6열 테이블 · rowspan 묶음</td></tr>
+          <tr><td><span class="cb empty">이력 없음</span></td><td>수정 0</td><td>`데이터가 존재하지 않습니다.`</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:10px">
+          <div class="mini"><div class="mh"><span class="cb ok">이력 있음</span></div><div class="mb" style="align-items:stretch;padding:8px"><div class="tscroll"><table class="m" style="font-size:8.5px;min-width:0"><thead><tr><th>수정일시</th><th>항목</th><th>전</th><th>후</th><th>수정자</th><th>기기</th></tr></thead><tbody>
+            <tr><td>07-02 10:20</td><td>판매가</td><td class="before">25,000</td><td class="after">26,500</td><td>김약사</td><td><span style="color:var(--teal-d);font-weight:700">앱·A21</span></td></tr>
+            <tr><td>06-30 14:05</td><td>제조업체</td><td class="before">-</td><td class="after">헥사곤</td><td>정OO</td><td><span style="color:var(--blue);font-weight:700">PC·POS-01</span></td></tr>
+          </tbody></table></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb empty">이력 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">데이터가 존재하지 않습니다.</div><div style="font-size:9.5px">수정 이력이 없는 상품</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>CNT-01-002</code><span class="ar">→</span><code>CNT-01-003</code>(닫기 → CNT-01-002)</div>
+    </section>
+  </div>
+
+  <!-- ════════════════════ P3 클라이언트 실재고 반영 ════════════════════ -->
+  <div class="platform" data-p="stock" hidden>
+    <section class="screen" data-sid="CNT-02-001">
+      <div class="sc-head"><span class="sid">CNT-02-001</span><span class="nm">실재고 반영 (반영전 큐 · 그룹핑 · 덮어쓰기)</span><span class="pf">굿팜 클라이언트 3.0 · 재고운영 › 실재고 관리</span></div>
+      <div class="sc-grid stack">
+        <div class="mock deskgut">
+          <div class="win">
+            <div class="bar"><span class="dotm"></span><span class="wt">재고운영</span><span class="x">✕</span></div>
+            <div class="tabrow"><span class="t">재고현황</span><span class="t on">실재고 관리</span><span class="t">사용/판매 조회</span><span class="t">거래관리</span><span class="t">자동입고</span><span class="t">입출고현황</span><span class="t">거래처 관리</span></div>
+            <div class="pad">
+              <div class="srow" style="justify-content:space-between">
+                <span style="font-weight:800;font-size:13px">실재고 반영</span>
+                <span class="hot" data-n="1" style="display:inline-block"><span class="num">1</span><span class="bn">앱 데이터 동기화</span><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);color:var(--muted);font-size:9px;font-weight:800;margin-left:4px" title="화면 진입 시 앱에서 제출한 재고를 불러옵니다. 필요 시 '앱 데이터 동기화'로 다시 불러올 수 있습니다. 같은 상품이 여러 번 제출된 경우 한 건을 선택해 반영해 주세요. 반영 전 재고는 앱 제출 당시 기준으로 현재 재고와 다를 수 있습니다. 0은 재고 없음, -는 수량을 입력하지 않은 경우입니다. 반영 이력은 '변경 내용 보기'에서 확인할 수 있습니다.">i</span></span>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin:2px 0 8px">굿팜 약사님용앱에서 입력한 수량을 확인한 뒤 전산상 재고에 반영합니다. · 마지막 동기화 2026-07-03 16:58</div>
+              <div class="srow" style="justify-content:space-between">
+                <span class="inp w" style="max-width:280px">검색어를 입력해주세요</span>
+                <span><span class="hot" data-n="6" style="display:inline-block"><span class="num">6</span><span class="bn g">변경 내용 보기</span></span> <span style="font-size:10px;color:var(--faint)">선택 1건</span> <span class="hot" data-n="5" style="display:inline-block"><span class="num">5</span><span class="bn">반영</span></span></span>
+              </div>
+              <div class="tscroll"><table class="m" style="margin-top:4px"><thead><tr><th style="width:22px"></th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 보정 사유</th><th>입력일시</th></tr></thead>
               <tbody>
-                <tr class="hot" data-n="3" style="display:table-row"><td><span class="num" style="left:-2px;top:2px">3</span>뮤테란과립</td><td>아세틸시스테인</td><td>가래제거약</td><td>하루 3회</td><td><span class="cta-b" style="background:#16b8a3">💡 추천 Tip 2건</span></td></tr>
-                <tr><td>시네츄라시럽</td><td>coptis…</td><td>기침가래약</td><td>하루 3회</td><td><span class="bn g" style="border-color:#bfe8e1;color:#0e9e8c">💡 추천 Tip 1건</span></td></tr>
-                <tr><td>어린이용타스펜정</td><td>acetaminophen</td><td>해열진통제</td><td>하루 3회</td><td><span class="bn" style="color:#9aa4af">추천 없음</span></td></tr>
-              </tbody></table>
+                <tr class="hot" data-n="2" style="display:table-row"><td colspan="2"><span class="num" style="left:2px">2</span>▾ 판콜에이 30ml <span class="badge nb">제출 2건</span></td><td>8806789012345</td><td colspan="8" style="color:var(--faint);font-size:10px">기본: 최신 제출 선택 · 묶음 내 1건만</td></tr>
+                <tr><td style="text-align:center">☑</td><td>└ 제출 (김약사)</td><td>8806789012345</td><td class="num-c">52</td><td class="num-c">60</td><td class="num-c">0</td><td class="num-c">60</td><td class="num-c hot" data-n="3" style="position:relative"><span class="num" style="top:-8px;left:-6px">3</span><span class="diff-pos">+8</span></td><td class="hot" data-n="4" style="position:relative"><span class="num" style="top:-8px;left:-6px">4</span>김약사(A21)</td><td>정기 실사 중 차이 확인</td><td>07-02 10:31</td></tr>
+                <tr style="opacity:.5"><td style="text-align:center">☐</td><td>└ 제출 (이약사)</td><td>8806789012345</td><td class="num-c">52</td><td class="num-c">58</td><td class="num-c">0</td><td class="num-c">58</td><td class="num-c"><span class="diff-pos">+6</span></td><td>이약사(B07)</td><td>-</td><td>07-02 09:10</td></tr>
+                <tr><td style="text-align:center">☑</td><td>타이레놀 500mg</td><td>8801234567890</td><td class="num-c">48</td><td class="num-c">14</td><td class="num-c">10</td><td class="num-c">24</td><td class="num-c"><span class="diff-neg">−24</span></td><td>김약사(A21)</td><td>파손 2개 폐기 처리</td><td>07-02 10:31</td></tr>
+              </tbody></table></div>
             </div>
-            <div class="hot reco-box" data-n="4" style="position:relative;margin-top:12px;padding:0;border:1px solid #bfe8e1;border-radius:10px;overflow:hidden">
-              <span class="num" style="left:-2px;top:-2px">4</span>
-              <div style="background:#e6f7f4;padding:8px 12px;font-size:11px;font-weight:800;color:#0c7a6c">추천 상품 상세 · 선택 약물 <b>뮤테란과립</b> · 2개 영양소</div>
-              <div style="padding:10px 12px">
-                <div style="border:1px solid #e6e9ee;border-radius:8px;padding:9px 11px;margin-bottom:7px;font-size:11px">
-                  <b>● 비타민 B12</b><br>관련 카테고리 · 비타민 B군, 종합비타민<br>추천 상품 · ①○○ 비타민B 컴플렉스, ②△△ 비타민B12<br>부족해지는 근거 · 메트포르민 장기 복용 시 B12 흡수 저하<br><span style="color:#9aa4af">근거(참고문헌) · 1) Metformin & B12, Diabetes Care</span><br><span style="color:#566">관련 약물 · 시네츄라시럽</span></div>
-                <div style="border:1px solid #e6e9ee;border-radius:8px;padding:9px 11px;font-size:11px">
-                  <b>● 코엔자임Q10</b><br>관련 카테고리 · 항산화 작용<br>추천 상품 · ①○○ 코엔자임Q10 100mg …<br>부족해지는 근거 · 스타틴은 CoQ10 생성을 줄일 수 있음</div>
-              </div>
-            </div>
-            <div class="asis" style="margin-top:12px"><div class="btabs"><span class="b on">현재 처방전 분석</span><span class="b">같은 의사 처방 비교</span><span class="b">직전 처방과 비교</span><span class="b">복용중인 약물 분석</span></div></div>
           </div>
         </div>
-        <!-- 디스크립션 -->
-        <ol class="desc">
-          <div class="dh">AIM-C-01 · 추천 상품 영역 컴포넌트 <span class="asis-note">시안 A/B 토글 제공 · CTA·추천 Tip 열은 공통</span></div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>추천 상품 설정 CTA</b> — <b>처방 약물 정보표 우측 상단</b>(시안 A·B 동일). 약사웹 추천 상품 설정 페이지로 이동(새 창).</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>처방 약물 정보표(기존 유지)</b> — 기존 컬럼 유지 + 우측에 <b>추천 Tip 열</b>만 추가. 표 안에 추천 상세를 복잡하게 끼워 넣지 않아 가독성 유지.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>시안 A · 약물별 인라인</b> — 각 약물 <b>row 바로 아래</b>에 연한 민트 sub-row로 추천 영역 배치. <b>기본 펼침</b>, 추천 없는 약물은 `추천 없음`만 표시. Tip 버튼으로 접기/펼치기. 영역 = 부족 위험 영양소·관련 카테고리·추천 상품·<b>부족해지는 근거(기본 노출)</b>. 약물별 종속 정보처럼 표시(약물 내 동일 바코드 1회, 약물 간 중복 허용).</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>시안 B · 하단 상세 패널(선택 기반)</b> — 표 아래 한 곳에 <b>선택 약물 1개</b>의 추천만 카드로 표시(첫 추천 약물 자동 선택). 카드에 <b>관련 약물</b> 표기 + 동일 바코드 전체 처방 기준 중복 제거. <b>현재 화면(유지본)</b>.</span></li>
+        <ol class="desc" style="max-width:760px">
+          <div class="dh">CNT-02-001 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>동기화</b> — `앱 데이터 동기화`. 탭 진입 자동 + 수동(loading·마지막 동기화·도움말 ⓘ).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>동일 바코드 그룹핑</b> — `제출 N건`·펼치기·`└ 제출 (입력자)`. <b>최신 제출 상단</b>·기본 체크·묶음 내 1건만.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>차이</b> — 총 수량 − 전산(`+`파랑/`−`빨강/`0`회색). 미입력 `-` vs 입력값 `0` 구분.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>입력자</b> — `이름(단말ID)`.</span></li>
+          <li><span class="di">＋</span><span class="dt"><b>재고 보정 사유</b> — 앱 실재고 입력 시 함께 제출된 사유. 미입력 시 `-`.</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>반영(덮어쓰기)</b> — 선택 0이면 <b>Disabled</b>. 클릭 → CNT-02-002.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>변경 내용 보기</b> — 반영 기록 CNT-02-004.</span></li>
         </ol>
       </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 예외</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
+          <tr><td><span class="cb empty">반영전 없음</span></td><td>대기 큐 0</td><td>`반영할 제출 건이 없습니다.`</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb info">그룹 접힘/펼침</span></td><td>동일 바코드 다건</td><td>`제출 N건`·펼치기·최신 상단</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb dis">미선택</span></td><td>선택 0</td><td>반영 <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
+          <tr><td><span class="cb ok">선택</span></td><td>1건 이상(묶음 1건)</td><td>반영 활성 · `선택 N건`</td><td class="nx">CNT-02-002</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb empty">반영전 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-size:9.5px">반영할 제출 건이 없습니다.</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">그룹 접힘/펼침</span></div><div class="mb"><div style="width:100%;border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9.5px;font-weight:700">▾ 판콜에이 30ml <span class="badge nb">제출 2건</span></div><div style="width:100%;border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9.5px;color:var(--faint)">▸ 판콜에이 30ml <span class="badge nb">제출 2건</span></div></div></div>
+          <div class="mini"><div class="mh"><span class="cb dis">미선택</span></div><div class="mb"><span class="bn dis" style="height:24px">반영</span><div style="font-size:9.5px;color:var(--faint)">선택 0건</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb ok">선택</span></div><div class="mb"><span class="bn" style="height:24px">반영</span><div style="font-size:9.5px;color:var(--faint)">선택 1건</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span> (앱)<code>APP-02-004</code><span class="ar">→</span><code>CNT-02-001</code><span class="ar">→</span> 반영 <code>CNT-02-002</code> · 실패 <code>CNT-02-003</code> · 기록 <code>CNT-02-004</code></div>
+    </section>
+
+    <section class="screen" data-sid="CNT-02-002">
+      <div class="sc-head"><span class="sid">CNT-02-002 · CNT-02-003</span><span class="nm">반영 확인 / 실패 모달</span><span class="pf">굿팜 클라이언트 3.0 · 재고운영</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="two-state">
+            <div class="state-col"><div class="state-cap"><span class="cb warn">Confirm</span> 반영 확인</div>
+              <div class="cmodal">
+                <div class="cm-b">
+                  <div class="hot" data-n="1" style="display:inline-block;width:100%"><span class="num">1</span>
+                    <div class="cm-t">선택한 실재고를 전산상 재고에 반영하시겠습니까?</div>
+                    <div class="cm-d">선택한 상품의 전산상 재고가 굿팜 약사님용앱 입력 총 수량으로 변경됩니다.</div>
+                    <div style="margin-top:8px"><span class="badge app">선택 2건</span></div>
+                  </div>
+                </div>
+                <div class="footb"><span class="bn g" style="flex:1;justify-content:center">취소</span><span class="hot bn" data-n="2" style="flex:1;justify-content:center"><span class="num">2</span>반영</span></div>
+              </div>
+            </div>
+            <div class="state-col"><div class="state-cap"><span class="cb err">Error</span> 반영 실패</div>
+              <div class="cmodal">
+                <div class="cm-b">
+                  <div class="hot" data-n="3" style="display:inline-block;width:100%"><span class="num">3</span>
+                    <div class="rico err" style="margin:0 auto">!</div>
+                    <div class="cm-t">반영 실패</div>
+                    <div class="cm-d">에러로 인하여 반영 처리에 실패하였습니다. 다시 시도해 주세요.</div>
+                  </div>
+                </div>
+                <div class="footb"><span class="bn" style="flex:1;justify-content:center">확인</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">CNT-02-002 · CNT-02-003 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>Confirm</b> — 덮어쓰기 안내 + 선택 건수.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>반영</b> — 성공 건 전산=총 수량, 메인에서 제거·기록 `반영완료`. <b>완료 토스트 없음</b>(별도 성공 알림 미노출).</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>실패(Error)</b> — 실패 건 기록 `반영실패` + <b>메인 반영전 유지</b>(반영부터 재시도). 일부 성공+일부 실패면 성공분은 `반영완료` 기록·실패분만 실패 모달로 안내(<b>토스트 없음</b>).</span></li>
+        </ol>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>CNT-02-001</code><span class="ar">→</span><code>CNT-02-002</code><span class="ar">→</span> 성공 <code>CNT-02-001</code>(제거)·<code>CNT-02-004</code>(기록) · 실패 <code>CNT-02-003</code><span class="ar">→</span><code>CNT-02-001</code></div>
+    </section>
+
+    <section class="screen" data-sid="CNT-02-004">
+      <div class="sc-head"><span class="sid">CNT-02-004</span><span class="nm">변경 내용 보기 (반영 기록 · 기간/상태 필터)</span><span class="pf">굿팜 클라이언트 3.0 · 재고운영</span></div>
+      <div class="sc-grid stack">
+        <div class="mock deskgut">
+          <div class="drw">
+            <div class="drw-h">변경 내용 보기</div>
+            <div style="padding:10px 12px">
+              <div class="hot srow" data-n="1"><span class="num">1</span><span class="inp">2026-06-03</span><span>~</span><span class="inp">2026-07-03</span><span class="bn" style="height:22px">1개월</span><span class="bn g" style="height:22px">3개월</span><span class="bn g" style="height:22px">6개월</span><span class="bn g" style="height:22px">전체</span></div>
+              <div class="hot srow" data-n="2"><span class="num">2</span><span class="inp">상품명 ▾</span><span class="inp w" style="max-width:200px">검색어를 입력해주세요</span><span class="inp">처리결과 전체 ▾</span><span style="font-size:10px;color:var(--faint)">조회 3건</span></div>
+              <div class="hot" data-n="3"><span class="num">3</span><div class="tscroll">
+                <table class="m"><thead><tr><th>처리일시</th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 보정 사유</th><th>처리결과</th><th>처리자</th></tr></thead>
+                <tbody>
+                  <tr><td>07-02 10:32</td><td>타이레놀 500mg</td><td>8801234567890</td><td class="num-c">48</td><td class="num-c">14</td><td class="num-c">10</td><td class="num-c">24</td><td class="num-c"><span class="diff-neg">−24</span></td><td>김약사(A21)</td><td>파손 2개 폐기 처리</td><td><span class="stt ok">반영완료</span></td><td>정OO</td></tr>
+                  <tr><td>07-02 10:33</td><td>겔포스엠</td><td>8803333000044</td><td class="num-c">38</td><td class="num-c">0</td><td class="num-c">40</td><td class="num-c">40</td><td class="num-c"><span class="diff-pos">+2</span></td><td>이약사(B07)</td><td>입고 검수 중 수량 오차</td><td><span class="stt rej">반영반려</span></td><td>정OO</td></tr>
+                  <tr><td>07-02 10:34</td><td>판콜에이 30ml</td><td>8806789012345</td><td class="num-c">52</td><td class="num-c">60</td><td class="num-c">0</td><td class="num-c">60</td><td class="num-c"><span class="diff-pos">+8</span></td><td>김약사(A21)</td><td>정기 실사 중 차이 확인</td><td><span class="stt fail">반영실패</span></td><td>정OO</td></tr>
+                </tbody></table>
+              </div></div>
+            </div>
+            <div class="footb"><span class="bn" style="flex:1;justify-content:center">확인</span></div>
+          </div>
+        </div>
+        <ol class="desc" style="max-width:760px">
+          <div class="dh">CNT-02-004 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>기간 필터</b> — 데이터피커 + 빠른 버튼 `1개월`(기본)/3/6개월/전체.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>검색 · 처리결과 필터</b> — 상품명/바코드 + `처리결과 전체/반영완료/반영실패/반영반려`.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>반영 기록 테이블</b> — 처리일시·상품명·바코드·전산·창고·진열·총 수량·차이·입력자·재고 보정 사유·처리결과·처리자(제출 시점 스냅샷). 재고 보정 사유 미입력 시 `-`. <span class="tbu">TBU</span> 반영실패 사유 노출 여부.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건</th><th>화면 처리</th></tr></thead><tbody>
+          <tr><td><span class="stt ok">반영완료</span> / <span class="stt rej">반영반려</span> / <span class="stt fail">반영실패</span></td><td>처리결과</td><td>Badge · 실패행 red-tint</td></tr>
+          <tr><td><span class="cb empty">조회 없음</span></td><td>기간/필터 결과 0</td><td>`조회 조건에 해당하는 기록이 없습니다. 기간을 넓혀 조회해 보세요.`</td></tr>
+        </tbody></table></div>
+        <div class="states-row" style="margin-top:12px">
+          <div class="mini"><div class="mh"><span class="cb empty">조회 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-size:9.5px">조회 조건에 해당하는 기록이 없습니다.<br>기간을 넓혀 조회해 보세요.</div></div></div>
+        </div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span><code>CNT-02-001</code><span class="ar">→</span><code>CNT-02-004</code>(닫기 → CNT-02-001)</div>
     </section>
   </div>
 
-  <!-- ════════ P2 약사웹 ════════ -->
-  <div class="platform" data-p="pharm" hidden>
-    <section class="screen" data-sid="AIM-P-01">
-      <div class="sc-head"><span class="sid">AIM-P-01</span><span class="nm">추천 상품 설정 — 목록</span><span class="pf">약국 어드민 · 약사웹</span></div>
-      <div class="sc-grid">
-        <div class="mock">
-          <div class="shell">
-            <div class="hot side" data-n="1"><span class="num">1</span>
-              <div class="br">◭ 굿팜</div>
-              <div class="ni">대시보드</div><div class="ni">경영분석</div><div class="ni on">AI mate 추천 상품</div>
-            </div>
-            <div class="scol">
-              <div class="stop">AI mate 추천 상품 설정<span class="me">임한일 · 대표약사</span></div>
-              <div class="pad">
-                <div class="hot srow" data-n="2"><span class="num">2</span>
-                  <span class="bn" style="background:#e6f8f4;color:#0ea58b;font-weight:800">전체 6건</span><span style="flex:1"></span><span class="bn g" data-n="5">＋ 항목 추가</span>
-                </div>
-                <div class="hot" data-n="3"><span class="num">3</span>
-                  <table class="m"><thead><tr><th>부족 위험 영양소</th><th>관련 성분</th><th>적용 상품</th><th>최종 수정</th><th>관리</th></tr></thead>
-                  <tbody>
-                    <tr class="hot" data-n="4" style="display:table-row"><td><span class="num" style="left:2px;top:2px">4</span>비타민 B12</td><td>메트포르민</td><td>○○ 비타민B</td><td>06-20 · 어드민</td><td><span class="bn g">수정</span> <span class="bn g">삭제</span></td></tr>
-                    <tr><td>코엔자임Q10</td><td>아토르바스타틴</td><td>○○ Q10</td><td>06-24 · 약국</td><td><span class="bn g">수정</span> <span class="bn g">삭제</span></td></tr>
-                    <tr><td>비타민 D</td><td>프레드니솔론</td><td>○○ 비타민D</td><td>06-12 · 약국</td><td><span class="bn g">수정</span> <span class="bn g">삭제</span></td></tr>
-                  </tbody></table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <ol class="desc">
-          <div class="dh">AIM-P-01 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>사이드바</b> — 굿팜 솔루션 &gt; <b>AI mate 추천 상품</b> 메뉴.</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>전체 건수</b> — <b>전체 N건은 좌측 상단</b>에 배치. (검색 필드는 제외 — 목록 건수 적어 우선 미사용)</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>목록 테이블</b> — 부족 위험 영양소·관련 성분·부족해지는 근거·적용 상품·최종 수정(날짜·수정자)·<b>관리</b>. AI mate에 출력되는 내용 기반, 성분코드·노출 설정·상태 값(출처) 미표기.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>관리 열(맨 오른쪽)</b> — <b>수정</b>(상세 가운데 모달) · <b>삭제</b>(바로 삭제, 확인 후). 행 클릭도 수정으로 진입.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b>항목 추가</b> — 어드민이 부족 위험 영양소 항목을 <b>하나씩</b> 등록(가운데 모달 폼).</span></li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="screen" data-sid="AIM-P-02">
-      <div class="sc-head"><span class="sid">AIM-P-02</span><span class="nm">추천 상품 설정 — 상세(가운데 모달)</span><span class="pf">약국 어드민 · 약사웹</span></div>
-      <div class="sc-grid">
-        <div class="mock">
-          <div class="drw">
-            <div class="hot drw-h" data-n="1"><span class="num">1</span>비타민 B12 · 관련 성분 메트포르민</div>
-            <div class="hot blk" data-n="2"><span class="num">2</span>
-              <div class="bh">기본 정보</div>
-              <div class="kvm">부족 위험 영양소 비타민 B12 · 관련 성분 메트포르민</div>
-            </div>
-            <div class="hot blk" data-n="3"><span class="num">3</span>
-              <div class="bh">부족해지는 근거</div>
-              <div class="kvm">메트포르민 장기 복용 시 B12 흡수가 저하되어 부족해질 위험.</div>
-            </div>
-            <div class="blk">
-              <div class="bh">추천 상품 <span style="margin-left:auto;font-size:11px;color:var(--muted)">정렬 · 삭제</span></div>
-              <div class="hot pitem" data-n="4"><span class="num">4</span><span class="nm">○○ 비타민B 컴플렉스</span><span class="bn g" style="display:inline-flex">삭제</span></div>
-              <div class="kvm" style="margin-top:4px">추천 상품 1 / 3개 · 기본값(기본 추천): ○○ 비타민B 컴플렉스</div>
-              <div class="hot" data-n="5" style="margin-top:4px"><span class="num">5</span><span class="bn g" style="display:inline-flex">＋ 상품 추가</span><span class="bn g" style="display:inline-flex">기본값 복원</span></div>
-            </div>
-            <div class="hot footb" data-n="6"><span class="num">6</span><span class="bn g">항목 삭제</span><span class="bn">저장</span></div>
-          </div>
-        </div>
-        <ol class="desc">
-          <div class="dh">AIM-P-02 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>모달 헤더</b> — 목록 행 클릭 시 <b>가운데 모달</b>로 열림. 선택한 부족 위험 영양소 · 관련 성분.</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>기본 정보</b> — 부족 위험 영양소·관련 성분. 성분코드 미표기, 약사 수정 불가('읽기 전용' 배지는 미표기).</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>부족해지는 근거</b> — AI mate에 노출되는 부족 사유. 수정 불가.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>추천 상품 항목</b> — 정렬 · 삭제. 약국당 <b>최대 3개</b>(정책 반영, 화면 문구 미노출 — `추천 상품 N / 3개`만 표기). 노출 ON/OFF 없음(모두 노출). 약국 설정이 기본 추천보다 우선. 상품 배지(건기식 등) 미표기.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b>상품 추가 / 기본값 복원</b> — 상품 DB 검색으로만 추가(메모형 입력 불가). <b>기본값(기본 추천 상품)</b> 함께 표기, 복원 시 그 상태로 되돌림.</span></li>
-          <li data-n="6"><span class="di">6</span><span class="dt"><b>항목 삭제 / 저장</b> — 수정 또는 삭제만. <b>변경 이력은 노출하지 않으며, 항목 삭제 시 삭제 이력도 어디에도 남기지 않는다.</b> 삭제 → 확인 → 목록에서 제거.</span></li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="screen" data-sid="AIM-P-03">
-      <div class="sc-head"><span class="sid">AIM-P-03</span><span class="nm">서버 마스터 상품 검색 모달</span><span class="pf">약국 어드민 · 약사웹</span></div>
-      <div class="sc-grid">
-        <div class="mock">
-          <div class="drw">
-            <div class="hot drw-h" data-n="1"><span class="num">1</span>상품 검색 · 서버 마스터 상품 데이터 기준</div>
-            <div class="blk">
-              <div class="hot srow" data-n="2"><span class="num">2</span><span class="inp">바코드 ▾</span><span class="inp w">바코드/상품명 입력</span><span class="bn">검색</span></div>
-              <div style="font-size:10px;color:var(--muted);margin:2px 0 8px">POS 미사용 약국도 등록 가능 · 약국 로컬이 아닌 <b>서버 마스터 상품 데이터</b>에서 검색(필수 상품명·바코드)</div>
-              <div class="hot" data-n="3"><span class="num">3</span>
-                <div class="pitem"><span class="nm">○○ 마그네슘 400</span><span class="bn g" style="height:22px;padding:0 8px">＋ 추가</span></div>
-                <div class="pitem"><span class="nm">○○ 비타민D 2000IU</span><span class="bn g" style="height:22px;padding:0 8px">＋ 추가</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <ol class="desc">
-          <div class="dh">AIM-P-03 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>모달 헤더</b> — 추천 상품 추가용 <b>서버 마스터 상품</b> 검색.</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>검색 바</b> — 바코드/상품명 검색. <b>메모형 입력 불가</b> · <b>POS 미사용 약국도</b> 약국 로컬이 아닌 <b>서버 마스터 상품 데이터</b>에서 검색·등록.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>검색 결과 · 추가</b> — 선택 시 약국 설정 상품으로 등록. <b>최대 3개</b> 도달 시·중복·결과 없음 안내 처리.</span></li>
-        </ol>
-      </div>
-    </section>
-  </div>
-
-  <!-- ════════ P3 슈퍼어드민 ════════ -->
+  <!-- ════════════════════ P4 슈퍼어드민 ════════════════════ -->
   <div class="platform" data-p="super" hidden>
-    <section class="screen" data-sid="AIM-S-01">
-      <div class="sc-head"><span class="sid">AIM-S-01</span><span class="nm">AI mate 추천 관리 — Master / 통계 / 매칭</span><span class="pf">슈퍼어드민</span></div>
-      <div class="sc-grid">
-        <div class="mock">
-          <div class="shell">
-            <div class="hot side" data-n="1"><span class="num">1</span>
-              <div class="br">◭ 굿팜</div>
-              <div class="ni">바코드 관리</div><div class="ni on">AI mate 추천 관리</div><div class="ni">마스터 상품 관리</div>
-            </div>
-            <div class="scol">
-              <div class="stop">AI mate 추천 관리</div>
-              <div class="pad">
-                <div class="hot" data-n="2"><span class="num">2</span>
-                  <div class="tabrow" style="padding:0"><span class="t on">추천 Master 목록</span><span class="t" style="opacity:.4">부족 영양소별 통계 (준비중)</span></div>
-                </div>
-                <div class="hot srow" data-n="3" style="margin-top:9px"><span class="num">3</span>
-                  <span class="inp">부족 위험 영양소 ▾</span><span class="inp w">검색</span><span class="bn">검색</span><span class="bn g" data-n="7">＋ 등록</span><span class="bn g">⬆ 업로드</span><span class="bn g">이력</span>
-                </div>
-                <div class="hot" data-n="4"><span class="num">4</span>
-                  <table class="m"><thead><tr><th>성분명</th><th>부족 위험 영양소</th><th>부족해지는 근거</th><th>기본/약국</th><th>노출</th></tr></thead>
-                  <tbody>
-                    <tr class="hot" data-n="8" style="display:table-row"><td><span class="num" style="left:-2px;top:2px">8</span>메트포르민</td><td>비타민 B12</td><td>B12 흡수 저하로 부족 위험</td><td>3 / 128</td><td><span class="hot stt ok" data-n="5" style="display:inline-block"><span class="num" style="top:-8px;left:-8px">5</span>ON</span></td></tr>
-                    <tr><td>프레드니솔론</td><td>비타민 D</td><td>골대사 영향으로 부족 위험</td><td>1 / 31</td><td><span class="stt hide">OFF</span></td></tr>
-                    <tr><td>메토트렉세이트</td><td>엽산</td><td>엽산 길항 — 전문가 확인</td><td>1 / 8</td><td><span class="stt hide">OFF</span></td></tr>
-                    <tr><td>살부타몰</td><td>칼륨</td><td>운영상 제외 항목</td><td>1 / 2</td><td><span class="stt hide">OFF</span></td></tr>
-                  </tbody></table>
-                </div>
-                <div class="hot" data-n="6" style="margin-top:8px;font-size:10.5px;color:var(--muted);border:1px dashed var(--line);border-radius:7px;padding:8px"><span class="num">6</span>
-                  약국별 매칭 현황은 별도 탭 없이 <b>Master 레코드 클릭 → 상세의 '약국별 제출 이력'</b>으로 조회 · 부족 영양소별 통계는 준비중(가림)
-                </div>
+    <section class="screen" data-sid="SA-01-001">
+      <div class="sc-head"><span class="sid">SA-01-001 · SA-01-002 · SA-01-003</span><span class="nm">바코드 상세 정보 (마스터 · 제출로그 · 수정 이력)</span><span class="pf">슈퍼어드민 · web</span></div>
+      <div class="sc-grid stack">
+        <div class="mock deskgut">
+          <div class="win">
+            <div class="bar"><span class="dotm"></span><span class="wt">바코드 상세 정보</span><span class="x">✕</span></div>
+            <div class="pad">
+              <div class="hot" data-n="1"><span class="num">1</span>
+                <div style="font-weight:800;font-size:12px;margin-bottom:6px">상품 통계 정보</div>
+                <div class="srow"><span class="inp" style="flex:1">평균가 0원</span><span class="inp" style="flex:1">최저가 0원</span><span class="inp" style="flex:1">최대가 0원</span><span class="inp" style="flex:1">최빈가 0원</span></div>
+              </div>
+              <div class="hot" data-n="2" style="margin-top:6px"><span class="num">2</span>
+                <div style="font-weight:800;font-size:12px;margin-bottom:6px">마스터 상품 정보 <span style="float:right"><span class="bn">수정</span> <span class="bn r">삭제</span></span></div>
+                <div class="kvm">상품명* (2매)(KF94)아에르황사마스크 · 제조사* — · 최소/최대/최빈가 0 · 포장 수량* 0 · 포장 단위* 개 · BARCODE 8809493472989</div>
+              </div>
+              <div class="hot" data-n="3" style="margin-top:8px"><span class="num">3</span>
+                <div style="font-weight:800;font-size:12px;margin-bottom:6px">약국별 제출로그 <span style="float:right;font-size:10px;color:var(--faint)">전체 1건 · 전체선택 · 페이지당 10/30/50/100개</span></div>
+                <div class="tscroll"><table class="m"><thead><tr><th>선택</th><th>약국명(지역)</th><th>제품명</th><th class="num-c">패키징</th><th>제조사</th><th class="num-c">판매가</th><th class="num-c">구매가</th><th>등록일</th><th>삭제</th></tr></thead>
+                <tbody><tr><td style="text-align:center">☐</td><td>굿헬스포트 <span style="color:var(--faint);font-size:9.5px">(서울특별시 강남구)</span></td><td class="hot" data-n="4" style="position:relative;color:var(--teal-d);text-decoration:underline"><span class="num" style="top:-8px;left:-6px">4</span>(2매)(KF94)아에르황사마스크</td><td class="num-c">0</td><td>-</td><td class="num-c">0원</td><td class="num-c">0원</td><td>2025. 8. 25.</td><td style="text-align:center"><span class="bn r" style="height:20px;padding:0 7px">삭제</span></td></tr></tbody></table></div>
               </div>
             </div>
           </div>
         </div>
-        <ol class="desc">
-          <div class="dh">AIM-S-01 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>사이드바</b> — 바코드 관리 &gt; <b>AI mate 추천 관리</b>.</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>탭</b> — 추천 Master 목록만 제공. <b>부족 영양소별 통계는 준비중(가림)</b>, 약국별 매칭 현황은 별도 탭 없이 상세로 이동.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>검색 · ＋등록 · 업로드 · 이력</b> — Master 검색, <b>하나씩 등록</b>(가운데 모달), 보유 매칭 데이터 일괄 반영, 변경 이력 조회.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>Master 테이블</b> — <b>성분명이 맨 첫 열</b>. 성분명·부족 위험 영양소(상세 내역 데이터)·부족해지는 근거·기본 추천/약국 설정 수·노출·최종 수정일. 성분코드는 내부 매칭 키로만 사용(미표기). 상세 모달에 <b>근거(참고문헌)</b> 필드 포함.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b>노출 ON/OFF</b> — 상태 값 대신 노출 상태만 표기. OFF면 AI mate·약사웹에 미노출.</span></li>
-          <li data-n="6"><span class="di">6</span><span class="dt"><b>약국별 제출 이력</b> — 통계·매칭 별도 탭 없음. 부족 영양소별 통계는 준비중(가림).</span></li>
-          <li data-n="7"><span class="di">7</span><span class="dt"><b>＋ 등록 / 수정</b> — 가운데 모달로 부족 위험 영양소·관련 성분·부족해지는 근거·노출 ON/OFF를 <b>하나씩 등록·수정</b>. 운영자 전용.</span></li>
-          <li data-n="8"><span class="di">8</span><span class="dt"><b>행 클릭 → 상세</b> — Master 레코드를 클릭하면 가운데 상세 모달에서 <b>수정·삭제</b> + <b>약국별 제출 이력</b>(약국명·상품·출처·수정일)을 제출 이력 형식으로 조회.</span></li>
+        <ol class="desc" style="max-width:760px">
+          <div class="dh">SA-01-001 · SA-01-002 · SA-01-003 · 컴포넌트</div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>상품 통계 정보</b> — 평균가·최저가·최대가·최빈가(약국 제출가 집계).</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>마스터 상품 정보</b> — 기본(상품명*·제조사*)·가격·포장(수량*·단위*)·바코드. <b>수정/삭제(운영자 전용)</b>. 앱 제출이 반영되는 마스터 원본.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>약국별 제출로그</b> — 선택·약국명(지역)·제품명·패키징·제조사·판매가·구매가·등록일·삭제. 전체선택·페이지당 10/30/50/100개.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>제품명 클릭 → 수정 이력(SA-01-003)</b> — 수정일시·변경항목·이전 값·변경 값·수정자`이름(단말ID)`. 반영 시마다 누적.</span></li>
         </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">케이스 · 상태 · 권한</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건</th><th>화면 처리</th></tr></thead><tbody>
+          <tr><td><span class="cb info">권한 · 운영자</span></td><td>운영자 계정</td><td>마스터 수정/삭제 가능</td></tr>
+          <tr><td><span class="cb dis">권한 · 조회</span></td><td>일반 계정</td><td>제출로그·이력 조회만(수정/삭제 <span class="cb dis">Disabled</span>)</td></tr>
+          <tr><td><span class="cb empty">제출로그 없음</span></td><td>제출 0</td><td>빈 목록</td></tr>
+          <tr><td><span class="cb empty">수정 이력 없음</span></td><td>이력 0</td><td>`데이터가 존재하지 않습니다.`</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="flow"><span class="fh">흐름</span> (앱 저장)<code>APP-01-005</code><span class="ar">→</span><code>SA-01-001</code>(마스터 반영) · 제품명 <span class="ar">→</span><code>SA-01-003</code></div>
+    </section>
+  </div>
+
+  <!-- ════════════════════ P0 공통 상태/예외 ════════════════════ -->
+  <div class="platform" data-p="common" hidden>
+    <section class="screen" data-sid="COMMON">
+      <div class="sc-head"><span class="sid">공통</span><span class="nm">상태 · 예외 처리 정책 (전 화면 공통)</span><span class="pf">Empty · Loading · Error · Toast · Confirm · Disabled</span></div>
+      <div class="sc-grid">
+        <div class="mock">
+          <div class="states-row">
+            <div class="mini"><div class="mh"><span class="cb empty">Empty</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-size:9.5px">데이터 없음 안내 + 다음 행동 유도(재검색/추가)</div></div></div>
+            <div class="mini"><div class="mh"><span class="cb load">Loading</span></div><div class="mb"><div class="rico load"><span class="spin"></span></div><div style="font-size:9.5px">조회/제출/동기화 중 스피너 · 중복 실행 방지</div></div></div>
+            <div class="mini"><div class="mh"><span class="cb err">Error</span></div><div class="mb"><div class="rico err">!</div><div style="font-size:9.5px">실패 사유 + 재시도 · 입력값 보존</div></div></div>
+          </div>
+          <div class="states-row" style="margin-top:12px">
+            <div class="mini"><div class="mh"><span class="cb info">Toast</span></div><div class="mb"><div class="toast">앱 데이터 동기화 완료</div><div style="font-size:9.5px;margin-top:4px">동기화 등 알림 · 2초 자동 소멸 · <b>반영 완료는 토스트 없음</b></div></div></div>
+            <div class="mini"><div class="mh"><span class="cb warn">Confirm / Cancel</span></div><div class="mb"><div style="display:flex;gap:5px"><span class="bn g" style="height:22px">취소</span><span class="bn" style="height:22px">확인</span></div><div style="font-size:9.5px;margin-top:4px">되돌릴 수 없는 동작(제출·반영·삭제) 전 확인</div></div></div>
+            <div class="mini"><div class="mh"><span class="cb dis">Disabled</span></div><div class="mb"><span class="bn dis" style="height:24px">제출하기</span><div style="font-size:9.5px;margin-top:4px">필수 미충족·선택 0·변경 없음 시 비활성</div></div></div>
+          </div>
+        </div>
+        <ol class="desc">
+          <div class="dh">공통 상태 정책</div>
+          <li><span class="di">∅</span><span class="dt"><b>Empty</b> — 목록/이력/검색 결과 0건. 화면별 문구 + 다음 행동(재검색·스캔·추가) 유도.</span></li>
+          <li><span class="di">⟳</span><span class="dt"><b>Loading</b> — 조회·제출·동기화·반영 중. 버튼 loading·중복 실행 방지.</span></li>
+          <li><span class="di">!</span><span class="dt"><b>Error</b> — 네트워크/서버/GPC 오류. 사유 안내·재시도, 입력값 보존. 제출은 원자적 배치라 전체 성공/전체 실패(부분 실패 없음).</span></li>
+          <li><span class="di">✓</span><span class="dt"><b>Toast</b> — 성공 알림(예: `앱 데이터 동기화 완료`). 짧게 노출. <b>재고 반영 완료는 토스트를 노출하지 않는다.</b></span></li>
+          <li><span class="di">?</span><span class="dt"><b>Confirm / Cancel</b> — 제출·반영·삭제 등 비가역 동작 전 확인. 취소 시 원상.</span></li>
+          <li><span class="di">⊘</span><span class="dt"><b>Disabled</b> — 필수값 미충족·선택 0건·변경 없음 시 실행 버튼 비활성.</span></li>
+          <li><span class="di">⚿</span><span class="dt"><b>권한</b> — 슈퍼어드민 마스터 수정/삭제는 운영자 전용, 그 외 조회. 클라이언트 반영은 클라이언트 계정.</span></li>
+          <li><span class="di">↻</span><span class="dt"><b>최초 · 재진입</b> — 최초 진입 시 자동 동기화·기본 선택. 재진입 시 마지막 동기화 시점 기준 최신 상태 유지.</span></li>
+        </ol>
+      </div>
+      <div class="cases">
+        <div class="cases-h">Validation 정책 (입력 검증)</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>대상</th><th>규칙</th><th>처리</th></tr></thead><tbody>
+          <tr><td>상품명 · 분류 (APP-01-004)</td><td>필수</td><td>미입력 시 저장 <span class="cb dis">Disabled</span> · `입력 오류`</td></tr>
+          <tr><td>판매가 (APP-01-004)</td><td>숫자만</td><td>비숫자 시 `숫자만 입력하세요` · 저장 <span class="cb dis">Disabled</span></td></tr>
+          <tr><td>진열·창고 (APP-02-002)</td><td>최소 1개 값</td><td>둘 다 미입력 시 담기 <span class="cb dis">Disabled</span></td></tr>
+          <tr><td>제출/반영 대상</td><td>1건 이상 선택</td><td>0건 시 실행 <span class="cb dis">Disabled</span> · Toast 안내</td></tr>
+        </tbody></table></div>
       </div>
     </section>
   </div>
@@ -346,14 +1287,12 @@ function showP(p){
   document.querySelectorAll('.platform').forEach(function(pl){ pl.hidden = pl.getAttribute('data-p')!==p; });
 }
 function pickP(el){ showP(el.getAttribute('data-p')); }
-// 딥링크: #client / #pharm / #super 로 진입하면 해당 플랫폼만 열기
 function applyHash(){
   var p=(location.hash||'').replace('#','');
-  if(['client','pharm','super'].indexOf(p)>=0) showP(p);
+  if(['app','product','stock','super','common'].indexOf(p)>=0) showP(p);
 }
 window.addEventListener('hashchange', applyHash);
 applyHash();
-// 컴포넌트 ↔ 디스크립션 하이라이트 (화면 단위 스코프, hover=미리보기 / click=고정)
 document.querySelectorAll('.screen').forEach(function(sc){
   function set(n,on){ sc.querySelectorAll('[data-n="'+n+'"]').forEach(function(el){ el.classList.toggle('active', on); }); }
   sc.querySelectorAll('.hot, .desc li').forEach(function(el){

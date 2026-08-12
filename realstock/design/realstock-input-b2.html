@@ -103,8 +103,8 @@
         <div class="sub" id="c-wh" onclick="pick('wh')"><span class="sl">창고</span><span class="sv num" id="v-wh"><span class="ph">0</span></span></div>
       </div>
 
-      <!-- 재고 차이 사유 — Bottom Sheet 트리거(총≠전산 일 때만) -->
-      <button class="rsbtn" id="rsbtn" onclick="openSheet()"><span id="rsbtnTxt">재고 차이 사유 남기기 (선택)</span></button>
+      <!-- 재고 보정 사유 — Bottom Sheet 트리거(총≠전산 일 때만) -->
+      <button class="rsbtn" id="rsbtn" onclick="openSheet()"><span id="rsbtnTxt">재고 보정 사유 남기기 (선택)</span></button>
 
       <div class="keypad" id="keypad"></div>
       <button class="kp-confirm" onclick="location.href='realstock-list.html'">목록에 담기</button>
@@ -113,7 +113,7 @@
     <!-- Bottom Sheet -->
     <div class="scrim" id="scrim">
       <div class="sheet">
-        <h4>재고 차이 사유</h4>
+        <h4>재고 보정 사유</h4>
         <p>앱 조회 시점 재고와 차이가 발생한 사유를 남겨 주세요. (선택 · 30자)</p>
         <input class="rin" id="rsInp" type="text" maxlength="30" placeholder="예: 정기 실사 중 차이 확인, 실물 기준 정정" oninput="document.getElementById('rc').textContent=this.value.length" />
         <div class="rcount"><span id="rc">0</span>/30</div>
@@ -146,7 +146,7 @@
     document.getElementById('warn').classList.toggle('show', diff);
     const btn=document.getElementById('rsbtn'); btn.classList.toggle('show', diff);
     btn.classList.toggle('filled', !!reason);
-    document.getElementById('rsbtnTxt').textContent = reason ? ('재고 차이 사유 · '+reason) : '재고 차이 사유 남기기 (선택)';
+    document.getElementById('rsbtnTxt').textContent = reason ? ('재고 보정 사유 · '+reason) : '재고 보정 사유 남기기 (선택)';
   }
   function pick(f){ active=f; render(); }
   function press(k){ let c=inv[active]; if(k==='del') c=c.slice(0,-1); else c=(c==="0"?"":c)+k; if(c.length>5) return; inv[active]=c; render(); }
