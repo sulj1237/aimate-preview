@@ -162,6 +162,8 @@
   .subc-meta{font-size:calc(11.5px*var(--k));color:var(--g-400);font-weight:600;margin-top:calc(4px*var(--k))}
   .subc-meta .sm-sep{color:var(--g-300);margin:0 calc(5px*var(--k))}
   .subc-meta .mut{color:var(--g-400)}
+  .subc-meta .m-lb{color:var(--g-400);font-weight:600}
+  .subc-meta .m-v{color:var(--g-700);font-weight:700}
   .subc-sum{flex:none;display:flex;gap:calc(4px*var(--k));flex-wrap:wrap;justify-content:flex-end}
   .sm-chip{font-size:calc(10.5px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(7px*var(--k));border-radius:999px;white-space:nowrap}
   .sm-chip.done{background:#e2f3ee;color:#1d8a76}
@@ -374,8 +376,8 @@
     SUBMISSIONS.forEach(function(sub, i){
       var fi=subFilteredItems(sub); if(!fi.length) return; total+=fi.length;
       var meta = sub.processAt
-        ? '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span>처리 '+esc(sub.processor)+' '+esc(sub.processAt)
-        : '제출 '+esc(sub.submitAt)+'<span class="sm-sep">·</span><span class="mut">반영 전</span>';
+        ? '<span class="m-lb">제출</span> <span class="m-v">'+esc(sub.submitAt)+'</span><span class="sm-sep">·</span><span class="m-lb">처리</span> <span class="m-v">'+esc(sub.processor)+' '+esc(sub.processAt)+'</span>'
+        : '<span class="m-lb">제출</span> <span class="m-v">'+esc(sub.submitAt)+'</span><span class="sm-sep">·</span><span class="mut">반영 전</span>';
       var groups="";
       STATUS_ORDER.forEach(function(st){ if(act.indexOf(st)<0) return; var its=fi.filter(function(p){return p.status===st;}); if(its.length) groups+=grpCard(st,its); });
       var open=!!OPEN[i];
