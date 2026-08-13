@@ -921,14 +921,13 @@
                 <!-- 기기 그룹 1 (펼침) -->
                 <div class="hot" data-n="3" style="border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px"><span class="num">3</span>
                   <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f7f9fa">
-                    <span style="color:var(--muted);font-size:10px">▾</span>
-                    <span style="width:20px;height:20px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                    <input type="checkbox" checked style="width:15px;height:15px" title="이 약사 제출 전체 선택">
                     <b style="font-size:12.5px">김약사</b><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 6px">A21</span>
                     <span style="font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 8px">4건</span>
+                    <span style="color:var(--muted);font-size:11px" title="더보기">▾</span>
                     <span style="margin-left:auto;font-size:10px;color:var(--faint)">마지막 제출 08.10 09:31</span>
                   </div>
                   <div style="padding:8px 12px 10px">
-                    <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:#4b5158;padding:0 2px 8px;border-bottom:1px solid #eef0f3;margin-bottom:6px"><input type="checkbox" checked style="width:14px;height:14px"> 전체 선택</div>
                     <!-- item: 수정 -->
                     <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft)">
                       <input type="checkbox" checked style="width:14px;height:14px">
@@ -946,10 +945,10 @@
                 <!-- 기기 그룹 2 (접힘) -->
                 <div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">
                   <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f7f9fa">
-                    <span style="color:var(--muted);font-size:10px">▸</span>
-                    <span style="width:20px;height:20px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                    <input type="checkbox" style="width:15px;height:15px" title="이 약사 제출 전체 선택">
                     <b style="font-size:12.5px">이약사</b><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 6px">B07</span>
                     <span style="font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 8px">2건</span>
+                    <span style="color:var(--muted);font-size:11px" title="더보기">▸</span>
                     <span style="margin-left:auto;font-size:10px;color:var(--faint)">마지막 제출 08.10 09:18</span>
                   </div>
                 </div>
@@ -980,7 +979,7 @@
           <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정 · 시안 B(리스트/표) 미채택</span></div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>진입 = 앱 데이터 동기화</b> — 상품 관리(CNT-01-001)의 `앱 데이터 동기화` 버튼(미처리 건수 Badge, 0건 미노출) 클릭 시 <b>`앱 상품 수정 요청` 모달</b>이 열린다.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>모달 제목(가운데)</b> — `앱 상품 수정 요청`. 굿팜 약사님용앱에서 제출한 상품 수정/신규 요청을 확인해 <b>선택 반영</b>한다.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 기기 그룹 헤더 `사용자 · 기기ID · N건 · 마지막 제출`. 펼치면 `전체 선택` + 상품 요청 목록. 최근 제출 그룹 기본 펼침.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 그룹 헤더 = <b>제출자명 앞 체크박스</b>(그 약사 제출 전체 선택) · 사용자 · 기기ID · N건 · <b>더보기(▶/▾, 건수 우측)</b> · 마지막 제출. 헤더(체크박스 제외) 클릭 시 펼침 → 상품 요청 목록(별도 `전체 선택` 행 없음 — 체크박스는 헤더에). 최근 제출 그룹 기본 펼침.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b> · <b>`삭제`</b>(항목별). 동일 상품은 최신 요청 1건만 노출.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
           <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). 삭제는 <b>항목별 `삭제`</b>·푸터 <b>`전체 삭제`</b>. <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(항목별/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
