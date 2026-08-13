@@ -52,7 +52,7 @@
   .glast{font-size:calc(12px*var(--k));color:var(--g-600);font-weight:600;letter-spacing:var(--tracking)}
   .gsep{color:var(--g-300)}
   .gbrk{font-size:calc(12px*var(--k));font-weight:700;letter-spacing:var(--tracking);white-space:nowrap}
-  .gbrk.done{color:#1d8a76}
+  .gbrk.done{color:var(--sys-green)}
   .gbrk.rej{color:var(--sys-red)}
   .gbrk.wait{color:var(--g-600)}
   /* 우: 건수 + chevron */
@@ -75,8 +75,8 @@
   .dsub{font-size:calc(12px*var(--k));color:var(--g-500);margin-top:calc(2px*var(--k));line-height:1.4}
   .stb{flex:none;align-self:flex-start;display:inline-block;font-size:calc(11px*var(--k));font-weight:700;
     padding:calc(2px*var(--k)) calc(9px*var(--k));border-radius:999px;white-space:nowrap}
-  .stb.done{background:#e2f3ee;color:#1d8a76}
-  .stb.rej{background:#fbe3e0;color:var(--sys-red)}
+  .stb.done{background:var(--sys-green-bg);color:var(--sys-green)}
+  .stb.rej{background:var(--sys-red-bg);color:var(--sys-red)}
   .stb.wait{background:var(--g-100);color:var(--g-600)}
 
   /* 수량 — 숫자 강조 + 증감 배지 */
@@ -88,15 +88,15 @@
   .dqty .unit{font-size:calc(13px*var(--k));font-weight:600;color:var(--g-500);align-self:flex-end;margin-bottom:calc(3px*var(--k))}
   .delta{margin-left:auto;align-self:center;font-size:calc(12.5px*var(--k));font-weight:800;
     padding:calc(2px*var(--k)) calc(9px*var(--k));border-radius:7px;white-space:nowrap}
-  .delta.down{background:#fbe3e0;color:#e5484d}
-  .delta.up{background:#e2f3ee;color:#1d8a76}
+  .delta.down{background:var(--sys-red-bg);color:var(--sys-red)}
+  .delta.up{background:var(--sys-green-bg);color:var(--sys-green)}
 
   /* 상태 묶음 섹션(반영전·반영완료·반영반려) — 헤더에 처리자·처리일시 */
   .ssec{margin-top:calc(16px*var(--k))}
   .ssec:first-child{margin-top:calc(2px*var(--k))}
   .ssec-h{display:flex;align-items:baseline;gap:calc(8px*var(--k));margin-bottom:calc(10px*var(--k));flex-wrap:wrap}
   .ssec-lb{font-size:calc(13px*var(--k));font-weight:800;letter-spacing:var(--tracking)}
-  .ssec.done .ssec-lb{color:#1d8a76}
+  .ssec.done .ssec-lb{color:var(--sys-green)}
   .ssec.rej .ssec-lb{color:var(--sys-red)}
   .ssec.wait .ssec-lb{color:var(--g-600)}
   .ssec-cnt{font-size:calc(12.5px*var(--k));font-weight:700;color:var(--g-500)}
@@ -166,20 +166,20 @@
   .subc-meta .m-v{color:var(--g-700)}
   .subc-sum{flex:none;display:flex;gap:calc(4px*var(--k));flex-wrap:wrap;justify-content:flex-end}
   .sm-chip{font-size:calc(10.5px*var(--k));font-weight:800;padding:calc(2px*var(--k)) calc(7px*var(--k));border-radius:999px;white-space:nowrap}
-  .sm-chip.done{background:#e2f3ee;color:#1d8a76}
-  .sm-chip.rej{background:#fbe3e0;color:#e5484d}
+  .sm-chip.done{background:var(--sys-green-bg);color:var(--sys-green)}
+  .sm-chip.rej{background:var(--sys-red-bg);color:var(--sys-red)}
   .sm-chip.wait{background:var(--g-100);color:var(--g-600)}
   .subc-chev{flex:none;color:var(--g-400);display:inline-flex;transition:transform .2s ease}
   .subc.open .subc-chev{transform:rotate(180deg)}
   .subc-b{padding:calc(4px*var(--k)) calc(15px*var(--k)) calc(14px*var(--k))}
   .gc{border-radius:calc(12px*var(--k));margin-top:calc(11px*var(--k));padding:calc(11px*var(--k)) calc(12px*var(--k))}
-  .gc.done{background:#eafaf3;border:1px solid #cdeede}
-  .gc.rej{background:#fdeeec;border:1px solid #f6d6d0}
+  .gc.done{background:var(--sys-green-bg);border:1px solid #BFE9CB}
+  .gc.rej{background:var(--sys-red-bg);border:1px solid #F6C9C9}
   .gc.wait{background:var(--g-50);border:1px solid var(--g-200)}
   .gc-h{display:flex;align-items:center;gap:calc(6px*var(--k));margin-bottom:calc(9px*var(--k))}
   .gc-h .sic{width:calc(15px*var(--k));height:calc(15px*var(--k))}
-  .gc.done .gc-h{color:#1d8a76}
-  .gc.rej .gc-h{color:#e5484d}
+  .gc.done .gc-h{color:var(--sys-green)}
+  .gc.rej .gc-h{color:var(--sys-red)}
   .gc.wait .gc-h{color:var(--g-600)}
   .gc-lb{font-size:calc(12.5px*var(--k));font-weight:800}
   .gc-cnt{font-size:calc(11.5px*var(--k));font-weight:700;opacity:.75}
@@ -194,8 +194,8 @@
   .ir-to{font-size:calc(16px*var(--k));font-weight:800;color:var(--g-900)}
   .ir-u{font-size:calc(11px*var(--k));color:var(--g-500)}
   .ir-d{font-size:calc(11px*var(--k));font-weight:800;padding:calc(1px*var(--k)) calc(6px*var(--k));border-radius:6px;margin-left:calc(3px*var(--k))}
-  .ir-d.down{background:#fbe3e0;color:#e5484d}
-  .ir-d.up{background:#e2f3ee;color:#1d8a76}
+  .ir-d.down{background:var(--sys-red-bg);color:var(--sys-red)}
+  .ir-d.up{background:var(--sys-green-bg);color:var(--sys-green)}
   .ir-memo{flex:none;color:var(--g-400);display:inline-flex}
   /* 시안3: 상태그룹 접기 + 큰 요약 */
   .gc-h{width:100%;border:0;background:transparent;font-family:inherit;cursor:pointer;padding:0}
@@ -204,8 +204,8 @@
   .gc[data-open="0"] .gc-h{margin-bottom:0}
   .gc-b[hidden]{display:none}
   /* 묶음 = 배경색 제거, 테두리만 */
-  .gc.done{background:#fff;border-color:#bfe6d5}
-  .gc.rej{background:#fff;border-color:#f0c8c1}
+  .gc.done{background:#fff;border-color:#BFE9CB}
+  .gc.rej{background:#fff;border-color:#F6C9C9}
   .gc.wait{background:#fff;border-color:var(--g-200)}
   .gc .irow{display:block;background:transparent;border-radius:0;padding:calc(11px*var(--k)) calc(2px*var(--k));margin-top:0;border-bottom:1px solid var(--g-100)}
   .gc .irow:last-child{border-bottom:0}
@@ -218,15 +218,15 @@
   .subc-sum{gap:calc(9px*var(--k))}
   .bsum{display:inline-flex;align-items:center;gap:calc(3px*var(--k));font-size:calc(13px*var(--k));font-weight:800}
   .bsum .sic{width:calc(14px*var(--k));height:calc(14px*var(--k))}
-  .bsum.done{color:#1d8a76}
-  .bsum.rej{color:#e5484d}
+  .bsum.done{color:var(--sys-green)}
+  .bsum.rej{color:var(--sys-red)}
   .bsum.wait{color:var(--g-500)}
   .bsum b{font-size:calc(15px*var(--k))}
 </style>
 </head>
 <body>
 <div class="stage">
-  <div style="max-width:calc(390px*var(--k));margin:0 auto calc(12px*var(--k));background:#fdecea;color:#d64431;font-size:calc(12.5px*var(--k));font-weight:800;text-align:center;padding:calc(9px*var(--k)) calc(12px*var(--k));border-radius:calc(12px*var(--k));border:1px solid #f3c9c2;letter-spacing:var(--tracking)">⚠ 이 화면(제출 상세)은 <u>확정 전</u> — (TBU)</div>
+  <div style="max-width:calc(390px*var(--k));margin:0 auto calc(12px*var(--k));background:var(--sys-red-bg);color:var(--sys-red);font-size:calc(12.5px*var(--k));font-weight:800;text-align:center;padding:calc(9px*var(--k)) calc(12px*var(--k));border-radius:calc(12px*var(--k));border:1px solid #F6C9C9;letter-spacing:var(--tracking);display:flex;align-items:center;justify-content:center;gap:calc(6px*var(--k))"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>이 화면(제출 상세)은 <u>확정 전</u> — (TBU)</span></div>
   <div class="device" data-screen-label="제출 상세 (TBU)">
     <div class="statusbar">
       <span class="num">9:41</span>
