@@ -133,9 +133,10 @@
     <h1>AI MATE 안내서</h1>
     <p><b>AI MATE</b>는 선택한 처방 환자를 웹 기반 AI가 분석해 주는 기능입니다. 고객정보부터 약력·구매 이력, 처방 약물 정보, AI 상담까지 <b>한 화면에서 위에서 아래로</b> 확인하며, 처방 약물별로 <b>부족해질 수 있는 영양소와 추천 상품</b>(드럭머거)도 함께 볼 수 있습니다.</p>
     <div class="partnav">
+      <a href="#sec-customer">고객정보</a>
       <a href="#sec-history">약력관리</a>
       <a href="#sec-purchase">구매정보</a>
-      <a href="#sec-drugtable">약물 정보표</a>
+      <a href="#sec-drugtable">처방 약물 정보표</a>
       <a href="#sec-aichat">AI 상담</a>
       <a href="#part-reco">추천 상품</a>
       <a href="#part-faq">자주 묻는 질문</a>
@@ -146,7 +147,7 @@
   <div class="partband" id="part-screen">
     <div class="pk">PART A · 화면 보기</div>
     <div class="pt">AI MATE 화면 살펴보기</div>
-    <div class="pd">굿팜 클라이언트 3.0 AI 차트에서 AI MATE를 열고, 고객정보 · 약력관리 · 구매정보 · 약물 정보표 · AI 상담을 한 화면에서 확인합니다.</div>
+    <div class="pd">굿팜 클라이언트 3.0 AI 차트에서 AI MATE를 열고, 고객정보 · 약력관리 · 구매정보 · 처방 약물 정보표 · AI 상담을 한 화면에서 확인합니다.</div>
   </div>
 
   <section>
@@ -162,22 +163,21 @@
 
   <section>
     <h2><span class="num">2</span>화면 구성 한눈에 보기</h2>
-    <p>AI MATE는 <b>하나의 화면</b>으로 되어 있습니다. 다음 다섯 개 영역이 위에서 아래 순서로 이어집니다.</p>
+    <p>AI MATE는 <b>하나의 화면</b>으로 되어 있습니다. <b>기본 순서</b>는 아래와 같으며, 화면 오른쪽 위 <span class="btn-ui">설정</span>에서 순서를 바꿀 수 있습니다.</p>
     <div class="flow">
       <div class="fi"><span class="fn">1</span><div><div class="ft">고객정보</div><div class="fd">성명 · 연령(성별) · 최근 처방일 · 약력관리 이력 · 특이사항</div></div></div>
       <div class="fi"><span class="fn">2</span><div><div class="ft">약력관리 <span class="tag n">AI 약력관리 분석</span></div><div class="fd">기간별 처방 추이 — 효능군별 복용 이력 그래프</div></div></div>
       <div class="fi"><span class="fn">3</span><div><div class="ft">구매정보</div><div class="fd">상품 구매 이력 — 일자별 상품 · 수량 · 판매금액</div></div></div>
-      <div class="fi"><span class="fn">4</span><div><div class="ft">약물 정보표</div><div class="fd">처방 약물 상세 + 약물별 드럭머거 &amp; 추천 상품</div></div></div>
+      <div class="fi"><span class="fn">4</span><div><div class="ft">처방 약물 정보표</div><div class="fd">처방 약물 상세 + 약물별 드럭머거 &amp; 추천 상품</div></div></div>
       <div class="fi"><span class="fn">5</span><div><div class="ft">AI 상담</div><div class="fd">복약 관련 질문을 입력해 답변 확인</div></div></div>
     </div>
 
     <h3>오른쪽 [바로가기]로 빠르게 이동합니다</h3>
     <p>화면 오른쪽의 <b>바로가기</b> 패널에서 <b>고객정보 · 약력관리 · 구매정보 · 약물 정보표 · AI 상담</b>을 누르면 해당 영역으로 바로 이동합니다. 지금 보고 있는 영역은 민트색으로 표시되고, <span class="btn-ui">∧ 접기</span>로 패널을 접을 수 있습니다.</p>
     <figure class="figimg"><img src="img/aimate/mate/quicknav.png" alt="예시 · 화면 오른쪽 [바로가기] 패널" loading="lazy"><figcaption>예시 · 오른쪽 <b>[바로가기]</b> 패널 — 고객정보 · 약력관리 · 구매정보 · 약물 정보표 · AI 상담</figcaption></figure>
-    <p class="note">화면 오른쪽 위 <span class="btn-ui">설정</span>에서 영역이 보이는 순서를 조정할 수 있습니다.</p>
   </section>
 
-  <section>
+  <section id="sec-customer">
     <h2><span class="num">3</span>고객정보</h2>
     <p>환자의 기본 정보와 약국이 남긴 메모를 확인하는 영역입니다.</p>
     <ul>
@@ -189,11 +189,11 @@
 
   <section id="sec-history">
     <h2><span class="num">4</span>약력관리</h2>
-    <p><b>AI 약력관리 분석</b>은 환자의 약력 데이터를 바탕으로 복용약물 분석 자료를 만들어 주는 영역입니다. <b>기간별 처방 추이</b>에서 지난 처방 내역을 한눈에 확인합니다.</p>
+    <p><b>AI 약력관리 분석</b>은 환자의 <b>과거 처방 이력을 효능군별로 정리해</b> 보여주는 영역입니다. <b>기간별 처방 추이</b>에서 어떤 약을 언제부터 얼마나 복용했는지 한눈에 확인합니다.</p>
     <ul>
-      <li><b>효능군</b>(혈압약 · 당뇨약 · 고지혈증약 · 소염진통제 등)별로 묶여 있고, 약물마다 언제부터 얼마나 복용했는지 <b>가로 막대</b>로 표시됩니다.</li>
+      <li><b>효능군</b>(고혈압약 · 당뇨약 · 고지혈증약 · 소염진통제 등)별로 묶여 있고, 약물마다 언제부터 얼마나 복용했는지 <b>가로 막대</b>로 표시됩니다.</li>
       <li>가로축은 <b>반기 단위</b>(예: 24.H1 · 24.H2)라서, 장기 복용 약과 최근 시작한 약을 한눈에 구분할 수 있습니다.</li>
-      <li>위쪽 효능군 표시로 어떤 색이 어떤 계열인지 확인합니다.</li>
+      <li>위쪽 <b>범례</b>에서 어떤 색이 어떤 효능군인지 확인합니다.</li>
     </ul>
     <figure class="figimg"><img src="img/aimate/mate/history.png" alt="예시 · AI 약력관리 분석 · 기간별 처방 추이" loading="lazy"><figcaption>예시 · AI 약력관리 분석 — 기간별 처방 추이(효능군별 복용 이력)</figcaption></figure>
   </section>
@@ -203,7 +203,7 @@
     <p>환자가 약국에서 구매한 <b>상품 구매 이력</b>을 확인하는 영역입니다.</p>
     <ul>
       <li><b>일자 · 상품명 · 수량 · 판매금액</b>이 표로 표시되고, 일자별 <b>합계</b>가 함께 나옵니다.</li>
-      <li>이력이 많으면 최근 건부터 보이고, 아래 <span class="btn-ui">▼ 더보기</span>를 누르면 나머지 이력이 펼쳐집니다.</li>
+      <li><b>최근 순으로 정렬</b>되며, 최근 이력만 먼저 표시됩니다. 아래 <span class="btn-ui">▼ 더보기</span>를 누르면 전체가 펼쳐집니다.</li>
     </ul>
     <figure class="figimg"><img src="img/aimate/mate/purchase.png" alt="예시 · 구매정보 · 상품 구매 이력" loading="lazy"><figcaption>예시 · 구매정보 — 상품 구매 이력(일자 · 상품명 · 수량 · 판매금액 · 합계 · 더보기)</figcaption></figure>
   </section>
@@ -213,7 +213,7 @@
     <p>현재 처방받은 약물의 상세 정보를 확인하는 영역입니다.</p>
     <ul>
       <li>표에는 <b>약물명 · 이미지 · 성분명 · 효능 · 복용법 · 주의사항</b>이 표시됩니다.</li>
-      <li><b>언어 선택</b> — 한국어 · 영어 · 중국어 · 일본어로 내용을 전환할 수 있고, <span class="btn-ui">언어 설정 ∨</span>에서 표시할 언어를 관리합니다. <b>베트남어 · 태국어 · 러시아어 등 10개 언어</b>로 번역이 가능합니다.</li>
+      <li><b>언어 선택</b> — <b>총 10개 언어</b>를 지원합니다. 기본은 <b>한국어 · 영어 · 중국어 · 일본어</b>가 노출되며, 나머지 언어(베트남어 · 태국어 · 러시아어 등)는 <span class="btn-ui">언어 설정 ∨</span>에서 추가합니다.</li>
     </ul>
     <figure class="figimg"><img src="img/aimate/mate/drugtable.png" alt="예시 · 처방 약물 정보표와 약물별 드럭머거 영역" loading="lazy"><figcaption>예시 · 처방 약물 정보표 — 언어 · 인쇄 버튼, 약물별 드럭머거 &amp; 추천 상품 영역</figcaption></figure>
     <h3>인쇄</h3>
@@ -237,7 +237,7 @@
     <figure class="figimg"><img src="img/aimate/mate/chat-chips.png" alt="예시 · AI 상담 추천 질문 버튼" loading="lazy"><figcaption>예시 · 추천 질문 버튼 5종</figcaption></figure>
 
     <h3>답변은 복약지도 참고용입니다</h3>
-    <p>답변에는 처방 약물의 성분 중복·상호작용·주의점이 함께 정리됩니다. <b>복약지도 참고용</b>이므로, 환자 상태와 복용 중인 약을 확인한 뒤 안내해 주세요.</p>
+    <p>답변에는 처방 약물의 성분 중복·상호작용·주의점이 함께 정리됩니다. AI 답변은 <b>부정확할 수 있는 복약지도 참고용</b>이므로, 환자 상태와 복용 중인 약을 확인한 뒤 <b>최종 판단은 약사가</b> 해 주세요.</p>
     <figure class="figimg"><img src="img/aimate/mate/chat-answer.png" alt="예시 · AI 상담 답변" loading="lazy"><figcaption>예시 · 질문에 대한 AI 상담 답변</figcaption></figure>
   </section>
 
@@ -245,11 +245,11 @@
   <div class="partband" id="part-reco">
     <div class="pk">PART B · 추천 상품</div>
     <div class="pt">드럭머거 &amp; 추천 상품</div>
-    <div class="pd"><b>드럭머거</b>는 특정 약을 복용할 때 일부 영양소가 부족해질 수 있는 정보를 알려주는 상담 참고 기능입니다. AI MATE는 이 정보를 바탕으로 부족해질 수 있는 영양소와 관련 추천 상품을 함께 보여줍니다.</div>
+    <div class="pd"><b>드럭머거(Drug Mugger)</b>는 특정 약물이 체내 영양소의 <b>흡수 · 대사 · 배설</b>에 영향을 주어 결핍을 일으킬 수 있다는 개념입니다. AI MATE는 이 개념을 바탕으로 처방 약물별로 부족해질 수 있는 영양소와 관련 추천 상품을 함께 보여줍니다.</div>
   </div>
 
   <section>
-    <h2><span class="num">8</span>AI mate 추천 상품이란?</h2>
+    <h2><span class="num">8</span>AI MATE 추천 상품이란?</h2>
     <p>환자의 <b>처방 약물</b>을 바탕으로, 그 약을 복용할 때 <b>부족해질 수 있는 영양소</b>와 이를 보충할 <b>추천 상품</b>을 함께 보여주는 <span class="mint">상담 참고</span> 기능입니다.</p>
     <h3>두 가지 추천 상품</h3>
     <div class="tbl"><table>
@@ -265,18 +265,19 @@
 
   <section>
     <h2><span class="num">9</span>AI MATE 화면에서 어디에 보이나요?</h2>
-    <p><b>약물 정보표</b>에서, 각 처방 약물 바로 아래에 추천 영역이 자동으로 표시됩니다.</p>
-    <figure class="figimg"><img src="img/aimate/mate/drugmugger.png" alt="예시 · AI MATE 화면 · 약물 정보표의 추천 영역" loading="lazy"><figcaption>예시 · AI MATE 화면 · 약물 정보표의 추천 영역(약물별 부족 영양소 + 우리약국/굿팜 추천 상품)</figcaption></figure>
+    <p><b>처방 약물 정보표</b>에서, 각 처방 약물 바로 아래에 추천 영역이 자동으로 표시됩니다.</p>
+    <figure class="figimg"><img src="img/aimate/mate/drugmugger.png" alt="예시 · AI MATE 화면 · 처방 약물 정보표의 추천 영역" loading="lazy"><figcaption>예시 · AI MATE 화면 · 처방 약물 정보표의 추천 영역(약물별 부족 영양소 + 우리약국/굿팜 추천 상품)</figcaption></figure>
     <h3>화면에 보이는 정보</h3>
     <ul>
       <li>이 약을 복용할 때 <b>부족해질 수 있는 영양소</b></li>
       <li>그 영양소가 부족해지는 <b>이유</b>(상담 참고 설명)와 <b>근거</b></li>
       <li>영양소별 <b>우리약국 추천 상품</b>과 <b>굿팜 추천 상품</b></li>
     </ul>
-    <p class="note"><b>AI MATE 화면은 조회 전용입니다.</b> AI MATE 화면에서는 추천 정보를 확인만 할 수 있습니다. 추천 상품을 추가하거나 수정하려면 관리자 웹페이지에서 설정해야 합니다.</p>
+    <p><b>근거</b>는 약물–영양소 상호작용을 다룬 <b>문헌 데이터</b>를 기반으로 하며, 근거 문장 옆 <b>ⓘ</b>에 마우스를 올리면 해당 <b>참고문헌</b>이 표시됩니다.</p>
+    <p class="note"><b>추천 상품 정보는 조회 전용입니다.</b> AI MATE 화면에서는 추천 정보를 확인만 할 수 있고, 추천 상품의 추가·수정은 관리자 웹페이지에서 합니다.</p>
   </section>
 
-  <section>
+  <section id="sec-when">
     <h2><span class="num">10</span>추천 상품은 언제 표시되나요?</h2>
     <p>영양소마다, 추천 상품이 <b>하나라도 있을 때만</b> AI MATE 화면에 해당 영양소 블록이 표시됩니다.</p>
     <div class="tbl"><table>
@@ -296,7 +297,7 @@
     <h2><span class="num">11</span>우리약국 추천 상품은 어디서 설정하나요?</h2>
     <p><b>관리자 웹페이지</b>에서 설정합니다. 영양소별로 우리 약국이 권하고 싶은 상품을 직접 등록할 수 있습니다.</p>
     <figure class="figimg"><div class="stack">
-      <img src="img/aimate/real/web-main.png" alt="예시 · 관리자 웹페이지 AI mate 추천 상품 목록" loading="lazy">
+      <img src="img/aimate/real/web-main.png" alt="예시 · 관리자 웹페이지 AI MATE 추천 상품 목록" loading="lazy">
       <img src="img/aimate/real/web-detail-setting.png" alt="예시 · 관리자 웹페이지 추천 상품 설정 영역" loading="lazy">
     </div><figcaption>예시 · 관리자 웹페이지 — 추천 상품 목록에서 영양소 진입 → 추천 상품 설정 영역(우리약국 추천 상품 · 굿팜 추천 상품)</figcaption></figure>
     <h3>설정 방법</h3>
@@ -306,16 +307,17 @@
       <li><b>저장하면 AI MATE 화면에 반영됩니다.</b></li>
     </ol>
     <ul>
-      <li><b>[＋ 우리약국 추천 상품 추가]</b> 버튼을 누르면 상품 추가 화면으로 이동합니다. 상품 추가 방식은 추후 확정된 화면 기준으로 별도 안내합니다.</li>
+      <li><b>[＋ 우리약국 추천 상품 추가]</b> 버튼을 누르면 상품 추가 화면으로 이동합니다.</li>
       <li><b>굿팜 추천 상품은 조회만 가능</b>합니다. 약국에서는 수정할 수 없으며, 굿팜이 관리합니다.</li>
     </ul>
   </section>
 
   <section>
-    <h2><span class="num">12</span>“AI mate 노출 중지”는 무슨 뜻인가요?</h2>
-    <p>‘노출 중지(OFF)’는 해당 영양소를 <b>AI MATE 화면에 잠시 보이지 않게</b> 한 상태입니다.</p>
+    <h2><span class="num">12</span>영양소 노출 중지(OFF)는 무슨 뜻인가요?</h2>
+    <p>‘노출 중지(OFF)’는 <b>해당 영양소만</b> AI MATE 화면에 잠시 보이지 않게 한 상태입니다. AI MATE 기능 전체가 꺼지는 것은 아닙니다.</p>
     <ul>
-      <li>AI MATE 화면에는 보이지 않습니다.</li>
+      <li>노출 <b>ON/OFF는 굿팜이 관리</b>하며, 약국에서는 변경할 수 없습니다.</li>
+      <li>해당 영양소 블록만 AI MATE 화면에 보이지 않습니다.</li>
       <li>관리자 웹페이지에서는 <b>그대로 확인하고, 추천 상품을 미리 등록·수정</b>할 수 있습니다.</li>
       <li>다시 노출이 <b>켜지면(ON)</b>, 저장해 둔 상품이 그대로 AI MATE 화면에 표시됩니다.</li>
     </ul>
@@ -324,43 +326,45 @@
   </section>
 
   <section>
-    <h2><span class="num">13</span>추천 상품이 안 보이는 경우</h2>
-    <p>추천 상품이 보이지 않는다고 해서 항상 오류는 아닙니다. 대부분은 <b>정상적인 미표시</b>입니다.</p>
-    <div class="tbl"><table>
-      <thead><tr><th>경우</th><th>구분</th><th>설명</th></tr></thead>
-      <tbody>
-        <tr><td>추천 상품이 등록되지 않음</td><td><span class="tag n">정상</span></td><td>등록된 상품이 없어 블록이 표시되지 않습니다.</td></tr>
-        <tr><td>노출 중지(OFF) 상태</td><td><span class="tag n">정상</span></td><td>굿팜에서 잠시 노출을 중지했습니다.</td></tr>
-        <tr><td>연결된 정보가 없음</td><td><span class="tag n">정상</span></td><td>해당 영양소에 연결된 추천 정보가 없습니다.</td></tr>
-        <tr><td>일시적인 시스템 오류</td><td><span class="tag e">오류</span></td><td>오류 시 <b>오류 화면</b>이 표시됩니다. 이때만 오류입니다.</td></tr>
-      </tbody>
-    </table></div>
-    <p class="note"><b>오류 화면</b>이 표시될 때만 시스템 오류입니다. 그 외에 그냥 안 보이는 경우는 대부분 정상입니다. 계속 이상하면 굿팜에 문의해 주세요.</p>
+    <h2><span class="num">13</span>추천 상품이 안 보일 때</h2>
+    <p>추천 상품이 보이지 않는다고 해서 항상 오류는 아닙니다. 대부분은 <b>정상적인 미표시</b>이며, 아래 순서로 확인하면 됩니다. (어떤 경우에 표시되는지는 <a href="#sec-when" style="color:var(--mint);font-weight:700">10번</a> 참고)</p>
+    <ol>
+      <li><b>다른 약물에는 추천이 보이는지 확인합니다.</b>추천 상품이 등록된 약물만 블록이 표시됩니다. 일부 약물에만 안 보이면 정상입니다.</li>
+      <li><b>관리자 웹페이지에서 해당 영양소를 확인합니다.</b>우리약국 추천 상품·굿팜 추천 상품이 모두 없거나, 굿팜이 노출을 중지(OFF)한 상태면 표시되지 않습니다.</li>
+      <li><b>권하고 싶은 상품을 등록합니다.</b>관리자 웹페이지에서 우리약국 추천 상품을 등록하면 다음 조회부터 표시됩니다.</li>
+      <li><b>오류 화면이 뜨면 굿팜에 문의합니다.</b>“추천 정보를 불러오지 못했습니다” 오류 화면이 표시될 때만 시스템 오류입니다.</li>
+    </ol>
     <figure class="figimg"><img src="img/aimate/real/guide-notshown.png" alt="예시 · 추천 상품이 있는 약물만 블록이 표시되고, 없는 약물은 표시되지 않음(정상)" loading="lazy"><figcaption>예시 · 추천 상품이 있는 약물만 블록이 표시되고, 없는 약물은 표시되지 않음(정상)</figcaption></figure>
   </section>
 
   <section id="part-faq">
-    <h2><span class="num">14</span>자주 묻는 질문</h2>
+    <h2>자주 묻는 질문</h2>
     <div class="qa"><div class="q">AI MATE 화면에서 추천 상품을 수정할 수 있나요?</div>
-      <div class="a">AI MATE 화면에서는 확인만 할 수 있습니다. 추가·수정은 관리자 웹페이지에서 합니다.</div></div>
+      <div class="a">AI MATE 화면에서 추천 상품 정보는 조회 전용입니다. 추가·수정은 관리자 웹페이지에서 합니다. (AI 상담은 AI MATE 화면에서 그대로 사용하실 수 있습니다.)</div></div>
     <div class="qa"><div class="q">굿팜 추천 상품을 우리 약국이 바꿀 수 있나요?</div>
       <div class="a">바꿀 수 없습니다. 굿팜 추천 상품은 굿팜이 관리합니다. 우리 약국 상품은 우리약국 추천 상품에 따로 등록하시면 됩니다.</div></div>
-    <div class="qa"><div class="q">우리약국 추천과 굿팜 추천 중 무엇이 먼저 보이나요?</div>
+    <div class="qa"><div class="q">우리약국 추천 상품과 굿팜 추천 상품 중 무엇이 먼저 보이나요?</div>
       <div class="a">우리약국 추천 상품이 먼저 표시되고, 그다음에 굿팜 추천 상품이 보입니다.</div></div>
     <div class="qa"><div class="q">노출 중지 상태에서도 상품을 등록할 수 있나요?</div>
       <div class="a">네. 노출이 꺼져 있어도 관리자 웹페이지에서 미리 등록·수정할 수 있습니다. 다시 켜지면 저장한 상품이 AI MATE 화면에 표시됩니다.</div></div>
     <div class="qa"><div class="q">추천이 안 뜨면 오류인가요?</div>
       <div class="a">대부분 오류가 아닙니다. 추천 상품이 없거나, 굿팜에서 잠시 노출을 중지한 경우에는 정상적으로 보이지 않을 수 있습니다. 오류 화면이 표시될 때만 오류입니다.</div></div>
+    <div class="qa"><div class="q">환자 정보가 외부로 나가나요?</div>
+      <div class="a">AI 분석과 AI 상담은 처방 내용을 바탕으로 동작하며, 환자를 식별할 수 있는 정보는 <b>가명(해시) 처리 후 전송</b>됩니다. 화면에도 성명이 김*팜처럼 가려진 형태로 표시됩니다.</div></div>
+    <div class="qa"><div class="q">AI 상담 답변을 그대로 환자에게 전달해도 되나요?</div>
+      <div class="a">AI 답변은 <b>부정확할 수 있어 복약지도 참고용</b>입니다. 환자 상태와 복용 중인 약을 확인한 뒤 <b>최종 판단은 약사가</b> 해 주세요.</div></div>
   </section>
 
   <div class="remember">
     <h2>마지막으로 꼭 기억할 점</h2>
     <ul>
-      <li><b>AI MATE는 한 화면</b>입니다. 고객정보 → 약력관리 → 구매정보 → 약물 정보표 → AI 상담 순으로 이어지고, 이동은 오른쪽 <b>[바로가기]</b> 패널로 합니다.</li>
-      <li><b>AI MATE 화면은 조회 전용</b>입니다. 확인만 하고, 수정은 하지 않습니다.</li>
+      <li><b>AI MATE는 한 화면</b>입니다. 기본 순서는 고객정보 → 약력관리 → 구매정보 → 처방 약물 정보표 → AI 상담이며, <b>오른쪽 위 [설정]에서 순서를 바꿀 수 있습니다.</b></li>
+      <li>영역 이동은 화면 오른쪽 <b>[바로가기]</b> 패널로 합니다.</li>
+      <li><b>추천 상품 정보는 조회 전용</b>입니다. AI MATE 화면에서 확인만 하고, 추가·수정은 관리자 웹페이지에서 합니다.</li>
       <li><b>우리약국 추천 상품은 관리자 웹페이지</b>에서 설정합니다. (영양소별 최대 3개)</li>
       <li><b>우리약국 추천 상품이 굿팜 추천 상품보다 먼저</b> 표시됩니다.</li>
-      <li><b>굿팜 기본 추천 상품</b>은 굿팜이 관리합니다. (약국은 수정 불가)</li>
+      <li><b>굿팜 추천 상품</b>과 <b>영양소 노출 ON/OFF</b>는 굿팜이 관리합니다. (약국은 수정 불가)</li>
+      <li><b>AI 상담 답변은 참고용</b>이며, 최종 판단은 약사가 합니다.</li>
     </ul>
   </div>
 
