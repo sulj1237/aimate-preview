@@ -94,7 +94,7 @@
   /* 등록(신규)만 하는 케이스 — 수정과 구분(amber) */
   .wi-sum.reg{color:var(--amber);background:#fbeecb;border-color:#f0dca6}
   .regtag{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--amber);border-radius:5px;padding:2px 6px;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
-  .wi-detail-btn,.wi-del{flex:none}
+  .wi-detail-btn{flex:none}
   /* 상세 내용 — 화면 우측 드로어가 아니라, 가운데 모달의 우측에 '붙는' 플로팅 팝업 */
   .drawer-bg{display:none;position:fixed;inset:0;background:transparent;z-index:90}   /* 투명 — 바깥 클릭 시 닫기 */
   .drawer-bg.open{display:block}
@@ -345,7 +345,7 @@
   <div class="modal" role="dialog" aria-modal="true" style="max-width:720px">
     <div class="modal-h">
       <div class="mtitle">앱 상품 수정 요청
-        <span class="help" id="wlHelp" tabindex="0">i<span class="tip">기기(Device ID) 단위로 앱에서 제출한 상품 수정 요청을 묶어 보여줍니다. 상품을 선택해 <b>선택 반영</b>하세요(<b>전체 삭제</b>도 가능). 동일 상품은 최신 요청 1건만 노출되고, 처리 결과는 <b>변경 내용 보기</b> 이력에 저장됩니다.</span></span>
+        <span class="help" id="wlHelp" tabindex="0">i<span class="tip">기기(Device ID) 단위로 앱에서 제출한 상품 수정 요청을 묶어 보여줍니다. 반영할 상품을 선택해 <b>선택 반영</b>하면, 선택한 상품은 상품 목록에 반영되고 <b>선택하지 않은 상품은 삭제</b>됩니다. 반영 결과는 <b>변경 내용 보기</b> 이력에 저장됩니다.</span></span>
       </div>
       <button class="x" id="wClose">✕</button>
     </div>
@@ -356,6 +356,20 @@
       <button class="mbtn red" id="wDelAll" style="margin-right:auto">전체 삭제</button>
       <button class="mbtn ghost" id="wCloseF">닫기</button>
       <button class="mbtn primary" id="wApplyAll" disabled>선택 반영</button>
+    </div>
+  </div>
+</div>
+<!-- 선택 반영 확인 모달 (실재고 반영 확인 모달과 동일 형식) -->
+<div class="modal-bg" id="applyModal">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:420px">
+    <div class="modal-b" style="padding:22px 20px 6px">
+      <div style="font-weight:800;font-size:15px;margin-bottom:8px">선택한 상품 정보를 상품 목록에 반영할까요?</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55">선택하지 않은 상품 정보는 <b>삭제 처리</b>되어 목록에서 사라집니다.</div>
+      <div style="margin-top:12px;font-weight:700;font-size:13px">선택 <span id="amCnt">0</span>건</div>
+    </div>
+    <div class="modal-f">
+      <button class="mbtn ghost" id="amCancel">취소</button>
+      <button class="mbtn primary" id="amOk">반영</button>
     </div>
   </div>
 </div>
@@ -448,7 +462,6 @@
             '<label class="wi-ck"><input type="checkbox" class="wi-pick" '+(it._sel?'checked':'')+'></label>'+
             '<div class="wi-main"><div class="wi-nmrow"><span class="wi-sum'+(it.type==='new'?' reg':'')+'">'+typeLabel(it)+'</span><span class="wi-nm">'+it.nm+'</span></div><div class="wi-bc">'+it.bc+'</div></div>'+
             '<button class="btn line sm wi-detail-btn">상세 내용</button>'+
-            '<button class="btn red sm wi-del">삭제</button>'+
           '</div>'+
         '</div>';
       }).join('');
@@ -476,18 +489,15 @@
     $('dwBody').innerHTML='<table class="cmp"><thead><tr><th>항목</th><th>'+(it.type==='new'?'현재':'현재값')+'</th><th class="c"></th><th>'+(it.type==='new'?'등록값':'앱 제출값')+'</th></tr></thead><tbody>'+cmp+'</tbody></table>';
     $('dwBg').classList.add('open');$('dwPanel').classList.add('open');}
   function closeDrawer(){$('dwBg').classList.remove('open');$('dwPanel').classList.remove('open');}
-  // 각 상품별 삭제(개별 제거)
-  function deleteItem(gi,ii){var g=groups[gi],it=g.items[ii];g.items.splice(ii,1);if(!g.items.length)groups.splice(gi,1);renderWaitlist();toast('삭제 · '+it.nm);}
-  // 선택 반영 — 전체 그룹에서 선택된 건 일괄 반영
+  // 선택 반영 — 선택 건은 반영(수정 이력 생성), 선택하지 않은 건은 삭제 처리(목록 비움)
   function applyAll(){var picked=totalSel();if(!picked)return;
-    groups.forEach(function(g){g.items=g.items.filter(function(it){return !it._sel;});});
-    for(var i=groups.length-1;i>=0;i--){if(!groups[i].items.length)groups.splice(i,1);}
-    renderWaitlist();closeDrawer();toast('반영 완료 · '+picked+'건 · 수정 이력 생성');}
+    var dropped=totalCount()-picked;
+    groups.length=0; // 선택=반영 / 미선택=삭제 → 모두 목록에서 제거
+    renderWaitlist();closeDrawer();
+    toast('반영 '+picked+'건'+(dropped?' · 삭제 '+dropped+'건':'')+' · 수정 이력 생성');}
   $('waitBody').addEventListener('click',function(e){
     var db=e.target.closest('.wi-detail-btn');
     if(db){var wi=db.closest('.wi');openDrawer(+wi.getAttribute('data-g'),+wi.getAttribute('data-i'));return;}
-    var del=e.target.closest('.wi-del');
-    if(del){var wi2=del.closest('.wi');deleteItem(+wi2.getAttribute('data-g'),+wi2.getAttribute('data-i'));return;}
     var h=e.target.closest('.wg-h');
     if(h && !e.target.closest('.wg-hck')){var gi=+h.closest('.wg').getAttribute('data-g');groups[gi]._open=!groups[gi]._open;renderWaitlist();}
   });
@@ -495,7 +505,13 @@
     if(e.target.classList.contains('wi-pick')){var wi=e.target.closest('.wi');groups[+wi.getAttribute('data-g')].items[+wi.getAttribute('data-i')]._sel=e.target.checked;renderWaitlist();return;}
     if(e.target.classList.contains('wg-all')){var gi=+e.target.closest('.wg').getAttribute('data-g'),v=e.target.checked;groups[gi].items.forEach(function(it){it._sel=v;});renderWaitlist();}
   });
-  $('wApplyAll').onclick=applyAll;
+  // 선택 반영 → 확인 모달 → 반영
+  var applyModal=$('applyModal');
+  function openApplyModal(){var picked=totalSel();if(!picked)return;$('amCnt').textContent=picked;applyModal.classList.add('open');}
+  $('wApplyAll').onclick=openApplyModal;
+  $('amCancel').onclick=function(){applyModal.classList.remove('open');};
+  applyModal.onclick=function(e){if(e.target===applyModal)applyModal.classList.remove('open');};
+  $('amOk').onclick=function(){applyModal.classList.remove('open');applyAll();};
   $('wDelAll').onclick=function(){if(!totalCount())return;groups.length=0;renderWaitlist();closeDrawer();toast('전체 삭제 · 모든 수정 요청 삭제');};
   $('dwClose').onclick=closeDrawer;$('dwBg').onclick=closeDrawer;
   $('syncBtn').onclick=function(){renderWaitlist();$('waitModal').classList.add('open');};
