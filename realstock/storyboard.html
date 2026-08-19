@@ -562,7 +562,7 @@
                 <div class="hot cell act" data-n="2"><span class="num">2</span><div class="cl">진열 수량</div><div class="cv">10</div></div>
                 <div class="hot cell" data-n="3"><span class="num">3</span><div class="cl">창고 수량</div><div class="cv">14</div></div>
               </div>
-              <div class="hot" data-n="4" style="margin-top:10px"><span class="num">4</span><div style="font-size:9.5px;font-weight:800;color:var(--ink);margin-bottom:3px">재고 차이 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx" style="height:26px;font-size:9.5px;color:#3a424c;justify-content:flex-start">정기 실사 중 진열·창고 차이 확인</div><div style="text-align:right;font-size:8px;color:var(--faint);margin-top:2px">19/30</div></div>
+              <div class="hot" data-n="4" style="margin-top:10px"><span class="num">4</span><div style="font-size:9.5px;font-weight:800;color:var(--ink);margin-bottom:3px">재고 보정 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx" style="height:26px;font-size:9.5px;color:#3a424c;justify-content:flex-start">정기 실사 중 진열·창고 차이 확인</div><div style="text-align:right;font-size:8px;color:var(--faint);margin-top:2px">19/30</div></div>
             </div>
             <div class="ph-foot" style="padding:11px 13px;border-top:1px solid var(--line);background:#fafbfc">
               <div class="hot totbox" data-n="5" style="margin:0 0 8px"><span class="num">5</span><span class="tl">총 수량 <span class="autob">자동</span></span><span class="tv">24 <span style="font-size:10px;font-weight:700">개</span></span></div>
@@ -578,7 +578,7 @@
           <li data-n="1"><span class="di">1</span><span class="dt"><b>상품 식별 헤더</b> — 바코드는 앱바(제목 옆). 본문에 <b>상품명·앱 조회 시점 재고</b>(읽기 전용) + <b>앱 동기화 시각</b> 캡션.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>진열 수량 셀</b> — 탭 시 활성(강조). 미입력 `입력` 표시.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>창고 수량 셀</b> — 탭 시 활성.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 차이 사유(선택)</b> — <b>수량(진열/창고) 입력 후 총 수량 ≠ 앱 조회 시점 재고</b>일 때만 노출. 1줄·30자(N/30). placeholder `앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.` 입력값은 제출 목록·제출 상세·클라이언트 실재고 관리에도 함께 노출.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>재고 보정 사유(선택)</b> — <b>수량(진열/창고) 입력 후 총 수량 ≠ 앱 조회 시점 재고</b>일 때만 노출. 1줄·30자(N/30). placeholder `앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.` 입력값은 제출 목록·제출 상세·클라이언트 실재고 관리에도 함께 노출.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b>총 수량(자동 · 읽기 전용)</b> — <b>키패드 위</b>에 상시 표시. `총 수량 = 진열 + 창고`. 직접 입력 없음.</span></li>
           <li data-n="6"><span class="di">6</span><span class="dt"><b>숫자 키패드(상시 노출)</b> — 1~9 · `00` · `0` · `⌫`. 탭 없이 바로 입력.</span></li>
           <li data-n="7"><span class="di">7</span><span class="dt"><b>목록에 담기</b> — 진열·창고 중 하나라도 값 있어야 활성 → APP-02-003.</span></li>
@@ -589,13 +589,13 @@
         <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
           <tr><td><span class="cb info">최초 진입</span></td><td>APP-02-001 인식</td><td>진열·창고 `입력` · 총 수량 `0` · 담기 <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
           <tr><td><span class="cb ok">진열/창고 입력</span></td><td>셀 값 입력</td><td>총 수량(키패드 위) 실시간 합산 · 담기 활성</td><td class="nx">—</td></tr>
-          <tr><td><span class="cb info">재고 차이 사유 노출</span></td><td>수량 입력 시 총 수량 ≠ 앱 조회 시점 재고</td><td>사유 입력란 노출(선택·30자)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb info">재고 보정 사유 노출</span></td><td>수량 입력 시 총 수량 ≠ 앱 조회 시점 재고</td><td>사유 입력란 노출(선택·30자)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb ok">목록 담기</span></td><td>담기 클릭</td><td>제출 목록에 추가</td><td class="nx">APP-02-003</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
           <div class="mini"><div class="mh"><span class="cb info">최초 진입</span></div><div class="mb" style="align-items:stretch"><div class="cells" style="margin:0"><div class="cell"><div class="cl">진열</div><div class="cv" style="color:var(--muted)">입력</div></div><div class="cell"><div class="cl">창고</div><div class="cv" style="color:var(--muted)">입력</div></div></div><div style="font-size:9.5px;color:var(--faint)">총 수량 <b>0</b> · 담기 <span class="cb dis">Disabled</span></div></div></div>
           <div class="mini"><div class="mh"><span class="cb ok">진열/창고 입력</span></div><div class="mb" style="align-items:stretch"><div class="cells" style="margin:0"><div class="cell act"><div class="cl">진열</div><div class="cv">10</div></div><div class="cell"><div class="cl">창고</div><div class="cv">14</div></div></div><div style="font-size:9.5px">총 수량(키패드 위) <b>24</b> 자동 합산 · 담기 활성</div></div></div>
-          <div class="mini"><div class="mh"><span class="cb info">재고 차이 사유 노출</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;font-weight:800">재고 차이 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx sel" style="height:24px;font-size:8.5px;justify-content:flex-start">앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.</div><div style="font-size:9px;color:var(--faint)">총 수량 ≠ 앱 조회 시점 재고일 때만 노출</div></div></div>
+          <div class="mini"><div class="mh"><span class="cb info">재고 보정 사유 노출</span></div><div class="mb" style="align-items:stretch"><div style="font-size:9px;font-weight:800">재고 보정 사유 <span style="font-weight:700;font-size:8px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px">선택</span></div><div class="bx sel" style="height:24px;font-size:8.5px;justify-content:flex-start">앱 조회 시점 재고와 차이가 발생한 사유를 입력해 주세요.</div><div style="font-size:9px;color:var(--faint)">총 수량 ≠ 앱 조회 시점 재고일 때만 노출</div></div></div>
         </div>
       </div>
       <div class="flow"><span class="fh">흐름</span><code>APP-02-001</code><span class="ar">→</span><code>APP-02-002</code><span class="ar">→</span><code>APP-02-003</code></div>
@@ -613,7 +613,7 @@
                   <div class="hot" data-n="1"><span class="num">1</span>
                     <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
                       <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">타이레놀콜드-에스정 (아세트아미노펜·클로르페니라민 복합제)</div><span style="font-weight:800;white-space:nowrap"><b>24</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
-                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 차이 사유</b> 정기 실사 중 차이 확인</div>
+                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 보정 사유</b> 정기 실사 중 차이 확인</div>
                       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8801234567890</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
                     </div>
                     <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
@@ -622,7 +622,7 @@
                     </div>
                     <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px">
                       <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="ln" style="flex:1;min-width:0">겔포스엠현탁액</div><span style="font-weight:800;white-space:nowrap"><b>40</b> <span style="font-size:9px;color:var(--muted)">개</span></span></div>
-                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 차이 사유</b> 파손 2개 폐기 처리</div>
+                      <div style="font-size:9.5px;color:#3a424c;margin-top:5px"><b style="color:var(--muted)">재고 보정 사유</b> 파손 2개 폐기 처리</div>
                       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="lb2">8803333000044</span><span style="display:flex;gap:6px"><span class="bn g" style="height:22px">편집</span><span class="bn g" style="height:22px">삭제</span></span></div>
                     </div>
                   </div>
@@ -640,7 +640,7 @@
         </div>
         <ol class="desc">
           <div class="dh">APP-02-003 · 컴포넌트</div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 차이 사유(있을 때)·바코드. 건별 `편집`/`삭제`. <b>`편집` → APP-02-002(실재고 입력)로 이동</b>해 해당 건의 진열·창고 수량을 다시 입력·수정한다. <b>`삭제` → `제출 상품 삭제` 확인 모달</b>(`해당 항목을 삭제하시겠습니까?` · 취소/삭제).</span></li>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>제출 건 카드</b> — 상품명·총 수량·재고 보정 사유(있을 때)·바코드. 건별 `편집`/`삭제`. <b>`편집` → APP-02-002(실재고 입력)로 이동</b>해 해당 건의 진열·창고 수량을 다시 입력·수정한다. <b>`삭제` → `제출 상품 삭제` 확인 모달</b>(`해당 항목을 삭제하시겠습니까?` · 취소/삭제).</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>제출하기 (N건)</b> — Confirm 후 제출 → APP-02-004. 0건이면 <b>Disabled</b>.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>상품 더 추가</b> — APP-02-001 스캔 복귀.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>Empty</b> — 담은 건 없음 안내.</span></li>
@@ -721,81 +721,84 @@
       <div class="flow"><span class="fh">흐름</span><code>APP-02-001/APP-02-004</code><span class="ar">→</span><code>APP-02-005</code><span class="ar">→</span> 카드 <code>APP-02-006</code></div>
     </section>
 
-    <!-- APP-02-006 제출 상세 (기기별 요약 → 상품 상세) -->
+    <!-- APP-02-006 제출 상세 (제출건 카드 → 상태별 묶음 · 시안 3) -->
     <section class="screen" data-sid="APP-02-006">
-      <div class="sc-head"><span class="sid">APP-02-006</span><span class="nm">제출 상세 (기기별 요약 → 상품 상세) <span class="tbu" style="font-size:11px">화면 TBU</span></span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
+      <div class="sc-head"><span class="sid">APP-02-006</span><span class="nm">제출 상세 (제출건 카드 → 상태별 묶음)</span><span class="pf">굿팜 약사님용앱 · 실재고 관리</span></div>
       <div class="sc-grid">
         <div class="mock">
           <div class="two-state">
-            <!-- ① 메인 = 기기별 요약 카드 -->
-            <div class="state-col"><div class="state-cap"><span class="cb info">① 기기별 요약</span> 메인</div>
+            <!-- ① 제출건 목록(접힘) -->
+            <div class="state-col"><div class="state-cap"><span class="cb info">① 제출건 목록</span> 접힘</div>
               <div class="phone">
                 <div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 상세</span><span class="hot" data-n="1" style="display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span class="num">1</span><span style="font-size:10px;color:var(--faint);font-weight:700">2026-07-02</span></span></div>
                 <div class="ph-body">
-                  <div class="hot" data-n="2" style="display:flex;align-items:center;gap:6px;margin:2px 0 8px"><span class="num">2</span><span style="font-size:9.5px;font-weight:800;color:var(--ink)">전체 <b>12</b>건</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:9px;font-weight:700;color:#3a424c">▽ 반영상태</span></div>
+                  <div class="hot" data-n="2" style="display:flex;align-items:center;gap:6px;margin:2px 0 8px"><span class="num">2</span><span style="font-size:9.5px;font-weight:800;color:var(--ink)">전체 <b>3</b>건</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:9px;font-weight:700;color:#3a424c">▽ 반영상태</span></div>
                   <div class="hot" data-n="3"><span class="num">3</span>
-                    <div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px">
-                      <div style="flex:1;min-width:0">
-                        <div style="display:flex;align-items:baseline;gap:5px"><b style="font-size:12.5px">김약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-S911</span></div>
-                        <div style="font-size:9px;color:var(--muted);margin-top:4px">마지막 제출 10:31 <span style="color:#c0c6cd">·</span> <span style="color:#1d8a76;font-weight:700">완료 6</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--danger);font-weight:700">반려 1</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--muted);font-weight:700">반영전 1</span></div>
+                    <!-- 제출건 카드 A · 김약사 오전(처리완료) -->
+                    <div style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:9px">
+                      <div style="display:flex;align-items:center;gap:5px"><b style="font-size:12.5px">김약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-S911</span><span style="margin-left:auto;color:var(--faint);font-size:11px">˅</span></div>
+                      <div style="font-size:9px;color:var(--muted);margin-top:5px"><span style="color:#5c6671;font-weight:600">제출 09:10</span> <span style="color:#c0c6cd">·</span> 처리 정약사 10:31</div>
+                      <div style="display:flex;gap:9px;margin-top:7px">
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#1d8a76"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1d8a76" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>6</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#e5484d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e5484d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>1</span>
                       </div>
-                      <span style="flex:none;display:flex;align-items:center;gap:3px"><b style="font-size:14px">8</b><span style="font-size:10px;color:var(--muted)">건</span><span style="color:var(--faint)">›</span></span>
                     </div>
-                    <div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:8px">
-                      <div style="flex:1;min-width:0">
-                        <div style="display:flex;align-items:baseline;gap:5px"><b style="font-size:12.5px">이약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-A21</span></div>
-                        <div style="font-size:9px;color:var(--muted);margin-top:4px">마지막 제출 09:22 <span style="color:#c0c6cd">·</span> <span style="color:#1d8a76;font-weight:700">완료 3</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--danger);font-weight:700">반려 1</span></div>
+                    <!-- 제출건 카드 B · 김약사 오후(미처리) = 같은 약사·다른 제출 시각 -->
+                    <div style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:5px">
+                      <div style="display:flex;align-items:center;gap:5px"><b style="font-size:12.5px">김약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-S911</span><span style="margin-left:auto;color:var(--faint);font-size:11px">˅</span></div>
+                      <div style="font-size:9px;color:var(--muted);margin-top:5px"><span style="color:#5c6671;font-weight:600">제출 14:20</span> <span style="color:#c0c6cd">·</span> <span style="color:var(--muted);font-weight:700">반영 전</span></div>
+                      <div style="display:flex;gap:9px;margin-top:7px">
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:var(--muted)"><span style="width:6px;height:6px;border-radius:999px;background:#c0c6cd"></span>1</span>
                       </div>
-                      <span style="flex:none;display:flex;align-items:center;gap:3px"><b style="font-size:14px">4</b><span style="font-size:10px;color:var(--muted)">건</span><span style="color:var(--faint)">›</span></span>
+                    </div>
+                    <div style="font-size:8px;color:var(--faint);margin:0 2px 9px;line-height:1.4">↑ 같은 약사라도 <b style="color:var(--muted)">제출 시각이 다르면 별도 제출건</b>(오전·오후 분리)</div>
+                    <!-- 제출건 카드 C · 이약사(처리완료) -->
+                    <div style="border:1px solid var(--line);border-radius:12px;padding:11px 12px">
+                      <div style="display:flex;align-items:center;gap:5px"><b style="font-size:12.5px">이약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-A21</span><span style="margin-left:auto;color:var(--faint);font-size:11px">˅</span></div>
+                      <div style="font-size:9px;color:var(--muted);margin-top:5px"><span style="color:#5c6671;font-weight:600">제출 09:22</span> <span style="color:#c0c6cd">·</span> 처리 정약사 09:35</div>
+                      <div style="display:flex;gap:9px;margin-top:7px">
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#1d8a76"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1d8a76" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>3</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#e5484d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e5484d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>1</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- ② 기기 상세 = 상품 카드 목록 -->
-            <div class="state-col"><div class="state-cap"><span class="cb ok">② 기기 상세</span> 카드 클릭 → 상품 상세</div>
+            <!-- ② 제출건 펼침 = 상태별 묶음 + 상품 목록 -->
+            <div class="state-col"><div class="state-cap"><span class="cb ok">② 제출건 펼침</span> 카드 → 상태별 묶음</div>
               <div class="phone">
-                <div class="ph-bar"><span class="bk">‹</span><span class="tt">김약사 SM-S911</span></div>
+                <div class="ph-bar"><span class="bk">‹</span><span class="tt">제출 상세</span></div>
                 <div class="ph-body">
-                  <div class="hot" data-n="4"><span class="num">4</span>
-                    <!-- 반영완료 · 감소(접힘) -->
-                    <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px">
-                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8801234567890</span><div class="dnm" style="margin-top:1px">타이레놀콜드-에스정</div><div style="font-size:8.5px;color:var(--muted)">아세트아미노펜·클로르페니라민 복합제</div></span><span class="stt ok">반영완료</span></div>
-                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:14px;color:var(--muted);font-weight:600">48</span><span style="color:#c0c6cd">→</span><span style="font-size:20px;font-weight:800;color:#28303a">24</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#fbe3e0;color:#e5484d;border-radius:6px;padding:2px 7px">−24</span></div>
-                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">10:31</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사 <span style="color:var(--faint)">→</span> 정약사</span><span style="color:#c0c6cd">|</span><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정</span><span style="flex:none;color:var(--faint)">˅</span></div>
+                  <!-- 펼친 제출건 카드(김약사 오전) -->
+                  <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px">
+                    <!-- 카드 헤더 -->
+                    <div style="display:flex;align-items:center;gap:5px"><b style="font-size:12.5px">김약사</b><span style="color:#c0c6cd">·</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--faint)">SM-S911</span><span style="margin-left:auto;color:var(--faint);font-size:11px">˄</span></div>
+                    <div style="font-size:9px;color:var(--muted);margin-top:5px"><span style="color:#5c6671;font-weight:600">제출 09:10</span> <span style="color:#c0c6cd">·</span> 처리 정약사 10:31</div>
+                    <div style="display:flex;gap:9px;margin-top:7px;padding-bottom:9px;border-bottom:1px solid #eef0f2">
+                      <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#1d8a76"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1d8a76" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>6</span>
+                      <span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;color:#e5484d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e5484d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>1</span>
                     </div>
-                    <!-- 반영완료 · 증가(펼침 = 자세히 노출) -->
-                    <div class="hot" data-n="5" style="border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px"><span class="num">5</span>
-                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8806789012345</span><div class="dnm" style="margin-top:1px">판콜에이내복액 30ml</div></span><span class="stt ok">반영완료</span></div>
-                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:14px;color:var(--muted);font-weight:600">52</span><span style="color:#c0c6cd">→</span><span style="font-size:20px;font-weight:800;color:#28303a">60</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#e2f3ee;color:#1d8a76;border-radius:6px;padding:2px 7px">+8</span></div>
-                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">10:31</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사 <span style="color:var(--faint)">→</span> 정약사</span><span style="flex:1"></span><span style="flex:none;color:var(--faint)">˄</span></div>
-                      <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)">
-                        <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafbfc">
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이</span><span style="flex:1">+8개</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이 사유</span><span style="flex:1;color:var(--faint)">-</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">처리</span><span style="flex:1">10:31 · 정약사</span></div>
-                        </div>
-                      </div>
+                    <!-- 상태 묶음: 반영완료 -->
+                    <div class="hot" data-n="4" style="display:flex;align-items:center;gap:6px;margin:10px 0 8px"><span class="num">4</span><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1d8a76" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span style="font-size:10px;font-weight:800;color:#1d8a76">반영완료</span><span style="font-size:9px;color:var(--muted);font-weight:700">6건</span></div>
+                    <div class="hot" data-n="5" style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px"><span class="num">5</span>
+                      <div class="dnm">타이레놀콜드-에스정</div>
+                      <div style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099;margin-top:2px">#8801234567890</div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:7px"><span style="font-size:14px;color:var(--muted);font-weight:600">48</span><span style="color:#c0c6cd">→</span><span style="font-size:19px;font-weight:800;color:#28303a">24</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#fbe3e0;color:#e5484d;border-radius:6px;padding:2px 7px">−24</span></div>
+                      <div style="display:flex;align-items:flex-start;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid #eef0f2;font-size:9px;color:#5c6671"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8a9099" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span style="flex:1">정기 실사 중 진열·창고 차이 확인, 실물 기준으로 정정</span></div>
                     </div>
-                    <!-- 반영반려(펼침 = 반려 사유 포함) -->
-                    <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px">
-                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8803333000044</span><div class="dnm" style="margin-top:1px">겔포스엠현탁액</div></span><span class="stt rej">반영반려</span></div>
-                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:14px;color:var(--muted);font-weight:600">38</span><span style="color:#c0c6cd">→</span><span style="font-size:20px;font-weight:800;color:#28303a">40</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#e2f3ee;color:#1d8a76;border-radius:6px;padding:2px 7px">+2</span></div>
-                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">10:35</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사 <span style="color:var(--faint)">→</span> 정약사</span><span style="flex:1"></span><span style="flex:none;color:var(--faint)">˄</span></div>
-                      <div style="margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)">
-                        <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fafbfc">
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이</span><span style="flex:1">+2개</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">재고 차이 사유</span><span style="flex:1">입고 검수 중 수량 오차 발견</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;border-bottom:1px solid #eef0f2;font-size:9.5px"><span style="flex:none;width:64px;color:var(--muted);font-weight:700">처리</span><span style="flex:1">10:35 · 정약사</span></div>
-                          <div style="display:flex;gap:8px;padding:7px 10px;font-size:9.5px"><span style="flex:none;width:64px;color:var(--danger);font-weight:700">반려 사유</span><span style="flex:1;color:var(--danger)">근거 자료 부족 — 재실사 후 재제출 요청</span></div>
-                        </div>
-                      </div>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px;margin-bottom:8px">
+                      <div class="dnm">판콜에이내복액 30ml</div>
+                      <div style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099;margin-top:2px">#8806789012345</div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:7px"><span style="font-size:14px;color:var(--muted);font-weight:600">52</span><span style="color:#c0c6cd">→</span><span style="font-size:19px;font-weight:800;color:#28303a">60</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#e2f3ee;color:#1d8a76;border-radius:6px;padding:2px 7px">+8</span></div>
                     </div>
-                    <!-- 반영전(접힘 · 제출 수량만) -->
-                    <div style="border:1px solid var(--line);border-radius:12px;padding:12px 13px">
-                      <div style="display:flex;gap:8px;align-items:flex-start"><span style="flex:1;min-width:0"><span style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099">#8801111000022</span><div class="dnm" style="margin-top:1px">훼스탈플러스정</div></span><span class="stt wait">반영전</span></div>
-                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:8px"><span style="font-size:16px;font-weight:800;color:#28303a">제출 30</span><span style="font-size:9.5px;color:var(--muted)">개</span></div>
-                      <div style="display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid #eef0f2;font-size:9px;color:var(--muted);overflow:hidden"><span style="color:#5c6671;font-weight:600">09:22</span><span style="color:#c0c6cd">|</span><span style="color:#5c6671;font-weight:600;white-space:nowrap">김약사</span><span style="flex:1"></span><span style="flex:none;color:var(--faint)">˅</span></div>
+                    <!-- 상태 묶음: 반영반려 -->
+                    <div style="display:flex;align-items:center;gap:6px;margin:12px 0 8px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e5484d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><span style="font-size:10px;font-weight:800;color:#e5484d">반영반려</span><span style="font-size:9px;color:var(--muted);font-weight:700">1건</span></div>
+                    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 11px">
+                      <div class="dnm">겔포스엠현탁액</div>
+                      <div style="font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#8a9099;margin-top:2px">#8803333000044</div>
+                      <div style="display:flex;align-items:baseline;gap:5px;margin-top:7px"><span style="font-size:14px;color:var(--muted);font-weight:600">38</span><span style="color:#c0c6cd">→</span><span style="font-size:19px;font-weight:800;color:#28303a">40</span><span style="font-size:9.5px;color:var(--muted)">개</span><span style="margin-left:auto;align-self:center;font-size:9px;font-weight:800;background:#e2f3ee;color:#1d8a76;border-radius:6px;padding:2px 7px">+2</span></div>
+                      <div style="display:flex;align-items:flex-start;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid #eef0f2;font-size:9px;color:#5c6671"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8a9099" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span style="flex:1">입고 검수 중 수량 오차 발견</span></div>
                     </div>
                   </div>
                 </div>
@@ -804,25 +807,25 @@
           </div>
         </div>
         <ol class="desc">
-          <div class="dh">APP-02-006 · 컴포넌트 <span class="asis-note">① 기기별 요약 → ② 기기 상세(상품 카드) → 상품 자세히 3단, 필터는 양쪽 연동</span></div>
-          <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — 메인은 `제출 상세` + 제출일자(제목 옆). 기기 카드 클릭 시 <b>제목이 제출자(`김약사 SM-S911`)로 바뀌고</b> 뒤로가기는 메인 복귀. 상단 별도 기기 헤더 없음.</span></li>
-          <li data-n="2"><span class="di">2</span><span class="dt"><b>전체 건수 + 반영상태 필터</b> — 좌측 `전체 N건`(필터 적용 시 `선택 N건`) · 우측 <b>`▽ 반영상태` 버튼</b> → Bottom Sheet(다중선택 체크박스: 전체·반영완료·반영반려·반영전). 필터는 <b>기기 요약·기기 상세 양쪽에 연동</b>(선택 상태 없는 기기는 메인에서 숨김).</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>기기별 요약 카드(카드 전체 클릭)</b> — 1행 `사용자 · 기기ID(SM-S911)`, 2행 `마지막 제출 HH:MM · 완료 D · 반려 R · 반영전 W`, 우측 `N건 ›`. 클릭 → 해당 기기 상세.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b>상품 카드(개별 카드·아코디언)</b> — 바코드(#)·상품명(2줄)·부제 + <b>수량 `48 → 24개`(결과 강조) + 증감 배지</b>(감소 <span style="color:#e5484d;font-weight:800">−N</span>·red / 증가 <span style="color:#1d8a76;font-weight:800">+N</span>·green) + 상태 배지(반영완료/반영반려/반영전). 구분선 아래 <b>메타 프리뷰 라인</b> `HH:MM | 제출자 → 처리자 | 재고 차이 사유(말줄임) ˅`. 반영전은 `제출 N개`·증감 배지 없음.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b>자세히(펼침)</b> — <b>[재고 차이 · 재고 차이 사유 · 처리]</b> 묶음 카드. 처리는 <b>PC id 제거</b>(`10:31 · 정약사`). 반영반려는 <b>반려 사유</b> 행 추가. 반영전은 처리 `반영 전이라 처리 전`.</span></li>
+          <div class="dh">APP-02-006 · 컴포넌트 <span class="asis-note">제출건(제출자+제출 시각) 카드 → 펼침 → 상태별 묶음(상품 목록). 필터는 카드·묶음에 연동</span></div>
+          <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — `제출 상세` + 제출일자(제목 옆). 뒤로가기 → 제출 목록(APP-02-005). 카드는 화면 안에서 펼치고 접으므로 별도 상세 화면 전환 없음.</span></li>
+          <li data-n="2"><span class="di">2</span><span class="dt"><b>전체 건수 + 반영상태 필터</b> — 좌측 `전체 N건`(필터 적용 시 `선택 N건`) · 우측 <b>`▽ 반영상태` 버튼</b> → Bottom Sheet(다중선택 체크박스: 반영완료·반영반려·반영전). 필터는 <b>제출건 카드·상품 묶음 양쪽에 연동</b>.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>제출건 카드(펼침)</b> — <b>묶음 단위 = 제출건(제출자 + 제출 시각)</b>. 같은 약사라도 <b>제출 시각이 다르면 별도 제출건</b>(오전·오후 분리). 카드 헤더 = 제출자명·기기ID / `제출 HH:MM · 처리 {처리자} HH:MM`(미처리 제출건은 <b>`반영 전`</b>) / 상태 요약(<b>반영완료 N · 반영반려 N</b> 아이콘) / 펼침(˅/˄) 아이콘. <b>반영은 제출건 단위 일괄 처리</b> — 반영 시 <b>체크하지 않은 항목은 자동 `반영반려`</b> → 처리자·처리시각은 제출건당 1개. 처리자 = <b>클라이언트 운영자</b>(제출자=약사와 구분).</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>상태별 묶음</b> — 카드를 펼치면 상태별 묶음(<b>반영전 상단 → 반영완료 → 반영반려</b>). 묶음 헤더 = 상태 라벨 + 건수(`반영완료 6건`). 묶음 자체 접기는 없음(항상 노출). 개별 상품에는 <b>상태 배지·자세히보기 없음</b>(상태는 묶음 헤더가 대표).</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>상품 항목</b> — 상품명(이름만) → 바코드(#) → 재고 <b>`이전 → 이후 개`(결과 강조) + 증감 배지</b>(감소 <span style="color:#e5484d;font-weight:800">−N</span>·red / 증가 <span style="color:#1d8a76;font-weight:800">+N</span>·green) → <b>재고 보정 사유</b>(메모 아이콘 + 내용 바로 노출, 선택값이라 없으면 미노출). 수량 기준 = 반영완료: 반영 전(앱 기준) → 반영 후 / 반영전·반려: 전산상(앱 기준) 재고 → 제출.</span></li>
         </ol>
       </div>
       <div class="cases">
-        <div class="cases-h">케이스 · 상태 (3단 · 필터)</div>
-        <div class="tscroll"><table class="cs"><thead><tr><th>단계 / 상태</th><th>수량 표기</th><th>증감 배지 · 자세히</th></tr></thead><tbody>
-          <tr><td><span class="cb info">① 기기 요약</span></td><td>기기별 `N건` · 완료/반려/반영전 건수</td><td>카드 전체 클릭 → ② 기기 상세</td></tr>
-          <tr><td><span class="stt ok">반영완료</span></td><td>반영 전 → 반영 후 `48 → 24개`</td><td>감소 <span class="diff-neg">−24</span> / 증가 <span style="color:#1d8a76;font-weight:800">+8</span> · 자세히: 재고 차이·사유·처리</td></tr>
-          <tr><td><span class="stt rej">반영반려</span></td><td>전산상 재고 → 제출 `38 → 40개`</td><td>제출-전산 차이 배지 · 자세히에 <b>반려 사유</b> 추가</td></tr>
-          <tr><td><span class="stt wait">반영전</span></td><td>`제출 30개`(전산상 재고 미제공 시)</td><td>배지 없음 · 처리 `반영 전이라 처리 전`</td></tr>
+        <div class="cases-h">케이스 · 상태 (제출건 · 상태별 묶음 · 필터)</div>
+        <div class="tscroll"><table class="cs"><thead><tr><th>단위 / 상태</th><th>수량 표기</th><th>묶음 · 처리</th></tr></thead><tbody>
+          <tr><td><span class="cb info">제출건 카드</span></td><td>제출자 + 제출 시각 단위(같은 약사·다른 시각 = 분리)</td><td>헤더에 처리자·처리시각(미처리 = `반영 전`) · 상태 요약(완료 N·반려 N)</td></tr>
+          <tr><td><span class="stt ok">반영완료</span></td><td>반영 전 → 반영 후 `48 → 24개`</td><td>감소 <span class="diff-neg">−24</span> / 증가 <span style="color:#1d8a76;font-weight:800">+8</span> · 묶음 헤더 `반영완료 N건`</td></tr>
+          <tr><td><span class="stt rej">반영반려</span></td><td>전산상(앱 기준) 재고 → 제출 `38 → 40개`</td><td>반영 시 <b>체크 안 한 항목 자동 반려</b> · 재고 보정 사유 있으면 노출</td></tr>
+          <tr><td><span class="stt wait">반영전</span></td><td>전산상(앱 기준) 재고 → 제출</td><td>미처리 제출건 묶음(상단) · 처리자·시각 없음</td></tr>
           <tr><td><span class="cb empty">결과 없음</span></td><td>필터 결과 0</td><td>`선택한 상태의 제출 내역이 없습니다.`</td></tr>
         </tbody></table></div>
       </div>
-      <div class="flow"><span class="fh">흐름</span><code>APP-02-005</code><span class="ar">→</span><code>APP-02-006</code>(① 기기 요약)<span class="ar">→</span> 기기 카드 <code>APP-02-006</code>(② 기기 상세) <span class="ar">→</span> 상품 카드 펼침(자세히)</div>
+      <div class="flow"><span class="fh">흐름</span><code>APP-02-005</code><span class="ar">→</span><code>APP-02-006</code>(제출건 목록)<span class="ar">→</span> 제출건 카드 펼침 <span class="ar">→</span> 상태별 묶음(상품 목록)</div>
     </section>
   </div>
 
@@ -918,35 +921,34 @@
                 <!-- 기기 그룹 1 (펼침) -->
                 <div class="hot" data-n="3" style="border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px"><span class="num">3</span>
                   <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f7f9fa">
-                    <span style="color:var(--muted);font-size:10px">▾</span>
-                    <span style="width:20px;height:20px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                    <input type="checkbox" checked style="width:15px;height:15px" title="이 약사 제출 전체 선택">
                     <b style="font-size:12.5px">김약사</b><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 6px">A21</span>
                     <span style="font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 8px">4건</span>
+                    <span style="color:var(--muted);font-size:11px" title="더보기">▾</span>
                     <span style="margin-left:auto;font-size:10px;color:var(--faint)">마지막 제출 08.10 09:31</span>
                   </div>
                   <div style="padding:8px 12px 10px">
-                    <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;color:#4b5158;padding:0 2px 8px;border-bottom:1px solid #eef0f3;margin-bottom:6px"><input type="checkbox" checked style="width:14px;height:14px"> 전체 선택</div>
                     <!-- item: 수정 -->
                     <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft)">
                       <input type="checkbox" checked style="width:14px;height:14px">
                       <span class="hot" data-n="4" style="flex:1;min-width:0;display:block"><span class="num" style="left:-13px">4</span><span style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:var(--teal-d);background:#fff;border:1px solid #cdeee8;border-radius:5px;padding:1px 6px">수정</span><b style="font-size:12px">타이레놀 500mg</b></span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)">8801234567890</span></span>
-                      <span class="bn g" style="height:22px">상세 내용</span><span class="bn r" style="height:22px">삭제</span>
+                      <span class="bn g" style="height:22px">상세 내용</span>
                     </div>
                     <!-- item: 신규 -->
                     <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft);margin-top:3px">
                       <input type="checkbox" checked style="width:14px;height:14px">
                       <span style="flex:1;min-width:0"><span style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:var(--amber);background:#fbeecb;border:1px solid #f0dca6;border-radius:5px;padding:1px 6px">신규</span><b style="font-size:12px">뉴트리원 마그네슘 240</b></span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)">8809111222333</span></span>
-                      <span class="bn g" style="height:22px">상세 내용</span><span class="bn r" style="height:22px">삭제</span>
+                      <span class="bn g" style="height:22px">상세 내용</span>
                     </div>
                   </div>
                 </div>
                 <!-- 기기 그룹 2 (접힘) -->
                 <div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">
                   <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f7f9fa">
-                    <span style="color:var(--muted);font-size:10px">▸</span>
-                    <span style="width:20px;height:20px;border-radius:6px;background:#e6f4f1;color:var(--teal-d);display:inline-flex;align-items:center;justify-content:center;font-size:11px">📱</span>
+                    <input type="checkbox" style="width:15px;height:15px" title="이 약사 제출 전체 선택">
                     <b style="font-size:12.5px">이약사</b><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;color:#5a6169;background:#eceff2;border-radius:5px;padding:2px 6px">B07</span>
                     <span style="font-size:10px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 8px">2건</span>
+                    <span style="color:var(--muted);font-size:11px" title="더보기">▸</span>
                     <span style="margin-left:auto;font-size:10px;color:var(--faint)">마지막 제출 08.10 09:18</span>
                   </div>
                 </div>
@@ -974,28 +976,27 @@
           </div>
         </div>
         <ol class="desc" style="max-width:820px">
-          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정 · 시안 B(리스트/표) 미채택</span></div>
+          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정</span></div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>진입 = 앱 데이터 동기화</b> — 상품 관리(CNT-01-001)의 `앱 데이터 동기화` 버튼(미처리 건수 Badge, 0건 미노출) 클릭 시 <b>`앱 상품 수정 요청` 모달</b>이 열린다.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>모달 제목(가운데)</b> — `앱 상품 수정 요청`. 굿팜 약사님용앱에서 제출한 상품 수정/신규 요청을 확인해 <b>선택 반영</b>한다.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 기기 그룹 헤더 `사용자 · 기기ID · N건 · 마지막 제출`. 펼치면 `전체 선택` + 상품 요청 목록. 최근 제출 그룹 기본 펼침.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b> · <b>`삭제`</b>(항목별). 동일 상품은 최신 요청 1건만 노출.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
-          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). 삭제는 <b>항목별 `삭제`</b>·푸터 <b>`전체 삭제`</b>. <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(항목별/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
-          <li><span class="di" style="background:var(--muted);color:#fff">B</span><span class="dt"><b>[시안 B · 미채택]</b> <b>리스트(표) 결재함</b> — 열: ☐·제출일시·상품명·제조사·바코드·변경 항목·이전값·변경값·제출자(변경 항목 다수 rowspan·동일 상품 `수정 N건` 묶음). <b>시안 A(기기별 묶음·상세 팝업)로 확정</b>되어 참고용으로만 남긴다.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 그룹 헤더 = <b>제출자명 앞 체크박스</b>(그 약사 제출 전체 선택) · 사용자 · 기기ID · N건 · <b>더보기(▶/▾, 건수 우측)</b> · 마지막 제출. 헤더(체크박스 제외) 클릭 시 펼침 → 상품 요청 목록(별도 `전체 선택` 행 없음 — 체크박스는 헤더에). 최근 제출 그룹 기본 펼침.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b>. 동일 상품은 최신 요청 1건만 노출. <b>개별 삭제 버튼 없음</b>(선택하지 않으면 반영 시 삭제).</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). <b>`선택 반영` → 확인 모달</b>(`선택한 상품 정보를 상품 목록에 반영할까요? / 선택하지 않은 상품 정보는 삭제 처리` · 선택 N건 · 취소/반영). <b>반영</b> = 체크한 상품 정보 반영 + <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>, <b>선택하지 않은 상품은 삭제 처리</b>(다시 안 뜸·이력 없음) → 목록 비워짐. <b>개별 삭제 버튼 없음</b>. <b>`전체 삭제`</b> = 반영 없이 전부 폐기. 반려 개념 없음.</span></li>
         </ol>
       </div>
       <div class="cases">
         <div class="cases-h">케이스 · 상태 · 예외</div>
         <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
           <tr><td><span class="cb warn">요청 있음</span></td><td>미처리 N건</td><td>동기화 버튼 Badge N · 클릭 시 요청 모달</td><td class="nx">CNT-01-004</td></tr>
-          <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>상품 정보 반영 · 목록에서 제거 · 이력 생성 · Toast `반영 완료 · N건`</td><td class="nx">CNT-01-003</td></tr>
+          <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>확인 모달 → 반영 · 이력 생성 · 미선택분 삭제 · Toast `반영 N건 · 삭제 M건`</td><td class="nx">CNT-01-003</td></tr>
           <tr><td><span class="cb dis">미선택</span></td><td>선택 0</td><td>`선택 반영` <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
-          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / 푸터 `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">미선택 삭제</span></td><td>`선택 반영` 시 체크 안 한 항목</td><td>삭제 처리(목록에서 제거·이력 없음·다시 안 뜸). 재반영하려면 앱에서 재수정</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">전체 삭제</span></td><td>푸터 `전체 삭제`</td><td>반영 없이 모든 요청 폐기(확인 후)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb empty">요청 없음</span></td><td>미처리 0</td><td>`반영할 수정 요청이 없습니다.` · Badge 미노출</td><td class="nx">—</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
           <div class="mini"><div class="mh"><span class="cb info">시안 A</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9px"><b>김약사</b> <span style="font-family:ui-monospace,Menlo,monospace;background:#eceff2;border-radius:4px;padding:0 4px">A21</span> <span style="color:var(--teal-d);font-weight:800">4건</span></div><div style="font-size:9px;color:var(--faint)">기기별 묶음 · 상세 내용 플로팅 팝업</div></div></div>
-          <div class="mini"><div class="mh"><span class="cb info">시안 B</span></div><div class="mb" style="align-items:stretch;padding:8px"><div class="tscroll"><table class="m" style="font-size:8px;min-width:0"><thead><tr><th>☐</th><th>상품명</th><th>항목</th><th>이전</th><th>변경</th></tr></thead><tbody><tr><td>☑</td><td>타이레놀서방정</td><td>판매가</td><td class="before">4,500</td><td class="after">5,000</td></tr></tbody></table></div><div style="font-size:9px;color:var(--faint)">리스트(표) · rowspan · 수정 N건 묶음</div></div></div>
           <div class="mini"><div class="mh"><span class="cb empty">요청 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">반영할 수정 요청이 없습니다</div><div style="font-size:9.5px">동기화 버튼 Badge 미노출</div></div></div>
         </div>
       </div>
@@ -1071,7 +1072,7 @@
                 <span class="inp w" style="max-width:280px">검색어를 입력해주세요</span>
                 <span><span class="hot" data-n="6" style="display:inline-block"><span class="num">6</span><span class="bn g">변경 내용 보기</span></span> <span style="font-size:10px;color:var(--faint)">선택 1건</span> <span class="hot" data-n="5" style="display:inline-block"><span class="num">5</span><span class="bn">반영</span></span></span>
               </div>
-              <div class="tscroll"><table class="m" style="margin-top:4px"><thead><tr><th style="width:22px"></th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 차이 사유</th><th>입력일시</th></tr></thead>
+              <div class="tscroll"><table class="m" style="margin-top:4px"><thead><tr><th style="width:22px"></th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 보정 사유</th><th>입력일시</th></tr></thead>
               <tbody>
                 <tr class="hot" data-n="2" style="display:table-row"><td colspan="2"><span class="num" style="left:2px">2</span>▾ 판콜에이 30ml <span class="badge nb">제출 2건</span></td><td>8806789012345</td><td colspan="8" style="color:var(--faint);font-size:10px">기본: 최신 제출 선택 · 묶음 내 1건만</td></tr>
                 <tr><td style="text-align:center">☑</td><td>└ 제출 (김약사)</td><td>8806789012345</td><td class="num-c">52</td><td class="num-c">60</td><td class="num-c">0</td><td class="num-c">60</td><td class="num-c hot" data-n="3" style="position:relative"><span class="num" style="top:-8px;left:-6px">3</span><span class="diff-pos">+8</span></td><td class="hot" data-n="4" style="position:relative"><span class="num" style="top:-8px;left:-6px">4</span>김약사(A21)</td><td>정기 실사 중 차이 확인</td><td>07-02 10:31</td></tr>
@@ -1087,7 +1088,7 @@
           <li data-n="2"><span class="di">2</span><span class="dt"><b>동일 바코드 그룹핑</b> — `제출 N건`·펼치기·`└ 제출 (입력자)`. <b>최신 제출 상단</b>·기본 체크·묶음 내 1건만.</span></li>
           <li data-n="3"><span class="di">3</span><span class="dt"><b>차이</b> — 총 수량 − 전산(`+`파랑/`−`빨강/`0`회색). 미입력 `-` vs 입력값 `0` 구분.</span></li>
           <li data-n="4"><span class="di">4</span><span class="dt"><b>입력자</b> — `이름(단말ID)`.</span></li>
-          <li><span class="di">＋</span><span class="dt"><b>재고 차이 사유</b> — 앱 실재고 입력 시 함께 제출된 사유. 미입력 시 `-`.</span></li>
+          <li><span class="di">＋</span><span class="dt"><b>재고 보정 사유</b> — 앱 실재고 입력 시 함께 제출된 사유. 미입력 시 `-`.</span></li>
           <li data-n="5"><span class="di">5</span><span class="dt"><b>반영(덮어쓰기)</b> — 선택 0이면 <b>Disabled</b>. 클릭 → CNT-02-002.</span></li>
           <li data-n="6"><span class="di">6</span><span class="dt"><b>변경 내용 보기</b> — 반영 기록 CNT-02-004.</span></li>
         </ol>
@@ -1161,7 +1162,7 @@
               <div class="hot srow" data-n="1"><span class="num">1</span><span class="inp">2026-06-03</span><span>~</span><span class="inp">2026-07-03</span><span class="bn" style="height:22px">1개월</span><span class="bn g" style="height:22px">3개월</span><span class="bn g" style="height:22px">6개월</span><span class="bn g" style="height:22px">전체</span></div>
               <div class="hot srow" data-n="2"><span class="num">2</span><span class="inp">상품명 ▾</span><span class="inp w" style="max-width:200px">검색어를 입력해주세요</span><span class="inp">처리결과 전체 ▾</span><span style="font-size:10px;color:var(--faint)">조회 3건</span></div>
               <div class="hot" data-n="3"><span class="num">3</span><div class="tscroll">
-                <table class="m"><thead><tr><th>처리일시</th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 차이 사유</th><th>처리결과</th><th>처리자</th></tr></thead>
+                <table class="m"><thead><tr><th>처리일시</th><th>상품명</th><th>바코드</th><th class="num-c">전산</th><th class="num-c">창고</th><th class="num-c">진열</th><th class="num-c">총 수량</th><th class="num-c">차이</th><th>입력자</th><th>재고 보정 사유</th><th>처리결과</th><th>처리자</th></tr></thead>
                 <tbody>
                   <tr><td>07-02 10:32</td><td>타이레놀 500mg</td><td>8801234567890</td><td class="num-c">48</td><td class="num-c">14</td><td class="num-c">10</td><td class="num-c">24</td><td class="num-c"><span class="diff-neg">−24</span></td><td>김약사(A21)</td><td>파손 2개 폐기 처리</td><td><span class="stt ok">반영완료</span></td><td>정OO</td></tr>
                   <tr><td>07-02 10:33</td><td>겔포스엠</td><td>8803333000044</td><td class="num-c">38</td><td class="num-c">0</td><td class="num-c">40</td><td class="num-c">40</td><td class="num-c"><span class="diff-pos">+2</span></td><td>이약사(B07)</td><td>입고 검수 중 수량 오차</td><td><span class="stt rej">반영반려</span></td><td>정OO</td></tr>
@@ -1176,7 +1177,7 @@
           <div class="dh">CNT-02-004 · 컴포넌트</div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>기간 필터</b> — 데이터피커 + 빠른 버튼 `1개월`(기본)/3/6개월/전체.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>검색 · 처리결과 필터</b> — 상품명/바코드 + `처리결과 전체/반영완료/반영실패/반영반려`.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b>반영 기록 테이블</b> — 처리일시·상품명·바코드·전산·창고·진열·총 수량·차이·입력자·재고 차이 사유·처리결과·처리자(제출 시점 스냅샷). 재고 차이 사유 미입력 시 `-`. <span class="tbu">TBU</span> 반영실패 사유 노출 여부.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>반영 기록 테이블</b> — 처리일시·상품명·바코드·전산·창고·진열·총 수량·차이·입력자·재고 보정 사유·처리결과·처리자(제출 시점 스냅샷). 재고 보정 사유 미입력 시 `-`. <span class="tbu">TBU</span> 반영실패 사유 노출 여부.</span></li>
         </ol>
       </div>
       <div class="cases">

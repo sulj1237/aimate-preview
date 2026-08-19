@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI MATE 화면 안내 (약사님용)</title>
+<meta name="theme-color" content="#FFFFFF" />
+<style>
+  :root{
+    --mint:#12918D; --mint-soft:#E7F4F3;
+    --ink-900:#212529; --ink-800:#343A40; --ink-700:#5E646C; --ink-500:#868E96;
+    --line:#ECEEF0; --bg:#FAFAFB; --red:#C92A2A; --amber:#9A6B00; --amber-soft:#FFF6E6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--bg); color:var(--ink-900); -webkit-font-smoothing:antialiased; line-height:1.65; font-size:16px}
+  .wrap{max-width:720px; margin:0 auto; background:#fff; min-height:100vh; padding:28px 20px 60px}
+  @media(min-width:760px){ .wrap{padding:40px 34px 80px} }
+
+  header.page-head{padding-bottom:18px; margin-bottom:6px; border-bottom:1px solid var(--line)}
+  header.page-head .eyebrow{font-size:12px; font-weight:800; color:var(--mint); letter-spacing:.4px}
+  header.page-head h1{font-size:24px; font-weight:800; letter-spacing:-0.4px; line-height:1.3; margin-top:5px}
+  header.page-head p{margin-top:8px; font-size:15px; color:var(--ink-500); line-height:1.6}
+
+  .partnav{display:flex; gap:8px; margin:16px 0 4px; flex-wrap:wrap}
+  .partnav a{font-size:13px; font-weight:700; text-decoration:none; color:var(--ink-700);
+    border:1px solid var(--line); border-radius:999px; padding:7px 14px; background:#fff}
+  .partnav a:hover{border-color:var(--mint); color:var(--mint)}
+
+  section{padding:22px 0; border-bottom:1px solid var(--line)}
+  h2{font-size:18px; font-weight:800; letter-spacing:-0.3px; margin-bottom:10px}
+  h2 .num{color:var(--mint); margin-right:6px}
+  h3{font-size:15px; font-weight:700; color:var(--ink-900); margin:16px 0 6px}
+  p{font-size:16px; color:var(--ink-800); margin:0 0 10px}
+  p:last-child{margin-bottom:0}
+  strong{font-weight:700; color:var(--ink-900)}
+  .mint{color:var(--mint); font-weight:700}
+
+  ul{list-style:none; margin:0 0 10px; padding:0}
+  ul li{position:relative; padding:4px 0 4px 15px; font-size:15.5px; color:var(--ink-800)}
+  ul li::before{content:""; position:absolute; left:2px; top:13px; width:4px; height:4px; border-radius:50%; background:#CED4DA}
+  ul li b{font-weight:700; color:var(--ink-900)}
+
+  ol{counter-reset:n; list-style:none; margin:0 0 10px; padding:0}
+  ol li{position:relative; padding:3px 0 12px 26px; counter-increment:n; font-size:15.5px; color:var(--ink-800)}
+  ol li:last-child{padding-bottom:0}
+  ol li::before{content:counter(n) "."; position:absolute; left:0; top:0; color:var(--mint); font-weight:800}
+  ol li b{display:block; font-weight:700; color:var(--ink-900)}
+
+  .note{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-size:14.5px; color:var(--ink-700); margin:10px 0}
+  .note b{color:var(--ink-900)}
+
+  .tbl{overflow-x:auto; margin:8px 0 4px}
+  table{width:100%; border-collapse:collapse; font-size:14px; min-width:460px}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top}
+  th{background:#F6F8F8; font-weight:800; color:var(--ink-800); white-space:nowrap}
+  .ok{color:var(--mint); font-weight:800}
+  .no{color:var(--ink-500); font-weight:800}
+  .tag{display:inline-block; font-size:12px; font-weight:800; padding:1px 8px; border-radius:999px}
+  .tag.n{background:var(--mint-soft); color:var(--mint)}
+
+  /* 한 화면 구성 — 세로 흐름 */
+  .flow{margin:10px 0 4px; border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .flow .fi{display:flex; gap:12px; align-items:flex-start; padding:12px 15px; border-top:1px solid var(--line)}
+  .flow .fi:first-child{border-top:0}
+  .flow .fi .fn{flex:0 0 22px; height:22px; border-radius:50%; background:var(--mint-soft); color:var(--mint);
+    font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:2px}
+  .flow .fi .ft{font-size:15px; font-weight:800; color:var(--ink-900)}
+  .flow .fi .fd{font-size:14px; color:var(--ink-700); margin-top:2px}
+
+  /* 좌·우 2열 블록 도식 */
+  .layout{display:flex; gap:10px; margin:10px 0 4px; flex-wrap:wrap}
+  .layout .col{flex:1; min-width:200px; border:1px solid var(--line); border-radius:12px; padding:14px 15px; background:#fff}
+  .layout .col .cl{font-size:12px; font-weight:800; color:var(--mint); letter-spacing:.2px}
+  .layout .col.gp .cl{color:var(--ink-500)}
+  .layout .col ul{margin:6px 0 0}
+  .layout .col ul li{font-size:14.5px; padding:3px 0 3px 13px}
+
+  /* 화면 버튼 표기 */
+  .btn-ui{display:inline-block; border:1px solid var(--mint); color:var(--mint); background:#fff;
+    border-radius:6px; padding:0 7px; font-size:13.5px; font-weight:700; line-height:1.55; white-space:nowrap}
+
+  .qa{padding:12px 0; border-top:1px solid var(--line)}
+  .qa:first-of-type{border-top:0; padding-top:4px}
+  .qa .q{font-size:15.5px; font-weight:700}
+  .qa .q::before{content:"Q. "; color:var(--mint); font-weight:800}
+  .qa .a{margin-top:5px; font-size:14.5px; color:var(--ink-700)}
+  .qa .a::before{content:"A. "; color:var(--ink-500); font-weight:800}
+
+  /* 예시 화면 — 실제 캡처 이미지 (추후 삽입) */
+  .figimg{margin:12px 0 4px}
+  .figimg img{width:100%; display:block; border:1px solid var(--line); border-radius:12px; cursor:zoom-in}
+  .figimg .stack{display:flex; flex-direction:column; gap:10px}
+  .figimg figcaption{margin-top:7px; font-size:12.5px; color:var(--ink-500); text-align:center}
+
+  /* 클릭 확대(라이트박스) */
+  .lb{display:none; position:fixed; inset:0; background:rgba(0,0,0,.86); z-index:999; padding:20px; cursor:zoom-out}
+  .lb.on{display:flex; align-items:center; justify-content:center}
+  .lb img{max-width:100%; max-height:100%; border-radius:8px; box-shadow:0 10px 44px rgba(0,0,0,.5)}
+  .lb .x{position:fixed; top:14px; right:18px; font-size:26px; color:#fff; font-weight:800; cursor:pointer; line-height:1}
+
+  /* 예시 화면 자리(이미지 확보 전) */
+  .shot{margin:12px 0 4px; border:1.5px dashed #C7D0D0; border-radius:12px; background:#F6F8F8;
+    min-height:170px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; text-align:center; padding:26px 18px}
+  .shot .ic{font-size:26px; opacity:.5}
+  .shot .cap{font-weight:800; color:var(--ink-700); font-size:14px}
+  .shot .sub{font-size:12px; color:var(--ink-500)}
+
+  .remember{margin-top:30px; background:var(--mint-soft); border-radius:14px; padding:20px 20px 22px}
+  .remember h2{font-size:17px; margin-bottom:12px}
+  .remember ul li{font-size:15px; color:var(--ink-800)}
+  .remember ul li::before{background:var(--mint)}
+
+  footer{padding-top:26px; font-size:12px; color:var(--ink-500); line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <div class="eyebrow">GOODPHARM · AI MATE</div>
+    <h1>AI MATE 화면 안내</h1>
+    <p><b>AI MATE</b>는 선택한 처방 환자를 웹 기반 AI가 분석해 주는 기능입니다. 고객정보부터 약력·구매 이력, 처방 약물 정보, AI 상담까지 <b>한 화면에서 위에서 아래로</b> 확인할 수 있고, 처방 약물별로 <b>부족해질 수 있는 영양소와 추천 상품</b>도 함께 볼 수 있습니다.</p>
+    <nav class="partnav">
+      <a href="#s1">화면 열기</a>
+      <a href="#s2">화면 구성</a>
+      <a href="#s3">고객정보 · 약력 · 구매</a>
+      <a href="#s4">처방 약물 정보표</a>
+      <a href="#s5">드럭머거 &amp; 추천 상품</a>
+      <a href="#s6">추천 상품 두 가지</a>
+      <a href="#s7">추천 상품 설정</a>
+      <a href="#s8">AI 상담</a>
+      <a href="#s9">자주 묻는 질문</a>
+    </nav>
+  </header>
+
+  <section id="s1">
+    <h2><span class="num">1</span>AI MATE 화면 열기</h2>
+    <p>굿팜 클라이언트 3.0 <b>AI 차트</b>에서 분석할 처방을 선택한 뒤, <b>조제 상세정보</b> 영역의 <span class="btn-ui">AI MATE</span> 버튼을 누르면 AI MATE 화면이 열립니다.</p>
+    <ol>
+      <li><b>AI 차트에서 처방을 선택합니다.</b>왼쪽 처방 목록에서 분석할 환자의 처방을 먼저 선택합니다.</li>
+      <li><b>조제 상세정보에서 [AI MATE]를 누릅니다.</b>새 창으로 AI MATE 분석 화면이 열립니다.</li>
+      <li><b>위에서 아래로 스크롤하며 확인합니다.</b>모든 분석 내용이 한 화면에 이어져 있습니다.</li>
+    </ol>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · AI 차트 조제 상세정보의 [AI MATE] 버튼</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+    <p class="note">환자 정보는 <b>해시(가명) 처리 후 전송</b>되어 분석됩니다.</p>
+  </section>
+
+  <section id="s2">
+    <h2><span class="num">2</span>화면 구성 한눈에 보기</h2>
+    <p>AI MATE는 <b>하나의 화면</b>으로 되어 있습니다. 다음 다섯 개 영역이 위에서 아래 순서로 이어집니다.</p>
+    <div class="flow">
+      <div class="fi"><span class="fn">1</span><div><div class="ft">고객정보</div><div class="fd">성명 · 연령(성별) · 최근 처방일 · 약력관리 이력 · 특이사항</div></div></div>
+      <div class="fi"><span class="fn">2</span><div><div class="ft">약력관리 <span class="tag n">AI 약력관리 분석</span></div><div class="fd">기간별 처방 추이 — 효능군별 복용 이력 그래프</div></div></div>
+      <div class="fi"><span class="fn">3</span><div><div class="ft">구매정보</div><div class="fd">상품 구매 이력 — 일자별 상품 · 수량 · 판매금액</div></div></div>
+      <div class="fi"><span class="fn">4</span><div><div class="ft">약물 정보표</div><div class="fd">처방 약물 상세 + 약물별 드럭머거 &amp; 추천 상품</div></div></div>
+      <div class="fi"><span class="fn">5</span><div><div class="ft">AI 상담</div><div class="fd">복약 관련 질문을 입력해 답변 확인</div></div></div>
+    </div>
+
+    <h3>오른쪽 [바로가기]로 빠르게 이동합니다</h3>
+    <p>화면 오른쪽 아래의 <b>바로가기</b> 패널에서 <b>고객정보 · 약력관리 · 구매정보 · 약물 정보표 · AI 상담</b>을 누르면 해당 영역으로 바로 이동합니다. 지금 보고 있는 영역은 민트색으로 표시되고, <span class="btn-ui">∧ 접기</span>로 패널을 접을 수 있습니다.</p>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · 한 화면 구성과 오른쪽 [바로가기] 패널</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+    <p class="note">화면 오른쪽 위 <span class="btn-ui">설정</span>에서 영역이 보이는 순서를 조정할 수 있습니다.</p>
+  </section>
+
+  <section id="s3">
+    <h2><span class="num">3</span>고객정보 · 약력관리 · 구매정보</h2>
+    <p>환자의 기본 정보와 그동안의 복약·구매 이력을 순서대로 확인합니다.</p>
+
+    <h3>고객정보</h3>
+    <ul>
+      <li><b>성명 · 연령(성별) · 최근 처방일 · 약력관리 이력</b>을 한 줄로 확인합니다.</li>
+      <li><b>특이사항</b>에는 동의 여부, 타과 복용, 연락처 등 약국이 남긴 메모가 표시됩니다.</li>
+    </ul>
+
+    <h3>약력관리 · 기간별 처방 추이</h3>
+    <ul>
+      <li>지난 처방 내역을 바탕으로 한 <b>약물 복용 이력 분석</b>입니다.</li>
+      <li><b>효능군</b>(혈압약 · 당뇨약 · 고지혈증약 · 소염진통제 등)별로 묶여 있고, 약물마다 언제부터 얼마나 복용했는지 <b>가로 막대</b>로 표시됩니다.</li>
+      <li>가로축은 <b>반기 단위</b>(예: 24.H1 · 24.H2)라서, 장기 복용 약과 최근 시작한 약을 한눈에 구분할 수 있습니다.</li>
+    </ul>
+
+    <h3>구매정보 · 상품 구매 이력</h3>
+    <ul>
+      <li><b>일자 · 상품명 · 수량 · 판매금액</b>이 표로 표시되고, 일자별 <b>합계</b>가 함께 나옵니다.</li>
+      <li>이력이 많으면 최근 건부터 보이고, 아래 <span class="btn-ui">▼ 더보기</span>를 누르면 나머지 이력이 펼쳐집니다.</li>
+    </ul>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · 고객정보 / 기간별 처방 추이 / 상품 구매 이력</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="num">4</span>처방 약물 정보표</h2>
+    <p>현재 처방받은 약물의 상세 정보를 확인하는 영역입니다.</p>
+    <ul>
+      <li>표에는 <b>약물명 · 이미지 · 성분명 · 효능 · 복용법 · 주의사항</b>이 표시됩니다.</li>
+      <li><b>언어 선택</b> — 한국어 · 영어 · 중국어 · 일본어로 내용을 전환할 수 있고, <span class="btn-ui">언어 설정 ∨</span>에서 표시할 언어를 관리합니다.</li>
+      <li><span class="btn-ui">인쇄 ⬇</span> — 확인한 복약안내 내용을 그대로 출력합니다.</li>
+      <li>각 약물 행 아래에 <b>드럭머거 &amp; 추천 상품</b> 영역이 이어집니다. <span class="tag n">상담 참고</span></li>
+    </ul>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · 처방 약물 정보표와 언어 · 인쇄 버튼</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="num">5</span>드럭머거 &amp; 추천 상품</h2>
+    <p><b>드럭머거</b>는 특정 약을 복용할 때 일부 영양소가 부족해질 수 있다는 정보를 알려 주는 <span class="mint">상담 참고</span> 기능입니다. 처방 약물 정보표에서 <b>각 약물 행 바로 아래</b>에 해당 영역이 자동으로 표시됩니다.</p>
+    <p>영역 머리말에 <b>Drug Mugger</b> 표시와 함께 <b>“○○○ 복용 시 부족해질 수 있는 영양소”</b>가 나오므로, 여러 약을 처방받은 환자도 약물별로 나누어 확인할 수 있습니다.</p>
+
+    <h3>영양소 한 개 = 블록 한 개, 좌·우로 나뉩니다</h3>
+    <div class="layout">
+      <div class="col">
+        <div class="cl">왼쪽 · 왜 부족해지나요</div>
+        <ul>
+          <li>부족 위험 <b>영양소명</b> (예: 멜라토닌, 코엔자임 Q10, 칼륨)</li>
+          <li>옆의 <b>회색 배지</b>는 관련 카테고리 (예: 수면유도·진정작용)</li>
+          <li><b>부족해지는 근거</b> 설명</li>
+          <li>ⓘ 에 마우스를 올리면 <b>참고문헌</b></li>
+        </ul>
+      </div>
+      <div class="col gp">
+        <div class="cl">오른쪽 · 무엇을 권할까요</div>
+        <ul>
+          <li><b>우리약국 추천</b> 상품</li>
+          <li><b>굿팜 추천</b> 상품</li>
+          <li>우리약국 상품이 <b>왼쪽에 먼저</b> 표시</li>
+        </ul>
+      </div>
+    </div>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · 약물 행 아래의 드럭머거 &amp; 추천 상품 영역</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+
+    <h3>영양소가 여러 개일 때</h3>
+    <ul>
+      <li>한 약물에 영양소가 많으면 <b>상위 5개</b>가 먼저 표시됩니다.</li>
+      <li>나머지는 <span class="btn-ui">＋ N개 더보기</span>를 누르면 펼쳐지고, <span class="btn-ui">접기</span>로 다시 접을 수 있습니다.</li>
+      <li>추천 상품이 등록된 영양소만 블록으로 표시됩니다.</li>
+    </ul>
+    <div class="tbl"><table>
+      <thead><tr><th>상황</th><th>AI MATE 표시</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>우리약국 추천만 있음</td><td class="ok">표시됨</td><td>우리약국 추천 상품이 표시됩니다.</td></tr>
+        <tr><td>굿팜 추천만 있음</td><td class="ok">표시됨</td><td>굿팜 추천 상품이 표시되고, 우리약국 자리에는 상품을 등록할 수 있는 버튼이 표시됩니다.</td></tr>
+        <tr><td>둘 다 있음</td><td class="ok">표시됨</td><td>우리약국 → 굿팜 순서로 함께 표시됩니다.</td></tr>
+        <tr><td>추천 상품이 없음</td><td class="no">표시 안 됨</td><td>해당 영양소 블록이 나타나지 않습니다. (정상)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note"><b>AI MATE 화면은 조회 전용입니다.</b> 추천 정보는 확인만 하고, 상품의 추가·순서 변경·삭제는 관리자 웹페이지에서 진행합니다.</p>
+  </section>
+
+  <section id="s6">
+    <h2><span class="num">6</span>두 가지 추천 상품</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>구분</th><th>무엇인가요?</th><th>몇 개까지</th><th>누가 정하나요?</th></tr></thead>
+      <tbody>
+        <tr><td><b>우리약국 추천</b></td><td>우리 약국이 직접 골라 등록한 상품</td><td>영양소별 최대 3개</td><td>약국(관리자 웹페이지에서 설정)</td></tr>
+        <tr><td><b>굿팜 추천</b></td><td>굿팜이 기본으로 제공하는 상품</td><td>영양소별 최대 2개</td><td>굿팜(약국은 조회만 가능)</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>AI MATE 화면에서는 <b>우리약국 추천이 굿팜 추천보다 먼저(왼쪽에)</b> 표시됩니다.</li>
+      <li>우리약국 추천 상품이 2개 이상이면 <b>1 · 2 · 3 우선순위 번호</b>가 함께 표시되어, 어떤 상품을 먼저 권할지 바로 알 수 있습니다.</li>
+      <li>상품명이 길면 줄여서 표시되며, 마우스를 올리면 전체 상품명을 확인할 수 있습니다.</li>
+    </ul>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · 우리약국 추천(번호 표시)과 굿팜 추천 구분</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+  </section>
+
+  <section id="s7">
+    <h2><span class="num">7</span>추천 상품 설정으로 이동하기</h2>
+    <p>우리 약국 상품을 등록·수정하려면 AI MATE 화면에서 바로 관리자 웹페이지로 이동합니다.</p>
+    <ol>
+      <li><b>[＋ 추천 상품 설정]을 누릅니다.</b>처방 약물 정보표 오른쪽 위에 있으며, 관리자 웹페이지의 추천 상품 설정이 새 창으로 열립니다.</li>
+      <li><b>[＋ 추천 상품 등록]을 눌러도 됩니다.</b>우리약국 추천이 아직 없는 영양소의 자리에 표시되며, 해당 영양소로 바로 이동합니다.</li>
+      <li><b>영양소별로 상품을 등록하고 저장합니다.</b>최대 3개까지 등록하고 순서를 조정할 수 있습니다.</li>
+      <li><b>저장한 내용은 AI MATE 화면에 반영됩니다.</b>다음 조회부터 등록한 상품이 우리약국 추천으로 표시됩니다.</li>
+    </ol>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · [＋ 추천 상품 설정] 버튼과 [＋ 추천 상품 등록] 자리</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+    <p class="note">굿팜 추천 상품은 굿팜이 관리합니다. 우리 약국이 권하고 싶은 상품은 <b>우리약국 추천</b>에 등록해 주세요.</p>
+  </section>
+
+  <section id="s8">
+    <h2><span class="num">8</span>AI 상담</h2>
+    <p>화면 맨 아래에서 현재 처방 내용을 바탕으로 궁금한 점을 물어볼 수 있습니다.</p>
+    <ul>
+      <li>입력창에 <b>약 복용법 · 부작용 · 상호작용</b> 등 궁금한 내용을 입력합니다.</li>
+      <li>자주 쓰는 질문은 <b>추천 질문 버튼</b>으로 준비되어 있습니다 — 부작용이 궁금해요 / 다른 약과 함께 먹어도 되나요? / 복용법을 다시 알려주세요 / 복용을 깜빡했을 때는 어떻게 하나요? / 음식과 함께 먹어도 되나요?</li>
+      <li>답변은 <b>복약지도 참고용</b>이므로, 환자 상태를 확인한 뒤 안내해 주세요.</li>
+    </ul>
+    <div class="shot"><span class="ic">🖼️</span><span class="cap">예시 화면 · AI 상담 추천 질문과 입력창</span><span class="sub">실제 캡처 이미지가 들어갈 자리입니다.</span></div>
+  </section>
+
+  <section id="s9">
+    <h2><span class="num">9</span>자주 묻는 질문</h2>
+    <div class="qa"><div class="q">보고 싶은 영역으로 빠르게 이동하려면 어떻게 하나요?</div>
+      <div class="a">화면 오른쪽 [바로가기] 패널에서 고객정보 · 약력관리 · 구매정보 · 약물 정보표 · AI 상담 중 원하는 영역을 누르면 됩니다.</div></div>
+    <div class="qa"><div class="q">추천 상품은 화면 어디에 보이나요?</div>
+      <div class="a">약물 정보표에서 각 약물 행 바로 아래에 표시됩니다. 머리말에 어떤 약물 기준인지 함께 표시됩니다.</div></div>
+    <div class="qa"><div class="q">AI MATE 화면에서 추천 상품을 수정할 수 있나요?</div>
+      <div class="a">AI MATE 화면에서는 확인만 할 수 있습니다. 추가·수정은 [＋ 추천 상품 설정]으로 열리는 관리자 웹페이지에서 합니다.</div></div>
+    <div class="qa"><div class="q">우리약국 추천과 굿팜 추천 중 무엇이 먼저 보이나요?</div>
+      <div class="a">우리약국 추천이 먼저 표시되고, 그다음에 굿팜 추천이 표시됩니다.</div></div>
+    <div class="qa"><div class="q">영양소가 5개까지만 보이는데 나머지는 어떻게 보나요?</div>
+      <div class="a">영역 아래 [＋ N개 더보기]를 누르면 나머지 영양소가 펼쳐집니다. [접기]로 다시 접을 수 있습니다.</div></div>
+    <div class="qa"><div class="q">‘부족해지는 근거’ 옆의 ⓘ는 무엇인가요?</div>
+      <div class="a">해당 설명의 참고문헌입니다. 마우스를 올리면 출처를 확인할 수 있습니다.</div></div>
+    <div class="qa"><div class="q">환자에게 추천 상품을 그대로 권해도 되나요?</div>
+      <div class="a">추천 상품은 상담 참고용입니다. 환자 상태와 복용 중인 약을 확인한 뒤 안내해 주세요.</div></div>
+  </section>
+
+  <div class="remember">
+    <h2>마지막으로 꼭 기억할 점</h2>
+    <ul>
+      <li><b>AI MATE는 한 화면</b>입니다. 고객정보 → 약력관리 → 구매정보 → 약물 정보표 → AI 상담 순으로 이어집니다.</li>
+      <li>이동은 오른쪽 <b>[바로가기]</b> 패널로 합니다.</li>
+      <li><b>추천 영역은 약물 정보표의 약물 행 아래</b>에 자동으로 표시됩니다. 왼쪽은 부족해지는 이유, 오른쪽은 추천 상품입니다.</li>
+      <li><b>우리약국 추천이 굿팜 추천보다 먼저</b> 표시됩니다. (영양소별 최대 3개)</li>
+      <li><b>AI MATE 화면은 조회 전용</b>이며, 설정은 [＋ 추천 상품 설정]에서 합니다.</li>
+      <li>추천 정보는 <b>치료·예방이 아닌 상담 참고</b> 자료입니다.</li>
+    </ul>
+  </div>
+
+  <footer>굿팜 · AI MATE 화면 안내 — 약사님용 안내 자료입니다.<br>문서 기준: 2026-08-13 · 한 화면(고객정보 · 약력관리 · 구매정보 · 약물 정보표 · AI 상담) 구성</footer>
+</div>
+
+<div id="lb" class="lb" onclick="closeLb()"><span class="x" onclick="closeLb()">✕</span><img id="lbimg" src="" alt="확대 이미지"></div>
+<script>
+  function closeLb(){ document.getElementById('lb').classList.remove('on'); }
+  document.addEventListener('click', function(e){
+    var t=e.target;
+    if(t.tagName==='IMG' && t.closest('.figimg')){
+      document.getElementById('lbimg').src=t.src;
+      document.getElementById('lb').classList.add('on');
+    }
+  });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeLb(); });
+</script>
+</body></html>

@@ -932,13 +932,13 @@
                     <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft)">
                       <input type="checkbox" checked style="width:14px;height:14px">
                       <span class="hot" data-n="4" style="flex:1;min-width:0;display:block"><span class="num" style="left:-13px">4</span><span style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:var(--teal-d);background:#fff;border:1px solid #cdeee8;border-radius:5px;padding:1px 6px">수정</span><b style="font-size:12px">타이레놀 500mg</b></span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)">8801234567890</span></span>
-                      <span class="bn g" style="height:22px">상세 내용</span><span class="bn r" style="height:22px">삭제</span>
+                      <span class="bn g" style="height:22px">상세 내용</span>
                     </div>
                     <!-- item: 신규 -->
                     <div style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;background:var(--teal-soft);margin-top:3px">
                       <input type="checkbox" checked style="width:14px;height:14px">
                       <span style="flex:1;min-width:0"><span style="display:flex;align-items:center;gap:6px"><span style="font-size:9.5px;font-weight:800;color:var(--amber);background:#fbeecb;border:1px solid #f0dca6;border-radius:5px;padding:1px 6px">신규</span><b style="font-size:12px">뉴트리원 마그네슘 240</b></span><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--faint)">8809111222333</span></span>
-                      <span class="bn g" style="height:22px">상세 내용</span><span class="bn r" style="height:22px">삭제</span>
+                      <span class="bn g" style="height:22px">상세 내용</span>
                     </div>
                   </div>
                 </div>
@@ -976,28 +976,27 @@
           </div>
         </div>
         <ol class="desc" style="max-width:820px">
-          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정 · 시안 B(리스트/표) 미채택</span></div>
+          <div class="dh">CNT-01-004 · 컴포넌트 <span class="asis-note">데스크탑(클라이언트) 모달 · 시안 A(기기별 묶음) 확정</span></div>
           <li data-n="1"><span class="di">1</span><span class="dt"><b>진입 = 앱 데이터 동기화</b> — 상품 관리(CNT-01-001)의 `앱 데이터 동기화` 버튼(미처리 건수 Badge, 0건 미노출) 클릭 시 <b>`앱 상품 수정 요청` 모달</b>이 열린다.</span></li>
           <li data-n="2"><span class="di">2</span><span class="dt"><b>모달 제목(가운데)</b> — `앱 상품 수정 요청`. 굿팜 약사님용앱에서 제출한 상품 수정/신규 요청을 확인해 <b>선택 반영</b>한다.</span></li>
-          <li data-n="3"><span class="di">3</span><span class="dt"><b class="tbu">[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 그룹 헤더 = <b>제출자명 앞 체크박스</b>(그 약사 제출 전체 선택) · 사용자 · 기기ID · N건 · <b>더보기(▶/▾, 건수 우측)</b> · 마지막 제출. 헤더(체크박스 제외) 클릭 시 펼침 → 상품 요청 목록(별도 `전체 선택` 행 없음 — 체크박스는 헤더에). 최근 제출 그룹 기본 펼침.</span></li>
-          <li data-n="4"><span class="di">4</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b> · <b>`삭제`</b>(항목별). 동일 상품은 최신 요청 1건만 노출.</span></li>
-          <li data-n="5"><span class="di">5</span><span class="dt"><b class="tbu">[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
-          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). 삭제는 <b>항목별 `삭제`</b>·푸터 <b>`전체 삭제`</b>. <b>반려 개념 없음</b> — 처리 액션은 <b>반영 · 삭제(항목별/전체)</b>. 반영하지 않은 요청은 <b>누적</b>, 반영 시 상품 정보에 반영되고 <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>.</span></li>
-          <li><span class="di" style="background:var(--muted);color:#fff">B</span><span class="dt"><b>[시안 B · 미채택]</b> <b>리스트(표) 결재함</b> — 열: ☐·제출일시·상품명·제조사·바코드·변경 항목·이전값·변경값·제출자(변경 항목 다수 rowspan·동일 상품 `수정 N건` 묶음). <b>시안 A(기기별 묶음·상세 팝업)로 확정</b>되어 참고용으로만 남긴다.</span></li>
+          <li data-n="3"><span class="di">3</span><span class="dt"><b>[시안 A]</b> <b>기기(Device ID)별 묶음 아코디언</b> — 그룹 헤더 = <b>제출자명 앞 체크박스</b>(그 약사 제출 전체 선택) · 사용자 · 기기ID · N건 · <b>더보기(▶/▾, 건수 우측)</b> · 마지막 제출. 헤더(체크박스 제외) 클릭 시 펼침 → 상품 요청 목록(별도 `전체 선택` 행 없음 — 체크박스는 헤더에). 최근 제출 그룹 기본 펼침.</span></li>
+          <li data-n="4"><span class="di">4</span><span class="dt"><b>[시안 A]</b> <b>상품 요청 항목</b> — 체크박스 · 상품명 좌측 <b>`수정`(teal)/`신규`(amber) 배지</b> · 바코드 · <b>`상세 내용`</b>. 동일 상품은 최신 요청 1건만 노출. <b>개별 삭제 버튼 없음</b>(선택하지 않으면 반영 시 삭제).</span></li>
+          <li data-n="5"><span class="di">5</span><span class="dt"><b>[시안 A]</b> <b>상세 내용 = 모달 옆에 붙는 플로팅 팝업</b> — 상품명·바코드·유형 배지 + <b>현재값 ↔ 앱 제출값</b> 비교 표. 바깥 클릭 시 닫힘.</span></li>
+          <li data-n="6"><span class="di">6</span><span class="dt"><b>푸터 · 처리 정책</b> — 좌측 <b>`전체 삭제`</b> · 우측 <b>`닫기`</b> / <b>`선택 반영`</b>(선택 0건 Disabled). <b>`선택 반영` → 확인 모달</b>(`선택한 상품 정보를 상품 목록에 반영할까요? / 선택하지 않은 상품 정보는 삭제 처리` · 선택 N건 · 취소/반영). <b>반영</b> = 체크한 상품 정보 반영 + <b>`변경 내용 보기`(CNT-01-003) 이력 생성</b>, <b>선택하지 않은 상품은 삭제 처리</b>(다시 안 뜸·이력 없음) → 목록 비워짐. <b>개별 삭제 버튼 없음</b>. <b>`전체 삭제`</b> = 반영 없이 전부 폐기. 반려 개념 없음.</span></li>
         </ol>
       </div>
       <div class="cases">
         <div class="cases-h">케이스 · 상태 · 예외</div>
         <div class="tscroll"><table class="cs"><thead><tr><th>상태</th><th>조건 / 트리거</th><th>화면 처리</th><th>→ 다음</th></tr></thead><tbody>
           <tr><td><span class="cb warn">요청 있음</span></td><td>미처리 N건</td><td>동기화 버튼 Badge N · 클릭 시 요청 모달</td><td class="nx">CNT-01-004</td></tr>
-          <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>상품 정보 반영 · 목록에서 제거 · 이력 생성 · Toast `반영 완료 · N건`</td><td class="nx">CNT-01-003</td></tr>
+          <tr><td><span class="cb ok">선택 반영</span></td><td>1건 이상 선택 후 `선택 반영`</td><td>확인 모달 → 반영 · 이력 생성 · 미선택분 삭제 · Toast `반영 N건 · 삭제 M건`</td><td class="nx">CNT-01-003</td></tr>
           <tr><td><span class="cb dis">미선택</span></td><td>선택 0</td><td>`선택 반영` <span class="cb dis">Disabled</span></td><td class="nx">—</td></tr>
-          <tr><td><span class="cb err">삭제</span></td><td>항목 `삭제` / 푸터 `전체 삭제`</td><td>해당 요청 제거(반려 아님 · 다음 동기화 시 재수신 가능)</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">미선택 삭제</span></td><td>`선택 반영` 시 체크 안 한 항목</td><td>삭제 처리(목록에서 제거·이력 없음·다시 안 뜸). 재반영하려면 앱에서 재수정</td><td class="nx">—</td></tr>
+          <tr><td><span class="cb err">전체 삭제</span></td><td>푸터 `전체 삭제`</td><td>반영 없이 모든 요청 폐기(확인 후)</td><td class="nx">—</td></tr>
           <tr><td><span class="cb empty">요청 없음</span></td><td>미처리 0</td><td>`반영할 수정 요청이 없습니다.` · Badge 미노출</td><td class="nx">—</td></tr>
         </tbody></table></div>
         <div class="states-row" style="margin-top:12px">
           <div class="mini"><div class="mh"><span class="cb info">시안 A</span></div><div class="mb" style="align-items:stretch"><div style="border:1px solid var(--line);border-radius:6px;padding:5px 7px;text-align:left;font-size:9px"><b>김약사</b> <span style="font-family:ui-monospace,Menlo,monospace;background:#eceff2;border-radius:4px;padding:0 4px">A21</span> <span style="color:var(--teal-d);font-weight:800">4건</span></div><div style="font-size:9px;color:var(--faint)">기기별 묶음 · 상세 내용 플로팅 팝업</div></div></div>
-          <div class="mini"><div class="mh"><span class="cb info">시안 B</span></div><div class="mb" style="align-items:stretch;padding:8px"><div class="tscroll"><table class="m" style="font-size:8px;min-width:0"><thead><tr><th>☐</th><th>상품명</th><th>항목</th><th>이전</th><th>변경</th></tr></thead><tbody><tr><td>☑</td><td>타이레놀서방정</td><td>판매가</td><td class="before">4,500</td><td class="after">5,000</td></tr></tbody></table></div><div style="font-size:9px;color:var(--faint)">리스트(표) · rowspan · 수정 N건 묶음</div></div></div>
           <div class="mini"><div class="mh"><span class="cb empty">요청 없음</span></div><div class="mb"><div class="rico empty">∅</div><div style="font-weight:800">반영할 수정 요청이 없습니다</div><div style="font-size:9.5px">동기화 버튼 Badge 미노출</div></div></div>
         </div>
       </div>
