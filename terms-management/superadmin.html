@@ -388,7 +388,7 @@ function setTypeErr(msg){
 function onTypeInput(){
   var el=document.getElementById("inType");
   el.value = el.value.replace(/[^A-Za-z0-9_]/g,"");        // 영문·숫자·_ 만 입력(한글·공백·기타 문자는 입력되지 않음)
-  checkDup();                                              // 입력 단계 실시간 중복 검증
+  setTypeErr("");                                          // 중복 검증은 저장 클릭 시점에 수행
 }
 function checkDup(){
   var ty = document.getElementById("inType").value.trim();
