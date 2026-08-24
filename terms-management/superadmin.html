@@ -180,8 +180,8 @@
 
           <div class="block" id="fldType">
             <div class="block-h">타입 코드 <span class="req">*</span></div>
-            <input class="fw mono" id="inType" placeholder="POINT_USE" oninput="onTypeInput()" maxlength="60" />
-            <div class="hint">시스템에서 약관을 구분하는 코드입니다. 한글은 입력할 수 없습니다. 예: <b>POINT_USE</b><br />최초 생성 후에는 수정할 수 없습니다.</div>
+            <input class="fw mono" id="inType" placeholder="예: POINT_USE" oninput="onTypeInput()" maxlength="60" />
+            <div class="hint">시스템에서 약관을 구분하는 코드입니다. 한글은 입력할 수 없습니다.<br />최초 생성 후에는 수정할 수 없습니다.</div>
             <div class="errmsg" id="errType"></div>
           </div>
 
@@ -194,7 +194,6 @@
             <div class="block-h">본문 <span class="req">*</span></div>
             <div class="edtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
             <textarea class="fw" id="inContents" placeholder="약관 내용을 입력하세요."></textarea>
-            <div class="hint">마크다운 형식으로 저장됩니다.</div>
           </div>
 
           <div class="dpage-bottom">
@@ -227,7 +226,6 @@
             <div class="block-h">본문</div>
             <div class="edtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
             <textarea class="fw" id="dContents"></textarea>
-            <div class="hint">마크다운 형식으로 저장됩니다.</div>
           </div>
 
           <div class="block sec" id="historySection">
