@@ -166,8 +166,8 @@
         </div>
         <div class="tbl" id="listTable">
           <table>
-            <colgroup><col style="width:30%"><col><col style="width:10%"><col style="width:18%"></colgroup>
-            <thead><tr><th>타입 코드</th><th>약관명</th><th class="c">버전</th><th>등록일</th></tr></thead>
+            <colgroup><col style="width:34%"><col><col style="width:20%"></colgroup>
+            <thead><tr><th>타입 코드</th><th>약관명</th><th>등록일</th></tr></thead>
             <tbody id="listBody"></tbody>
           </table>
         </div>
@@ -302,7 +302,7 @@ function renderList(){
   document.getElementById("tTotal").textContent = rows.length;
   var b = document.getElementById("listBody");
   if(!rows.length){
-    b.innerHTML = '<tr><td colspan="4" class="empty">등록된 약관이 없습니다.</td></tr>';
+    b.innerHTML = '<tr><td colspan="3" class="empty">등록된 약관이 없습니다.</td></tr>';
     return;
   }
   b.innerHTML = rows.map(function(t){
@@ -310,7 +310,6 @@ function renderList(){
     return '<tr class="click" onclick="openDetail('+i+')">'+
       '<td class="type">'+esc(t.type)+'</td>'+
       '<td>'+esc(L.title)+'</td>'+
-      '<td class="c">v'+L.v+'</td>'+
       '<td class="mono">'+esc(L.at)+'</td></tr>';
   }).join("");
 }
