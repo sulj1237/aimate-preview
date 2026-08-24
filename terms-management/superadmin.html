@@ -150,7 +150,7 @@
       <div class="pg" id="pgTitle">약관 관리</div>
       <div class="crumb" id="pgCrumb">설정 &gt; 약관 관리</div>
     </div>
-    <div class="filterbar" id="pgFilter">약관은 <b>타입 코드</b>를 기준으로 관리합니다. 약관명·본문을 수정해 저장하면 해당 타입의 신규 버전이 생성되고, 서비스에는 최신 버전이 노출됩니다.</div>
+    <div class="filterbar" id="pgFilter">약관은 <b>타입 코드</b>를 기준으로 관리합니다. 약관명·본문을 수정해 저장하면 해당 타입의 신규 버전이 생성되고, 서비스에는 현재 버전이 노출됩니다.</div>
 
     <div class="wrap">
 
@@ -163,8 +163,8 @@
         </div>
         <div class="tbl" id="listTable">
           <table>
-            <colgroup><col style="width:34%"><col><col style="width:20%"></colgroup>
-            <thead><tr><th>타입 코드</th><th>약관명</th><th>등록일</th></tr></thead>
+            <colgroup><col style="width:30%"><col><col style="width:10%"><col style="width:18%"></colgroup>
+            <thead><tr><th>타입 코드</th><th>약관명</th><th class="c">버전</th><th>등록일</th></tr></thead>
             <tbody id="listBody"></tbody>
           </table>
         </div>
@@ -175,7 +175,7 @@
         <div class="page-card">
           <div class="dpage-head">
             <span class="back" onclick="go('list')">‹</span>
-            <div><div class="dt">약관 등록</div><div class="ds">타입 코드 · 약관명 · 본문을 입력해 신규 약관을 등록합니다. 저장 시 v1이 생성됩니다.</div></div>
+            <div><div class="dt">약관 등록</div><div class="ds">타입 코드와 약관명은 필수입니다. 저장 시 v1이 생성됩니다.</div></div>
           </div>
 
           <div class="block" id="fldType">
@@ -191,7 +191,7 @@
           </div>
 
           <div class="block" id="fldContents">
-            <div class="block-h">본문 <span class="req">*</span></div>
+            <div class="block-h">본문</div>
             <div class="edtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
             <textarea class="fw" id="inContents" placeholder="약관 내용을 입력하세요."></textarea>
           </div>
@@ -208,24 +208,19 @@
         <div class="page-card">
           <div class="dpage-head" id="detailHead">
             <span class="back" onclick="go('list')">‹</span>
-            <div><div class="dt" id="dTitle">약관 상세</div><div class="ds" id="dSub"></div></div>
-          </div>
-
-          <div class="block" id="dFldType">
-            <div class="block-h">타입 코드</div>
-            <input class="fw mono" id="dType" readonly />
-            <div class="hint">타입 코드는 약관의 고유 식별값으로 고정됩니다. 다른 코드가 필요하면 신규 약관으로 등록합니다.</div>
+            <div><div class="dt mono type" id="dTitle"></div><div class="ds" id="dSub"></div></div>
+            <div class="rt"><button class="btn" id="btnEdit" onclick="editMode(true)">수정</button></div>
           </div>
 
           <div class="block" id="dFldTitle">
             <div class="block-h">약관명</div>
-            <input class="fw" id="dTitleIn" />
+            <input class="fw" id="dTitleIn" readonly />
           </div>
 
           <div class="block" id="dFldContents">
             <div class="block-h">본문</div>
-            <div class="edtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
-            <textarea class="fw" id="dContents"></textarea>
+            <div class="edtool" id="dEdtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
+            <textarea class="fw" id="dContents" readonly></textarea>
           </div>
 
           <div class="block sec" id="historySection">
@@ -239,8 +234,8 @@
             </div>
           </div>
 
-          <div class="dpage-bottom">
-            <button class="btn" onclick="go('list')">취소</button>
+          <div class="dpage-bottom hidden" id="dActions">
+            <button class="btn" onclick="editMode(false)">취소</button>
             <button class="btn primary" onclick="saveEdit()">저장</button>
           </div>
         </div>
@@ -305,7 +300,7 @@ function renderList(){
   document.getElementById("tTotal").textContent = rows.length;
   var b = document.getElementById("listBody");
   if(!rows.length){
-    b.innerHTML = '<tr><td colspan="3" class="empty">등록된 약관이 없습니다.</td></tr>';
+    b.innerHTML = '<tr><td colspan="4" class="empty">등록된 약관이 없습니다.</td></tr>';
     return;
   }
   b.innerHTML = rows.map(function(t){
@@ -313,6 +308,7 @@ function renderList(){
     return '<tr class="click" onclick="openDetail('+i+')">'+
       '<td class="type">'+esc(t.type)+'</td>'+
       '<td>'+esc(L.title)+'</td>'+
+      '<td class="c">v'+L.v+'</td>'+
       '<td class="mono">'+esc(L.at)+'</td></tr>';
   }).join("");
 }
@@ -336,12 +332,23 @@ function openDetail(i){ curIdx=i; go("detail"); }
 function fillDetail(){
   var t = TERMS[curIdx], L = latest(t);
   setHead("약관 상세","설정 > 약관 관리 > 상세");
-  document.getElementById("dTitle").textContent = L.title;
-  document.getElementById("dSub").innerHTML = '<span class="mono">'+esc(t.type)+'</span> · 최신 v'+L.v+' · 등록일 '+esc(L.at);
-  document.getElementById("dType").value = t.type;
+  document.getElementById("dTitle").textContent = t.type;                       // 대표 타이틀 = 불변값(타입 코드)
+  document.getElementById("dSub").textContent = "현재 v"+L.v+" · 등록일 "+L.at;   // 요약 정보만
   document.getElementById("dTitleIn").value = L.title;
   document.getElementById("dContents").value = L.body;
+  editMode(false);
   fillHistory();
+}
+
+/* 읽기 전용 ↔ 수정 모드 — 수정 진입 시 현재 값을 그대로 불러온 상태로 편집 */
+function editMode(on){
+  var t = TERMS[curIdx], L = latest(t);
+  if(!on){ document.getElementById("dTitleIn").value = L.title; document.getElementById("dContents").value = L.body; }
+  document.getElementById("dTitleIn").readOnly = !on;
+  document.getElementById("dContents").readOnly = !on;
+  document.getElementById("dEdtool").style.display = on ? "flex" : "none";
+  document.getElementById("dActions").classList.toggle("hidden", !on);
+  document.getElementById("btnEdit").classList.toggle("hidden", on);
 }
 
 /* ── 버전 이력 ──────────────────────────────────────── */
@@ -350,7 +357,7 @@ function fillHistory(){
   document.getElementById("hCount").textContent = "총 " + t.versions.length + "개";
   document.getElementById("historyBody").innerHTML = t.versions.map(function(v,i){
     return '<tr>'+
-      '<td><span class="vchip'+(i===0?"":" old")+'">v'+v.v+(i===0?" · 최신":"")+'</span></td>'+
+      '<td><span class="vchip'+(i===0?"":" old")+'">v'+v.v+(i===0?" · 현재":"")+'</span></td>'+
       '<td>'+esc(v.title)+'</td>'+
       '<td class="mono">'+esc(v.at)+'</td>'+
       '<td>'+esc(v.by)+'</td>'+
@@ -360,7 +367,7 @@ function fillHistory(){
 function viewVersion(i){
   var t = TERMS[curIdx], v = t.versions[i];
   document.getElementById("mvTitle").textContent = "v"+v.v+" · 약관 원문";
-  document.getElementById("mvSub").textContent = (i===0? "최신 버전 · 읽기 전용" : "이전 버전 · 읽기 전용");
+  document.getElementById("mvSub").textContent = (i===0? "현재 버전 · 읽기 전용" : "이전 버전 · 읽기 전용");
   document.getElementById("mvType").textContent = t.type;
   document.getElementById("mvName").textContent = v.title;
   document.getElementById("mvDate").textContent = v.at + " · " + v.by;
@@ -378,20 +385,22 @@ function setTypeErr(msg){
 }
 function onTypeInput(){
   var el=document.getElementById("inType");
-  el.value = el.value.replace(/\s/g,"").replace(/[ㄱ-ㅎㅏ-ㅣ가-힣]/g,"");   // 공백·한글은 입력되지 않음(별도 안내 없음)
-  setTypeErr("");
+  el.value = el.value.replace(/[^A-Za-z0-9_]/g,"");        // 영문·숫자·_ 만 입력(한글·공백·기타 문자는 입력되지 않음)
+  checkDup();                                              // 입력 단계 실시간 중복 검증
+}
+function checkDup(){
+  var ty = document.getElementById("inType").value.trim();
+  if(!ty){ setTypeErr(""); return false; }
+  var dup = TERMS.some(function(t){ return t.type.toUpperCase() === ty.toUpperCase(); });   // 대소문자 구분 없이 판정
+  setTypeErr(dup ? "이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요." : "");
+  return dup;
 }
 function saveNew(){
   var ty = document.getElementById("inType").value.trim();
   var ti = document.getElementById("inTitle").value.trim();
   var co = document.getElementById("inContents").value.trim();
-  if(!ty || !ti || !co){ toast("타입 코드 · 약관명 · 본문을 모두 입력해 주세요.","err"); return; }
-  var dup = TERMS.some(function(t){ return t.type.toUpperCase() === ty.toUpperCase(); });   // 대소문자 구분 없이 판정
-  if(dup){
-    setTypeErr("이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요.");
-    document.getElementById("inType").focus();
-    return;
-  }
+  if(!ty || !ti){ toast("타입 코드와 약관명을 입력해 주세요.","err"); return; }
+  if(checkDup()){ document.getElementById("inType").focus(); return; }
   TERMS.unshift({ type:ty, versions:[{ v:1, title:ti, at:now(), by:"김굿팜", body:co }] });
   document.getElementById("inType").value=""; document.getElementById("inTitle").value=""; document.getElementById("inContents").value="";
   go("list"); toast("약관 저장이 완료되었습니다.");
@@ -400,7 +409,7 @@ function saveEdit(){
   var t = TERMS[curIdx], L = latest(t);
   var ti = document.getElementById("dTitleIn").value.trim();
   var co = document.getElementById("dContents").value.trim();
-  if(!ti || !co){ toast("약관명과 본문을 입력해 주세요.","err"); return; }
+  if(!ti){ toast("약관명을 입력해 주세요.","err"); return; }
   if(ti===L.title && co===L.body){ toast("변경된 내용이 없습니다.","err"); return; }
   t.versions.unshift({ v:L.v+1, title:ti, at:now(), by:"김굿팜", body:co });
   go("list"); toast("약관 저장이 완료되었습니다.");
@@ -432,7 +441,7 @@ function toast(m, kind){
     document.getElementById("inType").value = "PRIVACY_POLICY";
     document.getElementById("inTitle").value = "개인정보 처리방침";
     document.getElementById("inContents").value = "회사는 회원의 개인정보를 중요시하며, 관련 법령을 준수합니다.";
-    setTypeErr("이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요.");
+    checkDup();
   }
   if(Q.get("view")==="history"){
     var sec = document.getElementById("historySection");
