@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>슈퍼어드민 · 약관 관리 (타입 기준)</title>
+<style>
+  :root{
+    --teal:#16c0a4; --teal-d:#0ea58b; --teal-soft:#e6f8f4; --teal-line:#bfe9e1;
+    --ink:#2a313b; --muted:#7b8794; --faint:#9aa4af; --line:#e7eaee; --bg:#f4f6f8;
+    --amber:#c98a12; --blue:#2a6fc0; --danger:#d8453a; --ok:#16a34a; --purple:#6f5fae;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#eef1f4;font-size:13px;line-height:1.5}
+  .app{display:flex;min-height:100vh;background:#eef1f4}
+
+  /* 사이드바 */
+  .side{width:210px;flex:none;background:#262b36;padding:14px 10px;overflow:auto;color:#c7cdd6}
+  .brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:16px;padding:2px 6px 10px;color:#fff}
+  .brand .mk{color:var(--teal)}
+  .who{display:flex;align-items:center;gap:7px;font-size:12px;color:#c7cdd6;padding:7px 8px;border:1px solid #3a4150;border-radius:8px;margin:6px 4px 12px;background:#2f3542}
+  .who .o{margin-left:auto;color:#7c8595;cursor:pointer}
+  .nav-h{font-size:10.5px;font-weight:800;color:#7c8595;letter-spacing:.02em;padding:11px 8px 4px}
+  .nav a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;color:#c7cdd6;font-size:12.5px;font-weight:600;text-decoration:none;cursor:pointer}
+  .nav a:hover{background:#333a47}
+  .nav a .cv{margin-left:auto;color:#7c8595;font-size:10px}
+  .nav a.grp{font-weight:700;color:#dfe3ea}
+  .nav .sub a{padding-left:24px;font-size:12px;color:#aab2be;font-weight:500}
+  .nav .sub a.on{background:rgba(22,192,164,.15);color:#4fd6bf;font-weight:800;border-radius:7px}
+
+  /* 메인 */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;background:#eef1f4}
+  .top{display:flex;align-items:center;padding:15px 24px;border-bottom:1px solid var(--line);background:#fff}
+  .top .pg{font-size:18px;font-weight:800}
+  .top .crumb{margin-left:auto;font-size:12px;color:var(--faint)}
+  .filterbar{font-size:12px;color:var(--muted);background:#f6f8fa;border:1px solid var(--line);border-radius:8px;padding:9px 14px;margin:16px 24px 0}
+  .wrap{padding:16px 24px 26px;flex:1}
+
+  .bar{display:flex;align-items:center;gap:9px;margin-bottom:13px;flex-wrap:wrap}
+  .total{font-size:12.5px;color:#5c6671}
+  .total b{color:var(--ink);font-weight:800}
+  .spacer{flex:1}
+  .btn{height:34px;padding:0 14px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:#4b5158;font-family:inherit}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn.sm{height:28px;padding:0 10px;font-size:11.5px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+  .tbl{border:1px solid var(--line);border-radius:10px;overflow:auto;background:#fff}
+  thead th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:11px 13px;border-bottom:1px solid var(--line)}
+  tbody td{padding:11px 13px;border-bottom:1px solid #eef1f4;color:#3a424c}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.click{cursor:pointer}
+  tbody tr.click:hover{background:#f8fafb}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  .type{font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#0b8f79}
+  .empty{padding:34px 12px;text-align:center;color:var(--faint);font-size:12.5px}
+
+  /* 페이지형 상세/등록 카드 */
+  .page-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px 22px}
+  .dpage-head{display:flex;align-items:center;gap:14px;padding-bottom:15px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .dpage-head .back{font-size:17px;color:var(--faint);cursor:pointer;font-weight:700}
+  .dpage-head .dt{font-size:18px;font-weight:800}
+  .dpage-head .ds{font-size:12px;color:var(--muted);margin-top:2px}
+  .dpage-head .rt{margin-left:auto;display:flex;gap:8px}
+  .dpage-bottom{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .dpage-bottom .btn{min-width:96px}
+
+  .block{margin-bottom:18px}.block:last-child{margin-bottom:0}
+  .block-h{font-size:12.5px;font-weight:800;margin:0 0 8px;display:flex;align-items:center;gap:7px}
+  .req{color:var(--danger);font-weight:800}
+  .fw{width:100%;height:36px;border:1px solid var(--line);border-radius:7px;padding:0 11px;font-size:12.5px;font-family:inherit;outline:none;color:var(--ink);background:#fff}
+  .fw:focus{border-color:var(--teal)}
+  .fw.mono{font-family:ui-monospace,Menlo,monospace}
+  .fw.err{border-color:var(--danger);background:#fef7f6}
+  .fw[readonly]{background:#f4f6f8;color:#5c6671;cursor:default}
+  textarea.fw{height:auto;min-height:230px;padding:10px 12px;line-height:1.75;resize:vertical}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.55}
+  .errmsg{display:none;font-size:11.5px;color:var(--danger);font-weight:700;margin-top:6px}
+  .errmsg.on{display:block}
+  .hint code{background:#f2f4f7;border-radius:4px;padding:0 4px}
+  .block.sec{border-top:1px solid var(--line);padding-top:18px;margin-top:22px}
+  .hcnt{font-size:11px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:2px 9px}
+  .ro{display:inline-block;font-size:10.5px;font-weight:800;background:#eef0f2;color:#77808a;border-radius:5px;padding:2px 7px;margin-left:6px}
+  .vchip{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--teal-soft);color:var(--teal-d)}
+  .vchip.old{background:#eef0f2;color:#8b8b97}
+
+  /* 에디터 툴바(형태만) */
+  .edtool{display:flex;gap:2px;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;background:#fafbfc;padding:5px 8px}
+  .edtool span{width:26px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;color:#77808a;border-radius:5px;cursor:default}
+  .edtool span:hover{background:#eef1f4}
+  .edtool + textarea.fw{border-radius:0 0 7px 7px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:13px;font-weight:700;padding:11px 18px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80;display:flex;align-items:center;gap:7px}
+  .toast.show{opacity:1}
+  .toast.err{background:var(--danger)}
+  .hidden{display:none}
+
+  /* 모달 */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(20,26,32,.45);z-index:70;align-items:center;justify-content:center;padding:24px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:14px;width:100%;max-width:660px;box-shadow:0 34px 90px -30px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column;max-height:88vh}
+  .m-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+  .m-head .dt{font-size:16px;font-weight:800}.m-head .ds{font-size:12px;color:var(--muted);margin-top:3px}
+  .m-head .x{margin-left:auto;font-size:20px;color:var(--faint);cursor:pointer;border:none;background:none}
+  .m-body{padding:16px 20px;overflow:auto;flex:1}
+  .m-foot{padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:8px}
+  .m-foot .btn{flex:1}
+  .readtx{border:1px solid var(--line);border-radius:9px;padding:13px 15px;font-size:12.5px;line-height:1.8;color:#3a424c;background:#fbfcfd;white-space:pre-wrap;max-height:340px;overflow:auto}
+  .kvs{border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px}
+  .kv{display:flex;font-size:12.5px;border-bottom:1px solid #eef1f4}.kv:last-child{border:none}
+  .kv .k{width:110px;flex:none;background:#f7f9fb;color:var(--muted);font-weight:700;padding:9px 11px}
+  .kv .v{padding:9px 11px;flex:1}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 사이드바 -->
+  <aside class="side">
+    <div class="brand"><span class="mk">◭</span> 굿팜</div>
+    <div class="who">👤 김굿팜 (관리자) <span class="o">⎋</span></div>
+    <div class="nav-h">굿팜 공통</div>
+    <nav class="nav">
+      <a class="grp">약국관리 <span class="cv">▾</span></a>
+      <a class="grp">헬스포트 관리 <span class="cv">▾</span></a>
+      <a class="grp">굿팜 서비스 관리 <span class="cv">▾</span></a>
+      <a class="grp">게시판 관리 <span class="cv">▾</span></a>
+    </nav>
+    <div class="nav-h">굿팜 약국 솔루션</div>
+    <nav class="nav">
+      <a class="grp">바코드 관리 <span class="cv">▾</span></a>
+      <a class="grp">AI Mate 추천 상품 관리 <span class="cv">▾</span></a>
+      <a class="grp">모바일 약국 관리 <span class="cv">▾</span></a>
+      <a class="grp">포인트/쿠폰 관리 <span class="cv">▾</span></a>
+    </nav>
+    <div class="nav-h">기타</div>
+    <nav class="nav">
+      <a class="grp">통계 <span class="cv">▾</span></a>
+      <a class="grp">설정 <span class="cv">▴</span></a>
+      <div class="sub">
+        <a class="on" onclick="go('list')">약관 관리</a>
+        <a>운영자 계정 관리</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- 메인 -->
+  <div class="main">
+    <div class="top">
+      <div class="pg" id="pgTitle">약관 관리</div>
+      <div class="crumb" id="pgCrumb">설정 &gt; 약관 관리</div>
+    </div>
+    <div class="filterbar" id="pgFilter">약관은 <b>타입 코드</b>를 기준으로 관리합니다. 약관명·본문을 수정해 저장하면 해당 타입의 신규 버전이 생성되고, 서비스에는 최신 버전이 노출됩니다.</div>
+
+    <div class="wrap">
+
+      <!-- ================= S-01 목록 ================= -->
+      <section id="viewList">
+        <div class="bar" id="listBar">
+          <span class="total">전체 <b id="tTotal">0</b> 건</span>
+          <span class="spacer"></span>
+          <button class="btn primary" id="btnCreate" onclick="go('create')">약관 등록</button>
+        </div>
+        <div class="tbl" id="listTable">
+          <table>
+            <colgroup><col style="width:34%"><col><col style="width:20%"></colgroup>
+            <thead><tr><th>타입 코드</th><th>약관명</th><th>등록일</th></tr></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= S-02 등록 ================= -->
+      <section id="viewCreate" class="hidden">
+        <div class="page-card">
+          <div class="dpage-head">
+            <span class="back" onclick="go('list')">‹</span>
+            <div><div class="dt">약관 등록</div><div class="ds">타입 코드 · 약관명 · 본문을 입력해 신규 약관을 등록합니다. 저장 시 v1이 생성됩니다.</div></div>
+          </div>
+
+          <div class="block" id="fldType">
+            <div class="block-h">타입 코드 <span class="req">*</span></div>
+            <input class="fw mono" id="inType" placeholder="POINT_USE" oninput="onTypeInput()" maxlength="60" />
+            <div class="hint">시스템에서 약관을 구분하는 코드입니다. 한글은 입력할 수 없습니다. 예: <b>POINT_USE</b><br />최초 생성 후에는 수정할 수 없습니다.</div>
+            <div class="errmsg" id="errType"></div>
+          </div>
+
+          <div class="block" id="fldTitle">
+            <div class="block-h">약관명 <span class="req">*</span></div>
+            <input class="fw" id="inTitle" placeholder="사용자에게 표시되는 약관 제목" />
+          </div>
+
+          <div class="block" id="fldContents">
+            <div class="block-h">본문 <span class="req">*</span></div>
+            <div class="edtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
+            <textarea class="fw" id="inContents" placeholder="약관 내용을 입력하세요."></textarea>
+            <div class="hint">마크다운 형식으로 저장됩니다.</div>
+          </div>
+
+          <div class="dpage-bottom">
+            <button class="btn" onclick="go('list')">취소</button>
+            <button class="btn primary" onclick="saveNew()">저장</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= S-03 상세·수정 ================= -->
+      <section id="viewDetail" class="hidden">
+        <div class="page-card">
+          <div class="dpage-head" id="detailHead">
+            <span class="back" onclick="go('list')">‹</span>
+            <div><div class="dt" id="dTitle">약관 상세</div><div class="ds" id="dSub"></div></div>
+          </div>
+
+          <div class="block" id="dFldType">
+            <div class="block-h">타입 코드 <span class="ro">조회만 가능</span></div>
+            <input class="fw mono" id="dType" readonly />
+            <div class="hint">타입 코드는 약관의 고유 식별값으로 고정됩니다. 다른 코드가 필요하면 신규 약관으로 등록합니다.</div>
+          </div>
+
+          <div class="block" id="dFldTitle">
+            <div class="block-h">약관명</div>
+            <input class="fw" id="dTitleIn" />
+          </div>
+
+          <div class="block" id="dFldContents">
+            <div class="block-h">본문</div>
+            <div class="edtool"><span>B</span><span>I</span><span>U</span><span>≡</span><span>•</span><span>1.</span><span>🔗</span></div>
+            <textarea class="fw" id="dContents"></textarea>
+            <div class="hint">마크다운 형식으로 저장됩니다.</div>
+          </div>
+
+          <div class="block sec" id="historySection">
+            <div class="block-h">버전 이력 <span class="hcnt" id="hCount"></span></div>
+            <div class="tbl" id="historyTable">
+              <table>
+                <colgroup><col style="width:14%"><col><col style="width:22%"><col style="width:14%"><col style="width:12%"></colgroup>
+                <thead><tr><th>버전</th><th>약관명</th><th>생성일시</th><th>작성자</th><th class="c">보기</th></tr></thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="dpage-bottom">
+            <button class="btn" onclick="go('list')">취소</button>
+            <button class="btn primary" onclick="saveEdit()">저장</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- (버전 이력은 상세 하단 섹션으로 통합) -->
+
+    </div>
+  </div>
+</div>
+
+<!-- 이전 버전 보기(읽기 전용) -->
+<div class="modal-bg" id="mView">
+  <div class="modal">
+    <div class="m-head">
+      <div><div class="dt" id="mvTitle">v1 · 약관 원문</div><div class="ds" id="mvSub">읽기 전용</div></div>
+      <button class="x" onclick="closeModal()">×</button>
+    </div>
+    <div class="m-body">
+      <div class="kvs">
+        <div class="kv"><div class="k">타입 코드</div><div class="v mono" id="mvType"></div></div>
+        <div class="kv"><div class="k">약관명</div><div class="v" id="mvName"></div></div>
+        <div class="kv"><div class="k">생성일시</div><div class="v" id="mvDate"></div></div>
+      </div>
+      <div class="readtx" id="mvBody"></div>
+    </div>
+    <div class="m-foot"><button class="btn" onclick="closeModal()">닫기</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── 데모 데이터 : 하나의 type에 버전 레코드가 쌓이는 구조 ───────────── */
+var TERMS = [
+  { type:"POINT_REGISTER_SERVICE", versions:[
+      { v:3, title:"굿팜 포인트 서비스 이용약관", at:"2026-08-21 14:20", by:"김굿팜", body:"제1조(목적)\n이 약관은 회사가 제공하는 굿팜 포인트 서비스의 이용조건 및 절차, 회원과 회사의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.\n\n제2조(정의)\n① \"포인트\"란 회원이 서비스 이용 과정에서 적립·사용할 수 있는 가상의 지급수단을 말합니다.\n② \"단골약국\"이란 회원이 등록한 기준 약국을 말합니다." },
+      { v:2, title:"굿팜 포인트 서비스 이용약관", at:"2026-06-02 09:10", by:"김굿팜", body:"제1조(목적)\n이 약관은 회사가 제공하는 포인트 서비스의 이용조건을 규정합니다.\n\n제2조(정의)\n① \"포인트\"란 회원이 적립·사용할 수 있는 가상의 지급수단을 말합니다." },
+      { v:1, title:"포인트 서비스 이용약관", at:"2026-03-11 17:45", by:"김굿팜", body:"제1조(목적)\n이 약관은 포인트 서비스의 이용조건을 규정합니다." } ] },
+  { type:"PRIVACY_POLICY", versions:[
+      { v:2, title:"개인정보 처리방침", at:"2026-07-30 11:05", by:"김굿팜", body:"회사는 회원의 개인정보를 중요시하며, 관련 법령을 준수합니다.\n\n1. 수집하는 개인정보 항목\n- 필수: 휴대폰번호, 이름\n- 선택: 생년월일" },
+      { v:1, title:"개인정보 처리방침", at:"2026-01-08 10:00", by:"김굿팜", body:"회사는 회원의 개인정보를 중요시합니다.\n\n1. 수집하는 개인정보 항목\n- 필수: 휴대폰번호" } ] },
+  { type:"SERVICE_TERMS", versions:[
+      { v:1, title:"굿팜 서비스 이용약관", at:"2026-05-19 16:32", by:"김굿팜", body:"제1조(목적)\n이 약관은 굿팜 서비스의 이용조건 및 절차를 규정함을 목적으로 합니다." } ] },
+  { type:"THIRD_PARTY_PROVISION", versions:[
+      { v:2, title:"개인정보 제3자 제공 동의", at:"2026-08-04 13:12", by:"김굿팜", body:"회사는 아래와 같이 개인정보를 제3자에게 제공합니다.\n- 제공받는 자: 제휴 약국\n- 제공 항목: 이름, 휴대폰번호" },
+      { v:1, title:"개인정보 제3자 제공 동의", at:"2026-02-27 15:40", by:"김굿팜", body:"회사는 아래와 같이 개인정보를 제3자에게 제공합니다." } ] },
+  { type:"MARKETING_CONSENT", versions:[
+      { v:1, title:"마케팅 정보 수신 동의", at:"2026-04-02 09:55", by:"김굿팜", body:"회사는 회원이 동의한 경우에 한해 광고성 정보를 전송합니다." } ] }
+];
+
+var Q = new URLSearchParams(location.search);
+var curIdx = 0;
+
+function latest(t){ return t.versions[0]; }
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+/* ── 목록 ───────────────────────────────────────────── */
+function renderList(){
+  var empty = Q.get("case") === "empty";
+  var rows = empty ? [] : TERMS;
+  document.getElementById("tTotal").textContent = rows.length;
+  var b = document.getElementById("listBody");
+  if(!rows.length){
+    b.innerHTML = '<tr><td colspan="3" class="empty">등록된 약관이 없습니다.</td></tr>';
+    return;
+  }
+  b.innerHTML = rows.map(function(t){
+    var L = latest(t), i = TERMS.indexOf(t);
+    return '<tr class="click" onclick="openDetail('+i+')">'+
+      '<td class="type">'+esc(t.type)+'</td>'+
+      '<td>'+esc(L.title)+'</td>'+
+      '<td class="mono">'+esc(L.at)+'</td></tr>';
+  }).join("");
+}
+
+/* ── 화면 전환 ──────────────────────────────────────── */
+function show(id){
+  ["viewList","viewCreate","viewDetail"].forEach(function(v){
+    document.getElementById(v).classList.toggle("hidden", v!==id);
+  });
+}
+function go(view){
+  if(view==="list"){ show("viewList"); setHead("약관 관리","설정 > 약관 관리"); renderList(); }
+  else if(view==="create"){ show("viewCreate"); setHead("약관 등록","설정 > 약관 관리 > 약관 등록"); }
+  else if(view==="detail"){ show("viewDetail"); fillDetail(); }
+  window.scrollTo(0,0);
+}
+function setHead(t,c){ document.getElementById("pgTitle").textContent=t; document.getElementById("pgCrumb").textContent=c; }
+
+/* ── 상세 ───────────────────────────────────────────── */
+function openDetail(i){ curIdx=i; go("detail"); }
+function fillDetail(){
+  var t = TERMS[curIdx], L = latest(t);
+  setHead("약관 상세","설정 > 약관 관리 > 상세");
+  document.getElementById("dTitle").textContent = L.title;
+  document.getElementById("dSub").innerHTML = '<span class="mono">'+esc(t.type)+'</span> · 최신 v'+L.v+' · 등록일 '+esc(L.at);
+  document.getElementById("dType").value = t.type;
+  document.getElementById("dTitleIn").value = L.title;
+  document.getElementById("dContents").value = L.body;
+  fillHistory();
+}
+
+/* ── 버전 이력 ──────────────────────────────────────── */
+function fillHistory(){
+  var t = TERMS[curIdx];
+  document.getElementById("hCount").textContent = "총 " + t.versions.length + "개";
+  document.getElementById("historyBody").innerHTML = t.versions.map(function(v,i){
+    return '<tr>'+
+      '<td><span class="vchip'+(i===0?"":" old")+'">v'+v.v+(i===0?" · 최신":"")+'</span></td>'+
+      '<td>'+esc(v.title)+'</td>'+
+      '<td class="mono">'+esc(v.at)+'</td>'+
+      '<td>'+esc(v.by)+'</td>'+
+      '<td class="c"><button class="btn sm" onclick="viewVersion('+i+')">보기</button></td></tr>';
+  }).join("");
+}
+function viewVersion(i){
+  var t = TERMS[curIdx], v = t.versions[i];
+  document.getElementById("mvTitle").textContent = "v"+v.v+" · 약관 원문";
+  document.getElementById("mvSub").textContent = (i===0? "최신 버전 · 읽기 전용" : "이전 버전 · 읽기 전용");
+  document.getElementById("mvType").textContent = t.type;
+  document.getElementById("mvName").textContent = v.title;
+  document.getElementById("mvDate").textContent = v.at + " · " + v.by;
+  document.getElementById("mvBody").textContent = v.body;
+  document.getElementById("mView").classList.add("open");
+}
+function closeModal(){ document.getElementById("mView").classList.remove("open"); }
+
+
+/* ── 저장 ───────────────────────────────────────────── */
+function setTypeErr(msg){
+  var el=document.getElementById("inType"), er=document.getElementById("errType");
+  if(msg){ el.classList.add("err"); er.textContent=msg; er.classList.add("on"); }
+  else { el.classList.remove("err"); er.classList.remove("on"); }
+}
+function onTypeInput(){
+  var el=document.getElementById("inType");
+  el.value = el.value.replace(/\s/g,"").replace(/[ㄱ-ㅎㅏ-ㅣ가-힣]/g,"");   // 공백·한글은 입력되지 않음(별도 안내 없음)
+  setTypeErr("");
+}
+function saveNew(){
+  var ty = document.getElementById("inType").value.trim();
+  var ti = document.getElementById("inTitle").value.trim();
+  var co = document.getElementById("inContents").value.trim();
+  if(!ty || !ti || !co){ toast("타입 코드 · 약관명 · 본문을 모두 입력해 주세요.","err"); return; }
+  var dup = TERMS.some(function(t){ return t.type.toUpperCase() === ty.toUpperCase(); });   // 대소문자 구분 없이 판정
+  if(dup){
+    setTypeErr("이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요.");
+    document.getElementById("inType").focus();
+    return;
+  }
+  TERMS.unshift({ type:ty, versions:[{ v:1, title:ti, at:now(), by:"김굿팜", body:co }] });
+  document.getElementById("inType").value=""; document.getElementById("inTitle").value=""; document.getElementById("inContents").value="";
+  go("list"); toast("약관 저장이 완료되었습니다.");
+}
+function saveEdit(){
+  var t = TERMS[curIdx], L = latest(t);
+  var ti = document.getElementById("dTitleIn").value.trim();
+  var co = document.getElementById("dContents").value.trim();
+  if(!ti || !co){ toast("약관명과 본문을 입력해 주세요.","err"); return; }
+  if(ti===L.title && co===L.body){ toast("변경된 내용이 없습니다.","err"); return; }
+  t.versions.unshift({ v:L.v+1, title:ti, at:now(), by:"김굿팜", body:co });
+  go("list"); toast("약관 저장이 완료되었습니다.");
+}
+function now(){
+  var d=new Date(), p=function(n){return String(n).padStart(2,"0")};
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes());
+}
+var tmr;
+function toast(m, kind){
+  var el=document.getElementById("toast");
+  el.textContent=(kind==="err"?"! ":"✓ ")+m;
+  el.classList.toggle("err", kind==="err");
+  el.classList.add("show");
+  clearTimeout(tmr); tmr=setTimeout(function(){el.classList.remove("show")},2400);
+}
+
+/* ── 초기 진입(파라미터) ────────────────────────────── */
+(function init(){
+  renderList();
+  var idx = parseInt(Q.get("term")||"", 10);
+  if(!isNaN(idx) && TERMS[idx]) curIdx = idx;
+
+  var v = Q.get("view") || "list";
+  if(v === "history") v = "detail";
+  go(v === "detail" || v === "create" ? v : "list");
+
+  if(Q.get("dup")==="1"){
+    document.getElementById("inType").value = "PRIVACY_POLICY";
+    document.getElementById("inTitle").value = "개인정보 처리방침";
+    document.getElementById("inContents").value = "회사는 회원의 개인정보를 중요시하며, 관련 법령을 준수합니다.";
+    setTypeErr("이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요.");
+  }
+  if(Q.get("view")==="history"){
+    var sec = document.getElementById("historySection");
+    if(sec) sec.scrollIntoView({block:"start"});
+  }
+  if(Q.get("modal")==="version"){ viewVersion(1); }
+})();
+</script>
+</body>
+</html>

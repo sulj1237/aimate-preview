@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>약관 관리 · 화면설계서(스토리보드)</title>
+<style>
+  :root{
+    --teal:#16c0a4; --teal-d:#0ea58b; --teal-soft:#e6f8f4; --teal-line:#bfe9e1;
+    --ink:#28303a; --muted:#7b8794; --faint:#9aa4af; --line:#e6e9ee; --bg:#f1f3f6;
+    --amber:#c98a12; --blue:#2a6fc0; --danger:#d8453a; --hl:#fff3d6; --hlb:#e8b84b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#eef1f4;font-size:13px;line-height:1.55;padding:16px}
+  .doc{max-width:1320px;margin:0 auto}
+  .doc-head h1{font-size:20px;font-weight:800;margin:0 0 4px}
+  .doc-head p{font-size:12.5px;color:var(--muted);margin:0}
+  .ptabs{display:flex;gap:8px;margin:16px 0 14px;flex-wrap:wrap}
+  .ptab{padding:11px 18px;border:1px solid var(--line);background:#fff;border-radius:10px;font-weight:800;font-size:13.5px;color:var(--muted);cursor:pointer}
+  .ptab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .ptab .pn{font-size:11px;color:var(--faint);margin-right:6px}.ptab.on .pn{color:#cdeee8}
+  .hint-bar{font-size:12px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 13px;margin-bottom:16px}
+  .hint-bar b{color:var(--teal-d)}
+
+  .screen{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px;box-shadow:0 6px 20px -14px rgba(0,0,0,.2)}
+  .sc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sc-head .sid{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:7px;padding:4px 10px}
+  .sc-head .nm{font-size:15px;font-weight:800}
+  .sc-head .pf{margin-left:auto;font-size:11.5px;color:var(--faint);font-weight:700}
+  .sc-ov{font-size:12px;color:#4f5963;background:#f7f9fb;border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin-bottom:14px;line-height:1.6}
+  .sc-ov b{color:var(--ink)}
+  .sc-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:start}
+  @media(max-width:920px){.sc-grid{grid-template-columns:1fr}}
+
+  /* 목업 — 번호 안 잘리게 테두리 없이 좌측 여백 */
+  .mock{border:none;background:transparent;position:relative;overflow:visible;padding:4px;margin:14px 0 4px 26px}
+  .hot{position:relative;cursor:pointer;transition:box-shadow .12s,background .12s}
+  .hot .num{position:absolute;z-index:5;top:-7px;left:-13px;width:21px;height:21px;border-radius:50%;
+    background:var(--teal);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px -1px rgba(0,0,0,.35);border:2px solid #fff}
+  .hot.active{box-shadow:0 0 0 3px var(--hlb),0 0 0 6px var(--hl);background:var(--hl);border-radius:6px;z-index:2}
+  .hot.active .num{background:var(--amber)}
+
+  .desc{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  .desc .dh{font-size:12px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+  .desc li{display:flex;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;cursor:pointer;background:#fff;transition:background .12s,border-color .12s}
+  .desc li:hover{border-color:var(--teal-line)}
+  .desc li .di{flex:none;width:22px;height:22px;border-radius:50%;background:var(--teal-soft);color:var(--teal-d);font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .desc li .dt{font-size:12.5px;color:#3a424c}.desc li .dt b{color:var(--ink)}
+  .desc li.active{background:var(--hl);border-color:var(--hlb)}
+  .desc li.active .di{background:var(--amber);color:#fff}
+  .tbu{color:var(--danger);font-weight:800}
+
+  /* admin shell mock */
+  .shell{display:flex;border:1px solid var(--line);border-radius:10px;overflow:visible;min-height:240px}
+  .side{width:120px;flex:none;border-right:1px solid var(--line);background:#fafbfc;padding:10px 8px;border-radius:10px 0 0 10px}
+  .side .br{font-weight:800;font-size:12px;color:var(--teal);padding:2px 4px 8px}
+  .side .ni{font-size:11px;color:#5c6671;padding:6px 7px;border-radius:6px;font-weight:600}
+  .side .ni.on{background:var(--teal-soft);color:var(--teal-d);font-weight:800}
+  .scol{flex:1;min-width:0;padding:0}
+  .stop{display:flex;align-items:center;padding:11px 13px;border-bottom:1px solid var(--line);font-weight:800;font-size:14px}
+  .stop .me{margin-left:auto;font-size:10px;color:var(--faint);font-weight:600}
+  .pad{padding:12px 13px}
+  .row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+  .inp,.selb{height:28px;border:1px solid var(--line);border-radius:6px;font-size:11px;color:var(--ink);padding:0 9px;display:inline-flex;align-items:center;background:#fff;white-space:nowrap}
+  .selb{color:#4b5158}.inp.w{flex:1;min-width:90px;color:var(--faint)}
+  .bn{height:28px;border-radius:6px;font-size:11px;font-weight:700;padding:0 11px;display:inline-flex;align-items:center;background:var(--teal);color:#fff}
+  .bn.g{background:#fff;border:1px solid var(--line);color:#5c6671}
+  .qb{height:24px;border-radius:6px;font-size:10.5px;font-weight:600;padding:0 9px;display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff;color:#5c6671}
+  .qb.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+  .sumc{border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:10.5px;color:var(--muted);background:#fbfdfc}
+  .sumc b{display:block;font-size:15px;color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+  table.m{width:100%;border-collapse:collapse;font-size:10.5px;white-space:nowrap}
+  table.m th{background:#f6f8fa;color:#5c6671;font-weight:700;text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+  table.m td{padding:7px 8px;border-bottom:1px solid #eef1f4;color:#3a424c}
+  .bdg{font-size:8.5px;font-weight:800;border-radius:4px;padding:1px 4px;margin-right:3px}
+  .bdg.n{background:#e6f7f4;color:var(--teal-d)}.bdg.v{background:#f3eef9;color:#6f5fae}.bdg.f{background:#eef2f6;color:#5c6671}
+  .sortic{color:var(--faint);font-size:8px;margin-left:2px}
+  .pager{display:flex;align-items:center;gap:6px;margin-top:9px;font-size:10.5px;color:var(--muted)}
+  .pg{border:1px solid var(--line);border-radius:5px;padding:2px 7px;background:#fff}
+  .pg.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  /* 엑셀 시트 mock */
+  .sheet{border:1px solid var(--line);border-radius:8px;overflow:auto}
+  .sheet table{width:100%;border-collapse:collapse;font-size:10px;white-space:nowrap}
+  .sheet th{background:#1f7a44;color:#fff;font-weight:700;padding:6px 8px;border:1px solid #176235}
+  .sheet th.add{background:#b9821a;border-color:#9c6e14}
+  .sheet td{padding:6px 8px;border:1px solid #e6e9ee;color:#3a424c}
+  /* 약관 관리 목업 추가 스타일 */
+  .fld{margin-bottom:10px}
+  .fld .lb{font-size:10.5px;font-weight:800;color:#5c6671;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+  .fld .lb .rq{color:var(--danger)}
+  .fld .lb .rox{font-size:9px;font-weight:800;background:#eef0f2;color:#77808a;border-radius:4px;padding:1px 5px}
+  .box{border:1px solid var(--line);border-radius:6px;background:#fff;font-size:11px;color:#3a424c;padding:7px 9px;min-height:30px;display:flex;align-items:center}
+  .box.ro{background:#f4f6f8;color:#77808a}
+  .box.mono{font-family:ui-monospace,Menlo,monospace;font-weight:700;color:#0b8f79}
+  .box.err{border-color:var(--danger);background:#fef7f6}
+  .box.ta{display:block;min-height:74px;line-height:1.7;color:#5c6671;white-space:pre-line}
+  .edbar{border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;background:#fafbfc;padding:3px 7px;font-size:10px;color:#9aa4af;letter-spacing:3px}
+  .edbar + .box{border-radius:0 0 6px 6px}
+  .fhint{font-size:9.5px;color:var(--faint);margin-top:4px}
+  .ferr{font-size:10px;color:var(--danger);font-weight:800;margin-top:4px}
+  .btm{display:flex;justify-content:flex-end;gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+  .secline{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+  .sech{font-size:11px;font-weight:800;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+  .sech .cnt{font-size:9.5px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);border-radius:999px;padding:1px 7px}
+  .vch{font-size:9px;font-weight:800;border-radius:999px;padding:1px 7px;background:var(--teal-soft);color:var(--teal-d)}
+  .vch.old{background:#eef0f2;color:#8b8b97}
+  .lnk{font-size:10px;font-weight:700;color:#5c6671;border:1px solid var(--line);border-radius:5px;padding:1px 7px;background:#fff}
+  .mdmock{border:1px solid var(--line);border-radius:9px;background:#fff;box-shadow:0 10px 26px -18px rgba(0,0,0,.5);overflow:hidden}
+  .mdmock .mh{display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:800}
+  .mdmock .mh .mx{margin-left:auto;color:var(--faint);font-weight:700}
+  .mdmock .mb{padding:11px 12px}
+  .mdmock .mf{border-top:1px solid var(--line);padding:8px 12px;display:flex}
+  .kvm{border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-bottom:9px}
+  .kvm .r{display:flex;font-size:10.5px;border-bottom:1px solid #eef1f4}
+  .kvm .r:last-child{border:none}
+  .kvm .r .k{width:74px;flex:none;background:#f7f9fb;color:var(--muted);font-weight:700;padding:5px 8px}
+  .kvm .r .v{padding:5px 8px;color:#3a424c}
+  .rdtx{border:1px solid var(--line);border-radius:7px;background:#fbfcfd;padding:9px 11px;font-size:10.5px;color:#5c6671;line-height:1.75;white-space:pre-line}
+  .ovstage{position:relative;border-radius:10px;overflow:hidden}
+  .ovdim{position:absolute;inset:0;background:rgba(20,26,32,.58);display:flex;align-items:center;justify-content:center;padding:12px}
+  .bn.dg{background:#fff;border:1px solid #f0c9c4;color:var(--danger)}
+  .bn.dg.solid{background:var(--danger);border-color:var(--danger);color:#fff}
+  .gd{display:flex;gap:5px;font-size:9.5px;color:#4a6f8a;background:#eef5fa;border:1px solid #d3e4f0;border-radius:7px;padding:7px 9px;margin-top:6px;line-height:1.5}
+  .tstwrap{border:1px dashed var(--line);border-radius:9px;background:#f7f9fb;padding:16px 12px;display:flex;justify-content:center}
+  .tst{display:inline-flex;align-items:center;gap:7px;border-radius:8px;padding:9px 15px;font-size:11.5px;font-weight:700;color:#fff;background:#28303a;box-shadow:0 8px 20px -12px rgba(0,0,0,.6)}
+  .tst.err{background:var(--danger)}
+  .tst.ok{background:#22c55e}
+  .tst .ic{font-size:12px}
+  .errtbl{width:100%;border-collapse:collapse;font-size:11.5px}
+  .errtbl th{background:#f6f8fa;color:#5c6671;font-weight:800;text-align:left;padding:8px 10px;border:1px solid var(--line);font-size:10.5px;white-space:nowrap}
+  .errtbl td{padding:8px 10px;border:1px solid var(--line);vertical-align:top;line-height:1.6;color:#3a424c}
+  .errtbl td.sc{white-space:nowrap;font-weight:800;color:var(--teal-d);width:74px}
+  .errtbl td.cs{white-space:nowrap;font-weight:700;width:140px}
+  .errtbl code{background:#f2f4f7;border-radius:4px;padding:1px 5px;font-size:10.5px;color:#375}
+  .emptyb{padding:26px 13px;text-align:center;color:var(--faint);font-size:11.5px;border:1px dashed var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="doc-head">
+    <h1>약관 관리 · 화면설계서 (스토리보드)</h1>
+    <p>플랫폼 — <b>슈퍼어드민(WEB, 내부 전용)</b> · 위치 <b>설정 › 약관 관리</b>. 화면의 <b>번호(컴포넌트)</b>나 우측 <b>디스크립션</b>에 hover 하면 짝이 하이라이트되고, 클릭하면 고정됩니다.</p>
+  </div>
+  <div class="ptabs">
+    <div class="ptab on"><span class="pn">P1</span>슈퍼어드민 · 약관 관리 (WEB)</div>
+  </div>
+  <div class="hint-bar">💡 컴포넌트 번호(①②③…) 또는 디스크립션에 <b>hover</b> = 미리보기 · <b>click</b> = 고정. 약관은 <b>타입 코드(<code>type</code>)</b> 기준으로 관리하며, 수정 저장 시 <b>신규 버전</b>이 생성됨.</div>
+
+  <!-- TRM-01 -->
+  <section class="screen" data-sid="TRM-01">
+    <div class="sc-head"><span class="sid">TRM-01</span><span class="nm">약관 목록</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 타입 1건을 한 행으로 하는 약관 목록. 진입: 슈퍼어드민 좌측 메뉴 <b>설정 › 약관 관리</b>. 최신 버전 기준으로 <b>타입 · 약관명 · 등록일</b>을 노출하고, 행 선택 시 상세(TRM-03)로 이동함.</div>
+    <div class="sc-grid">
+      <div class="mock">
+        <div class="shell">
+          <div class="side"><div class="br">◭ 굿팜 admin</div><div class="ni">통계</div><div class="ni">설정</div><div class="ni on">약관 관리</div></div>
+          <div class="scol">
+            <div class="stop">약관 관리<span class="me">설정 › 약관 관리</span></div>
+            <div class="pad">
+              <div class="row">
+                <div class="hot" data-n="1"><span class="num">1</span><span style="font-size:11px;color:#5c6671">전체 <b style="color:var(--ink)">4</b> 건</span></div>
+                <span style="flex:1"></span>
+                <div class="hot" data-n="2"><span class="num" style="left:auto;right:-13px">2</span><span class="bn">약관 등록</span></div>
+              </div>
+              <div class="hot" data-n="3"><span class="num">3</span>
+                <table class="m"><thead><tr>
+                  <th style="width:36%">타입 코드</th><th>약관명</th><th style="width:22%">등록일</th>
+                </tr></thead><tbody>
+                  <tr><td style="color:#0b8f79;font-weight:700">POINT_REGISTER_SERVICE</td><td>굿팜 포인트 서비스 이용약관</td><td>2026-08-21 14:20</td></tr>
+                  <tr><td style="color:#0b8f79;font-weight:700">PRIVACY_POLICY</td><td>개인정보 처리방침</td><td>2026-07-30 11:05</td></tr>
+                  <tr><td style="color:#0b8f79;font-weight:700">THIRD_PARTY_PROVISION</td><td>개인정보 제3자 제공 동의</td><td>2026-08-04 13:12</td></tr>
+                  <tr><td style="color:#0b8f79;font-weight:700">SERVICE_TERMS</td><td>굿팜 서비스 이용약관</td><td>2026-05-19 16:32</td></tr>
+                </tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ol class="desc">
+        <div class="dh">TRM-01 · 컴포넌트</div>
+        <li data-n="1"><span class="di">1</span><span class="dt"><b>전체 건수</b> — 목록 상단의 <b>텍스트 요약</b>. 현재 목록에 노출된 <b>약관 건수</b>를 표기함.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>약관 등록</b> — 신규 약관 등록 화면(TRM-02) 진입.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>목록 컬럼(3열)</b> — <b>타입 코드</b>(고유 식별값 <code>type</code> · 등록 후 고정) · <b>약관명</b>(최신 버전의 <code>title</code>) · <b>등록일</b>(최신 버전 생성 시점 <code>updatedAt</code>). 정렬은 등록일 최신순.</span></li>
+        <li data-n="3"><span class="di">·</span><span class="dt"><b>출력 기준</b> — 최신 버전 기준으로 목록을 출력함.</span></li>
+        <li data-n="3"><span class="di">·</span><span class="dt"><b>행 선택</b> — 행 전체 클릭 시 상세(TRM-03)로 이동. 상세에서 타입 코드는 조회 전용으로 표시됨.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TRM-02 -->
+  <section class="screen" data-sid="TRM-02">
+    <div class="sc-head"><span class="sid">TRM-02</span><span class="nm">약관 등록</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 신규 약관 등록 화면. 입력 항목은 <b>타입 코드 · 약관명 · 본문</b> 3가지이며, 저장 시 동일 타입 코드 존재 여부를 <b>대소문자 구분 없이</b> 검증한 뒤 해당 타입의 <b>v1</b>을 생성함.</div>
+    <div class="sc-grid">
+      <div class="mock">
+        <div class="shell">
+          <div class="side"><div class="br">◭ 굿팜 admin</div><div class="ni">설정</div><div class="ni on">약관 관리</div></div>
+          <div class="scol">
+            <div class="stop">약관 등록<span class="me">설정 › 약관 관리 › 약관 등록</span></div>
+            <div class="pad">
+              <div class="hot fld" data-n="1"><span class="num">1</span>
+                <div class="lb">타입 코드 <span class="rq">*</span></div>
+                <div class="box mono">POINT_USE</div>
+                <div class="fhint">시스템에서 약관을 구분하는 코드입니다. 한글은 입력할 수 없습니다. 예: POINT_USE<br>최초 생성 후에는 수정할 수 없습니다.</div>
+              </div>
+              <div class="hot fld" data-n="2" style="margin-top:12px"><span class="num">2</span>
+                <div class="lb">약관명 <span class="rq">*</span></div>
+                <div class="box">굿팜 포인트 서비스 이용약관</div>
+              </div>
+              <div class="hot fld" data-n="3"><span class="num">3</span>
+                <div class="lb">본문 <span class="rq">*</span></div>
+                <div class="edbar">B I U ≡ • 1. 🔗</div>
+                <div class="box ta">제1조(목적)
+이 약관은 회사가 제공하는 굿팜 포인트 서비스의 이용조건 및 절차, 회원과 회사의 권리·의무를 규정함을 목적으로 합니다.</div>
+              </div>
+              <div class="hot btm" data-n="4"><span class="num" style="left:-13px">4</span><span class="bn g">취소</span><span class="bn">저장</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ol class="desc">
+        <div class="dh">TRM-02 · 컴포넌트</div>
+        <li data-n="1"><span class="di">1</span><span class="dt"><b>타입 코드</b> <span style="color:var(--danger);font-weight:800">필수</span> — 시스템에서 약관을 구분하는 값(<code>type</code>). <b>단일 입력란</b>이며 저장 후에는 수정 불가. 중복 검증은 <b>저장 시 이 입력란에서 처리</b>함(별도 확인 입력란 없음).</span></li>
+        <li data-n="1"><span class="di">·</span><span class="dt"><b>입력 규칙</b> — 영문·숫자·특수기호 입력 가능 · <b>한글 입력 불가</b> · 공백은 제거됨. 하단에는 안내 문구 및 예시가 노출됨.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>약관명</b> <span style="color:var(--danger);font-weight:800">필수</span> — 사용자에게 표시되는 제목(<code>title</code>).</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>본문</b> <span style="color:var(--danger);font-weight:800">필수</span> — 약관 내용(<code>contents</code>)을 인라인 에디터로 입력. 저장 포맷은 <b>마크다운</b>.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>취소 / 저장</b> — 저장 시 타입 중복 검증을 거쳐 해당 타입의 <b>v1</b>이 생성되고 목록으로 이동, <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출. 취소 시 입력값을 폐기하고 목록으로 복귀.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt">에러 문구·처리는 하단 <b>에러 · 예외 케이스</b> 표에 정리.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TRM-03 -->
+  <section class="screen" data-sid="TRM-03">
+    <div class="sc-head"><span class="sid">TRM-03</span><span class="nm">약관 상세 · 수정 (하단 버전 이력 섹션)</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 선택한 타입의 최신 약관을 조회·수정함. 타입은 조회 전용이며 <b>약관명·본문</b>만 수정할 수 있음. 저장하면 기존 데이터를 덮어쓰지 않고 같은 타입의 <b>신규 버전</b>이 생성됨. <b>버전 이력은 별도 화면 없이 이 페이지 하단 섹션</b>에서 확인함.</div>
+    <div class="sc-grid">
+      <div class="mock">
+        <div class="shell">
+          <div class="side"><div class="br">◭ 굿팜 admin</div><div class="ni">설정</div><div class="ni on">약관 관리</div></div>
+          <div class="scol">
+            <div class="stop">약관 상세<span class="me">설정 › 약관 관리 › 상세</span></div>
+            <div class="pad">
+              <div class="hot" data-n="1"><span class="num">1</span>
+                <div style="font-size:12.5px;font-weight:800">‹ 굿팜 포인트 서비스 이용약관</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">POINT_REGISTER_SERVICE · 최신 v3 · 등록일 2026-08-21 14:20</div>
+              </div>
+              <div class="hot fld" data-n="2" style="margin-top:12px"><span class="num">2</span>
+                <div class="lb">타입 코드 <span class="rox">조회만 가능</span></div>
+                <div class="box ro mono">POINT_REGISTER_SERVICE</div>
+              </div>
+              <div class="hot fld" data-n="3"><span class="num">3</span>
+                <div class="lb">약관명</div>
+                <div class="box">굿팜 포인트 서비스 이용약관</div>
+              </div>
+              <div class="hot fld" data-n="4"><span class="num">4</span>
+                <div class="lb">본문</div>
+                <div class="edbar">B I U ≡ • 1. 🔗</div>
+                <div class="box ta">제1조(목적)
+이 약관은 회사가 제공하는 굿팜 포인트 서비스의 이용조건 및 절차를 규정함을 목적으로 합니다.</div>
+              </div>
+
+              <div class="hot secline" data-n="5"><span class="num" style="top:5px">5</span>
+                <div class="sech">버전 이력 <span class="cnt">총 3개</span></div>
+                <div class="hot" data-n="6"><span class="num">6</span>
+                  <table class="m"><thead><tr>
+                    <th style="width:15%">버전</th><th>약관명</th><th style="width:24%">생성일시</th><th style="width:14%">작성자</th><th style="width:12%">보기</th>
+                  </tr></thead><tbody>
+                    <tr><td><span class="vch">v3 · 최신</span></td><td>굿팜 포인트 서비스 이용약관</td><td>2026-08-21 14:20</td><td>김굿팜</td><td><span class="lnk">보기</span></td></tr>
+                    <tr><td><span class="vch old">v2</span></td><td>굿팜 포인트 서비스 이용약관</td><td>2026-06-02 09:10</td><td>김굿팜</td><td><span class="lnk">보기</span></td></tr>
+                    <tr><td><span class="vch old">v1</span></td><td>포인트 서비스 이용약관</td><td>2026-03-11 17:45</td><td>김굿팜</td><td><span class="lnk">보기</span></td></tr>
+                  </tbody></table>
+                </div>
+              </div>
+
+              <div class="hot" data-n="7" style="margin-top:16px"><span class="num" style="top:5px">7</span>
+                <div class="fhint" style="margin:0 0 6px">▼ 이력의 <b>보기</b> 클릭 시 — 상세 화면 위에 dimmed 배경 + 모달</div>
+                <div class="ovstage">
+                  <div class="shell" style="min-height:0">
+                    <div class="side" style="width:96px"><div class="br">◭ 굿팜</div><div class="ni on">약관 관리</div></div>
+                    <div class="scol">
+                      <div class="stop">약관 상세<span class="me">설정 › 약관 관리 › 상세</span></div>
+                      <div class="pad">
+                        <div class="fld"><div class="lb">타입 코드</div><div class="box ro mono">POINT_REGISTER_SERVICE</div></div>
+                        <div class="fld"><div class="lb">약관명</div><div class="box">굿팜 포인트 서비스 이용약관</div></div>
+                        <div class="sech" style="margin-top:12px">버전 이력 <span class="cnt">총 3개</span></div>
+                        <table class="m"><thead><tr><th style="width:16%">버전</th><th>약관명</th><th style="width:26%">생성일시</th><th style="width:12%">보기</th></tr></thead><tbody>
+                          <tr><td><span class="vch">v3 · 최신</span></td><td>굿팜 포인트 서비스 이용약관</td><td>2026-08-21 14:20</td><td><span class="lnk">보기</span></td></tr>
+                          <tr><td><span class="vch old">v2</span></td><td>굿팜 포인트 서비스 이용약관</td><td>2026-06-02 09:10</td><td><span class="lnk">보기</span></td></tr>
+                        </tbody></table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ovdim">
+                    <div class="mdmock" style="width:340px">
+                      <div class="mh">v2 · 약관 원문<span class="mx">×</span></div>
+                      <div class="mb">
+                        <div class="kvm">
+                          <div class="r"><div class="k">타입 코드</div><div class="v" style="font-family:ui-monospace,Menlo,monospace;color:#0b8f79;font-weight:700">POINT_REGISTER_SERVICE</div></div>
+                          <div class="r"><div class="k">약관명</div><div class="v">굿팜 포인트 서비스 이용약관</div></div>
+                          <div class="r"><div class="k">생성일시</div><div class="v">2026-06-02 09:10 · 김굿팜</div></div>
+                        </div>
+                        <div class="rdtx">제1조(목적)
+이 약관은 회사가 제공하는 포인트 서비스의 이용조건을 규정합니다.</div>
+                      </div>
+                      <div class="mf"><span class="bn g" style="flex:1;justify-content:center">닫기</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hot btm" data-n="8"><span class="num" style="left:-13px">8</span><span class="bn g">취소</span><span class="bn">저장</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ol class="desc">
+        <div class="dh">TRM-03 · 컴포넌트</div>
+        <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더 · 기본 정보</b> — 약관명 + <b>타입 코드 · 최신 버전(vN) · 등록일시</b>. <code>‹</code> 클릭 시 목록으로 복귀함.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>타입 코드</b> — <b>조회만 가능</b>. 고유 식별값으로 고정되며 읽기 전용으로 표시함. 다른 코드가 필요하면 신규 등록(TRM-02)으로 만듦.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>약관명</b> — 수정 가능(<code>title</code>). 저장 시 신규 버전의 제목으로 기록됨.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>본문</b> — 수정 가능(<code>contents</code>). 진입 시 최신 버전 본문이 채워진 상태로 표시됨.</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>버전 이력 섹션</b> — 섹션 헤더에 <b>총 N개</b>를 표기함.</span></li>
+        <li data-n="6"><span class="di">6</span><span class="dt"><b>이력 컬럼</b> — <b>버전</b>(v1→v2→v3 증가 · 최신 배지) · <b>약관명</b>(해당 버전 저장 시점의 제목) · <b>생성일시</b>(<code>createdAt</code>) · <b>작성자</b> · <b>보기</b>. 최신순 정렬 고정.</span></li>
+        <li data-n="7"><span class="di">7</span><span class="dt"><b>이전 버전 보기(읽기 전용 모달)</b> — 이력의 <code>보기</code> 클릭 시 <b>상세 화면 위에 dimmed 배경과 함께 모달</b>로 노출. 타입 코드 · 약관명 · 생성일시(작성자) · 본문 원문을 읽기 전용으로 표시하며, <code>닫기</code> 또는 <code>×</code> 로 상세 화면 복귀. 원문은 저장 시점 그대로 보존되어 개정 이력·분쟁 대응 근거가 됨.</span></li>
+        <li data-n="8"><span class="di">8</span><span class="dt"><b>취소 / 저장</b> — 저장 시 기존 데이터를 덮어쓰지 않고 <b>버전을 1 올려 그 버전으로 기록·저장</b>한 뒤 목록으로 이동, <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt"><b>케이스 · 변경 없이 저장</b> — 약관명·본문을 그대로 둔 채 <code>저장</code> 클릭 시.<br><b>처리</b> — 빨간 토스트 <code class="t">[toast] "변경된 내용이 없습니다."</code> 노출 후 저장 중단. 신규 버전을 만들지 않고 상세 화면을 그대로 유지함.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt"><b>케이스 · 필수값 미입력 저장</b> — 약관명 또는 본문을 비운 채 <code>저장</code> 클릭 시.<br><b>처리</b> — 빨간 토스트 <code class="t">[toast] "약관명과 본문을 입력해 주세요."</code> 노출 후 저장 중단. 입력값은 그대로 유지되어 이어서 작성 가능.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt"><b>노출 반영</b> — 저장된 최신 버전이 서비스 노출 대상이 됨. 노출 상태(<code>status</code>)는 서버가 최신 버전 기준으로 자동 관리함.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TRM-04 케이스별 화면 -->
+  <section class="screen" data-sid="TRM-04">
+    <div class="sc-head"><span class="sid">TRM-04</span><span class="nm">케이스별 화면 (0건 · 중복 · 토스트)</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 약관 관리의 상태별 화면. 등록된 약관이 없을 때, 이미 있는 타입 코드를 저장할 때, 저장 실패·완료 토스트를 정의함.</div>
+    <div class="sc-grid">
+      <div class="mock">
+        <div class="shell"><div class="scol" style="border-radius:10px">
+          <div class="pad">
+            <div class="hot" data-n="1"><span class="num">1</span>
+              <div class="row"><span class="selb">전체 <b style="margin-left:3px">0</b> 건</span><span style="flex:1"></span><span class="bn">약관 등록</span></div>
+              <div class="emptyb">등록된 약관이 없습니다.</div>
+            </div>
+
+            <div class="hot fld" data-n="2" style="margin-top:14px"><span class="num">2</span>
+              <div class="lb">타입 코드 <span class="rq">*</span></div>
+              <div class="box err">PRIVACY_POLICY</div>
+              <div class="ferr">이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요.</div>
+            </div>
+
+            <div class="hot" data-n="3" style="margin-top:14px"><span class="num">3</span>
+              <div class="tstwrap"><span class="tst err"><span class="ic">!</span>타입 · 약관명 · 본문을 모두 입력해 주세요.</span></div>
+            </div>
+
+            <div class="hot" data-n="4" style="margin-top:14px"><span class="num">4</span>
+              <div class="tstwrap"><span class="tst ok"><span class="ic">✓</span>약관 저장이 완료되었습니다.</span></div>
+            </div>
+
+          </div>
+        </div></div>
+      </div>
+      <ol class="desc">
+        <div class="dh">TRM-04 · 케이스</div>
+        <li data-n="1"><span class="di">1</span><span class="dt"><b>등록된 약관 0건</b> — 최초 도입·마이그레이션 전 상태. 목록 본문에 <code class="t">[empty] "등록된 약관이 없습니다."</code> · 전체 건수 <b>0 건</b>.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>타입 코드 중복</b> — 저장 시 <b>대소문자 구분 없이</b> 동일 코드를 판정함. 중복이면 필드 하단에 <code class="t">[error] "이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요."</code> 노출 후 <b>저장 중단</b>. 약관명·본문 입력값은 유지되고 타입 코드 입력란에 포커스가 남음.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>에러 토스트(빨강)</b> — 필수값을 채우지 않고 저장하면 <b>빨간 토스트</b>로 <code>타입 · 약관명 · 본문을 모두 입력해 주세요.</code> 를 노출함(상세 수정은 <code>약관명과 본문을 입력해 주세요.</code>). 저장은 중단되고 입력값은 유지됨.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>저장 완료 토스트(초록)</b> — 등록·수정 저장이 완료되면 초록 토스트 <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출 후 목록으로 이동함. 등록은 v1, 수정은 신규 버전이 생성된 뒤 노출됨.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt"><b>버전 1개(v1)</b> — 상세 하단 이력에 1건만 표시(최신 배지 · 이전 버전 없음).</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 에러 · 예외 케이스 통합 -->
+  <section class="screen">
+    <div class="sc-head"><span class="sid">공통</span><span class="nm">에러 · 예외 케이스</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 화면별 에러·예외 문구와 처리를 한곳에 정리. 문구는 <code>회색 코드</code>로 표기한 그대로 노출함.</div>
+    <table class="errtbl">
+      <thead><tr><th>화면</th><th>케이스</th><th>문구</th><th>처리</th></tr></thead>
+      <tbody>
+        <tr><td class="sc">TRM-01</td><td class="cs">등록된 약관 0건</td><td><code class="t">[empty] "등록된 약관이 없습니다."</code></td><td>전체 건수 <b>0 건</b><br>목록 본문만 빈 상태</td></tr>
+        <tr><td class="sc">TRM-02</td><td class="cs">필수값 미입력<br><span style="font-weight:400;color:#8a9099">3개 항목 중 하나라도 빈 상태</span></td><td><code class="t">[toast] "타입 코드 · 약관명 · 본문을 모두 입력해 주세요."</code></td><td>빨간 토스트 노출<br>저장 중단<br>입력값 유지</td></tr>
+        <tr><td class="sc">TRM-02</td><td class="cs">타입 코드 중복</td><td><code class="t">[error] "이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요."</code></td><td>저장 시 <b>대소문자 구분 없이</b> 판정<br>저장 중단 · 필드 에러 표시<br>타입 코드 입력란으로 포커스 이동<br>약관명·본문 입력값 유지</td></tr>
+        <tr><td class="sc">TRM-02</td><td class="cs">등록 성공</td><td><code class="t">[toast] "약관 저장이 완료되었습니다."</code></td><td>v1 생성<br>초록 토스트 노출<br>목록으로 이동</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">변경 없이 저장<br><span style="font-weight:400;color:#8a9099">약관명·본문 수정 없이 저장</span></td><td><code class="t">[toast] "변경된 내용이 없습니다."</code></td><td>빨간 토스트 노출<br>저장 중단 · 신규 버전 미생성<br>상세 화면 유지</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">필수값 미입력 저장<br><span style="font-weight:400;color:#8a9099">약관명 또는 본문이 빈 상태</span></td><td><code class="t">[toast] "약관명과 본문을 입력해 주세요."</code></td><td>빨간 토스트 노출<br>저장 중단<br>입력값 유지</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">수정 성공</td><td><code class="t">[toast] "약관 저장이 완료되었습니다."</code></td><td>버전 1 증가 → 해당 버전으로 기록·저장<br>초록 토스트 노출<br>목록으로 이동</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">버전 1개(v1)</td><td>—</td><td>하단 버전 이력에 1건만 표시<br>최신 배지 · 이전 버전 없음</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+document.querySelectorAll('.screen').forEach(function(sc){
+  function set(n,on){ sc.querySelectorAll('[data-n="'+n+'"]').forEach(function(el){ el.classList.toggle('active', on); }); }
+  sc.querySelectorAll('.hot, .desc li').forEach(function(el){
+    var n=el.getAttribute('data-n'); if(n===null||n==='0') return;
+    el.addEventListener('mouseenter', function(){ if(sc.dataset.lock!==n) set(n,true); });
+    el.addEventListener('mouseleave', function(){ if(sc.dataset.lock!==n) set(n,false); });
+    el.addEventListener('click', function(e){ e.stopPropagation();
+      if(sc.dataset.lock===n){ sc.dataset.lock=''; set(n,false); }
+      else { if(sc.dataset.lock){ set(sc.dataset.lock,false); } sc.dataset.lock=n; set(n,true); }
+    });
+  });
+});
+</script>
+</body>
+</html>
