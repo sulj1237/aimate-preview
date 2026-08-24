@@ -226,7 +226,7 @@
         <li data-n="1"><span class="di">·</span><span class="dt"><b>입력 규칙</b> — 영문·숫자·특수기호 입력 가능 · <b>한글 입력 불가</b> · 공백은 제거됨. 하단에는 안내 문구 및 예시가 노출됨.</span></li>
         <li data-n="2"><span class="di">2</span><span class="dt"><b>약관명</b> — 사용자에게 표시되는 제목(<code>title</code>).</span></li>
         <li data-n="3"><span class="di">3</span><span class="dt"><b>본문</b> — 약관 내용(<code>contents</code>)을 인라인 에디터로 입력. 저장 포맷은 <b>마크다운</b>.</span></li>
-        <li data-n="4"><span class="di">4</span><span class="dt"><b>취소 / 저장</b> — 저장 시 해당 타입의 <b>v1</b>이 생성되고 목록으로 이동, <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출. 취소 시 입력값을 폐기하고 목록으로 복귀.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>취소 / 저장</b> — <b>저장 클릭 시점</b>에 서버로 전송하고, 그 결과에 따라 토스트를 노출함. 성공 시 해당 타입의 <b>v1</b>이 생성되고 목록으로 이동하며 초록 토스트 <code class="t">[toast] "약관 저장이 완료되었습니다."</code>, 필수값이 비어 있으면 빨간 토스트 <code class="t">[toast] "타입 코드 · 약관명 · 본문을 모두 입력해 주세요."</code> 노출 후 저장 중단. 취소 시 입력값을 폐기하고 목록으로 복귀.</span></li>
         <li data-n="0"><span class="di">·</span><span class="dt">에러 문구·처리는 하단 <b>에러 · 예외 케이스</b> 표에 정리.</span></li>
       </ol>
     </div>
@@ -234,15 +234,10 @@
 
   <!-- TRM-03 -->
   <section class="screen" data-sid="TRM-03">
-    <div class="sc-head"><span class="sid">TRM-03</span><span class="nm">약관 상세 · 수정 (하단 버전 이력 섹션)</span><span class="sp"></span><button class="dtoggle" onclick="toggleDesc(this)">＋ 디스크립션 보기</button></div>
-    <table class="info">
-      <tr><td class="k">플랫폼</td><td>WEB · 슈퍼어드민</td><td class="k">화면 ID</td><td>TRM-03</td></tr>
-      <tr><td class="k">화면 경로</td><td>설정 &gt; 약관 관리 &gt; 상세</td><td class="k">권한</td><td>운영자/관리자</td></tr>
-      <tr><td class="k">화면 설명</td><td colspan="3">선택한 타입 코드의 현재 약관을 <b>읽기 전용</b>으로 조회하고, <code class="t">수정</code> 클릭 시 편집 모드로 전환함. 대표 타이틀은 불변값인 <b>타입 코드</b>이며 상단에는 <b>현재 버전 · 등록일</b>만 요약 노출. 저장 시 버전이 1 증가하고 해당 버전으로 기록됨. 버전 이력은 페이지 하단 섹션에서 확인.</td></tr>
-    </table>
-    <div class="body2">
-      <div class="screenview"><div class="cap">▶ 상세 진입 시 <b>읽기 전용</b> 상태 · 하단 버전 이력</div>
-        <div class="mock" style="margin:0">
+    <div class="sc-head"><span class="sid">TRM-03</span><span class="nm">약관 상세 · 수정 (하단 버전 이력 섹션)</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 선택한 타입 코드의 현재 약관을 <b>읽기 전용</b>으로 조회하고, <code class="t">수정</code> 클릭 시 편집 모드로 전환함. 대표 타이틀은 불변값인 <b>타입 코드</b>이며 상단에는 <b>현재 버전 · 등록일</b>만 요약 노출. 저장 시 버전이 1 증가하고 해당 버전으로 기록되며, 버전 이력은 페이지 하단 섹션에서 확인.</div>
+    <div class="sc-grid">
+      <div class="mock">
         <div class="shell">
           <div class="side"><div class="br">◭ 굿팜 admin</div><div class="ni">설정</div><div class="ni on">약관 관리</div></div>
           <div class="scol">
@@ -335,10 +330,9 @@
             </div>
           </div>
         </div>
-        </div>
       </div>
-      <div class="desc"><div class="dh">TRM-03 · 컴포넌트</div>
-        <ol class="desc" style="padding:0">
+      <ol class="desc">
+        <div class="dh">TRM-03 · 컴포넌트</div>
         <li data-n="1"><span class="di">1</span><span class="dt"><b>대표 타이틀 · 요약 정보</b> — 타이틀은 변경되는 약관명이 아니라 <b>불변값인 타입 코드</b>. 타입 코드 <b>오른쪽에 현재 버전 · 등록일</b>을 요약 표기함. 화면 상단 좌측 <b>뒤로가기 버튼</b>으로 목록 복귀(어드민 공통 헤더).</span></li>
         <li data-n="2"><span class="di">2</span><span class="dt"><b>수정</b> — 상세는 진입 시 <b>읽기 전용</b>이며, 이 버튼을 눌러야 편집 모드로 전환됨.</span></li>
         <li data-n="3"><span class="di">3</span><span class="dt"><b>약관명</b> — 읽기 전용으로 현재 버전의 <code>title</code> 표시.</span></li>
@@ -347,11 +341,10 @@
         <li data-n="6"><span class="di">6</span><span class="dt"><b>이력 목록</b> — <b>버전</b>(현재 버전에 <code>현재</code> 배지) · <b>약관명</b> · <b>생성일시</b>(<code>createdAt</code>) · <b>작성자</b> · <b>보기</b>. 최신순 정렬이며 <b>페이지네이션 없이 전체 이력을 누적 노출</b>함.</span></li>
         <li data-n="7"><span class="di">7</span><span class="dt"><b>수정 모드</b> — 빈 입력창이 아니라 <b>현재 약관명·본문을 그대로 불러온 상태</b>에서 편집함. 편집 항목은 약관명·본문 2가지. <b>취소</b> 시 편집 내용을 버리고 읽기 전용으로 복귀, <b>저장</b> 시 버전을 1 올려 그 버전으로 기록·저장한 뒤 목록으로 이동하며 <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출.</span></li>
         <li data-n="8"><span class="di">8</span><span class="dt"><b>이전 버전 보기(읽기 전용 모달)</b> — 이력의 <code>보기</code> 클릭 시 <b>상세 화면 위에 dimmed 배경과 함께 모달</b>로 노출. 타입 코드 · 약관명 · 생성일시(작성자) · 본문 원문을 읽기 전용으로 표시하며, <code>닫기</code> 또는 <code>×</code> 로 상세 화면 복귀.</span></li>
-        <li data-n="0"><span class="di">·</span><span class="dt"><b>케이스 · 변경 없이 저장</b> — 약관명·본문을 그대로 둔 채 <code>저장</code> 클릭 시.<br><b>처리</b> — 빨간 토스트 <code class="t">[toast] "변경된 내용이 없습니다."</code> 노출 후 저장 중단. 신규 버전을 만들지 않고 편집 상태를 그대로 유지함.</span></li>
-        <li data-n="0"><span class="di">·</span><span class="dt"><b>케이스 · 필수값 미입력 저장</b> — 약관명 또는 본문을 비운 채 <code>저장</code> 클릭 시.<br><b>처리</b> — 빨간 토스트 <code class="t">[toast] "약관명과 본문을 입력해 주세요."</code> 노출 후 저장 중단. 입력값은 그대로 유지되어 이어서 작성 가능.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt"><b>케이스 · 변경 없이 저장</b> — 약관명·본문을 그대로 둔 채 <code>저장</code> 클릭 시.<br><b>처리</b> — <b>저장 클릭 시점</b>에 빨간 토스트 <code class="t">[toast] "변경된 내용이 없습니다."</code> 노출 후 저장 중단. 신규 버전을 만들지 않고 편집 상태를 그대로 유지함.</span></li>
+        <li data-n="0"><span class="di">·</span><span class="dt"><b>케이스 · 필수값 미입력 저장</b> — 약관명 또는 본문을 비운 채 <code>저장</code> 클릭 시.<br><b>처리</b> — <b>저장 클릭 시점</b>에 빨간 토스트 <code class="t">[toast] "약관명과 본문을 입력해 주세요."</code> 노출 후 저장 중단. 입력값은 그대로 유지되어 이어서 작성 가능.</span></li>
         <li data-n="0"><span class="di">·</span><span class="dt"><b>노출 반영</b> — 저장된 현재 버전이 서비스 노출 대상이 됨. 노출 상태(<code>status</code>)는 서버가 현재 버전 기준으로 자동 관리함.</span></li>
-        </ol>
-      </div>
+      </ol>
     </div>
   </section>
 
@@ -390,7 +383,7 @@
         <li data-n="1"><span class="di">1</span><span class="dt"><b>등록된 약관 0건</b> — 최초 도입·마이그레이션 전 상태. 목록 본문에 <code class="t">[empty] "등록된 약관이 없습니다."</code> · 전체 건수 <b>0 건</b>.</span></li>
         <li data-n="2"><span class="di">2</span><span class="dt"><b>타입 코드 중복</b> — 저장 시 <b>대소문자 구분 없이</b> 동일 코드를 판정함. <b>입력하는 즉시</b> 중복을 확인하고, 중복이면 필드 하단에 <code class="t">[error] "이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요."</code> 노출. 약관명·본문 입력값은 유지되고 타입 코드 입력란에 포커스가 남음.</span></li>
         <li data-n="3"><span class="di">3</span><span class="dt"><b>에러 토스트(빨강)</b> — 필수값을 채우지 않고 저장하면 <b>빨간 토스트</b>로 <code>타입 · 약관명 · 본문을 모두 입력해 주세요.</code> 를 노출함(상세 수정은 <code>약관명과 본문을 입력해 주세요.</code>). 저장은 중단되고 입력값은 유지됨.</span></li>
-        <li data-n="4"><span class="di">4</span><span class="dt"><b>저장 완료 토스트(초록)</b> — 등록·수정 저장이 완료되면 초록 토스트 <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출 후 목록으로 이동함. 등록은 v1, 수정은 신규 버전이 생성된 뒤 노출됨.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>저장 완료 토스트(초록)</b> — <b>저장 버튼 클릭 후 서버 저장이 완료된 시점</b>에 노출됨. 등록·수정 저장이 완료되면 초록 토스트 <code class="t">[toast] "약관 저장이 완료되었습니다."</code> 노출 후 목록으로 이동함. 등록은 v1, 수정은 신규 버전이 생성된 뒤 노출됨.</span></li>
         <li data-n="0"><span class="di">·</span><span class="dt"><b>버전 1개(v1)</b> — 상세 하단 이력에 1건만 표시(최신 배지 · 이전 버전 없음).</span></li>
       </ol>
     </div>
@@ -399,18 +392,18 @@
   <!-- 에러 · 예외 케이스 통합 -->
   <section class="screen">
     <div class="sc-head"><span class="sid">공통</span><span class="nm">에러 · 예외 케이스</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — 화면별 에러·예외 문구와 처리를 한곳에 정리. 문구는 <code>회색 코드</code>로 표기한 그대로 노출함.</div>
+    <div class="sc-ov"><b>개요</b> — 화면별 에러·예외 문구와 <b>노출 시점</b>, 처리를 한곳에 정리. 문구는 <code>회색 코드</code>로 표기한 그대로 노출함.</div>
     <table class="errtbl">
-      <thead><tr><th>화면</th><th>케이스</th><th>문구</th><th>처리</th></tr></thead>
+      <thead><tr><th>화면</th><th>케이스</th><th>노출 시점</th><th>문구</th><th>처리</th></tr></thead>
       <tbody>
-        <tr><td class="sc">TRM-01</td><td class="cs">등록된 약관 0건</td><td><code class="t">[empty] "등록된 약관이 없습니다."</code></td><td>전체 건수 <b>0 건</b><br>목록 본문만 빈 상태</td></tr>
-        <tr><td class="sc">TRM-02</td><td class="cs">필수값 미입력<br><span style="font-weight:400;color:#8a9099">3개 항목 중 하나라도 빈 상태</span></td><td><code class="t">[toast] "타입 코드 · 약관명 · 본문을 모두 입력해 주세요."</code></td><td>빨간 토스트 노출<br>저장 중단<br>입력값 유지</td></tr>
-        <tr><td class="sc">TRM-02</td><td class="cs">타입 코드 중복<br><span style="font-weight:400;color:#8a9099">입력 단계 실시간 검증</span></td><td><code class="t">[error] "이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요."</code></td><td>입력 즉시 <b>대소문자 구분 없이</b> 판정<br>필드 하단 에러 노출<br>중복 상태에서는 저장 중단</td></tr>
-        <tr><td class="sc">TRM-02</td><td class="cs">등록 성공</td><td><code class="t">[toast] "약관 저장이 완료되었습니다."</code></td><td>v1 생성<br>초록 토스트 노출<br>목록으로 이동</td></tr>
-        <tr><td class="sc">TRM-03</td><td class="cs">변경 없이 저장<br><span style="font-weight:400;color:#8a9099">약관명·본문 수정 없이 저장</span></td><td><code class="t">[toast] "변경된 내용이 없습니다."</code></td><td>빨간 토스트 노출<br>저장 중단 · 신규 버전 미생성<br>편집 상태 유지</td></tr>
-        <tr><td class="sc">TRM-03</td><td class="cs">필수값 미입력 저장<br><span style="font-weight:400;color:#8a9099">약관명 또는 본문이 빈 상태</span></td><td><code class="t">[toast] "약관명과 본문을 입력해 주세요."</code></td><td>빨간 토스트 노출<br>저장 중단<br>입력값 유지</td></tr>
-        <tr><td class="sc">TRM-03</td><td class="cs">수정 성공</td><td><code class="t">[toast] "약관 저장이 완료되었습니다."</code></td><td>버전 1 증가 → 해당 버전으로 기록·저장<br>초록 토스트 노출<br>목록으로 이동</td></tr>
-        <tr><td class="sc">TRM-03</td><td class="cs">버전 1개(v1)</td><td>—</td><td>하단 버전 이력에 1건만 표시<br>최신 배지 · 이전 버전 없음</td></tr>
+        <tr><td class="sc">TRM-01</td><td class="cs">등록된 약관 0건</td><td class="cs">목록 진입 시</td><td><code class="t">[empty] "등록된 약관이 없습니다."</code></td><td>전체 건수 <b>0 건</b><br>목록 본문만 빈 상태</td></tr>
+        <tr><td class="sc">TRM-02</td><td class="cs">필수값 미입력<br><span style="font-weight:400;color:#8a9099">3개 항목 중 하나라도 빈 상태</span></td><td class="cs">저장 클릭 시</td><td><code class="t">[toast] "타입 코드 · 약관명 · 본문을 모두 입력해 주세요."</code></td><td>빨간 토스트 노출<br>저장 중단<br>입력값 유지</td></tr>
+        <tr><td class="sc">TRM-02</td><td class="cs">타입 코드 중복</td><td class="cs">입력 중(실시간)</td><td><code class="t">[error] "이미 사용 중인 타입 코드입니다. 다른 코드를 입력해 주세요."</code></td><td>입력 즉시 <b>대소문자 구분 없이</b> 판정<br>필드 하단 에러 노출<br>중복 상태에서는 저장 중단</td></tr>
+        <tr><td class="sc">TRM-02</td><td class="cs">등록 성공</td><td class="cs">저장 완료 후</td><td><code class="t">[toast] "약관 저장이 완료되었습니다."</code></td><td>v1 생성<br>초록 토스트 노출<br>목록으로 이동</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">변경 없이 저장<br><span style="font-weight:400;color:#8a9099">약관명·본문 수정 없이 저장</span></td><td class="cs">저장 클릭 시</td><td><code class="t">[toast] "변경된 내용이 없습니다."</code></td><td>빨간 토스트 노출<br>저장 중단 · 신규 버전 미생성<br>편집 상태 유지</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">필수값 미입력 저장<br><span style="font-weight:400;color:#8a9099">약관명 또는 본문이 빈 상태</span></td><td class="cs">저장 클릭 시</td><td><code class="t">[toast] "약관명과 본문을 입력해 주세요."</code></td><td>빨간 토스트 노출<br>저장 중단<br>입력값 유지</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">수정 성공</td><td class="cs">저장 완료 후</td><td><code class="t">[toast] "약관 저장이 완료되었습니다."</code></td><td>버전 1 증가 → 해당 버전으로 기록·저장<br>초록 토스트 노출<br>목록으로 이동</td></tr>
+        <tr><td class="sc">TRM-03</td><td class="cs">버전 1개(v1)</td><td class="cs">상세 진입 시</td><td>—</td><td>하단 버전 이력에 1건만 표시<br>최신 배지 · 이전 버전 없음</td></tr>
       </tbody>
     </table>
   </section>
