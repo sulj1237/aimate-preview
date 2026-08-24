@@ -71,7 +71,6 @@
 
   .block{margin-bottom:18px}.block:last-child{margin-bottom:0}
   .block-h{font-size:12.5px;font-weight:800;margin:0 0 8px;display:flex;align-items:center;gap:7px}
-  .req{color:var(--danger);font-weight:800}
   .fw{width:100%;height:36px;border:1px solid var(--line);border-radius:7px;padding:0 11px;font-size:12.5px;font-family:inherit;outline:none;color:var(--ink);background:#fff}
   .fw:focus{border-color:var(--teal)}
   .fw.mono{font-family:ui-monospace,Menlo,monospace}
@@ -177,18 +176,18 @@
       <section id="viewCreate" class="hidden">
         <div class="page-card">
           <div class="dpage-head">
-            <div><div class="dt">약관 등록</div><div class="ds">타입 코드와 약관명은 필수입니다. 저장 시 v1이 생성됩니다.</div></div>
+            <div><div class="dt">약관 등록</div><div class="ds">모든 항목을 입력해야 저장할 수 있습니다. 저장 시 v1이 생성됩니다.</div></div>
           </div>
 
           <div class="block" id="fldType">
-            <div class="block-h">타입 코드 <span class="req">*</span></div>
+            <div class="block-h">타입 코드</div>
             <input class="fw mono" id="inType" placeholder="예: POINT_USE" oninput="onTypeInput()" maxlength="60" />
-            <div class="hint">시스템에서 약관을 구분하는 코드입니다. 한글은 입력할 수 없습니다.<br />최초 생성 후에는 수정할 수 없습니다.</div>
+            <div class="hint">영문, 숫자, 기호('_')만 입력할 수 있습니다.<br />최초 생성 후에는 수정할 수 없습니다.</div>
             <div class="errmsg" id="errType"></div>
           </div>
 
           <div class="block" id="fldTitle">
-            <div class="block-h">약관명 <span class="req">*</span></div>
+            <div class="block-h">약관명</div>
             <input class="fw" id="inTitle" placeholder="사용자에게 표시되는 약관 제목" />
           </div>
 
@@ -404,7 +403,7 @@ function saveNew(){
   var ty = document.getElementById("inType").value.trim();
   var ti = document.getElementById("inTitle").value.trim();
   var co = document.getElementById("inContents").value.trim();
-  if(!ty || !ti){ toast("타입 코드와 약관명을 입력해 주세요.","err"); return; }
+  if(!ty || !ti || !co){ toast("타입 코드 · 약관명 · 본문을 모두 입력해 주세요.","err"); return; }
   if(checkDup()){ document.getElementById("inType").focus(); return; }
   TERMS.unshift({ type:ty, versions:[{ v:1, title:ti, at:now(), by:"김굿팜", body:co }] });
   document.getElementById("inType").value=""; document.getElementById("inTitle").value=""; document.getElementById("inContents").value="";
@@ -414,7 +413,7 @@ function saveEdit(){
   var t = TERMS[curIdx], L = latest(t);
   var ti = document.getElementById("dTitleIn").value.trim();
   var co = document.getElementById("dContents").value.trim();
-  if(!ti){ toast("약관명을 입력해 주세요.","err"); return; }
+  if(!ti || !co){ toast("약관명과 본문을 입력해 주세요.","err"); return; }
   if(ti===L.title && co===L.body){ toast("변경된 내용이 없습니다.","err"); return; }
   t.versions.unshift({ v:L.v+1, title:ti, at:now(), by:"김굿팜", body:co });
   go("list"); toast("약관 저장이 완료되었습니다.");
