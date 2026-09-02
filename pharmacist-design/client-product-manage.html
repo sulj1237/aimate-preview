@@ -41,10 +41,14 @@
   .btn.red{border-color:#ecc7c2;color:var(--red)}
   .btn .spin{width:11px;height:11px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:none;animation:sp .7s linear infinite}
   .btn.loading .spin{display:inline-block}
-  /* 동기화 — 실재고 관리와 버튼 디자인 통일(teal 아웃라인·배경 없음) */
-  .btn.sync{background:#fff;border-color:var(--teal);color:var(--teal-d);display:inline-flex;align-items:center;gap:6px}
-  .btn.sync:hover{background:var(--teal-soft)}
-  .btn.sync .spin{border-color:#cdeee8;border-top-color:var(--teal-d)}
+  /* 앱 데이터 동기화 = 주 액션(teal 채움) · 상품 데이터 올리기 = 보조(회색 아웃라인) · 아이콘으로 역할 구분 */
+  .btn.sync{background:var(--teal);border-color:var(--teal);color:#fff;display:inline-flex;align-items:center;gap:6px}
+  .btn.sync:hover{background:var(--teal-d)}
+  .btn.sync .spin{border-color:rgba(255,255,255,.45);border-top-color:#fff}
+  .btn.upload{background:#fff;border-color:var(--line);color:#4b5158}
+  .btn.upload:hover{background:#f6f7fa}
+  .btn.upload .spin{border-color:#d7dbe0;border-top-color:#8a9099}
+  .btn .ico{flex:none}
   @keyframes sp{to{transform:rotate(360deg)}}
   /* 앱 데이터 동기화 — 동기화된 상품 갯수 배지(POS '대기목록' 스타일 · 버튼 우상단 빨간 원, 0건이면 미노출) */
   .btn.sync{position:relative;overflow:visible}
@@ -241,11 +245,11 @@
       </div>
       <!-- 그 밑: (왼쪽) 상품 데이터 올리기 · 마지막 동기화 일시 · (오른쪽) 앱 데이터 동기화 버튼 -->
       <div class="sync-row">
-        <button class="btn teal sm" id="uploadBtn"><span class="spin"></span>상품 데이터 올리기</button>
+        <button class="btn sm upload" id="uploadBtn"><svg class="ico" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8 8l4-4 4 4"/><path d="M5 20h14"/></svg><span class="spin"></span>상품 데이터 올리기</button>
         <span class="help" id="uploadHelp" tabindex="0">i<span class="tip">기준이 되는 <b>최신 상품 데이터</b>를 서버에 먼저 올려 동기화합니다. 그 뒤 앱에서 제출한 데이터를 받아 반영/삭제할 수 있습니다.</span></span>
         <span class="synced" id="synced">마지막 동기화 <b>2026-07-03 09:12</b></span>
         <span class="spacer"></span>
-        <button class="btn sync sm" id="syncBtn">앱 데이터 동기화<span class="badge-n" id="syncBadge">3</span></button>
+        <button class="btn sync sm" id="syncBtn"><svg class="ico" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>앱 데이터 동기화<span class="badge-n" id="syncBadge">3</span></button>
         <span class="help right" id="syncHelp" tabindex="0">i<span class="tip">굿팜 약사님용앱에서 수정한 상품 정보를 <b>앱 상품 수정 요청</b>에서 확인해 반영/삭제합니다. 미처리 건수가 배지로 표시됩니다.</span></span>
       </div>
       <!-- 목록 리스트 바로 위: 전체·판매 드롭다운·신규·내보내기 -->
