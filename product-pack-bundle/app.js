@@ -128,13 +128,14 @@ function renderDetail(){
     return '<tr data-code="'+i.code+'">'
       + '<td class="ck"><input type="radio" name="rep" '+(draft.rep===i.code?"checked":"")+' data-rep="'+i.code+'" /></td>'
       + '<td class="nm">'+p.name+'</td>'
+      + '<td class="mono">'+p.code+'</td>'
       + '<td'+(displayName(nm, i) === "-" ? ' class="dash"' : "")+'>'+displayName(nm, i)+'</td>'
       + '<td>'+p.bc+'</td>'
       + '<td class="num"><input class="in-s'+(i.qty===null?" warn":"")+'" type="number" min="1" value="'+(i.qty??"")+'" placeholder="-" data-f="qty" /></td>'
       + '<td><input class="in-s unit'+(!i.unit?" warn":"")+'" value="'+(i.unit||"")+'" placeholder="-" data-f="unit" /></td>'
       + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>'
       + '<td><button class="btn sm" data-out="'+i.code+'">제외</button></td></tr>';
-  }).join("") || '<tr><td colspan="10" class="empty">[＋ 상품 추가]로 묶을 상품을 담아 주세요.</td></tr>';
+  }).join("") || '<tr><td colspan="11" class="empty">[＋ 상품 추가]로 묶을 상품을 담아 주세요.</td></tr>';
 
   el("detail").innerHTML =
     '<div class="sec-h"><h3>'+(isNew ? "적수 묶음 신규 등록" : "적수 묶음 상세")+'</h3><div class="acts">'
@@ -151,8 +152,8 @@ function renderDetail(){
     + '<div class="sub-sec"><div class="sec-h"><h3>구성 상품</h3>'
     + '<span class="hint" style="margin-left:auto">대표상품을 선택하고 적수·단위를 확인하세요.</span></div>'
     + '<div class="tablewrap" style="max-height:300px"><table>'
-    + '<colgroup><col style="width:30px"><col><col style="width:120px"><col style="width:104px"><col style="width:58px"><col style="width:48px"><col style="width:56px"><col style="width:56px"><col style="width:34px"><col style="width:58px"></colgroup>'
-    + '<thead><tr><th class="ck">대표</th><th>상품명</th><th>표시명</th><th>바코드</th>'
+    + '<colgroup><col style="width:28px"><col><col style="width:46px"><col style="width:84px"><col style="width:104px"><col style="width:52px"><col style="width:42px"><col style="width:52px"><col style="width:52px"><col style="width:32px"><col style="width:56px"></colgroup>'
+    + '<thead><tr><th class="ck">대표</th><th>상품명</th><th>상품코드</th><th>표시명</th><th>바코드</th>'
     + '<th class="num">적수</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th><th></th></tr></thead>'
     + '<tbody>'+rows+'</tbody></table></div>'
     + '<div class="note">대표상품은 표시·식별 기준입니다. 대표를 바꿔도 구성 상품의 상품명·상품코드·바코드·가격·재고는 그대로 유지됩니다.</div>'

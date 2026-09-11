@@ -151,11 +151,11 @@ function renderDetail(){
     + (editing ? '<span class="hint" style="margin-left:auto">대표상품을 선택하고 적수·단위를 확인하세요.</span>' : "") + '</div>'
     + '<div class="tablewrap" style="max-height:300px"><table>'
     + '<colgroup>' + (editing
-        ? '<col style="width:30px"><col><col style="width:92px"><col style="width:104px"><col style="width:58px"><col style="width:48px"><col style="width:58px"><col style="width:58px"><col style="width:36px"><col style="width:58px">'
-        : '<col><col style="width:124px"><col style="width:112px"><col style="width:62px"><col style="width:44px"><col style="width:64px"><col style="width:64px"><col style="width:44px">')
+        ? '<col style="width:28px"><col><col style="width:46px"><col style="width:84px"><col style="width:104px"><col style="width:52px"><col style="width:42px"><col style="width:52px"><col style="width:52px"><col style="width:32px"><col style="width:56px">'
+        : '<col><col style="width:48px"><col style="width:106px"><col style="width:106px"><col style="width:54px"><col style="width:42px"><col style="width:58px"><col style="width:58px"><col style="width:40px">')
     + '</colgroup><thead><tr>'
     + (editing ? '<th class="ck">대표</th>' : "")
-    + '<th>상품명</th><th>표시명</th><th>바코드</th><th class="num">적수</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th>'
+    + '<th>상품명</th><th>상품코드</th><th>표시명</th><th>바코드</th><th class="num">적수</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th>'
     + (editing ? "<th></th>" : "") + '</tr></thead><tbody>'+rows+'</tbody></table></div>'
     + (editing ? '<div class="note">대표상품은 표시·식별 기준입니다. 대표를 바꿔도 구성 상품의 상품명·상품코드·바코드·가격·재고는 그대로 유지됩니다.</div>' : "")
     + '</div>';
