@@ -187,25 +187,6 @@
   </div>
 </div>
 
-<!-- 적수 묶음 신규 등록 (상품 담기 + 적수 확인을 한 화면에서) -->
-<div class="modal-bg" id="regModal">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-h"><span class="mtitle">적수 묶음 신규 등록</span><button class="x" data-close="regModal">✕</button></div>
-    <div class="modal-b">
-      <div class="hintbar">💡 상품을 검색해 클릭하면 아래에 담깁니다. 담은 상품으로 적수 묶음을 등록합니다.</div>
-      <div class="bar"><input class="inp" id="regQ" placeholder="상품명 또는 바코드를 입력해 주세요." /><button class="btn teal sm" id="regSearch">검색</button></div>
-      <div class="tablewrap" style="max-height:220px">
-        <table><thead><tr><th>상품명</th><th>바코드</th><th>제조사</th><th class="num">사입가</th><th class="num">재고</th><th style="width:56px"></th></tr></thead>
-        <tbody id="regList"></tbody></table>
-      </div>
-      <div class="sub-sec"><div class="sec-h"><h3>담은 상품 <b id="regN">0</b></h3></div><div id="regPicked"></div></div>
-    </div>
-    <div class="modal-f"><span class="spacer"></span>
-      <button class="mbtn ghost" data-close="regModal">취소</button>
-      <button class="mbtn primary" id="regOk">적수 묶음 등록</button></div>
-  </div>
-</div>
-
 <!-- 상품 추가 (검색·선택 + 포장정보 확인을 한 화면에서) -->
 <div class="modal-bg" id="addModal">
   <div class="modal sm" role="dialog" aria-modal="true">

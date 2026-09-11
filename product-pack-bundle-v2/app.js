@@ -58,7 +58,7 @@ function displayName(baseNm, item){
   if (isUnk(item)) return "-";
   const p = parsePack(nm);
   if (p && p.qty === Number(item.qty) && p.unit === item.unit) return nm;
-  return (baseNm || nm) + " " + item.qty + item.unit;
+  return (baseNm || nm) + "(" + item.qty + item.unit + ")";
 }
 /* 기준(대표) 상품 = 최소 적수 상품. 적수를 모르면 사입가 최저 → 상품코드 순 */
 const byQty = (a,b) => (a.qty ?? Infinity) - (b.qty ?? Infinity) || (P(a.code).buy - P(b.code).buy) || a.code.localeCompare(b.code);
@@ -292,7 +292,9 @@ function renderCands(){
     const head = '<tr class="grow '+(picked?"on":"")+'" data-g="'+c.id+'">'
       + '<td class="ck"><input type="checkbox" data-gck="'+c.id+'" '+(picked===live.length?"checked":"")+' /></td>'
       + '<td class="nm"><span class="caret" data-tg="'+c.id+'">'+(open?"▾":"▸")+'</span> '+P(main.code).name
-      + '<span class="gbadge">적수 '+live.length+'건</span></td>' + cell(main) + '<td></td></tr>';
+      + '<span class="gbadge">적수 '+live.length+'건</span>'
+      + '<span class="hint" style="margin-left:6px">바코드 '+P(main.code).bc.slice(0,11)+'XX</span></td>'
+      + cell(main) + '<td></td></tr>';
     if (!open) return head;
     const kids = rest.map((i) =>
       '<tr class="'+(sel[c.id].has(i.code)?"on":"")+'" data-c="'+c.id+'" data-code="'+i.code+'">'
@@ -309,7 +311,7 @@ function renderCands(){
             + '<td><button class="btn sm" data-skuback="'+c.id+'|'+i.code+'">다시 추가</button></td></tr>').join("") : "");
     }
     return head + kids + fold;
-  }).join("") || '<tr><td colspan="9" class="empty">검토할 적수 후보가 없습니다.</td></tr>';
+  }).join("") || '<tr><td colspan="9" class="empty">검토할 적수 매칭 그룹이 없습니다.</td></tr>';
 
   document.querySelectorAll("#candBody tr[data-code]").forEach((tr) => tr.addEventListener("click", (e) => {
     if (e.target.dataset.tg || e.target.dataset.skuout || e.target.dataset.skuback) return;
@@ -363,7 +365,7 @@ function renderCands(){
 let BAR = { picked: [], ready: [] };
 el("dropSel").addEventListener("click", () => {
   BAR.picked.forEach((c) => removed.set(c.id, { at:"09-11", by:"약사(김)", n: c.items.length }));
-  renderCands(); renderGroups(); toast("선택한 그룹을 제외했습니다. 제외 내역에서 복원할 수 있습니다.");
+  renderCands(); renderGroups(); toast("선택한 매칭 그룹을 제외했습니다. 제외 내역에서 복원할 수 있습니다.");
 });
 el("makeSel").addEventListener("click", () => openMake(BAR.ready.map((c) => c.id)));
 
