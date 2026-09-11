@@ -145,7 +145,7 @@ function renderDetail(){
     + '<button class="btn teal sm" id="btnSave">💾 저장</button></div></div>'
     + '<div class="grid">'
     + '<div class="fld"><label>묶음명</label><input class="in" id="fName" value="'+nm+'" placeholder="대표상품명으로 자동 입력" style="height:30px" /></div>'
-    + '<div class="fld"><label>대표상품</label><span class="in ro">'+(draft.rep ? P(draft.rep).name : "-")+'</span></div>'
+    + '<div class="fld"><label>대표상품</label><span class="in ro">'+(draft.rep ? P(draft.rep).name + " (" + draft.rep + ")" : "-")+'</span></div>'
     + '<div class="fld"><label>상품 수</label><span class="in ro">'+items.length+'개</span></div>'
     + '<div class="fld"><label>환산 재고</label><span class="in ro">'+(convertible.length ? won(convStock({items})) + unit : "-")+'</span></div>'
     + '</div>'

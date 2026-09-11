@@ -144,7 +144,7 @@ function renderDetail(){
     + '<div class="grid">'
     + '<div class="fld"><label>묶음명</label>'
     + (editing ? '<input class="in" id="fName" value="'+nm+'" style="height:30px" />' : '<span class="in ro">'+nm+'</span>') + '</div>'
-    + '<div class="fld"><label>대표상품</label><span class="in ro">'+P(repCode).name+'</span></div>'
+    + '<div class="fld"><label>대표상품</label><span class="in ro">'+P(repCode).name+' ('+repCode+')</span></div>'
     + '<div class="fld"><label>상품 수</label><span class="in ro">'+items.length+'개</span></div>'
     + '<div class="fld"><label>환산 재고</label><span class="in ro">'+won(convStock({items}))+baseUnit({items})+'</span></div>'
     + '</div>'
