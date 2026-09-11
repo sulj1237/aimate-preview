@@ -2,37 +2,37 @@
 
 /* ── 상품 원본 (기존 상품 데이터) ───────────────────────────── */
 const PRODUCTS = [
-  { code:"A001", name:"박카스",              bc:"8801234567801", mk:"동아제약", buy:600,   sell:800,   stock:15 },
-  { code:"A002", name:"박카스10",            bc:"8801234567802", mk:"동아제약", buy:5800,  sell:7500,  stock:3  },
-  { code:"A003", name:"박카스 100병",        bc:"8801234567803", mk:"동아제약", buy:56000, sell:70000, stock:1  },
-  { code:"B001", name:"타이레놀500mg100정",  bc:"8805551234501", mk:"한국얀센", buy:7400,  sell:9800,  stock:4  },
-  { code:"B002", name:"타이레놀 500mg 300정",bc:"8805551234502", mk:"한국얀센", buy:21000, sell:27000, stock:2  },
-  { code:"B003", name:"타이레놀650mg100정",  bc:"8805551234503", mk:"한국얀센", buy:8300,  sell:11000, stock:5  },
-  { code:"C001", name:"비타민C 500mg 100정", bc:"8807770001101", mk:"고려은단", buy:9000,  sell:12000, stock:10 },
-  { code:"D001", name:"덴탈마스크",          bc:"8809998887701", mk:"웰킵스",   buy:200,   sell:300,   stock:50 },
-  { code:"D002", name:"덴탈마스크 대용량",    bc:"8809998887702", mk:"웰킵스",   buy:9000,  sell:12000, stock:5  },
-  { code:"E001", name:"이지엔6이브 10정",     bc:"8806667770011", mk:"대웅제약", buy:3200,  sell:4500,  stock:8  },
-  { code:"E002", name:"이지엔6이브 20정",     bc:"8806667770012", mk:"대웅제약", buy:6100,  sell:8500,  stock:2  },
-  { code:"E101", name:"종합비타민골드 30정",  bc:"8807771110011", mk:"유한양행", buy:12000, sell:16000, stock:2  },
-  { code:"E102", name:"종합비타민골드 100정", bc:"8807771110012", mk:"유한양행", buy:34000, sell:45000, stock:0  },
-  { code:"E103", name:"종합비타민골드 60정",  bc:"8807771110013", mk:"유한양행", buy:21000, sell:28000, stock:3  },
-  { code:"F001", name:"판피린큐",            bc:"8801111222201", mk:"동아제약", buy:900,   sell:1200,  stock:40 },
+  { code:"GP641702920", name:"박카스",              bc:"8801234567801", mk:"동아제약", buy:600,   sell:800,   stock:15 },
+  { code:"GP641702937", name:"박카스10",            bc:"8801234567802", mk:"동아제약", buy:5800,  sell:7500,  stock:3  },
+  { code:"GP641702944", name:"박카스 100병",        bc:"8801234567803", mk:"동아제약", buy:56000, sell:70000, stock:1  },
+  { code:"GP730115502", name:"타이레놀500mg100정",  bc:"8805551234501", mk:"한국얀센", buy:7400,  sell:9800,  stock:4  },
+  { code:"GP730115519", name:"타이레놀 500mg 300정",bc:"8805551234502", mk:"한국얀센", buy:21000, sell:27000, stock:2  },
+  { code:"GP730115526", name:"타이레놀650mg100정",  bc:"8805551234503", mk:"한국얀센", buy:8300,  sell:11000, stock:5  },
+  { code:"GP815440071", name:"비타민C 500mg 100정", bc:"8807770001101", mk:"고려은단", buy:9000,  sell:12000, stock:10 },
+  { code:"GP992018844", name:"덴탈마스크",          bc:"8809998887701", mk:"웰킵스",   buy:200,   sell:300,   stock:50 },
+  { code:"GP992018851", name:"덴탈마스크 대용량",    bc:"8809998887702", mk:"웰킵스",   buy:9000,  sell:12000, stock:5  },
+  { code:"GP708823310", name:"이지엔6이브 10정",     bc:"8806667770011", mk:"대웅제약", buy:3200,  sell:4500,  stock:8  },
+  { code:"GP708823327", name:"이지엔6이브 20정",     bc:"8806667770012", mk:"대웅제약", buy:6100,  sell:8500,  stock:2  },
+  { code:"GP550317761", name:"종합비타민골드 30정",  bc:"8807771110011", mk:"유한양행", buy:12000, sell:16000, stock:2  },
+  { code:"GP550317778", name:"종합비타민골드 100정", bc:"8807771110012", mk:"유한양행", buy:34000, sell:45000, stock:0  },
+  { code:"GP550317785", name:"종합비타민골드 60정",  bc:"8807771110013", mk:"유한양행", buy:21000, sell:28000, stock:3  },
+  { code:"GP600914233", name:"판피린큐",            bc:"8801111222201", mk:"동아제약", buy:900,   sell:1200,  stock:40 },
 ];
 const P = (code) => PRODUCTS.find((p) => p.code === code);
 
 /* ── 적수 묶음 (Mapping) ────────────────────────────────────── */
 let GROUPS = [
-  { id:"G001", name:"박카스", rep:"A001", upd:"09-08",
-    items:[ {code:"A001",qty:1,unit:"병"}, {code:"A002",qty:10,unit:"병"}, {code:"A003",qty:100,unit:"병"} ] },
-  { id:"G002", name:"종합비타민골드", rep:"E101", upd:"09-06",
-    items:[ {code:"E101",qty:30,unit:"정"}, {code:"E102",qty:100,unit:"정"}, {code:"E103",qty:6,unit:"정"} ] },
+  { id:"G001", name:"박카스", rep:"GP641702920", upd:"09-08",
+    items:[ {code:"GP641702920",qty:1,unit:"병"}, {code:"GP641702937",qty:10,unit:"병"}, {code:"GP641702944",qty:100,unit:"병"} ] },
+  { id:"G002", name:"종합비타민골드", rep:"GP550317761", upd:"09-06",
+    items:[ {code:"GP550317761",qty:30,unit:"정"}, {code:"GP550317778",qty:100,unit:"정"}, {code:"GP550317785",qty:6,unit:"정"} ] },
 ];
 
 /* ── 적수 후보 (미처리 매칭 그룹) ─────────────────────────── */
 const CANDS = [
-  { id:"C01", rank:1, items:[ { code:"B001", qty:100, unit:"정", memo:"" }, { code:"B002", qty:300, unit:"정", memo:"" } ] },
-  { id:"C02", rank:2, items:[ { code:"E001", qty:10,  unit:"정", memo:"" }, { code:"E002", qty:20,  unit:"정", memo:"" } ] },
-  { id:"C03", rank:3, items:[ { code:"D001", qty:null, unit:"", memo:"포장정보 미확인" }, { code:"D002", qty:null, unit:"", memo:"포장정보 미확인" } ] },
+  { id:"C01", rank:1, items:[ { code:"GP730115502", qty:100, unit:"정", memo:"" }, { code:"GP730115519", qty:300, unit:"정", memo:"" } ] },
+  { id:"C02", rank:2, items:[ { code:"GP708823310", qty:10,  unit:"정", memo:"" }, { code:"GP708823327", qty:20,  unit:"정", memo:"" } ] },
+  { id:"C03", rank:3, items:[ { code:"GP992018844", qty:null, unit:"", memo:"포장정보 미확인" }, { code:"GP992018851", qty:null, unit:"", memo:"포장정보 미확인" } ] },
 ];
 
 /* ── 공통 ───────────────────────────────────────────────────── */
@@ -97,10 +97,11 @@ function renderGroups(){
   if (el("matchN")) el("matchN").textContent = liveCands().length;
   el("grpBody").innerHTML = list.map((g) =>
     '<tr class="'+(g.id===curId?"on":"")+'" data-g="'+g.id+'"><td class="nm">'+g.name+'</td>'
+    + '<td class="mono">'+g.rep+'</td>'
     + '<td class="num">'+g.items.length+'</td>'
     + '<td class="num">'+won(convStock(g))+baseUnit(g)+'</td>'
     + '<td>'+g.upd+'</td></tr>').join("")
-    || '<tr><td colspan="4" class="empty">적수 묶음이 없습니다.</td></tr>';
+    || '<tr><td colspan="5" class="empty">적수 묶음이 없습니다.</td></tr>';
   document.querySelectorAll("#grpBody tr[data-g]").forEach((tr) => tr.addEventListener("click", () => {
     curId = tr.dataset.g; editing = false; draft = null; renderGroups(); renderDetail();
   }));
@@ -151,11 +152,11 @@ function renderDetail(){
     + (editing ? '<span class="hint" style="margin-left:auto">대표상품을 선택하고 적수·단위를 확인하세요.</span>' : "") + '</div>'
     + '<div class="tablewrap" style="max-height:300px"><table>'
     + '<colgroup>' + (editing
-        ? '<col style="width:28px"><col><col style="width:46px"><col style="width:84px"><col style="width:104px"><col style="width:52px"><col style="width:42px"><col style="width:52px"><col style="width:52px"><col style="width:32px"><col style="width:56px">'
-        : '<col><col style="width:48px"><col style="width:106px"><col style="width:106px"><col style="width:54px"><col style="width:42px"><col style="width:58px"><col style="width:58px"><col style="width:40px">')
+        ? '<col style="width:28px"><col><col style="width:96px"><col style="width:108px"><col style="width:52px"><col style="width:44px"><col style="width:54px"><col style="width:54px"><col style="width:34px"><col style="width:56px">'
+        : '<col><col style="width:112px"><col style="width:112px"><col style="width:58px"><col style="width:46px"><col style="width:60px"><col style="width:60px"><col style="width:44px">')
     + '</colgroup><thead><tr>'
     + (editing ? '<th class="ck">대표</th>' : "")
-    + '<th>상품명</th><th>상품코드</th><th>표시명</th><th>바코드</th><th class="num">적수</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th>'
+    + '<th>상품명</th><th>표시명</th><th>바코드</th><th class="num">적수</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th>'
     + (editing ? "<th></th>" : "") + '</tr></thead><tbody>'+rows+'</tbody></table></div>'
     + (editing ? '<div class="note">대표상품은 표시·식별 기준입니다. 대표를 바꿔도 구성 상품의 상품명·상품코드·바코드·가격·재고는 그대로 유지됩니다.</div>' : "")
     + '</div>';
