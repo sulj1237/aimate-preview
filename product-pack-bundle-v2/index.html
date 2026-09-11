@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>굿팜 클라이언트 3.0 · 적수 관리 [시안 2] 적수 매칭 후보</title>
+<title>굿팜 클라이언트 3.0 · 적수 관리 [시안 2] 적수 매칭 목록</title>
 <style>
   /* 기존 상품 관리 화면(client-product-manage.html)의 토큰·컴포넌트를 그대로 사용한다. */
   :root{
@@ -27,13 +27,35 @@
   .tab.off{color:#b3b9c0;cursor:default}
 
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  /* 적수 관리: 좌측 목록은 4열뿐이라 좁게, 우측 상세는 넓게 */
+  #page-pack .cols{grid-template-columns:38% 62%}
+  #page-pack .right table{font-size:11px;table-layout:fixed}
+  #page-pack .right td{overflow:hidden;text-overflow:ellipsis}
+  /* 상품명·표시명은 길면 줄바꿈 — 대표 배지가 밀려 잘리지 않게 한다 */
+  #page-pack .right td:nth-child(1),#page-pack .right td:nth-child(2),
+  #page-pack .right td.nm{white-space:normal;line-height:1.35}
+  .tag.rep{margin-left:0;margin-right:2px}
+  tr.grow td{border-top:2px solid #dfe3e8}
+  #candBody tr:first-child.grow td{border-top:none}
+  #candTable td.memo{white-space:normal;line-height:1.4}
+  .mgroup{border:1px solid var(--line);border-radius:9px;margin-bottom:12px;overflow:hidden}
+  .mgroup-h{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f4f6f8;border-bottom:1px solid var(--line);font-size:12.5px}
+  .mgroup table{font-size:11.5px;table-layout:fixed}
+  .mgroup th:nth-child(2),.mgroup td:nth-child(2){width:84px}
+  .mgroup th:nth-child(3),.mgroup td:nth-child(3){width:104px}
+  .mgroup th:nth-child(4),.mgroup td:nth-child(4){width:104px}
+  .mgroup th:nth-child(5),.mgroup td:nth-child(5){width:230px;white-space:normal}
+  .mgroup .tablewrap{border:none;border-radius:0;max-height:none}
+  #page-pack .right td,#page-pack .right th{padding:6px 7px}
+  #page-pack .right .in-s{width:62px;height:24px}
+  #page-pack .right .in-s.unit{width:52px}
   .left{border-right:1px solid var(--line);padding:12px 14px;min-width:0}
   .right{padding:12px 16px;min-width:0}
-  .full-page{padding:12px 14px}
+  .topbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:12px 14px 0}
 
   .bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
   .sel-in,.inp{height:30px;border:1px solid var(--line);border-radius:6px;padding:0 9px;font-size:12px;background:#fff;color:var(--ink)}
-  .inp{flex:1;min-width:120px;max-width:360px}
+  .inp{flex:1;min-width:120px;max-width:340px}
   .btn{height:30px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:#fff;color:#4b5158;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none}
   .btn.teal{background:var(--teal);border-color:var(--teal);color:#fff}
   .btn.teal:hover{background:var(--teal-d)}
@@ -44,10 +66,9 @@
   .cnt{font-size:12px;font-weight:700}
   .cnt b{color:var(--teal-d)}
   .spacer{flex:1}
-  .chks{display:flex;gap:14px;margin-bottom:10px;font-size:11.5px;color:var(--muted)}
-  .chks label{display:flex;align-items:center;gap:5px;cursor:pointer}
+  .hint{font-size:11.5px;color:var(--muted)}
 
-  .tablewrap{border:1px solid var(--line);border-radius:7px;overflow:auto;max-height:520px}
+  .tablewrap{border:1px solid var(--line);border-radius:7px;overflow:auto;max-height:420px}
   table{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap}
   thead th{position:sticky;top:0;background:#f4f6f8;color:#5a6066;font-weight:700;text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);z-index:2}
   td{padding:7px 9px;border-bottom:1px solid #eef0f2;color:#3a3f44}
@@ -55,10 +76,14 @@
   tbody tr:hover{background:#fafbfc}
   tbody tr.on{background:var(--sel)}
   tbody tr.ex{color:#a8adb4;background:#fafbfc;cursor:default}
-  tbody tr.ex:hover{background:#fafbfc}
   th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
-  th.ck,td.ck{width:34px;text-align:center}
+  th.ck,td.ck{width:38px;text-align:center}
   .nm{font-weight:600}
+  .sub{padding-left:22px}
+  .dash,td.dash{color:#b3b9c0}
+  td.unk{color:var(--amber);font-weight:700}
+  .empty{padding:36px 0;text-align:center;color:var(--muted);font-size:12px}
+
   .sec-h{display:flex;align-items:center;gap:8px;margin:0 0 10px}
   .sec-h h3{font-size:13.5px;font-weight:800;margin:0}
   .sec-h .acts{margin-left:auto;display:flex;gap:6px}
@@ -68,72 +93,23 @@
   .fld label{font-size:11px;color:var(--muted);font-weight:700}
   .fld .in{height:30px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:0 9px;display:flex;align-items:center;font-size:12px}
   .fld .in.ro{background:var(--field);color:#6b7178}
-  .price3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
   .sub-sec{margin-top:12px}
   .sub-sec .sec-h h3{font-size:12.5px}
-
-  /* 적수 관리 안의 업무 구분 (묶음 후보 / 묶음 목록) — 기존 버튼 스타일 재사용 */
-  .subtabs{display:flex;gap:6px;margin-bottom:10px}
-
-  /* 후보 묶음 블록 — 기존 목록 테이블에 머리글 줄만 얹는다 */
-  .cand{border:1px solid var(--line);border-radius:7px;margin-bottom:10px;overflow:hidden}
-  .cand-h{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f4f6f8;border-bottom:1px solid var(--line);font-size:12px}
-  .cand-h .t{font-weight:800}
-  .cand-h .c{color:var(--muted)}
-  .cand .tablewrap{border:none;border-radius:0;max-height:none}
-  #candTable{table-layout:fixed}
-  #candTable col.c-ck{width:40px} #candTable col.c-nm{width:290px} #candTable col.c-bc{width:118px}
-  #candTable col.c-mk{width:80px} #candTable col.c-buy{width:74px} #candTable col.c-st{width:72px}
-  #candTable col.c-pk{width:84px} #candTable col.c-memo{width:auto} #candTable col.c-act{width:78px}
-  #candTable td{overflow:hidden;text-overflow:ellipsis}
-  #candTable td.memo{white-space:normal;line-height:1.4;text-overflow:clip}
-  td.dash{color:#b3b9c0}
-  tr.foldrow td{background:#fbfcfd;color:var(--muted);font-size:11.5px}
-  tr.foldrow .fold{cursor:pointer;user-select:none}
-  .linkbtn{border:none;background:none;color:var(--blue);font-size:11.5px;cursor:pointer;padding:0}
-  .mutedbtn{border:none;background:none;color:#9aa0a6;font-size:11.5px;cursor:pointer;padding:0}
-  .mutedbtn:hover{color:var(--red)}
-  .dash{color:#b3b9c0}
-  .subline{font-size:11px;color:var(--muted);margin-top:2px}
-  .warnline{font-size:11px;color:var(--warn);margin-top:2px}
-  .conf{margin-left:6px}
-  .cand-f{display:flex;align-items:center;gap:6px;padding:7px 10px;border-top:1px solid var(--line);background:#fbfcfd}
-  .conf{font-size:11px;font-weight:800;border-radius:4px;padding:1px 7px}
-  .conf.hi{color:var(--teal-d);background:var(--teal-soft)}
-  .conf.mid{color:var(--amber);background:#fbeecb}
   .tag{font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 5px;margin-left:5px}
-  .tag.unk{color:var(--amber);background:#fbeecb}
-  td.unk{color:var(--amber);font-weight:700}
-  .tag.done{color:#5a6066;background:#eceff2}
-  .hint{font-size:11.5px;color:var(--muted)}
-  /* 적수 매칭 그룹 — 실재고 관리의 그룹 행(부모 + └ 자식) 패턴 */
-  tr.grow td{border-top:2px solid #dfe3e8}
-  tbody tr:first-child.grow td{border-top:none}
-  .caret{display:inline-block;width:12px;color:#8a9099;cursor:pointer;user-select:none}
+  .tag.rep{color:var(--teal-d);background:var(--teal-soft)}
   .gbadge{font-size:10.5px;font-weight:700;color:var(--teal-d);background:var(--teal-soft);border-radius:4px;padding:1px 6px;margin-left:6px}
-  .sub{padding-left:24px}
-  td.act{text-align:right;white-space:nowrap;overflow:visible}
-  td.act .btn{margin-left:4px}
-  .empty{padding:40px 0;text-align:center;color:var(--muted);font-size:12px}
-  /* 앱 상품 수정 요청 모달과 같은 처리 방식 — 안내 배너 + 하단 일괄 처리 바 */
+  .caret{display:inline-block;width:12px;color:#8a9099;cursor:pointer;user-select:none}
+  .subline{font-size:11px;color:var(--muted);margin-top:2px}
   .hintbar{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:12px;color:#5c6671;margin-bottom:10px}
   .actionbar{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-  .mgroup{border:1px solid var(--line);border-radius:9px;margin-bottom:12px;overflow:hidden}
-  .mgroup-h{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f4f6f8;border-bottom:1px solid var(--line);font-size:12.5px}
-  .mgroup-h .t{font-weight:800}
-  .mgroup table{font-size:11.5px;table-layout:fixed}
-  .mgroup th:nth-child(1),.mgroup td:nth-child(1){width:auto}
-  .mgroup th:nth-child(2),.mgroup td:nth-child(2){width:84px}
-  .mgroup th:nth-child(3),.mgroup td:nth-child(3){width:104px}
-  .mgroup th:nth-child(4),.mgroup td:nth-child(4){width:104px}
-  .mgroup th:nth-child(5),.mgroup td:nth-child(5){width:78px}
-  .mgroup th:nth-child(6),.mgroup td:nth-child(6){width:230px;white-space:normal}
-  .mgroup .tablewrap{border:none;border-radius:0;max-height:none}
+  .in-s{height:26px;width:78px;border:1px solid var(--line);border-radius:5px;padding:0 7px;font-size:11.5px;text-align:right}
+  .in-s.unit{text-align:left;width:70px}
+  .in-s.warn{background:#fdf6e6;border-color:#e8d7a8}
 
-  /* 모달 — 기존 모달 컴포넌트 재사용 */
-  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.45);z-index:80;align-items:center;justify-content:center;padding:24px}
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,25,33,.45);z-index:80;align-items:flex-start;justify-content:center;padding:32px 20px;overflow:auto}
   .modal-bg.open{display:flex}
-  .modal{background:#fff;border-radius:12px;width:100%;max-width:880px;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  .modal{background:#fff;border-radius:12px;width:100%;max-width:920px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  .modal.sm{max-width:640px}
   .modal-h{display:flex;align-items:center;justify-content:center;position:relative;padding:18px 20px;border-bottom:1px solid var(--line)}
   .modal-h .mtitle{font-size:16px;font-weight:800;color:#28303a}
   .modal-h .x{position:absolute;right:16px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;color:var(--muted);cursor:pointer}
@@ -142,11 +118,8 @@
   .mbtn{height:38px;border-radius:8px;font-size:13px;font-weight:700;padding:0 26px;cursor:pointer}
   .mbtn.ghost{background:#fff;border:1px solid #d7dbe0;color:#5c6671}
   .mbtn.primary{background:var(--teal);color:#fff;border:1px solid var(--teal)}
-  .mbtn:disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.3)}
   .mbtn.danger{background:#fff;border:1px solid #ecc7c2;color:var(--red)}
-  .modal .in-s{height:26px;width:74px;border:1px solid var(--line);border-radius:5px;padding:0 7px;font-size:11.5px;text-align:right}
-  .modal .in-s.unit{text-align:left;width:78px}
-  .modal .in-s.warn{background:#fdf6e6;border-color:#e8d7a8}
+  .mbtn:disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.3)}
   .note{margin-top:12px;font-size:11.5px;color:#6b7178;background:var(--field);border:1px solid var(--line);border-radius:7px;padding:9px 11px}
   .note b{color:var(--amber)}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:8px;font-size:12px;z-index:90;opacity:0;transition:opacity .18s}
@@ -158,7 +131,7 @@
   <div class="titlebar"><span class="tb-mark"></span><span class="tb-title">상품 관리</span>
     <span class="tb-actions"><span>↻</span><span>⚙</span><span>—</span><span>✕</span></span>
   </div>
-  <div class="subhead" id="subhead">적수 관리 <span class="gbadge">시안 2 · 적수 매칭 후보</span></div>
+  <div class="subhead" id="subhead">적수 관리 <span class="gbadge">시안 2 · 적수 매칭 목록</span></div>
   <nav class="tabs">
     <span class="tab" data-page="list">상품 목록</span>
     <span class="tab on" data-page="pack">적수 관리</span>
@@ -167,7 +140,7 @@
     <span class="tab off">ESL</span>
   </nav>
 
-  <!-- ── 상품 목록 (기존 화면 · 우측 상세의 '적수 관리' 영역은 적수 관리 탭으로 이동) ── -->
+  <!-- ── 상품 목록 (기존 화면 · 적수 관리 영역은 적수 관리 탭으로 이동) ── -->
   <div class="cols" id="page-list" style="display:none">
     <div class="left">
       <div class="bar">
@@ -175,607 +148,145 @@
         <input class="inp" placeholder="검색 기준 선택 후 검색어를 입력해 주세요." />
         <button class="btn teal sm">검색</button>
       </div>
-      <div class="chks">
-        <label><input type="checkbox" checked /> 사용 약품만 조회</label>
-        <label><input type="checkbox" checked /> 재고 0이상 조회</label>
-      </div>
-      <div class="cnt-row">
-        <span class="cnt">전체 <b>2132</b> 개</span>
-        <select class="sel-in"><option>판매</option></select>
-        <span class="spacer"></span>
-        <button class="btn sm">＋ 신규</button>
-        <button class="btn sm">⭳ 내보내기</button>
-      </div>
-      <div class="tablewrap" style="max-height:420px">
-        <table>
-          <thead><tr><th>상품명</th><th>바코드</th><th>단위</th><th class="num">사입가</th><th class="num">재고</th></tr></thead>
-          <tbody id="listBody"></tbody>
-        </table>
+      <div class="cnt-row"><span class="cnt">전체 <b>2132</b> 개</span><span class="spacer"></span>
+        <button class="btn sm">＋ 신규</button><button class="btn sm">⭳ 내보내기</button></div>
+      <div class="tablewrap">
+        <table><thead><tr><th>상품명</th><th>바코드</th><th>단위</th><th class="num">사입가</th><th class="num">재고</th></tr></thead>
+        <tbody id="plBody"></tbody></table>
       </div>
     </div>
     <div class="right">
       <div class="sec-h"><h3>상품 상세 정보</h3>
-        <div class="acts"><button class="btn red sm">🗑 삭제</button><button class="btn sm">💾 저장</button></div>
-      </div>
+        <div class="acts"><button class="btn red sm">🗑 삭제</button><button class="btn sm">💾 저장</button></div></div>
       <div class="grid">
-        <div class="fld"><label>상품명</label><span class="in" id="dNm">박카스</span></div>
+        <div class="fld"><label>상품명</label><span class="in">박카스</span></div>
         <div class="fld"><label>제조업체</label><span class="in">동아제약</span></div>
         <div class="fld"><label>대분류</label><span class="in ro">판매</span></div>
         <div class="fld"><label>중분류</label><span class="in">의약외품</span></div>
         <div class="fld"><label>단위</label><span class="in">병</span></div>
-        <div class="fld"><label>바코드</label><span class="in ro" id="dBc">8801234567801</span></div>
-        <div class="fld"><label>대응코드</label><span class="in ro">-</span></div>
-        <div class="fld"><label>약품코드</label><span class="in ro">DA00000037</span></div>
-        <div class="fld"><label>사입가</label><span class="in" id="dBuy">600</span></div>
-        <div class="fld"><label>판매가</label><span class="in" id="dSell">800</span></div>
-        <div class="fld full"><label>위치</label><span class="in"></span></div>
-        <div class="price3" style="grid-column:1/-1">
-          <div class="fld"><label>재고</label><span class="in ro" id="dStock">15</span></div>
-          <div class="fld"><label>안전재고</label><span class="in">4</span></div>
-          <div class="fld"><label>재고금액</label><span class="in ro">9,000</span></div>
-        </div>
+        <div class="fld"><label>바코드</label><span class="in ro">8801234567801</span></div>
+        <div class="fld"><label>사입가</label><span class="in">600</span></div>
+        <div class="fld"><label>판매가</label><span class="in">800</span></div>
+        <div class="fld"><label>재고</label><span class="in ro">15</span></div>
+        <div class="fld"><label>안전재고</label><span class="in">4</span></div>
       </div>
-      <div class="note">기존 상세의 <b>적수 관리</b> 영역은 <b>적수 관리 탭</b>으로 이동합니다. 상세에서는 해당 상품의 정보만 확인합니다.</div>
-      <div class="sub-sec">
-        <div class="sec-h"><h3>입고 내역</h3></div>
-        <div class="tablewrap" style="max-height:120px">
-          <table><thead><tr><th>입고일자</th><th class="num">사입가</th><th class="num">적수</th><th class="num">수량</th><th class="num">금액</th><th>거래처명</th></tr></thead>
-          <tbody>
-            <tr><td>26-08-17</td><td class="num">600</td><td class="num">1</td><td class="num">10</td><td class="num">6,000</td><td>드림약국</td></tr>
-            <tr><td>26-04-13</td><td class="num">600</td><td class="num">1</td><td class="num">5</td><td class="num">3,000</td><td>드림약국</td></tr>
-          </tbody></table>
-        </div>
-      </div>
+      <div class="note">기존 상세의 <b>적수 관리</b> 영역은 <b>적수 관리 탭</b>으로 이동합니다.</div>
     </div>
   </div>
 
-  <!-- ── 적수 관리 (신규 · 전체 폭 리스트형) ── -->
-  <div class="full-page" id="page-pack">
-    <div class="subtabs">
-      <button class="btn teal sm" data-sub="cand">적수 매칭 그룹</button>
-      <button class="btn sm" data-sub="group">적수 묶음 목록</button>
-    </div>
-
-    <!-- 묶음 후보 -->
-    <div id="sub-cand">
-      <div class="bar">
-        <select class="sel-in"><option>상품명</option><option>바코드</option></select>
-        <input class="inp" id="candQ" placeholder="상품명 또는 바코드를 입력해 주세요." />
-        <button class="btn teal sm" id="candSearch">검색</button>
+  <!-- ── 적수 관리 (기본 화면 = 적수 묶음 목록 + 상세) ── -->
+  <div id="page-pack">
+    <div class="cols">
+      <div class="left">
+        <div class="bar">
+          <select class="sel-in"><option>묶음명</option><option>상품명</option><option>바코드</option></select>
+          <input class="inp" id="grpQ" placeholder="묶음명 또는 상품명 입력" />
+          <button class="btn teal sm" id="grpSearch">검색</button>
+        </div>
+        <div class="cnt-row"><span class="cnt">적수 묶음 <b id="grpCnt">0</b> 건</span>
+          <span class="spacer"></span>
+          <button class="btn teal sm" id="openMatch">적수 매칭 목록 <b id="matchN">0</b>건</button></div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>묶음명</th><th class="num">상품 수</th><th class="num">환산 재고</th><th>최근 수정일</th></tr></thead>
+            <tbody id="grpBody"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="cnt-row">
-        <span class="cnt">적수 매칭 그룹 <b id="candCnt">0</b> 건</span>
-        <button class="btn sm" id="openHistory">제외 내역 <span id="histN" class="gbadge">0</span></button>
-        <span class="spacer"></span>
-        <span class="hint">묶거나 제외해 판단을 끝낸 그룹은 목록에서 빠집니다.</span>
-      </div>
-      <div class="hintbar">💡 시스템이 찾은 <b>적수 후보</b>입니다. 묶을지 제외할지만 판단하면 되고, 처리한 그룹은 목록에서 빠집니다.</div>
-      <div class="tablewrap" id="candWrap">
-        <table id="candTable">
-          <colgroup><col class="c-ck"><col class="c-nm"><col class="c-bc"><col class="c-mk"><col class="c-buy"><col class="c-st"><col class="c-pk"><col class="c-memo"><col class="c-act"></colgroup>
-          <thead><tr>
-            <th class="ck">선택</th><th>상품명</th><th>바코드</th><th>제조사</th>
-            <th class="num">사입가</th><th class="num">현재 재고</th><th>예상 포장</th><th>판정 참고</th><th></th>
-          </tr></thead>
-          <tbody id="candBody"></tbody>
-        </table>
-      </div>
-      <div class="actionbar">
-        <button class="btn red" id="dropSel">선택 그룹 제외</button>
-        <span class="spacer"></span>
-        <span class="hint" id="selSum">선택 없음</span>
-        <button class="btn teal" id="makeSel">선택 그룹 적수 묶기</button>
-      </div>
-    </div>
-
-    <!-- 묶음 목록 -->
-    <div id="sub-group" style="display:none">
-      <div class="bar">
-        <select class="sel-in"><option>묶음명</option><option>대표상품</option></select>
-        <input class="inp" placeholder="묶음명을 입력해 주세요." />
-        <button class="btn teal sm">검색</button>
-      </div>
-      <div class="cnt-row">
-        <span class="cnt">전체 <b id="grpCnt">0</b> 건</span>
-        <span class="spacer"></span>
-        <span class="hint">행을 더블클릭하면 구성 SKU 와 포장정보를 확인합니다.</span>
-      </div>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>묶음명</th><th>대표상품</th><th class="num">SKU 수</th><th class="num">환산재고</th><th>최근수정일</th><th>상태</th><th style="width:64px"></th></tr></thead>
-          <tbody id="grpBody"></tbody>
-        </table>
-      </div>
+      <div class="right" id="detail"></div>
     </div>
   </div>
 </div>
 
-<!-- 상품 정보 확인 (묶음 확정 직전) -->
+<!-- 적수 매칭 목록 -->
+<div class="modal-bg" id="matchModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">적수 매칭 목록</span><button class="x" data-close="matchModal">✕</button></div>
+    <div class="modal-b">
+      <div class="hintbar">💡 시스템이 찾은 <b>적수 후보</b>입니다. 묶을지 제외할지만 판단하면 되고, 처리한 그룹은 목록에서 빠집니다.</div>
+      <div class="cnt-row">
+        <span class="cnt">후보 <b id="candCnt">0</b> 건</span>
+        <button class="btn sm" id="openHistory">제외 내역 <span class="gbadge" id="histN">0</span></button>
+        <span class="spacer"></span>
+        <span class="hint">예상 포장 = 상품명 분석 결과 · 판정 참고 = 그룹 내 상품 비교 결과</span>
+      </div>
+      <div class="tablewrap" style="max-height:none">
+        <table id="candTable">
+          <colgroup><col style="width:38px"><col><col style="width:118px"><col style="width:80px"><col style="width:74px"><col style="width:74px"><col style="width:84px"><col style="width:180px"><col style="width:64px"></colgroup>
+          <thead><tr><th class="ck">선택</th><th>상품명</th><th>바코드</th><th>제조사</th>
+            <th class="num">사입가</th><th class="num">현재 재고</th><th>예상 포장</th><th>판정 참고</th><th></th></tr></thead>
+          <tbody id="candBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="mbtn danger" id="dropSel">선택 그룹 제외</button>
+      <span class="spacer"></span>
+      <span class="hint" id="selSum">선택 없음</span>
+      <button class="mbtn primary" id="makeSel">적수 묶기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 상품 정보 확인 -->
 <div class="modal-bg" id="mkModal">
   <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-h"><span class="mtitle">상품 정보 확인</span><button class="x" data-close="mkModal">✕</button></div>
     <div class="modal-b">
-      <div class="hintbar">💡 대표 상품과 포장수량·단위를 확인한 뒤 <b>선택한 그룹을 한 번에</b> 묶습니다.</div>
-      <div id="mkBody"></div>
-      <div class="note" id="mkNote"></div>
+      <div class="hintbar">💡 대표상품과 적수·단위를 확인한 뒤 <b>선택한 그룹을 한 번에</b> 묶습니다.</div>
+      <div id="mkBody"></div><div class="note" id="mkNote"></div>
     </div>
     <div class="modal-f"><span class="spacer"></span>
       <button class="mbtn ghost" data-close="mkModal">취소</button>
-      <button class="mbtn primary" id="mkOk">적수 묶기</button>
-    </div>
+      <button class="mbtn primary" id="mkOk">적수 묶기</button></div>
   </div>
 </div>
 
-<!-- 묶음 상세 / 변경 -->
-<div class="modal-bg" id="dtModal">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-h"><span class="mtitle" id="dtTitle">묶음 상세</span><button class="x" data-close="dtModal">✕</button></div>
-    <div class="modal-b">
-      <div class="sec-h"><h3 style="font-size:12.5px">구성 SKU</h3><div class="acts"><span class="hint" id="dtSum"></span></div></div>
-      <div class="tablewrap" style="max-height:none">
-        <table>
-          <thead><tr><th>상품명</th><th>바코드</th><th class="num">포장수량</th><th>단위</th><th class="num">환산값</th><th class="num">재고</th><th class="num">환산재고</th><th style="width:150px"></th></tr></thead>
-          <tbody id="dtBody"></tbody>
-        </table>
-      </div>
-      <div class="sub-sec">
-        <div class="sec-h"><h3 style="font-size:12.5px">변경 이력</h3></div>
-        <div class="tablewrap" style="max-height:150px">
-          <table>
-            <thead><tr><th>변경일시</th><th>처리자</th><th>작업 유형</th><th>변경 전</th><th>변경 후</th><th style="width:64px"></th></tr></thead>
-            <tbody id="dtHist"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="modal-f">
-      <button class="mbtn danger" id="dtRelease">묶음 해제</button>
-      <span class="spacer"></span>
-      <button class="mbtn ghost" data-close="dtModal">닫기</button>
-      <button class="mbtn primary" id="dtSave">포장정보 저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 제외 내역 (그룹 단위 제외 복구) -->
+<!-- 제외 내역 -->
 <div class="modal-bg" id="hxModal">
-  <div class="modal" style="max-width:720px" role="dialog" aria-modal="true">
+  <div class="modal sm" role="dialog" aria-modal="true">
     <div class="modal-h"><span class="mtitle">제외 내역</span><button class="x" data-close="hxModal">✕</button></div>
     <div class="modal-b">
-      <div class="hintbar">💡 제외한 적수 후보 그룹입니다. 다시 검토가 필요하면 <b>후보로 복원</b>합니다.</div>
+      <div class="hintbar">💡 제외한 적수 후보입니다. 다시 검토가 필요하면 <b>후보로 복원</b>합니다.</div>
       <div class="tablewrap" style="max-height:none">
-        <table>
-          <thead><tr><th>제외일</th><th>상품 그룹</th><th class="num">상품</th><th>처리자</th><th style="width:110px"></th></tr></thead>
-          <tbody id="hxBody"></tbody>
-        </table>
+        <table><thead><tr><th>제외일</th><th>상품 그룹</th><th class="num">상품</th><th>처리자</th><th style="width:104px"></th></tr></thead>
+        <tbody id="hxBody"></tbody></table>
       </div>
     </div>
     <div class="modal-f"><span class="spacer"></span><button class="mbtn ghost" data-close="hxModal">닫기</button></div>
   </div>
 </div>
 
+<!-- 상품 추가 (검색·선택 + 포장정보 확인을 한 화면에서) -->
+<div class="modal-bg" id="addModal">
+  <div class="modal sm" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">상품 추가</span><button class="x" data-close="addModal">✕</button></div>
+    <div class="modal-b">
+      <div class="bar"><input class="inp" id="addQ" placeholder="상품명 또는 바코드를 입력해 주세요." /><button class="btn teal sm" id="addSearch">검색</button></div>
+      <div class="tablewrap" style="max-height:250px">
+        <table><thead><tr><th>상품명</th><th>바코드</th><th>제조사</th><th class="num">사입가</th><th class="num">재고</th></tr></thead>
+        <tbody id="addBody"></tbody></table>
+      </div>
+      <div class="sub-sec"><div class="sec-h"><h3>선택 상품 정보</h3></div><div id="addInfo"></div></div>
+    </div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button class="mbtn ghost" data-close="addModal">취소</button>
+      <button class="mbtn primary" id="addOk">상품 추가</button></div>
+  </div>
+</div>
+
+<!-- 묶음 해제 확인 -->
+<div class="modal-bg" id="relModal">
+  <div class="modal sm" style="max-width:460px" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">묶음 해제</span><button class="x" data-close="relModal">✕</button></div>
+    <div class="modal-b"><p id="relText" style="margin:6px 0;font-size:13px;line-height:1.6"></p></div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button class="mbtn ghost" data-close="relModal">취소</button>
+      <button class="mbtn danger" id="relOk">묶음 해제</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
-
-<script>
-/* ── 데모 데이터 ───────────────────────────────────────────────── */
-const CANDS = [
-  { id:"C01", no:"후보 01", conf:"높음", items:[
-    { code:"A001", name:"박카스",        bc:"8801234567801", mk:"동아제약", buy:600,   stock:15, qty:1,   unit:"병", memo:"" },
-    { code:"A002", name:"박카스10",      bc:"8801234567802", mk:"동아제약", buy:5800,  stock:3,  qty:10,  unit:"",  memo:"포장정보 미확인 (단위 없음)" },
-    { code:"A003", name:"박카스 100병",  bc:"8801234567803", mk:"동아제약", buy:56000, stock:1,  qty:100, unit:"병", memo:"" },
-  ] },
-  { id:"C02", no:"후보 02", conf:"높음", items:[
-    { code:"B001", name:"타이레놀500mg100정",   bc:"8805551234501", mk:"한국얀센", buy:7400,  stock:4, qty:100, unit:"정", memo:"" },
-    { code:"B002", name:"타이레놀 500mg 300정", bc:"8805551234502", mk:"한국얀센", buy:21000, stock:2, qty:300, unit:"정", memo:"" },
-  ] },
-  { id:"C03", no:"후보 03", conf:"보통", items:[
-    { code:"D001", name:"덴탈마스크",       bc:"8809998887701", mk:"웰킵스", buy:200,  stock:50, qty:null, unit:"", memo:"포장정보 미확인" },
-    { code:"D002", name:"덴탈마스크 대용량", bc:"8809998887702", mk:"웰킵스", buy:9000, stock:5,  qty:null, unit:"", memo:"포장정보 미확인" },
-  ] },
-  { id:"C04", no:"후보 04", conf:"높음", items:[
-    { code:"E001", name:"이지엔6이브 10정", bc:"8806667770011", mk:"대웅제약", buy:3200, stock:8, qty:10, unit:"정", memo:"" },
-    { code:"E002", name:"이지엔6이브 20정", bc:"8806667770012", mk:"대웅제약", buy:6100, stock:2, qty:20, unit:"정", memo:"" },
-  ] },
-];
-let GROUPS = [
-  { id:"G002", name:"종합비타민골드", rep:"E101", unit:"정", upd:"09-06", status:"사용중",
-    items:[
-      { code:"E101", name:"종합비타민골드 30정",  bc:"8807771110011", qty:30, unit:"정", stock:2, rep:true },
-      { code:"E102", name:"종합비타민골드 100정", bc:"8807771110012", qty:100, unit:"정", stock:0, rep:false },
-      { code:"E103", name:"종합비타민골드 60정",  bc:"8807771110013", qty:6,   unit:"정", stock:3, rep:false },
-    ],
-    hist:[{ dt:"2026-09-06 14:20", by:"약사(김)", act:"묶음 생성", bf:"-", af:"E101*(30정) · E102(100정)",
-            snap:[{ code:"E101", name:"종합비타민골드 30정", bc:"8807771110011", qty:30, unit:"정", stock:2, rep:true },
-                  { code:"E102", name:"종합비타민골드 100정", bc:"8807771110012", qty:100, unit:"정", stock:0, rep:false }] }] },
-];
-const won = (n) => n === null || n === undefined ? "-" : Number(n).toLocaleString("ko-KR");
-const isUnk = (it) => it.qty === null || !it.unit;
-
-/* 기준(메인) 상품 = 최소 적수 SKU. 환산 기준단위가 되어 환산값이 1/10/100 으로 떨어지고,
-   포장 표기가 없는 짧은 상품명이라 표시명 조합에 그대로 쓸 수 있다.
-   낱개 상품은 상품명에 포장정보가 없어 적수를 못 읽는 경우가 많다. 그래서 구성 상품의 적수가
-   모두 확인된 경우에만 적수로 비교하고, 하나라도 미확인이면 사입가가 가장 낮은 상품을 최소 적수로 본다. */
-const byBase = (a, b) =>
-  (a.qty ?? Infinity) - (b.qty ?? Infinity)
-  || (a.buy ?? Infinity) - (b.buy ?? Infinity)
-  || String(a.code).localeCompare(String(b.code));
-function pickMain(items){
-  const allKnown = items.every((i) => i.qty !== null && i.qty !== undefined);
-  return [...items].sort(allKnown ? byBase : (a, b) =>
-    (a.buy ?? Infinity) - (b.buy ?? Infinity) || String(a.code).localeCompare(String(b.code))
-  )[0];
-}
-const packTxt = (it) => isUnk(it) ? "-" : it.qty + it.unit;
-
-/* 상품명에서 포장정보(수량+단위)를 읽는다. 함량·용량 단위는 먼저 걷어낸다. */
-const PACK_UNITS = ["정","캡슐","병","포","개","매","앰플","바이알","스틱","통"];
-function parsePack(name){
-  const stripped = String(name).replace(/(\d+(?:\.\d+)?)\s*(mg|mcg|g|ml|IU|%)/gi, " ");
-  const re = new RegExp("(\\d+(?:\\.\\d+)?)\\s*(" + PACK_UNITS.join("|") + ")(?![가-힣])", "g");
-  const m = [...stripped.matchAll(re)];
-  return m.length ? { qty: Number(m[m.length-1][1]), unit: m[m.length-1][2] } : null;
-}
-/* 표시명 = 상품명 + 적수 + 단위. 상품명에 이미 같은 포장정보가 있으면 중복해 붙이지 않는다. */
-function displayName(baseNm, item){
-  if (isUnk(item)) return (item.name || baseNm);
-  const pack = item.qty + item.unit;
-  const inName = String(item.name).replace(/\s/g, "").includes(String(pack).replace(/\s/g, ""));
-  return inName ? item.name : ((baseNm || item.name) + " " + pack);
-}
-/* 상품명에서 읽은 포장정보와 설정값이 다르면 확인 필요 상태로 알린다. */
-function packConflict(item){
-  if (isUnk(item)) return null;
-  const p = parsePack(item.name);
-  if (!p) return null;
-  if (p.qty === Number(item.qty) && p.unit === item.unit) return null;
-  return "포장정보 불일치 (상품명 " + p.qty + p.unit + " / 설정값 " + item.qty + item.unit + ")";
-}
-
-/* ── 화면 전환 ────────────────────────────────────────────────── */
-document.querySelectorAll(".tab[data-page]").forEach((t) => t.addEventListener("click", () => {
-  document.querySelectorAll(".tab").forEach((x) => x.classList.remove("on"));
-  t.classList.add("on");
-  const p = t.dataset.page;
-  document.getElementById("page-list").style.display = p === "list" ? "grid" : "none";
-  document.getElementById("page-pack").style.display = p === "pack" ? "block" : "none";
-  document.getElementById("subhead").textContent = p === "list" ? "상품 목록" : "적수 관리";
-}));
-document.querySelectorAll("[data-sub]").forEach((b) => b.addEventListener("click", () => {
-  document.querySelectorAll("[data-sub]").forEach((x) => x.classList.remove("teal"));
-  b.classList.add("teal");
-  const s = b.dataset.sub;
-  document.getElementById("sub-cand").style.display = s === "cand" ? "block" : "none";
-  document.getElementById("sub-group").style.display = s === "group" ? "block" : "none";
-}));
-document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () =>
-  document.getElementById(b.dataset.close).classList.remove("open")));
-
-function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("on"); setTimeout(()=>t.classList.remove("on"),2200); }
-
-/* ── 상품 목록 (기존 화면) ────────────────────────────────────── */
-const LIST = [
-  ["박카스","8801234567801","병",600,15],["박카스10","8801234567802","개",5800,3],
-  ["박카스 100병","8801234567803","박스",56000,1],["타이레놀500mg100정","8805551234501","개",7400,4],
-  ["타이레놀 500mg 300정","8805551234502","개",21000,2],["타이레놀650mg100정","8805551234503","개",8300,5],
-  ["덴탈마스크","8809998887701","개",200,50],["덴탈마스크 대용량","8809998887702","개",9000,5],
-  ["판피린큐","8801111222201","병",900,40],
-];
-document.getElementById("listBody").innerHTML = LIST.map((r,i)=>
-  '<tr class="'+(i===0?"on":"")+'"><td class="nm">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+won(r[3])+'</td><td class="num">'+r[4]+'</td></tr>').join("");
-
-/* ── 묶음 후보 ────────────────────────────────────────────────── */
-const sel = {};   // candId -> Set(code)
-const removed = new Map();   // 사용자가 제외한 그룹 (제외 내역)
-const skuOut = {};           // 그룹 안에서 제외한 상품
-const expandedOut = new Set();
-CANDS.forEach((c) => { sel[c.id] = new Set(c.items.map((i) => i.code)); skuOut[c.id] = new Set(); });
-const collapsed = new Set();   // 접힌 그룹
-
-function renderCands(){
-  const q = (document.getElementById("candQ").value || "").trim();
-  // 적수 매칭 그룹 = 아직 묶음/제외 판단이 끝나지 않은 후보만 남는 작업 목록
-  const list = CANDS.filter((c) => !removed.has(c.id))
-    .filter((c) => !q || c.items.some((i) => i.name.includes(q) || i.bc.includes(q)))
-    .sort((a, b) => (a.conf === b.conf ? 0 : a.conf === "높음" ? -1 : 1));
-  document.getElementById("candCnt").textContent = list.length;
-  document.getElementById("histN").textContent = removed.size;
-
-  const body = document.getElementById("candBody");
-  if (list.length === 0) {
-    body.innerHTML = '<tr><td colspan="9" class="empty">검토할 적수 후보가 없습니다.</td></tr>';
-    updateBar([]);
-    return;
-  }
-
-  const cell = (i) => {
-    const memo = i.memo || "";
-    return '<td>'+i.bc+'</td><td>'+i.mk+'</td><td class="num">'+won(i.buy)+'</td><td class="num">'+i.stock+'</td>'
-      + '<td'+(isUnk(i)?' class="dash"':"")+'>'+packTxt(i)+'</td>'
-      + '<td class="memo'+(memo?"":" dash")+'">'+(memo || "-")+'</td>';
-  };
-
-  body.innerHTML = list.map((c) => {
-    const open = !collapsed.has(c.id);
-    const live = c.items.filter((i) => !skuOut[c.id].has(i.code));
-    const out = c.items.filter((i) => skuOut[c.id].has(i.code));
-    const main = pickMain(live), rest = live.filter((i) => i !== main).sort(byBase);
-    const picked = live.filter((i) => sel[c.id].has(i.code)).length;
-
-    const head = '<tr class="grow '+(picked?"on":"")+'" data-g="'+c.id+'">'
-      + '<td class="ck"><input type="checkbox" data-gck="'+c.id+'" '+(picked===live.length?"checked":"")+' /></td>'
-      + '<td class="nm"><span class="caret" data-tg="'+c.id+'">'+(open?"▾":"▸")+'</span> '+main.name
-      + '<span class="gbadge">적수 '+live.length+'건</span></td>'
-      + cell(main) + '<td class="act"></td></tr>';
-    if (!open) return head;
-
-    const kids = rest.map((i) =>
-      '<tr class="'+(sel[c.id].has(i.code)?"on":"")+'" data-c="'+c.id+'" data-code="'+i.code+'">'
-      + '<td class="ck"><input type="checkbox" '+(sel[c.id].has(i.code)?"checked":"")+' /></td>'
-      + '<td class="sub">└ '+i.name+'</td>' + cell(i)
-      + '<td class="act"><button class="mutedbtn" data-skuout="'+c.id+'|'+i.code+'">제외</button></td></tr>').join("");
-
-    // 그룹 안에서 제외한 상품은 접어두고, 그 그룹 안에서 바로 되돌린다
-    let foldRows = "";
-    if (out.length > 0) {
-      const openFold = expandedOut.has(c.id);
-      foldRows = '<tr class="foldrow"><td></td><td colspan="8"><span class="fold" data-fold="'+c.id+'">'
-        + (openFold?"▾":"▸")+' 이전에 제외한 상품 '+out.length+'개</span></td></tr>';
-      if (openFold) {
-        foldRows += out.map((i) =>
-          '<tr class="ex"><td class="ck">–</td><td class="sub">└ '+i.name+'</td>' + cell(i)
-          + '<td class="act"><button class="linkbtn" data-skuback="'+c.id+'|'+i.code+'">다시 추가</button></td></tr>').join("");
-      }
-    }
-    return head + kids + foldRows;
-  }).join("");
-
-  body.querySelectorAll("tr[data-code]").forEach((tr) => tr.addEventListener("click", (e) => {
-    if (e.target.dataset.tg || e.target.closest("td.act")) return;
-    const s2 = sel[tr.dataset.c];
-    if (s2.has(tr.dataset.code)) s2.delete(tr.dataset.code); else s2.add(tr.dataset.code);
-    renderCands();
-  }));
-  body.querySelectorAll("tr[data-g]").forEach((tr) => tr.addEventListener("click", (e) => {
-    if (e.target.dataset.tg || e.target.closest("td.act")) return;
-    toggleGroup(tr.dataset.g);
-  }));
-  body.querySelectorAll("[data-tg]").forEach((el) => el.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (collapsed.has(el.dataset.tg)) collapsed.delete(el.dataset.tg); else collapsed.add(el.dataset.tg);
-    renderCands();
-  }));
-  body.querySelectorAll("[data-fold]").forEach((el) => el.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (expandedOut.has(el.dataset.fold)) expandedOut.delete(el.dataset.fold); else expandedOut.add(el.dataset.fold);
-    renderCands();
-  }));
-  body.querySelectorAll("[data-skuout]").forEach((b) => b.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const [cid, code] = b.dataset.skuout.split("|");
-    skuOut[cid].add(code); sel[cid].delete(code);
-    renderCands(); toast("이 상품을 그룹에서 제외했습니다.");
-  }));
-  body.querySelectorAll("[data-skuback]").forEach((b) => b.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const [cid, code] = b.dataset.skuback.split("|");
-    skuOut[cid].delete(code); sel[cid].add(code);
-    renderCands(); toast("그룹에 다시 추가했습니다.");
-  }));
-  body.querySelectorAll("[data-gck]").forEach((el) => {
-    const c = CANDS.find((x) => x.id === el.dataset.gck);
-    const live = c.items.filter((i) => !skuOut[c.id].has(i.code));
-    const n = live.filter((i) => sel[c.id].has(i.code)).length;
-    el.indeterminate = n > 0 && n < live.length;
-  });
-  updateBar(list);
-}
-
-function toggleGroup(gid){
-  const c = CANDS.find((x) => x.id === gid);
-  const live = c.items.filter((i) => !skuOut[gid].has(i.code));
-  const all = live.every((i) => sel[gid].has(i.code));
-  sel[gid] = new Set(all ? [] : live.map((i) => i.code));
-  renderCands();
-}
-
-/* 하단 처리 바 — 선택한 그룹을 한 번에 제외하거나 묶는다 */
-function updateBar(list){
-  const picked = list.filter((c) => sel[c.id].size > 0);
-  const skus = picked.reduce((n, c) => n + sel[c.id].size, 0);
-  const ready = picked.filter((c) => sel[c.id].size >= 2);
-  document.getElementById("selSum").textContent = picked.length
-    ? '그룹 '+picked.length+'개 · 상품 '+skus+'건 선택'+(ready.length < picked.length ? ' (2건 미만 선택 그룹 '+(picked.length-ready.length)+'개 제외)' : "")
-    : "선택 없음";
-  document.getElementById("makeSel").disabled = ready.length === 0;
-  document.getElementById("dropSel").disabled = picked.length === 0;
-  BAR = { picked, ready };
-}
-let BAR = { picked: [], ready: [] };
-document.getElementById("dropSel").addEventListener("click", () => {
-  BAR.picked.forEach((c) => removed.set(c.id, { at: "09-09", by: "약사(김)", n: c.items.length }));
-  renderCands(); toast("선택한 그룹을 제외했습니다. 제외 내역에서 복원할 수 있습니다.");
-});
-document.getElementById("makeSel").addEventListener("click", () => openMake(BAR.ready.map((c) => c.id)));
-document.getElementById("candSearch").addEventListener("click", renderCands);
-document.getElementById("candQ").addEventListener("keydown", (e) => { if (e.key === "Enter") renderCands(); });
-
-/* 제외 내역 — 그룹 단위 제외를 되돌리는 보조 화면 */
-document.getElementById("openHistory").addEventListener("click", () => { drawHistoryModal(); document.getElementById("hxModal").classList.add("open"); });
-function drawHistoryModal(){
-  const rows = [...removed.entries()].map(([cid, meta]) => {
-    const c = CANDS.find((x) => x.id === cid);
-    return '<tr><td>'+meta.at+'</td><td class="nm">'+pickMain(c.items).name+' 계열</td>'
-      + '<td class="num">'+meta.n+'개</td><td>'+meta.by+'</td>'
-      + '<td><button class="btn sm" data-restore="'+cid+'">후보로 복원</button></td></tr>';
-  }).join("");
-  document.getElementById("hxBody").innerHTML = rows || '<tr><td colspan="5" class="empty">제외한 그룹이 없습니다.</td></tr>';
-  document.querySelectorAll("#hxBody [data-restore]").forEach((b) => b.addEventListener("click", () => {
-    removed.delete(b.dataset.restore);
-    drawHistoryModal(); renderCands(); toast("후보 목록으로 복원했습니다.");
-  }));
-}
-
-/* ── 상품 정보 확인 모달 (선택한 그룹을 한 번에 확인·확정) ───── */
-let MK = null;
-function openMake(cids){
-  const ids = Array.isArray(cids) ? cids : [cids];
-  const groups = ids.map((cid) => {
-    const c = CANDS.find((x) => x.id === cid);
-    const picked = c.items.filter((i) => sel[cid].has(i.code));
-    return { cid, conf: c.conf, rep: pickMain(picked).code, rows: picked.slice().sort(byBase).map((i) => ({ ...i })) };
-  }).filter((g) => g.rows.length >= 2);
-  if (groups.length === 0) return toast("묶을 상품을 2개 이상 선택해 주세요.");
-  MK = { groups };
-  drawMake();
-  document.getElementById("mkModal").classList.add("open");
-}
-const baseNameOf = (g) => {
-  const r = g.rows.find((x) => x.code === g.rep) || g.rows[0];
-  return r.name.replace(/\s*\d+\s*(병|정|개|매|포|캡슐)?\s*$/, "").trim();
-};
-function drawMake(){
-  document.getElementById("mkBody").innerHTML = MK.groups.map((g) => {
-    const nm = baseNameOf(g);
-    const rows = g.rows.map((r) => {
-      const unk = isUnk(r), cf = packConflict(r);
-      return '<tr data-g="'+g.cid+'" data-code="'+r.code+'">'
-        + '<td class="nm">'+r.name+'</td>'
-        + '<td class="ck"><input type="radio" name="rep_'+g.cid+'" '+(g.rep===r.code?"checked":"")+' data-rep="'+r.code+'" data-g="'+g.cid+'" /></td>'
-        + '<td class="num"><input class="in-s'+(r.qty===null?" warn":"")+'" type="number" min="1" value="'+(r.qty??"")+'" placeholder="-" data-f="qty" /></td>'
-        + '<td><input class="in-s unit'+(!r.unit?" warn":"")+'" value="'+(r.unit||"")+'" placeholder="-" data-f="unit" /></td>'
-        + '<td class="num">'+(unk?'<span class="dash">-</span>':"×"+r.qty)+'</td>'
-        + '<td>'+(unk?'<span class="dash">-</span>':displayName(nm, r))
-        + (cf?'<div class="warnline">'+cf+'</div>':"")+'</td></tr>';
-    }).join("");
-    return '<div class="mgroup"><div class="mgroup-h"><span class="t">'+nm+'</span>'
-      + '<span class="gbadge">적수 '+g.rows.length+'건</span></div>'
-      + '<div class="tablewrap"><table><thead><tr><th>현재 상품명</th><th class="ck">대표 상품</th>'
-      + '<th class="num">포장수량</th><th>단위</th><th class="num">환산값</th><th>표시명</th></tr></thead>'
-      + '<tbody>'+rows+'</tbody></table></div></div>';
-  }).join("");
-
-  const all = MK.groups.flatMap((g) => g.rows);
-  const unkN = all.filter(isUnk).length;
-  const cfN = all.filter((r) => packConflict(r)).length;
-  document.getElementById("mkNote").innerHTML =
-    '묶음 <b>'+MK.groups.length+'개</b> · 상품 <b>'+all.length+'건</b>을 확인합니다.'
-    + (unkN ? '<br>포장수량·단위가 확인되지 않은 상품 <b>'+unkN+'건</b>은 직접 입력해야 합니다.' : "")
-    + (cfN ? '<br>상품명과 설정값이 다른 상품 <b>'+cfN+'건</b>이 있습니다. 상품명은 수정하지 않으므로 적수·단위를 확인해 주세요.' : "");
-  document.getElementById("mkOk").disabled = unkN > 0;
-  document.getElementById("mkOk").textContent = "적수 묶기 (" + MK.groups.length + ")";
-
-  document.querySelectorAll("#mkBody [data-rep]").forEach((el) => el.addEventListener("change", () => {
-    MK.groups.find((g) => g.cid === el.dataset.g).rep = el.dataset.rep; drawMake();
-  }));
-  document.querySelectorAll("#mkBody input[data-f]").forEach((el) => el.addEventListener("change", () => {
-    const tr = el.closest("tr");
-    const g = MK.groups.find((x) => x.cid === tr.dataset.g);
-    const row = g.rows.find((r) => r.code === tr.dataset.code);
-    if (el.dataset.f === "qty") row.qty = el.value === "" ? null : Number(el.value);
-    else row.unit = el.value.trim();
-    drawMake();
-  }));
-}
-document.getElementById("mkOk").addEventListener("click", () => {
-  MK.groups.forEach((g) => {
-    const nm = baseNameOf(g);
-    const gid = "G" + String(GROUPS.length + 3).padStart(3, "0");
-    GROUPS.unshift({
-      id: gid, name: nm, rep: g.rep, unit: g.rows[0].unit, upd: "09-08", status: "사용중",
-      items: g.rows.map((r) => ({ code:r.code, name:r.name, bc:r.bc, qty:r.qty, unit:r.unit, stock:r.stock, rep:r.code===g.rep })),
-      hist: [{ dt:"2026-09-08 11:24", by:"약사(김)", act:"묶음 생성", bf:"-",
-               af: g.rows.map((r)=>r.code+(r.code===g.rep?"*":"")+"("+r.qty+r.unit+")").join(" · "),
-               snap: g.rows.map((r) => ({ code:r.code, name:r.name, bc:r.bc, qty:r.qty, unit:r.unit, stock:r.stock, rep:r.code===g.rep })) }],
-    });
-    removed.set(g.cid, { at: "09-09", by: "약사(김)", n: g.rows.length, done: true });
-  });
-  const n = MK.groups.length;
-  document.getElementById("mkModal").classList.remove("open");
-  renderCands(); renderGroups();
-  document.querySelector('[data-sub=group]').click();
-  toast(n + "개 그룹을 적수 묶음으로 만들었습니다.");
-});
-
-/* ── 묶음 목록 · 상세 ────────────────────────────────────────── */
-const conv = (g) => g.items.reduce((s, i) => s + (i.qty ? i.qty * i.stock : 0), 0);
-function renderGroups(){
-  document.getElementById("grpCnt").textContent = GROUPS.length;
-  document.getElementById("grpBody").innerHTML = GROUPS.map((g) =>
-    '<tr data-g="'+g.id+'"><td class="nm">'+g.name+'</td>'
-    + '<td>'+(g.items.find((i)=>i.rep)||{}).name+'</td>'
-    + '<td class="num">'+g.items.length+'</td>'
-    + '<td class="num">'+won(conv(g))+(g.unit||"")+'</td>'
-    + '<td>'+g.upd+'</td><td>'+g.status+'</td>'
-    + '<td><button class="btn sm" data-dt="'+g.id+'">상세</button></td></tr>').join("")
-    || '<tr><td colspan="7" class="empty">확정된 적수 묶음이 없습니다.</td></tr>';
-  document.querySelectorAll("#grpBody tr[data-g]").forEach((tr) => tr.addEventListener("dblclick", () => openDetail(tr.dataset.g)));
-  document.querySelectorAll("[data-dt]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); openDetail(b.dataset.dt); }));
-}
-let DT = null;
-function openDetail(gid){ DT = GROUPS.find((g) => g.id === gid); drawDetail(); document.getElementById("dtModal").classList.add("open"); }
-function drawDetail(){
-  document.getElementById("dtTitle").textContent = "묶음 상세 · " + DT.name;
-  document.getElementById("dtSum").textContent = "구성 " + DT.items.length + "개 · 총 환산재고 " + won(conv(DT)) + (DT.unit||"");
-  document.getElementById("dtBody").innerHTML = DT.items.map((i) =>
-    '<tr data-code="'+i.code+'"><td class="nm">'+i.name+(i.rep?'<span class="tag done">대표</span>':"")
-    + '<div class="subline">표시명 '+displayName(DT.name, i)+'</div>'
-    + (packConflict(i)?'<div class="warnline">'+packConflict(i)+'</div>':"")+'</td><td>'+i.bc+'</td>'
-    + '<td class="num"><input class="in-s" type="number" value="'+(i.qty??"")+'" data-f="qty" /></td>'
-    + '<td><input class="in-s unit" value="'+(i.unit||"")+'" data-f="unit" /></td>'
-    + '<td class="num">×'+i.qty+'</td><td class="num">'+i.stock+'</td><td class="num">'+won(i.qty*i.stock)+'</td>'
-    + '<td><button class="btn sm" data-rep="'+i.code+'" '+(i.rep?"disabled":"")+'>대표로 지정</button> '
-    + '<button class="btn sm red" data-rm="'+i.code+'" '+(i.rep?"disabled":"")+'>제외</button></td></tr>').join("");
-  document.getElementById("dtHist").innerHTML = DT.hist.map((h, idx) =>
-    '<tr><td>'+h.dt+'</td><td>'+h.by+'</td><td>'+h.act+'</td><td>'+h.bf+'</td><td>'+h.af+'</td>'
-    + '<td><button class="btn sm" data-rs="'+idx+'">복원</button></td></tr>').join("");
-
-  document.querySelectorAll("#dtBody [data-rep]").forEach((b) => b.addEventListener("click", () => {
-    const bf = snap(DT); DT.items.forEach((i) => i.rep = i.code === b.dataset.rep);
-    DT.name = (DT.items.find((i)=>i.rep).name || DT.name).replace(/\s*\d+\s*(병|정|개|매|포|캡슐)?\s*$/, "").trim();
-    log("대표 상품 변경", bf); drawDetail(); renderGroups(); toast("대표 상품을 변경했습니다.");
-  }));
-  document.querySelectorAll("#dtBody [data-rm]").forEach((b) => b.addEventListener("click", () => {
-    const bf = snap(DT); DT.items = DT.items.filter((i) => i.code !== b.dataset.rm);
-    log("상품 제외", bf); drawDetail(); renderGroups(); toast("묶음에서 제외했습니다. 기존 상품·판매·재고는 그대로입니다.");
-  }));
-  document.querySelectorAll("#dtHist [data-rs]").forEach((b) => b.addEventListener("click", () => {
-    const h = DT.hist[Number(b.dataset.rs)];
-    if (!h.snap) return toast("복원할 시점 정보가 없습니다.");
-    const bf = snap(DT); DT.items = h.snap.map((x) => ({ ...x }));
-    log("이전 상태 복원", bf); drawDetail(); renderGroups(); toast("이전 묶음 상태로 복원했습니다.");
-  }));
-}
-const snap = (g) => g.items.map((i) => ({ ...i }));
-const txt = (items) => items.map((i) => i.code + (i.rep?"*":"") + "(" + (i.qty??"UNKNOWN") + (i.unit||"") + ")").join(" · ") || "(구성 없음)";
-function log(act, before){
-  DT.hist.unshift({ dt:"2026-09-07 11:" + String(30 + DT.hist.length).slice(-2), by:"약사(김)", act, bf: txt(before), af: txt(DT.items), snap: before });
-  DT.upd = "09-07";
-}
-document.getElementById("dtSave").addEventListener("click", () => {
-  const bf = snap(DT);
-  document.querySelectorAll("#dtBody tr").forEach((tr) => {
-    const it = DT.items.find((i) => i.code === tr.dataset.code);
-    const q = tr.querySelector('[data-f=qty]').value, u = tr.querySelector('[data-f=unit]').value.trim();
-    it.qty = q === "" ? null : Number(q); it.unit = u;
-  });
-  log("포장정보 수정", bf); drawDetail(); renderGroups(); toast("포장정보를 저장했습니다.");
-});
-document.getElementById("dtRelease").addEventListener("click", () => {
-  GROUPS = GROUPS.filter((g) => g.id !== DT.id);
-  document.getElementById("dtModal").classList.remove("open");
-  renderGroups(); toast("묶음을 해제했습니다. 각 상품은 개별 상품으로 다시 조회됩니다.");
-});
-
-renderCands(); renderGroups();
-
-/* 리뷰 링크용 — ?view=group (적수 묶음 목록) · ?modal=make (상품 정보 확인) · ?modal=detail (묶음 상세) */
-const qs = new URLSearchParams(location.search);
-if (qs.get("view") === "group") document.querySelector("[data-sub=group]").click();
-if (qs.get("modal") === "make") document.getElementById("makeSel").click();
-if (qs.get("demo") === "skuout") { skuOut["C01"].add("A002"); sel["C01"].delete("A002"); expandedOut.add("C01"); renderCands(); }
-if (qs.get("demo") === "removed") { removed.set("C03", { at:"09-08", by:"약사(김)", n:2 }); renderCands(); }
-if (qs.get("modal") === "history") { removed.set("C03", { at:"09-08", by:"약사(김)", n:2 }); renderCands(); document.getElementById("openHistory").click(); }
-if (qs.get("modal") === "detail") { document.querySelector("[data-sub=group]").click(); openDetail(GROUPS[0].id); }
-</script>
+<script src="app.js"></script>
 </body>
 </html>
