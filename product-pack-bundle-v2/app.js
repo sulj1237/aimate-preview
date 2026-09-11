@@ -50,15 +50,13 @@ function parsePack(name){
   const m = [...stripped.matchAll(re)];
   return m.length ? { qty: Number(m[m.length-1][1]), unit: m[m.length-1][2] } : null;
 }
-/* 표시명 = 상품명 + 적수 + 단위.
-   상품명에서 읽은 포장정보가 저장값과 같으면 이미 포함된 것으로 보고 기존 상품명을 그대로 쓴다.
-   (문자열 포함 여부로 판단하면 '160정' 안의 '60정' 같은 경우를 같은 값으로 오인한다) */
+/* 표시명 = 대표상품명(적수+단위).
+   대표상품명은 포장 표기를 뺀 이름이므로, 구성 상품마다 같은 형식으로 떨어진다.
+   예) 박카스(1병) · 박카스(10병) · 박카스(100병) / 타이레놀 500mg(300정) */
+const coreName = (nm) => String(nm).replace(/\s*\d+(?:\.\d+)?\s*(병|정|개|매|포|캡슐|앰플|바이알|스틱|통)\s*$/, "").trim();
 function displayName(baseNm, item){
-  const nm = P(item.code).name;
   if (isUnk(item)) return "-";
-  const p = parsePack(nm);
-  if (p && p.qty === Number(item.qty) && p.unit === item.unit) return nm;
-  return (baseNm || nm) + "(" + item.qty + item.unit + ")";
+  return (baseNm || coreName(P(item.code).name)) + "(" + item.qty + item.unit + ")";
 }
 /* 기준(대표) 상품 = 최소 적수 상품. 적수를 모르면 사입가 최저 → 상품코드 순 */
 const byQty = (a,b) => (a.qty ?? Infinity) - (b.qty ?? Infinity) || (P(a.code).buy - P(b.code).buy) || a.code.localeCompare(b.code);
