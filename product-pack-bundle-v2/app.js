@@ -277,10 +277,8 @@ function renderCands(){
   el("matchN").textContent = list.length;
 
   const cell = (i) => {
-    const p = P(i.code), memo = i.memo || "";
-    return '<td>'+p.bc+'</td><td>'+p.mk+'</td><td class="num">'+won(p.buy)+'</td><td class="num">'+p.stock+'</td>'
-      + '<td'+(isUnk(i)?' class="dash"':"")+'>'+packTxt(i)+'</td>'
-      + '<td class="memo'+(memo?"":" dash")+'">'+(memo || "-")+'</td>';
+    const p = P(i.code);
+    return '<td>'+p.bc+'</td><td>'+p.mk+'</td><td class="num">'+won(p.buy)+'</td><td class="num">'+p.stock+'</td>';
   };
   el("candBody").innerHTML = list.map((c) => {
     const open = !collapsed.has(c.id);
@@ -291,9 +289,7 @@ function renderCands(){
     const head = '<tr class="grow '+(picked?"on":"")+'" data-g="'+c.id+'">'
       + '<td class="ck"><input type="checkbox" data-gck="'+c.id+'" '+(picked===live.length?"checked":"")+' /></td>'
       + '<td class="nm"><span class="caret" data-tg="'+c.id+'">'+(open?"▾":"▸")+'</span> '+P(main.code).name
-      + '<span class="gbadge">적수 '+live.length+'건</span>'
-      + '<span class="hint" style="margin-left:6px">바코드 '+P(main.code).bc.slice(0,11)+'XX</span></td>'
-      + cell(main) + '<td></td></tr>';
+      + '<span class="gbadge">적수 '+live.length+'건</span></td>' + cell(main) + '<td></td></tr>';
     if (!open) return head;
     const kids = rest.map((i) =>
       '<tr class="'+(sel[c.id].has(i.code)?"on":"")+'" data-c="'+c.id+'" data-code="'+i.code+'">'
@@ -303,14 +299,14 @@ function renderCands(){
     let fold = "";
     if (out.length) {
       const openFold = expandedOut.has(c.id);
-      fold = '<tr class="ex"><td></td><td colspan="8"><span class="caret" data-fold="'+c.id+'">'+(openFold?"▾":"▸")
+      fold = '<tr class="ex"><td></td><td colspan="6"><span class="caret" data-fold="'+c.id+'">'+(openFold?"▾":"▸")
         + '</span> 이전에 제외한 상품 '+out.length+'개</td></tr>'
         + (openFold ? out.map((i) =>
             '<tr class="ex"><td class="ck">–</td><td class="sub">└ '+P(i.code).name+'</td>' + cell(i)
             + '<td><button class="btn sm" data-skuback="'+c.id+'|'+i.code+'">다시 추가</button></td></tr>').join("") : "");
     }
     return head + kids + fold;
-  }).join("") || '<tr><td colspan="9" class="empty">검토할 적수 매칭 그룹이 없습니다.</td></tr>';
+  }).join("") || '<tr><td colspan="7" class="empty">검토할 적수 매칭 그룹이 없습니다.</td></tr>';
 
   document.querySelectorAll("#candBody tr[data-code]").forEach((tr) => tr.addEventListener("click", (e) => {
     if (e.target.dataset.tg || e.target.dataset.skuout || e.target.dataset.skuback) return;
