@@ -205,10 +205,9 @@
   <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-h"><span class="mtitle">적수 매칭 그룹</span><button class="x" data-close="matchModal">✕</button></div>
     <div class="modal-b">
-      <div class="hintbar">💡 <b>바코드 앞 11자리가 같은 상품</b>을 묶어 보여줍니다. 상품을 선택한 뒤 <b>적수 묶기</b> 또는 <b>선택 그룹 제외</b>를 누르세요.</div>
+      <div class="hintbar">💡 <b>바코드 앞 11자리가 같은 상품</b>을 묶어 보여줍니다. 상품을 선택한 뒤 <b>적수 묶기</b> 또는 <b>선택 그룹 제외</b>를 누르세요. 제외한 상품은 다시 표시되지 않습니다.</div>
       <div class="cnt-row">
         <span class="cnt">적수 매칭 그룹 <b id="candCnt">0</b> 건</span>
-        <button class="btn sm" id="openHistory">제외 내역 <span class="gbadge" id="histN">0</span></button>
         <span class="spacer"></span>
       </div>
       <div class="tablewrap" style="max-height:none">
@@ -240,21 +239,6 @@
     <div class="modal-f"><span class="spacer"></span>
       <button class="mbtn ghost" data-close="mkModal">취소</button>
       <button class="mbtn primary" id="mkOk">적수 묶기</button></div>
-  </div>
-</div>
-
-<!-- 제외 내역 -->
-<div class="modal-bg" id="hxModal">
-  <div class="modal sm" role="dialog" aria-modal="true">
-    <div class="modal-h"><span class="mtitle">제외 내역</span><button class="x" data-close="hxModal">✕</button></div>
-    <div class="modal-b">
-      <div class="hintbar">💡 제외한 적수 후보입니다. 다시 검토가 필요하면 <b>후보로 복원</b>합니다.</div>
-      <div class="tablewrap" style="max-height:none">
-        <table><thead><tr><th>제외일</th><th>상품 그룹</th><th class="num">상품</th><th>처리자</th><th style="width:104px"></th></tr></thead>
-        <tbody id="hxBody"></tbody></table>
-      </div>
-    </div>
-    <div class="modal-f"><span class="spacer"></span><button class="mbtn ghost" data-close="hxModal">닫기</button></div>
   </div>
 </div>
 

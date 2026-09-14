@@ -321,17 +321,28 @@ el("addOk").addEventListener("click", () => {
 });
 
 /* ── 적수 매칭 목록 (모달) ─────────────────────────────────── */
-const sel = {}, removed = new Map(), done = new Set(), skuOut = {}, expandedOut = new Set(), collapsed = new Set();
+const sel = {}, hidden = new Set(), done = new Set(), skuOut = {}, collapsed = new Set();
 CANDS.forEach((c) => { sel[c.id] = new Set(); skuOut[c.id] = new Set(); });
-const liveCands = () => CANDS.filter((c) => !removed.has(c.id) && !done.has(c.id));
+
+/* 매칭 제외 기록 — 적수 매핑 정보에 보관 (상품 마스터는 그대로)
+   · 제외한 상품은 이후 매칭 후보에 다시 나오지 않는다
+   · 제외일시 이후 등록된 신규 상품은 남아 있는 상품과 합쳐 2개 이상이면 다시 표시된다
+   · 상품별로 상품 상세의 변경 내용 보기(CNT-01-003)에 '적수 매칭 · 매칭 후보 → 매칭 제외'로 남는다 */
+const EXCLUDED = [];   // { pharmacy, prefix, code, at, by }
+function recordExclusion(c, code, at){
+  EXCLUDED.push({ pharmacy: "PH001", prefix: P(code).bc.slice(0, 11), code, at, by: "약사(김)" });
+  skuOut[c.id].add(code);
+}
+// 예시: 이지엔6이브 20정은 09-05에 매칭에서 제외됐고, 이후 30정이 신규 등록돼 10정 + 30정으로 다시 표시된다
+recordExclusion(CANDS.find((c) => c.id === "C02"), "GP708823327", "2026-09-05 10:12");
+
+const liveCands = () => CANDS.filter((c) => !hidden.has(c.id) && !done.has(c.id));
 
 el("openMatch").addEventListener("click", () => { renderCands(); openM("matchModal"); });
-el("openHistory").addEventListener("click", () => { drawHistory(); openM("hxModal"); });
 
 function renderCands(){
   const list = liveCands().sort((a,b) => a.rank - b.rank);
   el("candCnt").textContent = list.length;
-  el("histN").textContent = removed.size;
   el("matchN").textContent = list.length;
 
   const cell = (i) => {
@@ -341,7 +352,6 @@ function renderCands(){
   el("candBody").innerHTML = list.map((c) => {
     const open = !collapsed.has(c.id);
     const live = c.items.filter((i) => !skuOut[c.id].has(i.code)).sort(byQty);
-    const out = c.items.filter((i) => skuOut[c.id].has(i.code));
     const main = pickMain(live);
     const picked = live.filter((i) => sel[c.id].has(i.code)).length;
     // 그룹 행: 그룹 전체 선택 전용 (상품 정보는 아래 상품 행에서)
@@ -355,20 +365,11 @@ function renderCands(){
       '<tr class="'+(sel[c.id].has(i.code)?"on":"")+'" data-c="'+c.id+'" data-code="'+i.code+'">'
       + '<td class="ck"><input type="checkbox" '+(sel[c.id].has(i.code)?"checked":"")+' /></td>'
       + '<td class="sub">└ '+(i===main?'<span class="tag rep">대표</span> ':"")+P(i.code).name+'</td>' + cell(i) + '<td></td></tr>').join("");
-    let fold = "";
-    if (out.length) {
-      const openFold = expandedOut.has(c.id);
-      fold = '<tr class="ex"><td></td><td colspan="6"><span class="caret" data-fold="'+c.id+'">'+(openFold?"▾":"▸")
-        + '</span> 이전에 제외한 상품 '+out.length+'개</td></tr>'
-        + (openFold ? out.map((i) =>
-            '<tr class="ex"><td class="ck">–</td><td class="sub">└ '+P(i.code).name+'</td>' + cell(i)
-            + '<td><button class="btn sm" data-skuback="'+c.id+'|'+i.code+'">다시 추가</button></td></tr>').join("") : "");
-    }
-    return head + rows + fold;
+    return head + rows;
   }).join("") || '<tr><td colspan="7" class="empty">검토할 적수 매칭 그룹이 없습니다.</td></tr>';
 
   document.querySelectorAll("#candBody tr[data-code]").forEach((tr) => tr.addEventListener("click", (e) => {
-    if (e.target.dataset.tg || e.target.dataset.skuback) return;
+    if (e.target.dataset.tg) return;
     const s2 = sel[tr.dataset.c];
     if (s2.has(tr.dataset.code)) s2.delete(tr.dataset.code); else s2.add(tr.dataset.code);
     renderCands();
@@ -385,15 +386,6 @@ function renderCands(){
     e.stopPropagation();
     if (collapsed.has(x.dataset.tg)) collapsed.delete(x.dataset.tg); else collapsed.add(x.dataset.tg);
     renderCands();
-  }));
-  document.querySelectorAll("#candBody [data-fold]").forEach((x) => x.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (expandedOut.has(x.dataset.fold)) expandedOut.delete(x.dataset.fold); else expandedOut.add(x.dataset.fold);
-    renderCands();
-  }));
-  document.querySelectorAll("#candBody [data-skuback]").forEach((b) => b.addEventListener("click", (e) => {
-    e.stopPropagation(); const [cid, code] = b.dataset.skuback.split("|");
-    skuOut[cid].delete(code); renderCands(); toast("그룹에 다시 추가했습니다.");
   }));
   document.querySelectorAll("#candBody [data-gck]").forEach((x) => {
     const c = CANDS.find((y) => y.id === x.dataset.gck);
@@ -413,30 +405,19 @@ function renderCands(){
 }
 let BAR = { picked: [], ready: [] };
 el("dropSel").addEventListener("click", () => {
-  // 선택한 상품을 해당 그룹에서 제외한다. 남은 상품이 1개 이하가 되면 묶을 대상이 없으므로 제외 내역으로 보낸다.
+  // 선택한 상품을 매칭 후보에서 제외한다. 묶을 상품이 2개 미만으로 남은 그룹은 목록에서 빠진다.
   let items = 0, groupsOut = 0;
   BAR.picked.forEach((c) => {
-    sel[c.id].forEach((code) => { skuOut[c.id].add(code); items++; });
+    sel[c.id].forEach((code) => { recordExclusion(c, code, "2026-09-14 14:20"); items++; });
     sel[c.id] = new Set();
     const live = c.items.filter((i) => !skuOut[c.id].has(i.code));
-    if (live.length < 2) { removed.set(c.id, { at:"09-14", by:"약사(김)", n: c.items.length }); groupsOut++; }
+    if (live.length < 2) { hidden.add(c.id); groupsOut++; }
   });
   renderCands(); renderGroups();
-  toast("선택한 상품 " + items + "건을 그룹에서 제외했습니다." + (groupsOut ? " 묶을 상품이 남지 않은 그룹 " + groupsOut + "개는 제외 내역으로 이동했습니다." : ""));
+  toast("선택한 상품 " + items + "건을 매칭 후보에서 제외했습니다. 기록은 상품 상세의 변경 내용 보기에 남습니다."
+    + (groupsOut ? " 묶을 상품이 남지 않은 그룹 " + groupsOut + "개는 목록에서 빠졌습니다." : ""));
 });
 el("makeSel").addEventListener("click", () => openMake(BAR.ready.map((c) => c.id)));
-
-function drawHistory(){
-  el("hxBody").innerHTML = [...removed.entries()].map(([cid, meta]) => {
-    const c = CANDS.find((x) => x.id === cid);
-    return '<tr><td>'+meta.at+'</td><td class="nm">'+P(pickMain(c.items).code).name+' 계열</td>'
-      + '<td class="num">'+meta.n+'개</td><td>'+meta.by+'</td>'
-      + '<td><button class="btn sm" data-restore="'+cid+'">후보로 복원</button></td></tr>';
-  }).join("") || '<tr><td colspan="5" class="empty">제외한 후보가 없습니다.</td></tr>';
-  document.querySelectorAll("#hxBody [data-restore]").forEach((b) => b.addEventListener("click", () => {
-    removed.delete(b.dataset.restore); skuOut[b.dataset.restore] = new Set(); drawHistory(); renderCands(); renderGroups(); toast("후보 목록으로 복원했습니다.");
-  }));
-}
 
 /* ── 상품 정보 확인 → 적수 묶기 ─────────────────────────────── */
 let MK = null;
