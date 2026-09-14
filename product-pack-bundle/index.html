@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>굿팜 클라이언트 3.0 · 적수 관리 [시안 1] 신규 등록</title>
+<title>굿팜 클라이언트 3.0 · 상품 관리 &gt; 적수 관리</title>
 <style>
   /* 기존 상품 관리 화면(client-product-manage.html)의 토큰·컴포넌트를 그대로 사용한다. */
   :root{
@@ -35,6 +35,17 @@
   #page-pack .right td:nth-child(1),#page-pack .right td:nth-child(2),
   #page-pack .right td.nm{white-space:normal;line-height:1.35}
   .tag.rep{margin-left:0;margin-right:2px}
+  tr.grow td{border-top:2px solid #dfe3e8;background:#f7f8fa}
+  #candBody tr:first-child.grow td{border-top:none}
+  #candTable td.memo{white-space:normal;line-height:1.4}
+  .mgroup{border:1px solid var(--line);border-radius:9px;margin-bottom:12px;overflow:hidden}
+  .mgroup-h{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f4f6f8;border-bottom:1px solid var(--line);font-size:12.5px}
+  .mgroup table{font-size:11.5px;table-layout:fixed}
+  .mgroup th:nth-child(2),.mgroup td:nth-child(2){width:84px}
+  .mgroup th:nth-child(3),.mgroup td:nth-child(3){width:104px}
+  .mgroup th:nth-child(4),.mgroup td:nth-child(4){width:104px}
+  .mgroup th:nth-child(5),.mgroup td:nth-child(5){width:230px;white-space:normal}
+  .mgroup .tablewrap{border:none;border-radius:0;max-height:none}
   #page-pack .right td,#page-pack .right th{padding:6px 7px}
   #page-pack .right .in-s{width:62px;height:24px}
   #page-pack .right .in-s.unit{width:52px}
@@ -121,7 +132,7 @@
   <div class="titlebar"><span class="tb-mark"></span><span class="tb-title">상품 관리</span>
     <span class="tb-actions"><span>↻</span><span>⚙</span><span>—</span><span>✕</span></span>
   </div>
-  <div class="subhead" id="subhead">적수 관리 <span class="gbadge">시안 1 · 신규 등록</span></div>
+  <div class="subhead" id="subhead">적수 관리</div>
   <nav class="tabs">
     <span class="tab" data-page="list">상품 목록</span>
     <span class="tab on" data-page="pack">적수 관리</span>
@@ -175,7 +186,8 @@
         </div>
         <div class="cnt-row"><span class="cnt">적수 묶음 <b id="grpCnt">0</b> 건</span>
           <span class="spacer"></span>
-          <button class="btn teal sm" id="openReg">＋ 신규 등록</button></div>
+          <button class="btn sm" id="openReg">＋ 신규 등록</button>
+          <button class="btn teal sm" id="openMatch">적수 매칭 그룹 <b id="matchN">0</b>건</button></div>
         <div class="tablewrap">
           <table>
             <thead><tr><th>묶음명</th><th>상품코드</th><th class="num">상품 수</th><th class="num">환산 재고</th><th>최근 수정일</th></tr></thead>
@@ -185,6 +197,83 @@
       </div>
       <div class="right" id="detail"></div>
     </div>
+  </div>
+</div>
+
+<!-- 적수 매칭 목록 -->
+<div class="modal-bg" id="matchModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">적수 매칭 그룹</span><button class="x" data-close="matchModal">✕</button></div>
+    <div class="modal-b">
+      <div class="hintbar">💡 <b>바코드 앞 11자리가 같은 상품</b>을 묶어 보여줍니다. 상품을 선택한 뒤 <b>적수 묶기</b> 또는 <b>선택 그룹 제외</b>를 누르세요.</div>
+      <div class="cnt-row">
+        <span class="cnt">적수 매칭 그룹 <b id="candCnt">0</b> 건</span>
+        <button class="btn sm" id="openHistory">제외 내역 <span class="gbadge" id="histN">0</span></button>
+        <span class="spacer"></span>
+      </div>
+      <div class="tablewrap" style="max-height:none">
+        <table id="candTable">
+          <colgroup><col style="width:38px"><col><col style="width:132px"><col style="width:100px"><col style="width:90px"><col style="width:90px"><col style="width:84px"></colgroup>
+          <thead><tr><th class="ck">선택</th><th>상품명</th><th>바코드</th><th>제조사</th>
+            <th class="num">사입가</th><th class="num">현재 재고</th><th></th></tr></thead>
+          <tbody id="candBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="mbtn danger" id="dropSel">선택 그룹 제외</button>
+      <span class="spacer"></span>
+      <span class="hint" id="selSum">선택 없음</span>
+      <button class="mbtn primary" id="makeSel">적수 묶기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 상품 정보 확인 -->
+<div class="modal-bg" id="mkModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">상품 정보 확인</span><button class="x" data-close="mkModal">✕</button></div>
+    <div class="modal-b">
+      <div class="hintbar">💡 대표상품과 적수·단위를 확인한 뒤 <b>선택한 그룹을 한 번에</b> 묶습니다.</div>
+      <div id="mkBody"></div><div class="note" id="mkNote"></div>
+    </div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button class="mbtn ghost" data-close="mkModal">취소</button>
+      <button class="mbtn primary" id="mkOk">적수 묶기</button></div>
+  </div>
+</div>
+
+<!-- 제외 내역 -->
+<div class="modal-bg" id="hxModal">
+  <div class="modal sm" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">제외 내역</span><button class="x" data-close="hxModal">✕</button></div>
+    <div class="modal-b">
+      <div class="hintbar">💡 제외한 적수 후보입니다. 다시 검토가 필요하면 <b>후보로 복원</b>합니다.</div>
+      <div class="tablewrap" style="max-height:none">
+        <table><thead><tr><th>제외일</th><th>상품 그룹</th><th class="num">상품</th><th>처리자</th><th style="width:104px"></th></tr></thead>
+        <tbody id="hxBody"></tbody></table>
+      </div>
+    </div>
+    <div class="modal-f"><span class="spacer"></span><button class="mbtn ghost" data-close="hxModal">닫기</button></div>
+  </div>
+</div>
+
+<!-- 적수 묶음 신규 등록 (상품 담기 + 적수 묶음 상세 영역) -->
+<div class="modal-bg" id="regModal">
+  <div class="modal" style="max-width:1000px" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">적수 묶음 신규 등록</span><button class="x" data-close="regModal">✕</button></div>
+    <div class="modal-b">
+      <div class="bar"><input class="inp" id="regQ" placeholder="상품명 또는 바코드를 입력해 주세요." /><button class="btn teal sm" id="regSearch">검색</button></div>
+      <div class="tablewrap" style="max-height:200px">
+        <table><colgroup><col><col style="width:130px"><col style="width:100px"><col style="width:80px"><col style="width:60px"><col style="width:64px"></colgroup>
+        <thead><tr><th>상품명</th><th>바코드</th><th>제조사</th><th class="num">사입가</th><th class="num">재고</th><th></th></tr></thead>
+        <tbody id="regList"></tbody></table>
+      </div>
+      <div class="sub-sec"><div class="sec-h"><h3>적수 묶음 상세</h3></div><div id="regEditor"></div></div>
+    </div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button class="mbtn ghost" data-close="regModal">취소</button>
+      <button class="mbtn primary" id="regOk">등록</button></div>
   </div>
 </div>
 
