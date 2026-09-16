@@ -28,7 +28,7 @@
 
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
   /* 적수 관리: 좌측 목록은 4열뿐이라 좁게, 우측 상세는 넓게 */
-  #page-pack .cols{grid-template-columns:38% 62%}
+  #page-pack .cols{grid-template-columns:42% 58%}
   #page-pack .right table{font-size:11px;table-layout:fixed}
   #page-pack .right td{overflow:hidden;text-overflow:ellipsis}
   /* 상품명·표시명은 길면 줄바꿈 — 대표 배지가 밀려 잘리지 않게 한다 */
@@ -81,6 +81,7 @@
   .nm{font-weight:600}
   .sub{padding-left:22px}
   .dash,td.dash{color:#b3b9c0}
+  #grpBody td,#page-pack .left thead th{padding-left:7px;padding-right:7px}
   td.mono,span.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:#5a6066}
   td.unk{color:var(--amber);font-weight:700}
   .empty{padding:36px 0;text-align:center;color:var(--muted);font-size:12px}
@@ -190,7 +191,7 @@
           <button class="btn teal sm" id="openMatch">적수 매칭 그룹 <b id="matchN">0</b>건</button></div>
         <div class="tablewrap">
           <table>
-            <colgroup><col><col style="width:90px"><col style="width:60px"><col style="width:48px"><col style="width:60px"><col style="width:78px"></colgroup>
+            <colgroup><col><col style="width:88px"><col style="width:56px"><col style="width:42px"><col style="width:58px"><col style="width:70px"></colgroup>
             <thead><tr><th>묶음명</th><th>약품코드</th><th>제조사</th><th class="num">상품 수</th><th class="num">환산 재고</th><th>수정일</th></tr></thead>
             <tbody id="grpBody"></tbody>
           </table>

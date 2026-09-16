@@ -255,11 +255,11 @@ function saveDraft(){
 
 /* ── 적수 묶음 신규 등록 (모달 · 상품 담기 + 적수 묶음 상세 영역) ── */
 let REG = null;
-el("openReg").addEventListener("click", () => {
+el("openReg").addEventListener("click", () => guard(() => {
   REG = { name: "", rep: null, items: [] };
   el("regQ").value = "";
   drawReg(); openM("regModal");
-});
+}));
 function drawReg(){
   const q = (el("regQ").value || "").trim();
   const used = bundledCodes();
@@ -385,7 +385,7 @@ recordExclusion(CANDS.find((c) => c.id === "C02"), "P708823327", "2026-09-05 10:
 
 const liveCands = () => CANDS.filter((c) => !hidden.has(c.id) && !done.has(c.id));
 
-el("openMatch").addEventListener("click", () => { renderCands(); openM("matchModal"); });
+el("openMatch").addEventListener("click", () => guard(() => { renderCands(); openM("matchModal"); }));
 
 function renderCands(){
   const list = liveCands().sort((a,b) => a.rank - b.rank);
