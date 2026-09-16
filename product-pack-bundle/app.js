@@ -1,42 +1,54 @@
 /* 상품 관리 > 적수 관리 — 적수 묶음 목록/상세 + 적수 매칭 목록(팝업) */
 
-/* ── 상품 원본 (기존 상품 데이터) ───────────────────────────── */
+/* ── 상품 원본 (기존 상품 데이터) ───────────────────────────────
+   dc   = 약품코드 — 상품 목록·상세에 출력되는 품목 식별 코드. 적수 변형끼리 같은 값을 쓴다.
+   bc   = 바코드   — 적수별 단품을 식별한다.
+   unit·qty = 기존 상품 데이터가 이미 가지고 있는 단위·적수(기본값 1).
+   code = 내부 키(PRODUCT_CODE) — 화면에는 출력하지 않는다. */
 const PRODUCTS = [
-  { code:"GP641702920", name:"박카스",              bc:"8801234567801", mk:"동아제약", buy:600,   sell:800,   stock:15 },
-  { code:"GP641702937", name:"박카스10",            bc:"8801234567802", mk:"동아제약", buy:5800,  sell:7500,  stock:3  },
-  { code:"GP641702944", name:"박카스 100병",        bc:"8801234567803", mk:"동아제약", buy:56000, sell:70000, stock:1  },
-  { code:"GP730115502", name:"타이레놀500mg100정",  bc:"8805551234501", mk:"한국얀센", buy:7400,  sell:9800,  stock:4  },
-  { code:"GP730115519", name:"타이레놀 500mg 300정",bc:"8805551234502", mk:"한국얀센", buy:21000, sell:27000, stock:2  },
-  { code:"GP730115526", name:"타이레놀650mg100정",  bc:"8805551234503", mk:"한국얀센", buy:8300,  sell:11000, stock:5  },
-  { code:"GP815440071", name:"비타민C 500mg 100정", bc:"8807770001101", mk:"고려은단", buy:9000,  sell:12000, stock:10 },
-  { code:"GP992018844", name:"덴탈마스크",          bc:"8809998887701", mk:"웰킵스",   buy:200,   sell:300,   stock:50 },
-  { code:"GP992018851", name:"덴탈마스크 대용량",    bc:"8809998887702", mk:"웰킵스",   buy:9000,  sell:12000, stock:5  },
-  { code:"GP708823310", name:"이지엔6이브 10정",     bc:"8806667770011", mk:"대웅제약", buy:3200,  sell:4500,  stock:8  },
-  { code:"GP708823327", name:"이지엔6이브 20정",     bc:"8806667770012", mk:"대웅제약", buy:6100,  sell:8500,  stock:2  },
-  { code:"GP708823334", name:"이지엔6이브 30정",     bc:"8806667770013", mk:"대웅제약", buy:8900,  sell:12500, stock:1  },
-  { code:"GP550317761", name:"종합비타민골드 30정",  bc:"8807771110011", mk:"유한양행", buy:12000, sell:16000, stock:2  },
-  { code:"GP550317778", name:"종합비타민골드 100정", bc:"8807771110012", mk:"유한양행", buy:34000, sell:45000, stock:0  },
-  { code:"GP550317785", name:"종합비타민골드 60정",  bc:"8807771110013", mk:"유한양행", buy:21000, sell:28000, stock:3  },
-  { code:"GP600914233", name:"판피린큐",            bc:"8801111222201", mk:"동아제약", buy:900,   sell:1200,  stock:40 },
+  { code:"P641702920", dc:"DA00004721", name:"박카스",              bc:"8801234567801", unit:"병", qty:1,   mk:"동아제약", buy:600,   sell:800,   stock:15 },
+  { code:"P641702937", dc:"DA00004721", name:"박카스10",            bc:"8801234567802", unit:"병", qty:10,  mk:"동아제약", buy:5800,  sell:7500,  stock:3  },
+  { code:"P641702944", dc:"DA00004721", name:"박카스 100병",        bc:"8801234567803", unit:"병", qty:100, mk:"동아제약", buy:56000, sell:70000, stock:1  },
+  { code:"P730115502", dc:"JS00001803", name:"타이레놀500mg100정",  bc:"8805551234501", unit:"정", qty:1,   mk:"한국얀센", buy:7400,  sell:9800,  stock:4  },
+  { code:"P730115519", dc:"JS00001803", name:"타이레놀 500mg 300정",bc:"8805551234502", unit:"정", qty:1,   mk:"한국얀센", buy:21000, sell:27000, stock:2  },
+  { code:"P730115526", dc:"JS00001811", name:"타이레놀650mg100정",  bc:"8805551234503", unit:"정", qty:1,   mk:"한국얀센", buy:8300,  sell:11000, stock:5  },
+  { code:"P815440071", dc:"KE00002250", name:"비타민C 500mg 100정", bc:"8807770001101", unit:"정", qty:100, mk:"고려은단", buy:9000,  sell:12000, stock:10 },
+  { code:"P992018844", dc:"",           name:"덴탈마스크",          bc:"8809998887701", unit:"개", qty:1,   mk:"웰킵스",   buy:200,   sell:300,   stock:50 },
+  { code:"P992018851", dc:"",           name:"덴탈마스크 대용량",    bc:"8809998887702", unit:"",   qty:1,   mk:"웰킵스",   buy:9000,  sell:12000, stock:5  },
+  { code:"P708823310", dc:"DW00003318", name:"이지엔6이브 10정",     bc:"8806667770011", unit:"정", qty:1,   mk:"대웅제약", buy:3200,  sell:4500,  stock:8  },
+  { code:"P708823327", dc:"DW00003318", name:"이지엔6이브 20정",     bc:"8806667770012", unit:"정", qty:1,   mk:"대웅제약", buy:6100,  sell:8500,  stock:2  },
+  { code:"P708823334", dc:"DW00003318", name:"이지엔6이브 30정",     bc:"8806667770013", unit:"정", qty:1,   mk:"대웅제약", buy:8900,  sell:12500, stock:1  },
+  { code:"P550317761", dc:"YH00005140", name:"종합비타민골드 30정",  bc:"8807771110011", unit:"정", qty:30,  mk:"유한양행", buy:12000, sell:16000, stock:2  },
+  { code:"P550317778", dc:"YH00005140", name:"종합비타민골드 100정", bc:"8807771110012", unit:"정", qty:100, mk:"유한양행", buy:34000, sell:45000, stock:0  },
+  { code:"P550317785", dc:"YH00005140", name:"종합비타민골드 60정",  bc:"8807771110013", unit:"정", qty:60,  mk:"유한양행", buy:21000, sell:28000, stock:3  },
+  { code:"P600914233", dc:"DA00001102", name:"판피린큐",            bc:"8801111222201", unit:"병", qty:1,   mk:"동아제약", buy:900,   sell:1200,  stock:40 },
 ];
 const P = (code) => PRODUCTS.find((p) => p.code === code);
+const dcTxt = (code) => P(code).dc || "-";
+/* 담기·추가할 때 채울 적수·단위 — 저장된 값이 기본값 1이면 상품명에서 읽은 값을 제안한다 */
+function seedPack(code){
+  const p = P(code), parsed = parsePack(p.name);
+  if (parsed && p.qty === 1 && parsed.qty !== 1) return { qty: parsed.qty, unit: parsed.unit || p.unit };
+  return { qty: p.qty, unit: p.unit };
+}
 
 /* ── 적수 묶음 (Mapping) ────────────────────────────────────── */
 let GROUPS = [
-  { id:"G001", name:"박카스", rep:"GP641702920", upd:"09-08",
-    items:[ {code:"GP641702920",qty:1,unit:"병"}, {code:"GP641702937",qty:10,unit:"병"}, {code:"GP641702944",qty:100,unit:"병"} ] },
-  { id:"G002", name:"종합비타민골드", rep:"GP550317761", upd:"09-06",
-    items:[ {code:"GP550317761",qty:30,unit:"정"}, {code:"GP550317778",qty:100,unit:"정"}, {code:"GP550317785",qty:6,unit:"정"} ] },
+  { id:"G001", name:"박카스", rep:"P641702920", upd:"2026-09-08",
+    items:[ {code:"P641702920",qty:1,unit:"병"}, {code:"P641702937",qty:10,unit:"병"}, {code:"P641702944",qty:100,unit:"병"} ] },
+  { id:"G002", name:"종합비타민골드", rep:"P550317761", upd:"2026-09-06",
+    items:[ {code:"P550317761",qty:30,unit:"정"}, {code:"P550317778",qty:100,unit:"정"}, {code:"P550317785",qty:60,unit:"정"} ] },
 ];
 
 /* ── 적수 후보 (미처리 매칭 그룹) ─────────────────────────── */
 const CANDS = [
-  { id:"C01", rank:1, items:[ { code:"GP730115502", qty:100, unit:"정", memo:"" }, { code:"GP730115519", qty:300, unit:"정", memo:"" } ] },
-  { id:"C02", rank:2, items:[ { code:"GP708823310", qty:10,  unit:"정", memo:"" }, { code:"GP708823327", qty:20,  unit:"정", memo:"" }, { code:"GP708823334", qty:30, unit:"정", memo:"" } ] },
-  { id:"C03", rank:3, items:[ { code:"GP992018844", qty:null, unit:"", memo:"포장정보 미확인" }, { code:"GP992018851", qty:null, unit:"", memo:"포장정보 미확인" } ] },
+  { id:"C01", rank:1, items:[ { code:"P730115502", qty:100, unit:"정" }, { code:"P730115519", qty:300, unit:"정" } ] },
+  { id:"C02", rank:2, items:[ { code:"P708823310", qty:10,  unit:"정" }, { code:"P708823327", qty:20,  unit:"정" }, { code:"P708823334", qty:30, unit:"정" } ] },
+  { id:"C03", rank:3, items:[ { code:"P992018844", qty:1, unit:"개" }, { code:"P992018851", qty:1, unit:"" } ] },
 ];
 
 /* ── 공통 ───────────────────────────────────────────────────── */
+const TODAY = "2026-09-16";
 const el = (id) => document.getElementById(id);
 const won = (n) => (n === null || n === undefined ? "-" : Number(n).toLocaleString("ko-KR"));
 const isUnk = (i) => i.qty === null || i.qty === undefined || !i.unit;
@@ -59,11 +71,12 @@ function displayName(baseNm, item){
   if (isUnk(item)) return "-";
   return (baseNm || coreName(P(item.code).name)) + "(" + item.qty + item.unit + ")";
 }
-/* 기준(대표) 상품 = 최소 적수 상품. 적수를 모르면 사입가 최저 → 상품코드 순 */
-const byQty = (a,b) => (a.qty ?? Infinity) - (b.qty ?? Infinity) || (P(a.code).buy - P(b.code).buy) || a.code.localeCompare(b.code);
+/* 기준(대표) 상품 = 최소 적수 상품. 적수를 모르면 사입가 최저 → 바코드 순 */
+const byBc = (a,b) => P(a.code).bc.localeCompare(P(b.code).bc);
+const byQty = (a,b) => (a.qty ?? Infinity) - (b.qty ?? Infinity) || (P(a.code).buy - P(b.code).buy) || byBc(a,b);
 function pickMain(items){
   const allKnown = items.every((i) => i.qty !== null && i.qty !== undefined);
-  return [...items].sort(allKnown ? byQty : (a,b) => P(a.code).buy - P(b.code).buy || a.code.localeCompare(b.code))[0];
+  return [...items].sort(allKnown ? byQty : (a,b) => P(a.code).buy - P(b.code).buy || byBc(a,b))[0];
 }
 const convStock = (g) => g.items.reduce((s,i) => s + (isUnk(i) ? 0 : i.qty * P(i.code).stock), 0);
 const baseUnit = (g) => (g.items.find((i) => i.unit) || {}).unit || "";
@@ -73,37 +86,58 @@ const openM = (id) => el(id).classList.add("open");
 const closeM = (id) => el(id).classList.remove("open");
 document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => closeM(b.dataset.close)));
 
+/* ── 저장하지 않은 변경 가드 ────────────────────────────────
+   값이 바뀌면 [저장]이 활성화되고, 저장 전에 다른 묶음·탭·닫기로 이동하면 확인을 받는다. */
+let pendingNav = null;
+function guard(run){
+  if (!dirty) return run();
+  pendingNav = run;
+  openM("navModal");
+}
+el("navOk").addEventListener("click", () => {
+  closeM("navModal");
+  dirty = false;
+  const run = pendingNav; pendingNav = null;
+  if (run) run();
+});
+el("winClose").addEventListener("click", () => guard(() => toast("화면을 닫습니다.")));
+
 /* ── 탭 ─────────────────────────────────────────────────────── */
-document.querySelectorAll(".tab[data-page]").forEach((t) => t.addEventListener("click", () => {
+document.querySelectorAll(".tab[data-page]").forEach((t) => t.addEventListener("click", () => guard(() => {
   document.querySelectorAll(".tab").forEach((x) => x.classList.remove("on"));
   t.classList.add("on");
   const p = t.dataset.page;
   el("page-list").style.display = p === "list" ? "grid" : "none";
   el("page-pack").style.display = p === "pack" ? "block" : "none";
   el("subhead").textContent = p === "list" ? "상품 목록" : "적수 관리";
-}));
+})));
 el("plBody").innerHTML = PRODUCTS.map((p,i) =>
-  '<tr class="'+(i===0?"on":"")+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td><td>'+(parsePack(p.name)?.unit ?? "개")+'</td>'
-  + '<td class="num">'+won(p.buy)+'</td><td class="num">'+p.stock+'</td></tr>').join("");
+  '<tr class="'+(i===0?"on":"")+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td><td>'+(p.unit || "-")+'</td>'
+  + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>'
+  + '<td class="mono">'+(p.dc || "-")+'</td><td>'+p.mk+'</td></tr>').join("");
 
 /* ── 적수 묶음 목록 ─────────────────────────────────────────── */
 let curId = GROUPS[0]?.id ?? null;
 let draft = null;     // 상세에서 편집 중인 값
+let dirty = false;    // 저장하지 않은 변경이 있는지
 
 function renderGroups(){
   const q = (el("grpQ").value || "").trim();
-  const list = GROUPS.filter((g) => !q || g.name.includes(q) || g.items.some((i) => P(i.code).name.includes(q) || P(i.code).bc.includes(q)));
+  const list = GROUPS.filter((g) => !q || g.name.includes(q)
+    || g.items.some((i) => P(i.code).name.includes(q) || P(i.code).bc.includes(q) || (P(i.code).dc && P(i.code).dc.includes(q))));
   el("grpCnt").textContent = list.length;
   el("matchN").textContent = liveCands().length;
   el("grpBody").innerHTML = list.map((g) =>
     '<tr class="'+(g.id===curId?"on":"")+'" data-g="'+g.id+'"><td class="nm">'+g.name+'</td>'
-    + '<td class="mono">'+g.rep+'</td>'
+    + '<td class="mono">'+dcTxt(g.rep)+'</td>'
+    + '<td>'+P(g.rep).mk+'</td>'
     + '<td class="num">'+g.items.length+'</td>'
     + '<td class="num">'+won(convStock(g))+baseUnit(g)+'</td>'
     + '<td>'+g.upd+'</td></tr>').join("")
-    || '<tr><td colspan="5" class="empty">적수 묶음이 없습니다.</td></tr>';
+    || '<tr><td colspan="6" class="empty">적수 묶음이 없습니다.</td></tr>';
   document.querySelectorAll("#grpBody tr[data-g]").forEach((tr) => tr.addEventListener("click", () => {
-    selectGroup(tr.dataset.g);
+    if (tr.dataset.g === curId) return;
+    guard(() => selectGroup(tr.dataset.g));
   }));
 }
 el("grpSearch").addEventListener("click", renderGroups);
@@ -123,43 +157,49 @@ function editorHTML(d, scope){
       + '<td class="nm">'+p.name+'</td>'
       + '<td'+(displayName(nm, i) === "-" ? ' class="dash"' : "")+'>'+displayName(nm, i)+'</td>'
       + '<td>'+p.bc+'</td>'
-      + '<td class="num"><input class="in-s'+(i.qty===null?" warn":"")+'" type="number" min="1" value="'+(i.qty??"")+'" placeholder="-" data-f="qty" /></td>'
       + '<td><input class="in-s unit'+(!i.unit?" warn":"")+'" value="'+(i.unit||"")+'" placeholder="-" data-f="unit" /></td>'
+      + '<td class="num"><input class="in-s'+(i.qty===null?" warn":"")+'" type="number" min="1" value="'+(i.qty??"")+'" placeholder="-" data-f="qty" /></td>'
       + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>'
       + '<td><button class="btn sm" data-out="'+i.code+'">제외</button></td></tr>';
   }).join("") || '<tr><td colspan="10" class="empty">'+(scope==="reg" ? "위 목록에서 상품을 [담기] 해 주세요." : "[＋ 상품 추가]로 상품을 담아 주세요.")+'</td></tr>';
 
+  /* 상단은 묶음 공통 정보만 둔다. 대표상품·바코드·가격·재고는 구성 상품 목록에서 확인한다. */
+  const dcCode = d.rep || items[0]?.code;
   return '<div class="grid">'
     + '<div class="fld"><label>묶음명</label><input class="in" data-name value="'+nm+'" placeholder="대표상품명으로 자동 입력" style="height:30px" /></div>'
-    + '<div class="fld"><label>대표상품</label><span class="in ro">'+(d.rep ? P(d.rep).name + " (" + d.rep + ")" : "-")+'</span></div>'
+    + '<div class="fld"><label>약품코드</label><span class="in ro mono">'+(dcCode ? dcTxt(dcCode) : "-")+'</span></div>'
     + '<div class="fld"><label>상품 수</label><span class="in ro">'+items.length+'개</span></div>'
     + '<div class="fld"><label>환산 재고</label><span class="in ro">'+(items.some((i) => !isUnk(i)) ? won(convStock({items})) + unit : "-")+'</span></div>'
+    + (scope === "reg" ? "" : '<div class="fld"><label>최근 수정일</label><span class="in ro">'+(d.upd || "-")+'</span></div>')
     + '</div>'
     + '<div class="sub-sec"><div class="sec-h"><h3>구성 상품</h3>'
     + '<span class="hint" style="margin-left:auto">대표상품을 선택하고 적수·단위를 확인하세요.</span></div>'
     + '<div class="tablewrap" style="max-height:'+(scope==="reg" ? 220 : 300)+'px"><table>'
-    + '<colgroup><col style="width:28px"><col><col style="width:104px"><col style="width:112px"><col style="width:54px"><col style="width:44px"><col style="width:56px"><col style="width:56px"><col style="width:34px"><col style="width:56px"></colgroup>'
+    + '<colgroup><col style="width:28px"><col><col style="width:104px"><col style="width:112px"><col style="width:46px"><col style="width:52px"><col style="width:56px"><col style="width:56px"><col style="width:34px"><col style="width:56px"></colgroup>'
     + '<thead><tr><th class="ck">대표</th><th>상품명</th><th>표시명</th><th>바코드</th>'
-    + '<th class="num">적수</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th><th></th></tr></thead>'
+    + '<th>단위</th><th class="num">적수</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th><th></th></tr></thead>'
     + '<tbody>'+rows+'</tbody></table></div>'
-    + '<div class="note">대표상품은 표시·식별 기준입니다. 대표를 바꿔도 구성 상품의 상품명·상품코드·바코드·가격·재고는 그대로 유지됩니다.</div>'
+    + '<div class="note">구성 상품은 적수별 단품이라 <b>바코드</b>로 구분합니다. 약품코드는 묶음 전체가 같은 값이라 위 기본 정보에 한 번만 표기합니다. 대표를 바꿔도 구성 상품의 상품명·바코드·약품코드·가격·재고는 그대로 유지됩니다.</div>'
     + '</div>';
 }
 
 function bindEditor(root, d, rerender, onOut){
+  const touch = () => { if (d === draft) dirty = true; };
   root.querySelectorAll("[data-rep]").forEach((r) => r.addEventListener("change", () => {
+    touch();
     d.rep = r.dataset.rep;
     if (!d.name) d.name = autoName(d.rep);
     rerender();
   }));
   root.querySelectorAll("input[data-f]").forEach((inp) => inp.addEventListener("change", () => {
+    touch();
     const it = d.items.find((x) => x.code === inp.closest("tr").dataset.code);
     if (inp.dataset.f === "qty") it.qty = inp.value === "" ? null : Number(inp.value);
     else it.unit = inp.value.trim();
     rerender();
   }));
   root.querySelectorAll("[data-out]").forEach((b) => b.addEventListener("click", () => onOut(b.dataset.out)));
-  root.querySelector("[data-name]").addEventListener("change", (e) => { d.name = e.target.value.trim(); });
+  root.querySelector("[data-name]").addEventListener("change", (e) => { touch(); d.name = e.target.value.trim(); });
 }
 
 function validate(d){
@@ -175,7 +215,8 @@ function selectGroup(gid){
   const g = GROUPS.find((x) => x.id === gid);
   if (!g) return;
   curId = gid;
-  draft = { name: g.name, rep: g.rep, items: g.items.map((i) => ({ ...i })) };
+  draft = { name: g.name, rep: g.rep, upd: g.upd, items: g.items.map((i) => ({ ...i })) };
+  dirty = false;
   renderGroups(); renderDetail();
 }
 
@@ -185,7 +226,7 @@ function renderDetail(){
     '<div class="sec-h"><h3>적수 묶음 상세</h3><div class="acts">'
     + '<button class="btn sm" id="btnAdd">＋ 상품 추가</button>'
     + '<button class="btn red sm" id="btnRelease">묶음 해제</button>'
-    + '<button class="btn teal sm" id="btnSave">💾 저장</button></div></div>'
+    + '<button class="btn teal sm" id="btnSave"'+(dirty ? "" : " disabled")+'>💾 저장</button></div></div>'
     + editorHTML(draft, "detail");
   bindEditor(el("detail"), draft, renderDetail, removeItem);
   el("btnAdd").addEventListener("click", openAdd);
@@ -197,6 +238,7 @@ function removeItem(code){
   if (draft.items.length <= 2) { askRelease(curGroup(), "구성 상품이 1개만 남습니다. 묶음을 해제할까요?"); return; }
   draft.items = draft.items.filter((i) => i.code !== code);
   if (draft.rep === code) draft.rep = pickMain(draft.items).code;
+  dirty = true;
   renderDetail();
   toast("적수 묶음에서만 제외됩니다. 해당 상품은 개별 상품으로 그대로 남습니다.");
 }
@@ -206,7 +248,7 @@ function saveDraft(){
   if (err) return toast(err);
   const g = curGroup();
   g.name = draft.name || autoName(draft.rep); g.rep = draft.rep;
-  g.items = draft.items.map((i) => ({ ...i })); g.upd = "09-14";
+  g.items = draft.items.map((i) => ({ ...i })); g.upd = TODAY;
   selectGroup(g.id);
   toast("수정 내용을 저장했습니다.");
 }
@@ -225,10 +267,11 @@ function drawReg(){
   const list = PRODUCTS.filter((p) => !used.has(p.code) && !inReg.has(p.code))
     .filter((p) => !q || p.name.includes(q) || p.bc.includes(q));
   el("regList").innerHTML = list.map((p) =>
-    '<tr data-code="'+p.code+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td><td>'+p.mk+'</td>'
-    + '<td class="num">'+won(p.buy)+'</td><td class="num">'+p.stock+'</td>'
+    '<tr data-code="'+p.code+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td><td class="mono">'+(p.dc || "-")+'</td>'
+    + '<td>'+(p.unit || "-")+'</td>'
+    + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>'
     + '<td><button class="btn sm" data-pick="'+p.code+'">담기</button></td></tr>').join("")
-    || '<tr><td colspan="6" class="empty">담을 수 있는 상품이 없습니다. 이미 다른 적수 묶음에 포함된 상품은 표시되지 않습니다.</td></tr>';
+    || '<tr><td colspan="8" class="empty">담을 수 있는 상품이 없습니다. 이미 다른 적수 묶음에 포함된 상품은 표시되지 않습니다.</td></tr>';
   el("regEditor").innerHTML = editorHTML(REG, "reg");
   bindEditor(el("regEditor"), REG, drawReg, (code) => {
     REG.items = REG.items.filter((i) => i.code !== code);
@@ -237,7 +280,7 @@ function drawReg(){
   });
   el("regList").querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
     const code = b.dataset.pick;
-    const g = parsePack(P(code).name) ?? { qty: null, unit: "" };
+    const g = seedPack(code);
     REG.items.push({ code, qty: g.qty, unit: g.unit });
     REG.rep = pickMain(REG.items).code;
     if (!REG.name) REG.name = autoName(REG.rep);
@@ -251,7 +294,7 @@ el("regOk").addEventListener("click", () => {
   if (err) return toast(err);
   const gid = "G" + String(GROUPS.length + 3).padStart(3, "0");
   const name = REG.name || autoName(REG.rep);
-  GROUPS.unshift({ id: gid, name, rep: REG.rep, upd: "09-14", items: REG.items.map((i) => ({ ...i })) });
+  GROUPS.unshift({ id: gid, name, rep: REG.rep, upd: TODAY, items: REG.items.map((i) => ({ ...i })) });
   closeM("regModal"); selectGroup(gid);
   toast(name + " 적수 묶음을 등록했습니다.");
 });
@@ -283,11 +326,12 @@ function drawAddList(){
     .filter((p) => !q || p.name.includes(q) || p.bc.includes(q));
   el("addBody").innerHTML = rows.map((p) =>
     '<tr class="'+(addDraft?.code===p.code?"on":"")+'" data-code="'+p.code+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td>'
-    + '<td>'+p.mk+'</td><td class="num">'+won(p.buy)+'</td><td class="num">'+p.stock+'</td></tr>').join("")
-    || '<tr><td colspan="5" class="empty">추가할 수 있는 상품이 없습니다. 이미 다른 적수 묶음에 포함된 상품은 추가할 수 없습니다.</td></tr>';
-  // 상품을 고르면 같은 화면에서 포장정보를 확인·수정한다
+    + '<td class="mono">'+(p.dc || "-")+'</td><td>'+(p.unit || "-")+'</td>'
+    + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td></tr>').join("")
+    || '<tr><td colspan="7" class="empty">추가할 수 있는 상품이 없습니다. 이미 다른 적수 묶음에 포함된 상품은 추가할 수 없습니다.</td></tr>';
+  // 상품을 고르면 같은 화면에서 적수·단위를 확인·수정한다
   document.querySelectorAll("#addBody tr[data-code]").forEach((tr) => tr.addEventListener("click", () => {
-    const guess = parsePack(P(tr.dataset.code).name) ?? { qty:null, unit:"" };
+    const guess = seedPack(tr.dataset.code);
     addDraft = { code: tr.dataset.code, qty: guess.qty, unit: guess.unit };
     drawAddList(); drawAddInfo();
   }));
@@ -302,6 +346,8 @@ function drawAddInfo(){
   el("addInfo").innerHTML =
     '<div class="grid" style="margin-bottom:0">'
     + '<div class="fld full"><label>상품명</label><span class="in ro">'+p.name+'</span></div>'
+    + '<div class="fld"><label>바코드</label><span class="in ro mono">'+p.bc+'</span></div>'
+    + '<div class="fld"><label>약품코드</label><span class="in ro mono">'+(p.dc || "-")+'</span></div>'
     + '<div class="fld"><label>적수</label><input class="in'+(addDraft.qty===null?" warn":"")+'" id="aq" type="number" min="1" value="'+(addDraft.qty??"")+'" placeholder="-" style="height:30px"/></div>'
     + '<div class="fld"><label>단위</label><input class="in'+(!addDraft.unit?" warn":"")+'" id="au" value="'+(addDraft.unit||"")+'" placeholder="-" style="height:30px"/></div>'
     + '<div class="fld full"><label>표시명 미리보기</label><span class="in ro">'+displayName(draft?.name || P(addDraft.code).name, addDraft)+'</span></div></div>'
@@ -314,6 +360,7 @@ el("addSearch").addEventListener("click", drawAddList);
 el("addQ").addEventListener("keydown", (e) => { if (e.key === "Enter") drawAddList(); });
 el("addOk").addEventListener("click", () => {
   draft.items.push({ code: addDraft.code, qty: addDraft.qty, unit: addDraft.unit });
+  dirty = true;
   if (!draft.rep) draft.rep = pickMain(draft.items).code;
   if (!draft.name && draft.rep) draft.name = P(draft.rep).name.replace(/\s*\d+\s*(병|정|개|매|포|캡슐)?\s*$/, "").trim();
   closeM("addModal"); renderDetail();
@@ -334,7 +381,7 @@ function recordExclusion(c, code, at){
   skuOut[c.id].add(code);
 }
 // 예시: 이지엔6이브 20정은 09-05에 매칭에서 제외됐고, 이후 30정이 신규 등록돼 10정 + 30정으로 다시 표시된다
-recordExclusion(CANDS.find((c) => c.id === "C02"), "GP708823327", "2026-09-05 10:12");
+recordExclusion(CANDS.find((c) => c.id === "C02"), "P708823327", "2026-09-05 10:12");
 
 const liveCands = () => CANDS.filter((c) => !hidden.has(c.id) && !done.has(c.id));
 
@@ -347,7 +394,8 @@ function renderCands(){
 
   const cell = (i) => {
     const p = P(i.code);
-    return '<td>'+p.bc+'</td><td>'+p.mk+'</td><td class="num">'+won(p.buy)+'</td><td class="num">'+p.stock+'</td>';
+    return '<td>'+p.bc+'</td><td>'+(p.unit || "-")+'</td><td class="num">'+won(p.buy)+'</td>'
+      + '<td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>';
   };
   el("candBody").innerHTML = list.map((c) => {
     const open = !collapsed.has(c.id);
@@ -357,7 +405,9 @@ function renderCands(){
     // 그룹 행: 그룹 전체 선택 전용 (상품 정보는 아래 상품 행에서)
     const head = '<tr class="grow" data-g="'+c.id+'">'
       + '<td class="ck"><input type="checkbox" data-gck="'+c.id+'" '+(live.length && picked===live.length?"checked":"")+' /></td>'
-      + '<td class="nm" colspan="6"><span class="caret" data-tg="'+c.id+'">'+(open?"▾":"▸")+'</span> '+P(main.code).name
+      + '<td class="nm" colspan="7"><span class="caret" data-tg="'+c.id+'">'+(open?"▾":"▸")+'</span> '+P(main.code).name
+      + (P(main.code).dc ? ' <span class="mono">'+P(main.code).dc+'</span>' : ' <span class="tag">약품코드 없음</span>')
+      + ' · '+P(main.code).mk
       + '<span class="gbadge">적수 '+live.length+'건</span></td></tr>';
     if (!open) return head;
     // 상품 행: 대표 상품 포함 모든 상품을 적수 오름차순으로, 각각 선택
@@ -366,7 +416,7 @@ function renderCands(){
       + '<td class="ck"><input type="checkbox" '+(sel[c.id].has(i.code)?"checked":"")+' /></td>'
       + '<td class="sub">└ '+(i===main?'<span class="tag rep">대표</span> ':"")+P(i.code).name+'</td>' + cell(i) + '<td></td></tr>').join("");
     return head + rows;
-  }).join("") || '<tr><td colspan="7" class="empty">검토할 적수 매칭 그룹이 없습니다.</td></tr>';
+  }).join("") || '<tr><td colspan="8" class="empty">검토할 적수 매칭 그룹이 없습니다.</td></tr>';
 
   document.querySelectorAll("#candBody tr[data-code]").forEach((tr) => tr.addEventListener("click", (e) => {
     if (e.target.dataset.tg) return;
@@ -465,7 +515,7 @@ function drawMake(){
 el("mkOk").addEventListener("click", () => {
   MK.groups.forEach((g) => {
     const gid = "G" + String(GROUPS.length + 3).padStart(3, "0");
-    GROUPS.unshift({ id: gid, name: baseNameOf(g), rep: g.rep, upd: "09-11",
+    GROUPS.unshift({ id: gid, name: baseNameOf(g), rep: g.rep, upd: TODAY,
       items: g.rows.map((r) => ({ code:r.code, qty:r.qty, unit:r.unit })) });
     done.add(g.cid);
     curId = gid;
@@ -485,6 +535,6 @@ if (qs.get("modal") === "match") el("openMatch").click();
 if (qs.get("modal") === "add") {
   el("btnAdd")?.click();
   const pick = qs.get("pick");   // 리뷰 링크용 — 선택 상태로 열기
-  if (pick) { const g2 = parsePack(P(pick).name) ?? { qty:null, unit:"" }; addDraft = { code:pick, qty:g2.qty, unit:g2.unit }; drawAddList(); drawAddInfo(); }
+  if (pick && P(pick)) { const g2 = seedPack(pick); addDraft = { code:pick, qty:g2.qty, unit:g2.unit }; drawAddList(); drawAddInfo(); }
 }
 if (qs.get("g")) selectGroup(qs.get("g"));

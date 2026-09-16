@@ -81,7 +81,7 @@
   .nm{font-weight:600}
   .sub{padding-left:22px}
   .dash,td.dash{color:#b3b9c0}
-  td.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:#5a6066}
+  td.mono,span.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:#5a6066}
   td.unk{color:var(--amber);font-weight:700}
   .empty{padding:36px 0;text-align:center;color:var(--muted);font-size:12px}
 
@@ -130,7 +130,7 @@
 <body>
 <div class="win">
   <div class="titlebar"><span class="tb-mark"></span><span class="tb-title">상품 관리</span>
-    <span class="tb-actions"><span>↻</span><span>⚙</span><span>—</span><span>✕</span></span>
+    <span class="tb-actions"><span>↻</span><span>⚙</span><span>—</span><span id="winClose" style="cursor:pointer">✕</span></span>
   </div>
   <div class="subhead" id="subhead">적수 관리</div>
   <nav class="tabs">
@@ -152,7 +152,7 @@
       <div class="cnt-row"><span class="cnt">전체 <b>2132</b> 개</span><span class="spacer"></span>
         <button class="btn sm">＋ 신규</button><button class="btn sm">⭳ 내보내기</button></div>
       <div class="tablewrap">
-        <table><thead><tr><th>상품명</th><th>바코드</th><th>단위</th><th class="num">사입가</th><th class="num">재고</th></tr></thead>
+        <table><thead><tr><th>상품명</th><th>바코드</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th><th>약품코드</th><th>제조사</th></tr></thead>
         <tbody id="plBody"></tbody></table>
       </div>
     </div>
@@ -180,7 +180,7 @@
     <div class="cols">
       <div class="left">
         <div class="bar">
-          <select class="sel-in"><option>묶음명</option><option>상품명</option><option>바코드</option></select>
+          <select class="sel-in"><option>묶음명</option><option>상품명</option><option>바코드</option><option>약품코드</option></select>
           <input class="inp" id="grpQ" placeholder="묶음명 또는 상품명 입력" />
           <button class="btn teal sm" id="grpSearch">검색</button>
         </div>
@@ -190,7 +190,8 @@
           <button class="btn teal sm" id="openMatch">적수 매칭 그룹 <b id="matchN">0</b>건</button></div>
         <div class="tablewrap">
           <table>
-            <thead><tr><th>묶음명</th><th>상품코드</th><th class="num">상품 수</th><th class="num">환산 재고</th><th>최근 수정일</th></tr></thead>
+            <colgroup><col><col style="width:90px"><col style="width:60px"><col style="width:48px"><col style="width:60px"><col style="width:78px"></colgroup>
+            <thead><tr><th>묶음명</th><th>약품코드</th><th>제조사</th><th class="num">상품 수</th><th class="num">환산 재고</th><th>수정일</th></tr></thead>
             <tbody id="grpBody"></tbody>
           </table>
         </div>
@@ -212,9 +213,9 @@
       </div>
       <div class="tablewrap" style="max-height:none">
         <table id="candTable">
-          <colgroup><col style="width:38px"><col><col style="width:132px"><col style="width:100px"><col style="width:90px"><col style="width:90px"><col style="width:84px"></colgroup>
-          <thead><tr><th class="ck">선택</th><th>상품명</th><th>바코드</th><th>제조사</th>
-            <th class="num">사입가</th><th class="num">현재 재고</th><th></th></tr></thead>
+          <colgroup><col style="width:38px"><col><col style="width:132px"><col style="width:56px"><col style="width:84px"><col style="width:84px"><col style="width:74px"><col style="width:60px"></colgroup>
+          <thead><tr><th class="ck">선택</th><th>상품명</th><th>바코드</th><th>단위</th>
+            <th class="num">사입가</th><th class="num">판매가</th><th class="num">현재 재고</th><th></th></tr></thead>
           <tbody id="candBody"></tbody>
         </table>
       </div>
@@ -249,8 +250,8 @@
     <div class="modal-b">
       <div class="bar"><input class="inp" id="regQ" placeholder="상품명 또는 바코드를 입력해 주세요." /><button class="btn teal sm" id="regSearch">검색</button></div>
       <div class="tablewrap" style="max-height:200px">
-        <table><colgroup><col><col style="width:130px"><col style="width:100px"><col style="width:80px"><col style="width:60px"><col style="width:64px"></colgroup>
-        <thead><tr><th>상품명</th><th>바코드</th><th>제조사</th><th class="num">사입가</th><th class="num">재고</th><th></th></tr></thead>
+        <table><colgroup><col><col style="width:130px"><col style="width:108px"><col style="width:52px"><col style="width:72px"><col style="width:72px"><col style="width:54px"><col style="width:64px"></colgroup>
+        <thead><tr><th>상품명</th><th>바코드</th><th>약품코드</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th><th></th></tr></thead>
         <tbody id="regList"></tbody></table>
       </div>
       <div class="sub-sec"><div class="sec-h"><h3>적수 묶음 상세</h3></div><div id="regEditor"></div></div>
@@ -268,7 +269,7 @@
     <div class="modal-b">
       <div class="bar"><input class="inp" id="addQ" placeholder="상품명 또는 바코드를 입력해 주세요." /><button class="btn teal sm" id="addSearch">검색</button></div>
       <div class="tablewrap" style="max-height:250px">
-        <table><thead><tr><th>상품명</th><th>바코드</th><th>제조사</th><th class="num">사입가</th><th class="num">재고</th></tr></thead>
+        <table><thead><tr><th>상품명</th><th>바코드</th><th>약품코드</th><th>단위</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th></tr></thead>
         <tbody id="addBody"></tbody></table>
       </div>
       <div class="sub-sec"><div class="sec-h"><h3>선택 상품 정보</h3></div><div id="addInfo"></div></div>
@@ -287,6 +288,17 @@
     <div class="modal-f"><span class="spacer"></span>
       <button class="mbtn ghost" data-close="relModal">취소</button>
       <button class="mbtn danger" id="relOk">묶음 해제</button></div>
+  </div>
+</div>
+
+<!-- 저장하지 않은 변경 확인 -->
+<div class="modal-bg" id="navModal">
+  <div class="modal sm" style="max-width:460px" role="dialog" aria-modal="true">
+    <div class="modal-h"><span class="mtitle">저장하지 않은 변경사항</span><button class="x" data-close="navModal">✕</button></div>
+    <div class="modal-b"><p style="margin:6px 0;font-size:13px;line-height:1.6">저장하지 않은 변경사항이 있습니다. 변경사항을 저장하지 않고 이동하시겠습니까?</p></div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button class="mbtn ghost" data-close="navModal">취소</button>
+      <button class="mbtn primary" id="navOk">저장하지 않고 이동</button></div>
   </div>
 </div>
 
