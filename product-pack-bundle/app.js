@@ -48,7 +48,7 @@ const CANDS = [
 ];
 
 /* ── 공통 ───────────────────────────────────────────────────── */
-const TODAY = "2026-09-16";
+const TODAY = "2026-09-18";
 const el = (id) => document.getElementById(id);
 const won = (n) => (n === null || n === undefined ? "-" : Number(n).toLocaleString("ko-KR"));
 const isUnk = (i) => i.qty === null || i.qty === undefined || !i.unit;
@@ -78,7 +78,6 @@ function pickMain(items){
   const allKnown = items.every((i) => i.qty !== null && i.qty !== undefined);
   return [...items].sort(allKnown ? byQty : (a,b) => P(a.code).buy - P(b.code).buy || byBc(a,b))[0];
 }
-const convStock = (g) => g.items.reduce((s,i) => s + (isUnk(i) ? 0 : i.qty * P(i.code).stock), 0);
 const baseUnit = (g) => (g.items.find((i) => i.unit) || {}).unit || "";
 
 function toast(msg){ const t = el("toast"); t.textContent = msg; t.classList.add("on"); setTimeout(()=>t.classList.remove("on"), 2400); }
@@ -110,16 +109,39 @@ document.querySelectorAll(".tab[data-page]").forEach((t) => t.addEventListener("
   el("page-list").style.display = p === "list" ? "grid" : "none";
   el("page-pack").style.display = p === "pack" ? "block" : "none";
   el("subhead").textContent = p === "list" ? "상품 목록" : "적수 관리";
+  if (p === "list") renderProducts();
 })));
-el("plBody").innerHTML = PRODUCTS.map((p,i) =>
-  '<tr class="'+(i===0?"on":"")+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td><td>'+(p.unit || "-")+'</td>'
-  + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>'
-  + '<td class="mono">'+(p.dc || "-")+'</td><td>'+p.mk+'</td></tr>').join("");
+function renderProducts(){
+  el("plBody").innerHTML = PRODUCTS.map((p,i) =>
+    '<tr class="'+(i===0?"on":"")+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td><td>'+(p.unit || "-")+'</td>'
+    + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+won(p.stock)+'</td>'
+    + '<td class="mono">'+(p.dc || "-")+'</td><td>'+p.mk+'</td></tr>').join("");
+}
+renderProducts();
 
 /* ── 적수 묶음 목록 ─────────────────────────────────────────── */
 let curId = GROUPS[0]?.id ?? null;
 let draft = null;     // 상세에서 편집 중인 값
 let dirty = false;    // 저장하지 않은 변경이 있는지
+
+/* ── 재고 ────────────────────────────────────────────────────
+   묶을 때 약품코드 기준 하나로 합친다(구성 상품 재고 × 적수). 합친 재고는 다시 나누지 않는다.
+   · 묶음 해제한 상품은 재고 0으로 개별 상품이 되고, 재고는 묶음에 남는다.
+   · 마지막 1개만 남으면 묶음이 삭제되고, 재고는 그 상품에 모두 모인다.
+   · 해제된 상품의 상품명은 묶음에서 쓰던 표시명으로 바뀐다. */
+const mergeStock = (items) => items.reduce((s,i) => s + (isUnk(i) ? 0 : i.qty * P(i.code).stock), 0);
+const stockTxt = (n, unit) => won(n) + (unit || "");
+GROUPS.forEach((g) => { g.stock = mergeStock(g.items); });
+function leaveBundle(nm, item){
+  const p = P(item.code);
+  p.name = displayName(nm, item);   // 예) 박카스10 → 박카스(10병)
+  p.stock = 0;
+}
+function draftStock(d){
+  // 저장된 묶음 재고 + 이번에 새로 담은 상품의 재고
+  const had = d.baseCodes ?? new Set();
+  return (d.baseStock ?? 0) + mergeStock(d.items.filter((i) => !had.has(i.code)));
+}
 
 function renderGroups(){
   const q = (el("grpQ").value || "").trim();
@@ -132,7 +154,7 @@ function renderGroups(){
     + '<td class="mono">'+dcTxt(g.rep)+'</td>'
     + '<td>'+P(g.rep).mk+'</td>'
     + '<td class="num">'+g.items.length+'</td>'
-    + '<td class="num">'+won(convStock(g))+baseUnit(g)+'</td>'
+    + '<td class="num">'+stockTxt(g.stock, baseUnit(g))+'</td>'
     + '<td>'+g.upd+'</td></tr>').join("")
     || '<tr><td colspan="6" class="empty">적수 묶음이 없습니다.</td></tr>';
   document.querySelectorAll("#grpBody tr[data-g]").forEach((tr) => tr.addEventListener("click", () => {
@@ -143,43 +165,60 @@ function renderGroups(){
 el("grpSearch").addEventListener("click", renderGroups);
 el("grpQ").addEventListener("keydown", (e) => { if (e.key === "Enter") renderGroups(); });
 
-/* ── 적수 묶음 편집 영역 (상세 화면 · 신규 등록 모달 공용) ───── */
+/* ── 적수 묶음 편집 영역 (상세 화면 · 신규 등록 모달 공용) ─────
+   구성 상품은 표시명·바코드로 구분한다. 상품명은 등록 당시 이름이라 두지 않고,
+   재고는 묶음 단위로 합쳐지므로 상단 기본 정보에만 둔다. */
 const autoName = (code) => P(code).name.replace(/\s*\d+\s*(병|정|개|매|포|캡슐)?\s*$/, "").trim();
 
 function editorHTML(d, scope){
   const items = d.items.slice().sort(byQty);
   const nm = d.name || (d.rep ? autoName(d.rep) : "");
   const unit = (items.find((i) => i.unit) || {}).unit || "";
+  const detail = scope === "detail";
+  const sel = d.sel || (d.sel = new Set());
   const rows = items.map((i) => {
-    const p = P(i.code);
+    const p = P(i.code), dn = displayName(nm, i);
     return '<tr data-code="'+i.code+'">'
+      + (detail ? '<td class="ck"><input type="checkbox" data-sel="'+i.code+'" '+(sel.has(i.code)?"checked":"")+' /></td>' : "")
       + '<td class="ck"><input type="radio" name="rep_'+scope+'" '+(d.rep===i.code?"checked":"")+' data-rep="'+i.code+'" /></td>'
-      + '<td class="nm">'+p.name+'</td>'
-      + '<td'+(displayName(nm, i) === "-" ? ' class="dash"' : "")+'>'+displayName(nm, i)+'</td>'
+      + '<td class="nm'+(dn === "-" ? " dash" : "")+'">'+dn+'</td>'
       + '<td>'+p.bc+'</td>'
       + '<td><input class="in-s unit'+(!i.unit?" warn":"")+'" value="'+(i.unit||"")+'" placeholder="-" data-f="unit" /></td>'
       + '<td class="num"><input class="in-s'+(i.qty===null?" warn":"")+'" type="number" min="1" value="'+(i.qty??"")+'" placeholder="-" data-f="qty" /></td>'
-      + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td>'
-      + '<td><button class="btn sm" data-out="'+i.code+'">제외</button></td></tr>';
-  }).join("") || '<tr><td colspan="10" class="empty">'+(scope==="reg" ? "위 목록에서 상품을 [담기] 해 주세요." : "[＋ 상품 추가]로 상품을 담아 주세요.")+'</td></tr>';
+      + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td>'
+      + (detail ? "" : '<td><button class="btn sm" data-out="'+i.code+'">제외</button></td>')
+      + '</tr>';
+  }).join("") || '<tr><td colspan="8" class="empty">'+(detail ? "[＋ 상품 추가]로 상품을 담아 주세요." : "위 목록에서 상품을 [담기] 해 주세요.")+'</td></tr>';
 
-  /* 상단은 묶음 공통 정보만 둔다. 대표상품·바코드·가격·재고는 구성 상품 목록에서 확인한다. */
+  const stockVal = detail ? draftStock(d) : mergeStock(items);
+  const hasStock = items.some((i) => !isUnk(i));
+  const cols = (detail ? '<col style="width:40px">' : "")
+    + '<col style="width:40px"><col><col style="width:118px"><col style="width:54px"><col style="width:60px"><col style="width:66px"><col style="width:66px">'
+    + (detail ? "" : '<col style="width:58px">');
+  const head = (detail ? '<th class="ck">선택</th>' : "")
+    + '<th class="ck">대표</th><th>표시명</th><th>바코드</th><th>단위</th><th class="num">적수</th><th class="num">사입가</th><th class="num">판매가</th>'
+    + (detail ? "" : "<th></th>");
+  const acts = detail
+    ? '<div class="acts"><button class="btn sm" id="btnAdd">＋ 상품 추가</button>'
+      + '<button class="btn red sm" id="btnOut"'+(sel.size ? "" : " disabled")+'>묶음 해제'+(sel.size ? " ("+sel.size+")" : "")+'</button></div>'
+    : '<span class="hint" style="margin-left:auto">대표상품을 선택하고 적수·단위를 확인하세요.</span>';
+
+  /* 상단은 묶음 공통 정보만 둔다. */
   const dcCode = d.rep || items[0]?.code;
   return '<div class="grid">'
     + '<div class="fld"><label>묶음명</label><input class="in" data-name value="'+nm+'" placeholder="대표상품명으로 자동 입력" style="height:30px" /></div>'
     + '<div class="fld"><label>약품코드</label><span class="in ro mono">'+(dcCode ? dcTxt(dcCode) : "-")+'</span></div>'
     + '<div class="fld"><label>상품 수</label><span class="in ro">'+items.length+'개</span></div>'
-    + '<div class="fld"><label>환산 재고</label><span class="in ro">'+(items.some((i) => !isUnk(i)) ? won(convStock({items})) + unit : "-")+'</span></div>'
-    + (scope === "reg" ? "" : '<div class="fld"><label>최근 수정일</label><span class="in ro">'+(d.upd || "-")+'</span></div>')
+    + '<div class="fld"><label>재고</label><span class="in ro">'+(hasStock ? stockTxt(stockVal, unit) : "-")+'</span></div>'
+    + (detail ? '<div class="fld"><label>최근 수정일</label><span class="in ro">'+(d.upd || "-")+'</span></div>' : "")
     + '</div>'
-    + '<div class="sub-sec"><div class="sec-h"><h3>구성 상품</h3>'
-    + '<span class="hint" style="margin-left:auto">대표상품을 선택하고 적수·단위를 확인하세요.</span></div>'
-    + '<div class="tablewrap" style="max-height:'+(scope==="reg" ? 220 : 300)+'px"><table>'
-    + '<colgroup><col style="width:28px"><col><col style="width:104px"><col style="width:112px"><col style="width:46px"><col style="width:52px"><col style="width:56px"><col style="width:56px"><col style="width:34px"><col style="width:56px"></colgroup>'
-    + '<thead><tr><th class="ck">대표</th><th>상품명</th><th>표시명</th><th>바코드</th>'
-    + '<th>단위</th><th class="num">적수</th><th class="num">사입가</th><th class="num">판매가</th><th class="num">재고</th><th></th></tr></thead>'
+    + '<div class="sub-sec"><div class="sec-h"><h3>구성 상품</h3>' + acts + '</div>'
+    + '<div class="tablewrap" style="max-height:'+(detail ? 300 : 220)+'px"><table>'
+    + '<colgroup>'+cols+'</colgroup><thead><tr>'+head+'</tr></thead>'
     + '<tbody>'+rows+'</tbody></table></div>'
-    + '<div class="note">구성 상품은 적수별 단품이라 <b>바코드</b>로 구분합니다. 약품코드는 묶음 전체가 같은 값이라 위 기본 정보에 한 번만 표기합니다. 대표를 바꿔도 구성 상품의 상품명·바코드·약품코드·가격·재고는 그대로 유지됩니다.</div>'
+    + '<div class="note">'+(detail
+        ? '구성 상품은 적수별 단품이라 <b>바코드</b>로 구분합니다. 재고는 약품코드 기준으로 합쳐져 묶음 단위로 관리합니다. 묶음 해제한 상품은 재고 0으로 개별 상품이 되고, 재고는 묶음에 남습니다.'
+        : '담은 상품의 재고는 등록할 때 약품코드 기준으로 합쳐집니다.')+'</div>'
     + '</div>';
 }
 
@@ -198,7 +237,12 @@ function bindEditor(root, d, rerender, onOut){
     else it.unit = inp.value.trim();
     rerender();
   }));
-  root.querySelectorAll("[data-out]").forEach((b) => b.addEventListener("click", () => onOut(b.dataset.out)));
+  // 선택은 변경이 아니다 — 묶음 해제 대상만 고른다
+  root.querySelectorAll("[data-sel]").forEach((c) => c.addEventListener("change", () => {
+    if (c.checked) d.sel.add(c.dataset.sel); else d.sel.delete(c.dataset.sel);
+    rerender();
+  }));
+  if (onOut) root.querySelectorAll("[data-out]").forEach((b) => b.addEventListener("click", () => onOut(b.dataset.out)));
   root.querySelector("[data-name]").addEventListener("change", (e) => { touch(); d.name = e.target.value.trim(); });
 }
 
@@ -215,7 +259,8 @@ function selectGroup(gid){
   const g = GROUPS.find((x) => x.id === gid);
   if (!g) return;
   curId = gid;
-  draft = { name: g.name, rep: g.rep, upd: g.upd, items: g.items.map((i) => ({ ...i })) };
+  draft = { name: g.name, rep: g.rep, upd: g.upd, items: g.items.map((i) => ({ ...i })),
+            baseStock: g.stock, baseCodes: new Set(g.items.map((i) => i.code)), sel: new Set() };
   dirty = false;
   renderGroups(); renderDetail();
 }
@@ -224,30 +269,36 @@ function renderDetail(){
   if (!draft) { el("detail").innerHTML = '<div class="empty">좌측에서 적수 묶음을 선택하세요.</div>'; return; }
   el("detail").innerHTML =
     '<div class="sec-h"><h3>적수 묶음 상세</h3><div class="acts">'
-    + '<button class="btn sm" id="btnAdd">＋ 상품 추가</button>'
-    + '<button class="btn red sm" id="btnRelease">묶음 해제</button>'
     + '<button class="btn teal sm" id="btnSave"'+(dirty ? "" : " disabled")+'>💾 저장</button></div></div>'
     + editorHTML(draft, "detail");
-  bindEditor(el("detail"), draft, renderDetail, removeItem);
+  bindEditor(el("detail"), draft, renderDetail, null);
   el("btnAdd").addEventListener("click", openAdd);
+  el("btnOut").addEventListener("click", releaseSelected);
   el("btnSave").addEventListener("click", saveDraft);
-  el("btnRelease").addEventListener("click", () => askRelease(curGroup(), null));
 }
 
-function removeItem(code){
-  if (draft.items.length <= 2) { askRelease(curGroup(), "구성 상품이 1개만 남습니다. 묶음을 해제할까요?"); return; }
-  draft.items = draft.items.filter((i) => i.code !== code);
-  if (draft.rep === code) draft.rep = pickMain(draft.items).code;
+/* 선택한 구성 상품을 묶음 해제한다. 1개만 남게 되면 묶음을 삭제한다. */
+function releaseSelected(){
+  const picked = [...draft.sel];
+  if (!picked.length) return;
+  const remain = draft.items.filter((i) => !draft.sel.has(i.code));
+  if (remain.length <= 1) { askDelete(remain[0]?.code ?? draft.rep); return; }
+  draft.items = remain;
+  if (picked.includes(draft.rep)) draft.rep = pickMain(remain).code;
+  draft.sel = new Set();
   dirty = true;
   renderDetail();
-  toast("적수 묶음에서만 제외됩니다. 해당 상품은 개별 상품으로 그대로 남습니다.");
+  toast("상품 " + picked.length + "개를 묶음 해제했습니다. 저장하면 표시명으로 이름이 바뀌고 재고 0으로 개별 상품이 됩니다.");
 }
 
 function saveDraft(){
   const err = validate(draft);
   if (err) return toast(err);
   const g = curGroup();
+  const kept = new Set(draft.items.map((i) => i.code));
+  g.items.filter((i) => !kept.has(i.code)).forEach((i) => leaveBundle(g.name, i));   // 이전에 설정된 표시명으로
   g.name = draft.name || autoName(draft.rep); g.rep = draft.rep;
+  g.stock = draftStock(draft);
   g.items = draft.items.map((i) => ({ ...i })); g.upd = TODAY;
   selectGroup(g.id);
   toast("수정 내용을 저장했습니다.");
@@ -294,25 +345,35 @@ el("regOk").addEventListener("click", () => {
   if (err) return toast(err);
   const gid = "G" + String(GROUPS.length + 3).padStart(3, "0");
   const name = REG.name || autoName(REG.rep);
-  GROUPS.unshift({ id: gid, name, rep: REG.rep, upd: TODAY, items: REG.items.map((i) => ({ ...i })) });
+  const items = REG.items.map((i) => ({ ...i }));
+  GROUPS.unshift({ id: gid, name, rep: REG.rep, upd: TODAY, items, stock: mergeStock(items) });
   closeM("regModal"); selectGroup(gid);
   toast(name + " 적수 묶음을 등록했습니다.");
 });
 
-/* ── 묶음 해제 ──────────────────────────────────────────────── */
-let relTarget = null;
-function askRelease(g, lead){
-  relTarget = g;
-  el("relText").textContent = (lead ? lead + " " : "")
-    + "이 적수 묶음을 해제하시겠습니까? 구성 상품의 상품정보·판매내역·재고는 변경되지 않으며 적수 연결만 해제됩니다.";
+/* ── 묶음 삭제 (구성 상품이 1개만 남을 때) ─────────────────── */
+let delTarget = null;
+function askDelete(lastCode){
+  const g = curGroup();
+  const lastItem = g.items.find((i) => i.code === lastCode) || draft.items.find((i) => i.code === lastCode);
+  const newName = displayName(g.name, lastItem);
+  delTarget = { gid: g.id, last: lastCode, lastItem, total: draftStock(draft), unit: baseUnit(g) };
+  el("relText").innerHTML = "구성 상품이 1개만 남아 이 적수 묶음이 삭제됩니다.<br>"
+    + "재고 <b>" + stockTxt(delTarget.total, delTarget.unit) + "</b>은 남은 상품 <b>" + newName + "</b>(" + P(lastCode).bc + ")에 모두 합쳐집니다.<br>"
+    + "구성 상품의 상품명은 표시명으로 바뀌고, 판매내역은 그대로입니다.";
   openM("relModal");
 }
 el("relOk").addEventListener("click", () => {
-  GROUPS = GROUPS.filter((g) => g.id !== relTarget.id);
+  const { gid, last, lastItem, total, unit } = delTarget;
+  const g = GROUPS.find((x) => x.id === gid);
+  g.items.forEach((i) => leaveBundle(g.name, i));
+  P(last).stock = total / (lastItem?.qty || 1);   // 재고는 마지막 남은 상품에 모두 모은다
+  const lastName = P(last).name;
+  GROUPS = GROUPS.filter((x) => x.id !== gid);
   closeM("relModal");
-  draft = null;
+  draft = null; dirty = false;
   if (GROUPS.length) selectGroup(GROUPS[0].id); else { curId = null; renderGroups(); renderDetail(); }
-  toast("적수 묶음을 해제했습니다.");
+  toast("묶음을 삭제했습니다. 재고 " + stockTxt(total, unit) + "은 " + lastName + "에 합쳐졌습니다.");
 });
 
 /* ── 상품 추가 (검색·선택 + 포장정보 확인을 한 화면에서) ──── */
@@ -515,8 +576,8 @@ function drawMake(){
 el("mkOk").addEventListener("click", () => {
   MK.groups.forEach((g) => {
     const gid = "G" + String(GROUPS.length + 3).padStart(3, "0");
-    GROUPS.unshift({ id: gid, name: baseNameOf(g), rep: g.rep, upd: TODAY,
-      items: g.rows.map((r) => ({ code:r.code, qty:r.qty, unit:r.unit })) });
+    const items = g.rows.map((r) => ({ code:r.code, qty:r.qty, unit:r.unit }));
+    GROUPS.unshift({ id: gid, name: baseNameOf(g), rep: g.rep, upd: TODAY, items, stock: mergeStock(items) });
     done.add(g.cid);
     curId = gid;
   });
