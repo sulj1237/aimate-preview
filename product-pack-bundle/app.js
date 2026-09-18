@@ -9,6 +9,7 @@ const PRODUCTS = [
   { code:"P641702920", dc:"DA00004721", name:"박카스",              bc:"8801234567801", unit:"병", qty:1,   mk:"동아제약", buy:600,   sell:800,   stock:15 },
   { code:"P641702937", dc:"DA00004721", name:"박카스10",            bc:"8801234567802", unit:"병", qty:10,  mk:"동아제약", buy:5800,  sell:7500,  stock:3  },
   { code:"P641702944", dc:"DA00004721", name:"박카스 100병",        bc:"8801234567803", unit:"병", qty:100, mk:"동아제약", buy:56000, sell:70000, stock:1  },
+  { code:"P641702951", dc:"DA00004721", name:"박카스 50병",         bc:"8801234567804", unit:"병", qty:1,   mk:"동아제약", buy:28500, sell:36000, stock:2  },
   { code:"P730115502", dc:"JS00001803", name:"타이레놀500mg100정",  bc:"8805551234501", unit:"정", qty:1,   mk:"한국얀센", buy:7400,  sell:9800,  stock:4  },
   { code:"P730115519", dc:"JS00001803", name:"타이레놀 500mg 300정",bc:"8805551234502", unit:"정", qty:1,   mk:"한국얀센", buy:21000, sell:27000, stock:2  },
   { code:"P730115526", dc:"JS00001811", name:"타이레놀650mg100정",  bc:"8805551234503", unit:"정", qty:1,   mk:"한국얀센", buy:8300,  sell:11000, stock:5  },
@@ -378,9 +379,16 @@ el("relOk").addEventListener("click", () => {
 
 /* ── 상품 추가 (검색·선택 + 포장정보 확인을 한 화면에서) ──── */
 let addDraft = null;
-function openAdd(){ addDraft = null; el("addQ").value = ""; drawAddList(); drawAddInfo(); openM("addModal"); }
+/* 처음 열면 검색창은 비워 두고, 목록만 대표상품명으로 찾은 결과를 보여준다.
+   검색을 한 번 실행하면 그때부터는 검색창 값으로 찾는다. */
+let addDefaultQ = "";
+function openAdd(){
+  addDraft = null; el("addQ").value = "";
+  addDefaultQ = draft?.rep ? autoName(draft.rep) : "";
+  drawAddList(); drawAddInfo(); openM("addModal");
+}
 function drawAddList(){
-  const q = (el("addQ").value || "").trim();
+  const q = addDefaultQ || (el("addQ").value || "").trim();
   const used = bundledCodes();
   const inDraft = new Set((draft?.items ?? []).map((i) => i.code));
   const rows = PRODUCTS.filter((p) => !used.has(p.code) && !inDraft.has(p.code))
@@ -389,7 +397,7 @@ function drawAddList(){
     '<tr class="'+(addDraft?.code===p.code?"on":"")+'" data-code="'+p.code+'"><td class="nm">'+p.name+'</td><td>'+p.bc+'</td>'
     + '<td class="mono">'+(p.dc || "-")+'</td><td>'+(p.unit || "-")+'</td>'
     + '<td class="num">'+won(p.buy)+'</td><td class="num">'+won(p.sell)+'</td><td class="num">'+p.stock+'</td></tr>').join("")
-    || '<tr><td colspan="7" class="empty">추가할 수 있는 상품이 없습니다. 이미 다른 적수 묶음에 포함된 상품은 추가할 수 없습니다.</td></tr>';
+    || '<tr><td colspan="7" class="empty">'+(addDefaultQ ? "‘"+addDefaultQ+"’(으)로 찾은 상품 중 추가할 수 있는 상품이 없습니다. 검색어를 입력해 찾아 주세요." : "추가할 수 있는 상품이 없습니다. 이미 다른 적수 묶음에 포함된 상품은 추가할 수 없습니다.")+'</td></tr>';
   // 상품을 고르면 같은 화면에서 적수·단위를 확인·수정한다
   document.querySelectorAll("#addBody tr[data-code]").forEach((tr) => tr.addEventListener("click", () => {
     const guess = seedPack(tr.dataset.code);
@@ -417,8 +425,9 @@ function drawAddInfo(){
   el("au").addEventListener("change", (e) => { addDraft.unit = e.target.value.trim(); drawAddInfo(); });
   el("addOk").disabled = isUnk(addDraft);
 }
-el("addSearch").addEventListener("click", drawAddList);
-el("addQ").addEventListener("keydown", (e) => { if (e.key === "Enter") drawAddList(); });
+const runAddSearch = () => { addDefaultQ = ""; drawAddList(); };
+el("addSearch").addEventListener("click", runAddSearch);
+el("addQ").addEventListener("keydown", (e) => { if (e.key === "Enter") runAddSearch(); });
 el("addOk").addEventListener("click", () => {
   draft.items.push({ code: addDraft.code, qty: addDraft.qty, unit: addDraft.unit });
   dirty = true;
