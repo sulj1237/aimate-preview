@@ -210,7 +210,7 @@
       <tbody>
         <tr class="grp"><td colspan="4">목록</td></tr>
         <tr><td>적용된 필터 · 초기화 · 상세▼ · 엑셀 · 페이지네이션</td><td><span class="tag k">유지</span></td><td>구조 그대로. 상세▼ 안에 상태·담당자·카테고리·기간 필터.</td><td>익숙한 방식 유지.</td></tr>
-        <tr><td>검색 조건 (약국명)</td><td><span class="tag c">변경</span></td><td>약국명 / <b>전화번호</b></td><td>전화 받은 번호로 약국을 바로 찾는다. CTI 없이 가능한 가장 싼 자동화.</td></tr>
+        <tr><td>검색 조건 (약국명)</td><td><span class="tag c">변경</span></td><td>약국명 / <b>전화번호</b></td><td>전화 받은 번호로 약국을 바로 찾는다. 전화 시스템 연동 없이 가능한 가장 간단한 자동화.</td></tr>
         <tr><td>(없음)</td><td><span class="tag a">추가</span></td><td><b>＋ A/S 등록</b> 버튼</td><td>전화로 받은 문의를 CS가 직접 등록.</td></tr>
         <tr><td>약국명(지역) · 카테고리 · 접수내용 · 접수일자 · 상태</td><td><span class="tag k">유지</span></td><td>그대로. 카테고리는 <b>기존 1단 그대로 필수</b>.</td><td>원래 있던 칸이라 부담이 늘지 않는다. 세부 분류는 종료 후 AI가 따로 만든다(DATA).</td></tr>
         <tr><td>진행내역 컬럼</td><td><span class="tag d">제거</span></td><td>상세 › 진행내용 탭에서 확인.</td><td>누적 기록이라 한 칸에 요약되지 않는다. 그 자리에 담당자·처리시간을 둔다.</td></tr>
@@ -218,12 +218,12 @@
         <tr><td>상태 3종 (접수요청 · 확인중 · 처리완료)</td><td><span class="tag c">변경</span></td><td>4종 — 접수 · 처리중 · 처리완료 · 종료</td><td>`확인중` → `처리중`. 처리완료(담당자 조치 완료)와 종료(고객 안내 완료)는 개발팀에 넘긴 건에서만 나뉜다.</td></tr>
         <tr class="grp"><td colspan="4">A/S 수정 Modal → A/S 상세 Modal</td></tr>
         <tr><td>접수 정보 (약국명·연락처·접수일자·카테고리·접수내용)</td><td><span class="tag k">유지</span></td><td>그대로. 접수일자 → 접수일시(기본값 현재 시각, 필요할 때만 수정).</td><td>—</td></tr>
-        <tr><td>업체명 · 엔지니어정보</td><td><span class="tag c">변경</span></td><td><b>접수자 · 담당자</b>(이관 횟수)</td><td>이관 흐름을 보기 위해. 담당자 기본값 = 접수자라 따로 고를 일이 적다. <span class="tbu">외부 업체 엔지니어 처리 건 여부 확인 필요</span></td></tr>
+        <tr><td>업체명 · 엔지니어정보</td><td><span class="tag c">변경</span></td><td><b>접수자 · 담당자</b>(이관 횟수)</td><td>A/S는 모두 내부 인원이 처리하므로 업체명 대신 접수자·담당자로 이관 흐름을 본다. 담당자 기본값 = 접수자라 따로 고를 일이 적다.</td></tr>
         <tr><td>처리일자</td><td><span class="tag c">변경</span></td><td>시각 자동 기록(첫 진행·처리완료·종료)</td><td>한 개의 날짜로는 대기·처리·안내 시간을 나눠 볼 수 없다.</td></tr>
         <tr><td>AS 진행내역 (덮어쓰는 한 칸)</td><td><span class="tag c">변경</span></td><td>① <b>진행내용</b> — 한 줄씩 쌓임(작성자·시각 자동) ② <b>처리내용</b> — 완료 시 1칸 필수</td><td>경과와 최종 해결 방법이 남아야 재발 대응·챗봇 데이터로 쓸 수 있다.</td></tr>
         <tr><td>(없음)</td><td><span class="tag a">추가</span></td><td>변경 이력 · 이 약국의 다른 A/S (탭, 자동)</td><td>담당자·상태 변경 추적, 재발 확인.</td></tr>
         <tr><td>수정 버튼</td><td><span class="tag c">변경</span></td><td>상태별 버튼(완료 · 이관 · 보완 요청 등)</td><td>버튼으로 바꿔야 누가 언제 바꿨는지 기록된다.</td></tr>
-        <tr><td>삭제 버튼</td><td><span class="tag d">제거</span></td><td>상세에서 뺀다. <span class="tbu">잘못 등록한 건 처리 방식 확인 필요</span></td><td>삭제하면 이력·통계가 함께 사라진다. 대안 — ⓐ `접수` 상태에서만 접수자가 삭제(기록 보존형) ⓑ 종료 + 처리내용 `오등록`.</td></tr>
+        <tr><td>삭제 버튼</td><td><span class="tag k">유지</span></td><td>그대로. 삭제한 A/S는 목록·엑셀·통계에서 빠지고, 삭제 기록(삭제자·일시)은 보관한다.</td><td>잘못 등록한 건을 정리하는 방법. 삭제 기록을 남겨 통계가 달라진 이유를 추적한다.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -243,7 +243,7 @@
         <tr><td>당일 해결률 · 1차 해결률(이관 없이 종료) · 이관율</td><td>건수 기준</td><td class="ok">지금부터 정확</td></tr>
         <tr><td>개발팀 처리시간</td><td>이관 시각 → 처리완료 시각</td><td class="ok">지금부터 정확</td></tr>
         <tr><td>접수 ~ 종료 시간</td><td>접수일시 → 종료 시각</td><td class="wait">참고값 — 접수일시를 수정하지 않은 건은 등록 시각 기준</td></tr>
-        <tr><td>실제 전화 수신 → 종료 시간</td><td>통화 시작 → 종료 시각</td><td class="wait">CTI 연동 후 공식 지표로 전환</td></tr>
+        <tr><td>실제 전화 수신 → 종료 시간</td><td>통화 시작 → 종료 시각</td><td class="wait">측정 범위 밖 — 전화 시스템과 연동하지 않으므로 접수 ~ 종료 참고값으로 대신한다</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -341,10 +341,10 @@
       <ol class="desc">
         <div class="dh">AS-02 · 컴포넌트</div>
         <li data-n="1"><span class="di">1</span><span class="dt"><b>약국명</b>(필수) — 약국명 또는 <b>전화번호</b>로 검색해 선택. 연락처·지역은 약국 정보에서 자동으로 채워진다.</span></li>
-        <li data-n="2"><span class="di">2</span><span class="dt"><b>카테고리</b>(필수) — <b>기존 1단 카테고리</b> 그대로(기기 · 향정 …). 세부 분류는 종료 후 AI가 따로 만든다(2차, DATA ③). <span class="tbu">현재 카테고리 전체 목록 확인 필요</span></span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>카테고리</b>(필수) — <b>기존 1단 카테고리</b> 그대로(기기 · 향정 …). 세부 분류는 종료 후 AI가 따로 만든다(2차, DATA ③). <span class="tbu">카테고리 목록은 기존 A/S 접수내용을 벡터화해 비슷한 패턴끼리 묶은 뒤 확정</span></span></li>
         <li data-n="3"><span class="di">3</span><span class="dt"><b>접수내용</b>(필수) — 약국이 말한 증상을 그대로 적는다.</span></li>
         <li data-n="4"><span class="di">4</span><span class="dt"><b>담당자</b> — 기본값 = <b>등록한 사람</b>. CS가 직접 처리하면 그대로 두고, 개발팀에 넘길 때만 바꾼다. 바꾸면 그 담당자에게 알림.</span></li>
-        <li data-n="5"><span class="di">5</span><span class="dt"><b>접수일시</b> — 기본값 = 현재 시각(자동). 통화가 길었던 건만 `수정`으로 실제 전화 받은 시각을 넣는다. 등록 시각은 따로 자동 저장. CTI 연동 후 통화 시작 시각으로 자동 대체.</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>접수일시</b> — 기본값 = 현재 시각(자동). 통화가 길었던 건만 `수정`으로 실제 전화 받은 시각을 넣는다. 등록 시각은 따로 자동 저장.</span></li>
         <li data-n="6"><span class="di">6</span><span class="dt"><b>등록</b> — 필수 3개가 채워지면 활성화. 등록 후 AS-03 상세가 열리고 변경 이력에 `A/S 등록`이 기록된다.</span></li>
       </ol>
     </div>
@@ -407,7 +407,7 @@
               </tbody></table></div>
             </div>
           </div>
-          <div class="mf hot" data-n="8"><span class="num" style="left:auto;right:-13px">8</span><span class="bn g lg">보완 요청</span><span class="bn g lg">이관</span><span class="bn b lg">처리완료</span></div>
+          <div class="mf hot" data-n="8"><span class="num" style="left:auto;right:-13px">8</span><span class="bn r lg" style="margin-right:auto">삭제</span><span class="bn g lg">보완 요청</span><span class="bn g lg">이관</span><span class="bn b lg">처리완료</span></div>
         </div></div>
         <div class="help" style="margin-top:6px">※ 탭 3개는 한 번에 하나만 보인다. 설명을 위해 세 탭을 펼쳐 그렸다.</div>
       </div>
@@ -416,12 +416,12 @@
         <div class="dh">AS-03 · 컴포넌트</div>
         <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — 약국명 · 접수내용 요약 · 상태 · 담당자 · <b>접수 ~ 종료 시간</b>. 종료되면 `10:02 ~ 12:01 (1시간 59분)`으로 고정.</span></li>
         <li data-n="2"><span class="di">2</span><span class="dt"><b>접수 정보</b> — 현재 항목 그대로. `편집`으로 종료 전까지 고칠 수 있고, 고치면 변경 이력에 남는다.</span></li>
-        <li data-n="3"><span class="di">3</span><span class="dt"><b>접수자 · 담당자</b> — 현재 `업체명·엔지니어정보` 자리. 담당자 옆에 이관 횟수.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>접수자 · 담당자</b> — 현재 `업체명·엔지니어정보` 자리(A/S는 모두 내부 인원이 처리). 담당자 옆에 이관 횟수.</span></li>
         <li data-n="4"><span class="di">4</span><span class="dt"><b>처리내용</b>(완료 시 필수) — 최종 해결 방법 1칸. 원인·조치·결과를 나눠 쓰지 않는다. 종료 후 AI가 이 문장에서 원인·조치·결과를 따로 뽑아 별도 저장한다(2차, 원본은 그대로 보존).</span></li>
         <li data-n="5"><span class="di">5</span><span class="dt"><b>진행내용</b> 탭 — 현재 `AS 진행내역`을 <b>한 줄씩 쌓이는 방식</b>으로 바꾼다. 작성자·시각 자동. 담당자가 <b>처음 진행내용을 추가하면 상태가 자동으로 처리중</b>이 된다(별도 버튼 없음).</span></li>
         <li data-n="6"><span class="di">6</span><span class="dt"><b>변경 이력</b> 탭(자동) — 등록 · 이관 · 보완 요청 · 상태 변경 · 정보 수정을 시간순으로 기록. 기록은 추가만 된다.</span></li>
         <li data-n="7"><span class="di">7</span><span class="dt"><b>이 약국의 다른 A/S</b> 탭(자동) — `같은 카테고리`(기본) / `전체`. <b>지난 처리내용</b>까지 보여 같은 문제의 해결 방법을 바로 참고한다. 행 클릭 → 그 A/S 상세.</span></li>
-        <li data-n="8"><span class="di">8</span><span class="dt"><b>상태 버튼</b> — 현재 `삭제`·`수정` 자리. 상태·사용자별 조합은 AS-05.<br/>· 담당자 ≠ 접수자(개발팀 건): `보완 요청` · `이관` · `처리완료`<br/>· 담당자 = 접수자(CS 직접 처리): `이관` · <b>`완료`</b> — 한 번에 종료까지</span></li>
+        <li data-n="8"><span class="di">8</span><span class="dt"><b>하단 버튼</b> — 왼쪽 `삭제`는 현재와 같이 유지, `수정` 자리에 상태 버튼. 상태·사용자별 조합은 AS-05.<br/>· 삭제: 확인 후 목록·엑셀·통계에서 빠지고 변경 이력에 삭제자·일시가 남는다<br/>· 담당자 ≠ 접수자(개발팀 건): `보완 요청` · `이관` · `처리완료`<br/>· 담당자 = 접수자(CS 직접 처리): `이관` · <b>`완료`</b> — 한 번에 종료까지</span></li>
       </ol>
     </div>
   </section>
