@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A/S 관리 고도화 · CS팀 확인 요청</title>
+<style>
+  :root{
+    --teal:#5dbfb3; --teal-d:#2f9d90; --teal-soft:#e8f6f4; --teal-line:#bfe6e0;
+    --ink:#28303a; --muted:#7b8794; --faint:#9aa4af; --line:#e6e9ee;
+    --danger:#e0504a; --blue:#3d7fe0; --ok:#23935f; --amber:#b87a0c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:#eef1f4;font-size:14px;line-height:1.6;padding:20px}
+  .doc{max-width:1060px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px 32px}
+  h1{font-size:22px;margin:0 0 6px;font-weight:800}
+  .meta{font-size:12.5px;color:var(--muted);margin:0 0 18px}
+  .lead{font-size:13.5px;background:#f7f9fb;border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin-bottom:24px}
+  h2{font-size:16px;margin:26px 0 10px;font-weight:800;padding-bottom:6px;border-bottom:2px solid var(--teal-soft)}
+  p{margin:8px 0}
+  code{background:#f2f4f7;border-radius:4px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,Menlo,monospace}
+  .tw{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+  th{background:#f6f8fa;color:#4b5158;font-weight:700;text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:9px 11px;border-bottom:1px solid #eef1f4;vertical-align:top}
+  td.n{width:34px;font-weight:800;color:var(--teal-d);text-align:center}
+  td.q{width:26%;font-weight:600}
+  td.ans{width:88px;background:#fcfdfd}
+  .ok{color:var(--ok);font-weight:700}
+  .wait{color:var(--amber);font-weight:700}
+  .tbu{color:var(--danger);font-weight:700}
+  ul{margin:8px 0;padding-left:20px}
+  li{margin:3px 0}
+  .foot{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+  .foot a{color:var(--teal-d)}
+  @media print{body{background:#fff;padding:0}.doc{border:none;padding:0}}
+</style>
+</head>
+<body>
+<div class="doc">
+  <h1>A/S 관리 고도화 — CS팀 확인 요청</h1>
+  <p class="meta">2026-09-21 · 기획팀</p>
+
+  <div class="lead">
+    슈퍼어드민 A/S 관리를 고도화하기 전에 CS팀 의견이 필요한 10가지입니다. 최근 6개월 A/S <b>7,309건</b>(2026-03-18~09-17)을 분석해 정리했고, 각 항목에 추천안을 적었으니 그대로 가도 되는지만 봐주시면 됩니다.
+    <br/><br/>화면은 여기서 보실 수 있습니다 — <a href="./storyboard.html">A/S 관리 화면설계서(스토리보드)</a>
+  </div>
+
+  <h2>무엇이 달라지나</h2>
+  <p>CS가 입력하는 칸은 지금과 같은 <b>약국 · 카테고리 · 접수내용 3개</b>입니다. 전화를 받은 <b>상담사</b>와 기술로 해결한 <b>엔지니어</b>를 나눠 기록해, 누가 받았고 누가 해결했는지 남습니다. 엔지니어는 등록한 본인으로 자동 지정되고, 다른 사람에게 넘기면 그 사람으로 바뀝니다.</p>
+  <p>지금은 <code>AS진행내역</code> 한 칸에 경과와 결과를 같이 적습니다. 이것을 둘로 나눕니다. 경과는 <b>진행내용</b>에 한 줄씩 쓰고(지금과 같습니다), 끝낼 때 "이렇게 해결했다"를 <b>처리내용</b>에 한 줄 적습니다. 이 한 줄이 같은 문제가 다시 들어올 때 바로 보이는 해결 방법이 됩니다.</p>
+  <p>상담사·엔지니어·상태·처리 시각·넘긴 기록·변경 이력은 시스템이 자동으로 남깁니다. 지금은 처리날짜가 접수일자와 똑같이 찍혀 실제로 언제 처리했는지 알 수 없는데, 이 부분이 자동으로 기록됩니다.</p>
+
+  <h2>먼저 정해야 하는 것</h2>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>질문</th><th>지금 데이터</th><th>추천</th><th>답변</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="n">1</td>
+        <td class="q">문의 유형을 아래 12가지로 하면 될까요? 쓰시는 말과 다를지 봐주세요</td>
+        <td>지금 카테고리는 제품 구분(팜·피엠 29%, 청구 20%, 3.0 12% …)이라 '무엇이 문제인지'는 안 남아 있습니다</td>
+        <td>카테고리(제품)는 지금처럼 고르고, <b>유형은 시스템이 자동으로</b> 붙입니다(키워드로 96% 분류됨)</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">2</td>
+        <td class="q">청구·보고 같은 정기 업무를 장애 신고와 나눠서 볼까요?</td>
+        <td>청구 33% + 보고 9% = 전체의 42%가 매달 하는 대행 업무입니다</td>
+        <td>업무 구분을 <code>장애</code> / <code>정기 업무</code>로 자동 나눔 — 처리시간 지표가 섞이지 않습니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">3</td>
+        <td class="q">한 전화에 문의가 여러 건일 때 지금처럼 한 건으로 다 적을까요?</td>
+        <td>접수내용에 <code>1. 2. 3.</code>으로 묶은 건이 11.4%(835건)</td>
+        <td>한 건으로 적는 방식 유지 — 나누려면 입력이 늘어납니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">4</td>
+        <td class="q">처리내용을 반드시 문장으로 적어야 하는 유형은 어디까지일까요?</td>
+        <td>지금 진행내역이 <code>완료</code>·<code>청구완료</code>처럼 6자 이하인 것이 16.5%</td>
+        <td>장애성 건은 해결 방법을 문장으로, 정기 업무는 <code>완료</code>로 충분합니다. 이것도 부담이면 마지막 진행내용을 그대로 처리내용으로 삼는 방법도 있습니다(추가 입력 없음)</td>
+        <td class="ans"></td>
+      </tr>
+    </tbody>
+  </table></div>
+  <p><b>문의 유형 후보 —</b> 청구·정산 33% · 처방전·조제 입력 16% · 프로그램 설치·설정·오류 10% · 보고(향정·구입·폐기·반품) 9% · 스캔·OCR·바코드 9% · 출력물(봉투·라벨·영수증) 7% · 결제·단말 3% · 키오스크 2% · 재고·약품 관리 2% · 사용 문의·안내 2% · 약국·인력/계정 1% · 기타 4%</p>
+
+  <h2>확인만 하면 되는 것</h2>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>질문</th><th>추천</th><th>답변</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="n">5</td>
+        <td class="q">상태 이름을 <code>접수</code> · <code>처리중</code> · <code>처리완료</code> · <code>종료</code>로 바꿔도 될까요?</td>
+        <td>지금 <code>확인중</code>을 <code>처리중</code>으로 바꿉니다. 개발팀에 넘긴 건만 처리완료(조치 끝)와 종료(약국 안내 끝)를 나눕니다. 상담사가 직접 해결한 건은 <code>완료</code> 한 번으로 끝납니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">6</td>
+        <td class="q">접수일시를 실제 전화 받은 시각으로 고쳐 적을 일이 있을까요?</td>
+        <td>기본값은 등록 시각이고 그대로 두면 됩니다. 통화가 길었던 건은 <code>10분 전</code> · <code>30분 전</code> · <code>1시간 전</code> 버튼 한 번으로 시간을 당깁니다. 분 단위로 넣으려면 직접 입력도 됩니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">7</td>
+        <td class="q">상담사(전화 받은 사람)와 엔지니어(기술로 해결한 사람)를 나눠 기록합니다. 엔지니어는 등록한 본인으로 자동 지정하고 필요할 때 바꾸는 방식이 맞을까요? 슬랙은 CS팀 전원이 쓰시나요?</td>
+        <td>지금은 엔지니어 한 명만 남아 누가 전화를 받았고 누가 해결했는지 구분되지 않습니다. 등록하면 상담사·엔지니어 모두 등록한 본인으로 들어가고, 다른 사람에게 넘기면 엔지니어만 바뀝니다. 넘기는 즉시 그 엔지니어에게 슬랙 개인 메시지(A/S 여는 링크 포함)가 가고, 처리가 끝나면 상담사에게 갑니다. 슬랙을 놓쳐도 목록의 <code>내 처리 건</code>·<code>미확인</code>으로 보입니다. 카카오톡으로 사내 발송은 알림톡(건당 비용)이 필요합니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">8</td>
+        <td class="q">지금 어떤 경우에 A/S를 삭제하시나요?</td>
+        <td>삭제 버튼은 그대로 둡니다. 삭제한 건은 목록·엑셀·통계에서 바로 빠집니다. 삭제 내역을 보여주는 화면은 만들지 않습니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">9</td>
+        <td class="q">목록의 <code>진행내역</code> 컬럼을 빼도 괜찮을까요?</td>
+        <td>그 자리에 <code>상담사</code>·<code>엔지니어</code>·<code>접수 ~ 종료</code>를 넣습니다. 진행내역은 상세에서 봅니다. 목록에서 훑어보는 용도로 쓰신다면 알려주세요<br/><span class="wait">참고</span> — 진행내역은 6자 이하가 16.5%, 30자를 넘어 목록에서 잘리는 건이 48.7%입니다</td>
+        <td class="ans"></td>
+      </tr>
+      <tr>
+        <td class="n">10</td>
+        <td class="q">약국명이 빈 건과 <code>접수요청</code> 상태로 남은 건은 어디서 들어온 건가요?</td>
+        <td>기존 데이터를 옮길 때 처리 방법을 정해야 합니다</td>
+        <td class="ans"></td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h2>참고 — 6개월 데이터</h2>
+  <p>2026-03-18 ~ 09-17 A/S <b>7,309건</b>(월 1,100~1,300건, 하루 약 40건).</p>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>숫자</th></tr></thead>
+    <tbody>
+      <tr><td>카테고리(제품)</td><td>팜·피엠 29% · 청구 20% · 3.0 12% · 향정 7% · 스캐너 6% · 나머지 26%</td></tr>
+      <tr><td>상태</td><td>처리완료 96.6% · 확인중 3.1% · 접수요청 0.3%</td></tr>
+      <tr><td>엔지니어</td><td>네 분이 전체의 77%</td></tr>
+      <tr><td>처리날짜</td><td>접수일자와 동일 99.9%(7,309건 중 7,299건)</td></tr>
+      <tr><td>문의 형태</td><td>한 건에 문의 여러 개 11.4% · 진행내역 6자 이하 16.5%</td></tr>
+      <tr><td>업체명</td><td>전원 헬스포트(엔지니어정보 = 사내 인원)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>지표는 언제부터 정확한가</h2>
+  <div class="tw"><table>
+    <thead><tr><th>지표</th><th>계산</th><th>신뢰도</th></tr></thead>
+    <tbody>
+      <tr><td>당일 해결률 · 1차 해결률(넘기지 않고 종료) · 이관율</td><td>건수 기준</td><td class="ok">지금부터 정확</td></tr>
+      <tr><td>개발팀 처리시간</td><td>넘긴 시각 → 처리완료 시각</td><td class="ok">지금부터 정확</td></tr>
+      <tr><td>접수 ~ 종료 시간</td><td>접수일시 → 종료 시각</td><td class="wait">참고값 — 접수일시를 고치지 않은 건은 등록 시각 기준</td></tr>
+      <tr><td>실제 전화 수신 → 종료 시간</td><td>통화 시작 → 종료 시각</td><td class="wait">측정 범위 밖 — 전화 시스템과 연동하지 않습니다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>확정된 것</h2>
+  <ul>
+    <li><b>처리 주체</b> — A/S는 모두 내부 인원이 처리합니다. 업체명·엔지니어정보는 상담사·엔지니어로 대체합니다.</li>
+    <li><b>전화 시스템 연동</b> — 과거에 발신번호 연동을 썼다가 불편해서 제거한 이력이 있어 이번 범위에서 연동하지 않습니다. 약국은 전화번호 검색으로 찾습니다.</li>
+    <li><b>알림</b> — 슬랙 개인 메시지(즉시) + 목록의 <code>내 처리 건</code>·<code>미확인</code> 표시. 메일·문자는 쓰지 않습니다.</li>
+  </ul>
+
+  <p class="foot">답변은 이 표의 <code>답변</code> 칸에 적어주시거나 기획팀에 알려주시면 됩니다. 확인 후 화면설계서를 그 기준으로 확정합니다. · <a href="./storyboard.html">화면설계서(스토리보드) 보기</a></p>
+</div>
+</body>
+</html>
