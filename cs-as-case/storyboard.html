@@ -329,7 +329,7 @@
               <div class="kv">
                 <span class="k">상담사</span><div class="v">운영팀 홍길동 <span class="auto">자동</span></div>
                 <span class="k">처리자</span><div class="v hot" data-n="4"><span class="num">4</span><span class="selb">운영팀 홍길동 (나) ▾</span></div>
-                <span class="k">접수일시</span><div class="v hot" data-n="5"><span class="num">5</span>2026-09-18 10:02 <span class="auto">자동</span> <span class="help" style="text-decoration:underline">수정</span></div>
+                <span class="k">접수일시</span><div class="v hot" data-n="5"><span class="num">5</span>2026-09-18 10:02 <span class="auto">자동</span><div class="row" style="margin-top:4px"><span class="qb">10분 전</span><span class="qb">30분 전</span><span class="qb">1시간 전</span><span class="qb">직접 입력</span></div></div>
                 <span class="k">상태</span><div class="v"><span class="st s1">접수</span> <span class="auto">자동</span></div>
               </div>
             </div>
@@ -344,7 +344,7 @@
         <li data-n="2"><span class="di">2</span><span class="dt"><b>카테고리</b>(필수) — <b>기존 1단 카테고리</b> 그대로(기기 · 향정 …). 세부 분류는 종료 후 AI가 따로 만든다(2차, DATA ③). <span class="tbu">카테고리 목록은 기존 A/S 접수내용을 벡터화해 비슷한 패턴끼리 묶은 뒤 확정</span></span></li>
         <li data-n="3"><span class="di">3</span><span class="dt"><b>접수내용</b>(필수) — 약국이 말한 증상을 그대로 적는다.</span></li>
         <li data-n="4"><span class="di">4</span><span class="dt"><b>처리자</b> — 기본값 = <b>등록한 사람</b>. CS가 직접 처리하면 그대로 두고, 개발팀에 넘길 때만 바꾼다. 바꾸면 그 처리자에게 알림.</span></li>
-        <li data-n="5"><span class="di">5</span><span class="dt"><b>접수일시</b> — 기본값 = 현재 시각(자동). 통화가 길었던 건만 `수정`으로 실제 전화 받은 시각을 넣는다. 등록 시각은 따로 자동 저장.</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>접수일시</b> — 기본값 = 현재 시각(자동)이고 그대로 등록한다. 통화가 길었던 건은 <b>`10분 전`·`30분 전`·`1시간 전` 버튼 한 번</b>으로 시각을 당긴다(분 단위로 정확히 넣으려면 `직접 입력`). 등록 시각은 따로 자동 저장해 둘을 구분한다.</span></li>
         <li data-n="6"><span class="di">6</span><span class="dt"><b>등록</b> — 필수 3개가 채워지면 활성화. 등록 후 AS-03 상세가 열리고 변경 이력에 `A/S 등록`이 기록된다.</span></li>
       </ol>
     </div>
