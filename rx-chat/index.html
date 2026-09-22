@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>굿팜 처방 Guided AI Chat</title>
+<style>
+:root{--line:#e5e7eb;--muted:#6b7280;--bg:#f6f7f9;--new:#2563eb;--chg:#b45309;--out:#b91c1c;--con:#047857}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.6 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:#111}
+.wrap{display:flex;gap:20px;padding:20px;align-items:flex-start;flex-wrap:wrap}
+.panel{width:260px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:20px}
+.panel h1{font-size:15px;margin:0 0 4px}
+.panel p{font-size:12px;color:var(--muted);margin:0 0 14px}
+.panel h2{font-size:12px;color:var(--muted);margin:16px 0 6px;font-weight:600}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;padding:8px 0;border:0;background:#fff;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:#111;color:#fff}
+select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+.legend{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.7}
+.stage{flex:1;min-width:340px}
+.phone{width:390px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;min-height:640px}
+.desktop{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;max-width:720px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.row:hover{background:#fafafa}
+.hd{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px}
+.hd b{font-size:17px}.hd span{color:var(--muted);font-size:13px}
+h3.sec{font-size:13px;color:var(--muted);margin:22px 0 8px;font-weight:600}
+.chg-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f1f2f4;align-items:baseline;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 7px;border-radius:999px;color:#fff;white-space:nowrap}
+.t-NEW{background:var(--new)}.t-CHANGED{background:var(--chg)}.t-OUT{background:var(--out)}.t-CONTINUE{background:var(--con)}
+.nm{font-weight:600}.det{color:var(--muted);font-size:12.5px}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.card .k{font-size:11px;color:var(--muted);margin-top:9px}
+.card .v{margin-top:2px}
+.q{font-style:normal;background:#f3f4f6;border-radius:8px;padding:8px 10px;margin-top:4px}
+details{margin-top:10px;font-size:12.5px;color:var(--muted)}
+summary{cursor:pointer}
+.btn{width:100%;padding:11px;border:1px solid #111;background:#111;color:#fff;border-radius:10px;font:inherit;cursor:pointer;margin-top:12px}
+.btn.ghost{background:#fff;color:#111}
+.fq{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:6px;cursor:pointer;font-size:13px}
+.fq:hover{background:#fafafa}
+.fq .ans{color:var(--muted);font-size:12.5px;margin-top:6px}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin-bottom:14px}
+.empty{color:var(--muted);padding:14px 0}
+.linkrow{display:flex;gap:8px;margin-top:12px}
+.linkrow button{flex:1;padding:9px;border:1px solid var(--line);background:#fff;border-radius:8px;font:inherit;cursor:pointer}
+.stepbar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.stepbar button{padding:6px 10px;border:1px solid var(--line);background:#fff;border-radius:999px;font-size:12px;cursor:pointer}
+.stepbar button.on{background:#111;color:#fff;border-color:#111}
+.kv{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px}
+.kv div{display:flex;justify-content:space-between;padding:3px 0;font-size:13px}
+.kv div span:first-child{color:var(--muted)}
+.msg{display:flex;margin:8px 0}
+.msg.me{justify-content:flex-end}
+.bub{max-width:80%;padding:9px 12px;border-radius:14px;font-size:13px;line-height:1.55}
+.msg.bot .bub{background:#f3f4f6;border-top-left-radius:4px}
+.msg.me .bub{background:#111;color:#fff;border-top-right-radius:4px}
+.src{font-size:11px;color:var(--muted);margin-top:6px}
+.pill{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+.chip{display:inline-block;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;margin:4px 4px 0 0;font-size:12.5px;cursor:pointer}
+.chip:hover{background:#f3f4f6}
+.ansbox{background:#f9fafb;border-radius:8px;padding:9px 11px;margin-top:8px;font-size:12.5px}
+.dur{border:1px solid #fecaca;background:#fef2f2;border-radius:10px;padding:12px;margin-bottom:10px}
+.dur b{color:#b91c1c}
+.pathbtn{display:block;width:100%;text-align:left;padding:14px;border:1px solid var(--line);background:#fff;border-radius:12px;margin-top:10px;font:inherit;cursor:pointer}
+.pathbtn b{display:block;margin-bottom:3px}
+.pathbtn span{color:var(--muted);font-size:12.5px}
+.cmp{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px}
+.cmp th,.cmp td{padding:5px 6px;border-bottom:1px solid #f1f2f4;text-align:right}
+.cmp th:first-child,.cmp td:first-child{text-align:left;color:var(--muted);font-weight:400}
+.cmp td.dif{font-weight:700;color:var(--chg)}
+.map{position:relative;height:260px;border-radius:12px;margin-top:10px;overflow:hidden;
+ background:linear-gradient(#e9eef3 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,#e9eef3 1px,#f7f9fb 1px) 0 0/28px 28px}
+.me{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;background:#2563eb;box-shadow:0 0 0 6px rgba(37,99,235,.18)}
+.mk{position:absolute;transform:translate(-50%,-100%);cursor:pointer;font-size:11px;border-radius:999px;padding:3px 8px;white-space:nowrap;border:2px solid transparent}
+.mk.on{background:#047857;color:#fff}
+.mk.off{background:#9ca3af;color:#fff}
+.mk.sel{transform:translate(-50%,-100%) scale(1.25);border-color:#111}
+.sheet{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.badge{display:inline-block;font-size:11px;border-radius:999px;padding:2px 8px;margin-top:4px}
+.badge.on{background:#d1fae5;color:#065f46}.badge.off{background:#f3f4f6;color:#4b5563}
+.tabbar{display:flex;border-top:1px solid var(--line);margin-top:18px;padding-top:8px}
+.tabbar button{flex:1;border:0;background:none;font:inherit;font-size:12px;cursor:pointer;color:var(--muted)}
+.cam{height:200px;border:2px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin:14px 0}
+</style></head><body>
+<div class="wrap">
+ <div class="panel">
+  <h1>처방 변화 상담 포인트</h1>
+  <p>프로토타입 · 가상 데이터</p>
+  <h2>화면</h2>
+  <div class="seg"><button id="m-in" class="on">내부 검증</button><button id="m-cu">고객앱</button></div>
+  <h2>환자 / 고객</h2>
+  <select id="sel"></select>
+  <div id="case" class="legend" style="margin-top:6px"></div>
+  <h2>단말 처방 데이터 (챗봇 첫 화면)</h2>
+  <div class="seg"><button id="rx-has" class="on">있음</button><button id="rx-none">없음</button></div>
+  <h2>위치 권한 (재고 찾기)</h2>
+  <div class="seg"><button id="pm-allow">허용됨</button><button id="pm-first" class="on">처음</button><button id="pm-deny">거절함</button></div>
+  <div id="steps"></div>
+  <div class="legend">
+   내부 검증 화면은 실제로는 <b>AI MATE 고객 종합 분석 탭</b>의 두 영역으로 붙습니다.<br>판정은 <b>03 5장</b> 규칙을 그대로 구현했습니다.<br>
+   AI 문장은 연동 없이 <b>샘플 템플릿</b>으로 표시합니다.<br>
+   장기복용은 기존 AI 약력관리 기준을 확인한 뒤 붙습니다.
+  </div>
+ </div>
+ <div class="stage" id="stage"></div>
+</div>
+<script>
+const DB = {"drugs": [{"drugId": "D001", "drugName": "인데놀정10mg", "ingredient": "프로프라놀롤", "ingredientCode": "ING-001", "strength": "10mg", "atcCode": "C07AA05", "precautions": ["갑작스러운 중단 시 증상이 심해질 수 있음", "저혈압·서맥이 나타날 수 있음"], "counselingPoints": ["복용 후 어지러움 여부", "맥박이 느려지는 느낌 여부"], "source": "sample", "effect": "혈압을 낮추고 맥박을 안정시키는 약입니다", "timing": "식사와 관계없이 일정한 시간에"}, {"drugId": "D002", "drugName": "프라놀정10mg", "ingredient": "프로프라놀롤", "ingredientCode": "ING-001", "strength": "10mg", "atcCode": "C07AA05", "precautions": ["갑작스러운 중단 시 증상이 심해질 수 있음"], "counselingPoints": ["복용 후 어지러움 여부"], "source": "sample", "effect": "혈압을 낮추고 맥박을 안정시키는 약입니다", "timing": "식사와 관계없이 일정한 시간에"}, {"drugId": "D003", "drugName": "노바스크정5mg", "ingredient": "암로디핀", "ingredientCode": "ING-002", "strength": "5mg", "atcCode": "C08CA01", "precautions": ["복용 초기에 얼굴이 화끈거릴 수 있음", "발목이 붓는 경우가 있음"], "counselingPoints": ["발목 부기 여부", "어지러움 여부"], "source": "sample", "effect": "혈압을 낮추는 약입니다", "timing": "하루 중 정해진 시간에 1회"}, {"drugId": "D004", "drugName": "아모디핀정5mg", "ingredient": "암로디핀", "ingredientCode": "ING-002", "strength": "5mg", "atcCode": "C08CA01", "precautions": ["복용 초기에 얼굴이 화끈거릴 수 있음"], "counselingPoints": ["발목 부기 여부"], "source": "sample", "effect": "혈압을 낮추는 약입니다", "timing": "하루 중 정해진 시간에 1회"}, {"drugId": "D005", "drugName": "코자정50mg", "ingredient": "로사르탄", "ingredientCode": "ING-003", "strength": "50mg", "atcCode": "C09CA01", "precautions": ["복용 중 어지러움이 나타날 수 있음"], "counselingPoints": ["기립 시 어지러움 여부"], "source": "sample", "effect": "혈압을 낮추는 약입니다", "timing": "식사와 관계없이 일정한 시간에"}, {"drugId": "D006", "drugName": "다이아벡스정500mg", "ingredient": "메트포르민", "ingredientCode": "ING-004", "strength": "500mg", "atcCode": "A10BA02", "precautions": ["복용 초기에 속이 불편할 수 있음", "식사와 함께 복용"], "counselingPoints": ["속 불편감 여부", "식사 거르는 일이 있는지"], "source": "sample", "effect": "혈당을 낮추는 약입니다", "timing": "식사 직후 또는 식사 중"}, {"drugId": "D007", "drugName": "아마릴정2mg", "ingredient": "글리메피리드", "ingredientCode": "ING-005", "strength": "2mg", "atcCode": "A10BB12", "precautions": ["식사를 거르면 저혈당이 올 수 있음"], "counselingPoints": ["저혈당 증상 경험 여부", "식사 시간 규칙성"], "source": "sample", "effect": "혈당을 낮추는 약입니다", "timing": "아침 식사 직전 또는 식사 중"}, {"drugId": "D008", "drugName": "자누비아정100mg", "ingredient": "시타글립틴", "ingredientCode": "ING-006", "strength": "100mg", "atcCode": "A10BH01", "precautions": ["복용 중 속 불편감이 나타날 수 있음"], "counselingPoints": ["복용 시간 준수 여부"], "source": "sample", "effect": "혈당을 낮추는 약입니다", "timing": "식사와 관계없이 일정한 시간에"}, {"drugId": "D009", "drugName": "리피토정10mg", "ingredient": "아토르바스타틴", "ingredientCode": "ING-007", "strength": "10mg", "atcCode": "C10AA05", "precautions": ["근육통이 나타나면 알릴 것", "자몽주스와 함께 복용하지 않기"], "counselingPoints": ["근육통·근육 힘빠짐 여부"], "source": "sample", "effect": "콜레스테롤을 낮추는 약입니다", "timing": "하루 중 정해진 시간에 1회"}, {"drugId": "D010", "drugName": "크레스토정10mg", "ingredient": "로수바스타틴", "ingredientCode": "ING-008", "strength": "10mg", "atcCode": "C10AA07", "precautions": ["근육통이 나타나면 알릴 것"], "counselingPoints": ["근육통 여부"], "source": "sample", "effect": "콜레스테롤을 낮추는 약입니다", "timing": "하루 중 정해진 시간에 1회"}, {"drugId": "D011", "drugName": "아스피린프로텍트정100mg", "ingredient": "아세틸살리실산", "ingredientCode": "ING-009", "strength": "100mg", "atcCode": "B01AC06", "precautions": ["출혈이 잘 멈추지 않을 수 있음", "시술 전에는 복용 사실을 알릴 것"], "counselingPoints": ["멍이 쉽게 드는지", "잇몸 출혈 여부"], "source": "sample", "effect": "혈액이 굳는 것을 막는 약입니다", "timing": "식후"}, {"drugId": "D012", "drugName": "플라빅스정75mg", "ingredient": "클로피도그렐", "ingredientCode": "ING-010", "strength": "75mg", "atcCode": "B01AC04", "precautions": ["출혈이 잘 멈추지 않을 수 있음"], "counselingPoints": ["멍·출혈 여부"], "source": "sample", "effect": "혈액이 굳는 것을 막는 약입니다", "timing": "식사와 관계없이 일정한 시간에"}, {"drugId": "D013", "drugName": "넥시움정20mg", "ingredient": "에스오메프라졸", "ingredientCode": "ING-011", "strength": "20mg", "atcCode": "A02BC05", "precautions": ["식전 복용"], "counselingPoints": ["복용 시점 준수 여부", "속쓰림 변화"], "source": "sample", "effect": "위산을 줄이는 약입니다", "timing": "식전 30분"}, {"drugId": "D014", "drugName": "란스톤캡슐15mg", "ingredient": "란소프라졸", "ingredientCode": "ING-012", "strength": "15mg", "atcCode": "A02BC03", "precautions": ["식전 복용"], "counselingPoints": ["복용 시점 준수 여부"], "source": "sample", "effect": "위산을 줄이는 약입니다", "timing": "식전 30분"}, {"drugId": "D015", "drugName": "세레브렉스캡슐200mg", "ingredient": "세레콕시브", "ingredientCode": "ING-013", "strength": "200mg", "atcCode": "M01AH01", "precautions": ["속 불편감이 나타날 수 있음", "다른 소염진통제와 함께 복용하지 않기"], "counselingPoints": ["위장 불편감 여부", "다른 진통제 복용 여부"], "source": "sample", "effect": "통증과 염증을 줄이는 약입니다", "timing": "식후 30분"}, {"drugId": "D016", "drugName": "낙센정250mg", "ingredient": "나프록센", "ingredientCode": "ING-014", "strength": "250mg", "atcCode": "M01AE02", "precautions": ["식후 복용", "속 불편감이 나타날 수 있음"], "counselingPoints": ["위장 불편감 여부"], "source": "sample", "effect": "통증과 염증을 줄이는 약입니다", "timing": "식후 30분"}, {"drugId": "D017", "drugName": "타이레놀정500mg", "ingredient": "아세트아미노펜", "ingredientCode": "ING-015", "strength": "500mg", "atcCode": "N02BE01", "precautions": ["다른 감기약이나 진통제에도 같은 성분이 들어 있을 수 있습니다"], "counselingPoints": ["다른 해열진통제 복용 여부"], "source": "sample", "effect": "열을 내리고 통증을 줄이는 약입니다", "timing": "식사와 관계없이"}, {"drugId": "D018", "drugName": "울트라셋정", "ingredient": "트라마돌·아세트아미노펜", "ingredientCode": "ING-016", "strength": "37.5mg/325mg", "atcCode": "N02AJ13", "precautions": ["졸음이 올 수 있음", "운전 시 주의"], "counselingPoints": ["졸음 여부", "어지러움 여부"], "source": "sample", "effect": "통증을 줄이는 약입니다", "timing": "식후 30분"}, {"drugId": "D019", "drugName": "지르텍정10mg", "ingredient": "세티리진", "ingredientCode": "ING-017", "strength": "10mg", "atcCode": "R06AE07", "precautions": ["졸음이 올 수 있음"], "counselingPoints": ["졸음 여부"], "source": "sample", "effect": "알레르기 증상을 줄이는 약입니다", "timing": "취침 전"}, {"drugId": "D020", "drugName": "씨잘정5mg", "ingredient": "레보세티리진", "ingredientCode": "ING-018", "strength": "5mg", "atcCode": "R06AE09", "precautions": ["졸음이 올 수 있음"], "counselingPoints": ["졸음 여부"], "source": "sample", "effect": "알레르기 증상을 줄이는 약입니다", "timing": "취침 전"}, {"drugId": "D021", "drugName": "뮤코스타정100mg", "ingredient": "레바미피드", "ingredientCode": "ING-019", "strength": "100mg", "atcCode": "A02BX14", "precautions": ["식후 복용"], "counselingPoints": ["속 불편감 변화"], "source": "sample", "effect": "위 점막을 보호하는 약입니다", "timing": "식후 30분"}, {"drugId": "D022", "drugName": "알레그라정120mg", "ingredient": "펙소페나딘", "ingredientCode": "ING-020", "strength": "120mg", "atcCode": "R06AX26", "precautions": ["과일주스와 함께 복용하지 않기"], "counselingPoints": ["복용 시점 준수 여부"], "source": "sample", "effect": "알레르기 증상을 줄이는 약입니다", "timing": "식전 또는 공복"}, {"drugId": "D023", "drugName": "싱귤레어정10mg", "ingredient": "몬테루카스트", "ingredientCode": "ING-021", "strength": "10mg", "atcCode": "R03DC03", "precautions": ["저녁에 복용"], "counselingPoints": ["복용 시간 준수 여부", "기침 변화"], "source": "sample", "effect": "기관지 염증과 알레르기를 줄이는 약입니다", "timing": "취침 전"}, {"drugId": "D024", "drugName": "프레탈정100mg", "ingredient": "실로스타졸", "ingredientCode": "ING-022", "strength": "100mg", "atcCode": "B01AC23", "precautions": ["두통이 나타날 수 있음"], "counselingPoints": ["두통 여부", "두근거림 여부"], "source": "sample", "effect": "혈액 순환을 돕는 약입니다", "timing": "식전 30분 또는 식후 2시간"}, {"drugId": "D025", "drugName": "씬지로이드정0.1mg", "ingredient": "레보티록신", "ingredientCode": "ING-023", "strength": "0.1mg", "atcCode": "H03AA01", "precautions": ["아침 공복에 복용", "다른 약과 시간 간격을 둘 것"], "counselingPoints": ["복용 시점 준수 여부", "두근거림 여부"], "source": "sample", "effect": "갑상선 호르몬을 보충하는 약입니다", "timing": "아침 공복에, 복용 후 30분간 식사 전"}, {"drugId": "D026", "drugName": "트라젠타정5mg", "ingredient": "리나글립틴", "ingredientCode": "ING-024", "strength": "5mg", "atcCode": "A10BH05", "precautions": ["복용 중 속 불편감이 나타날 수 있음"], "counselingPoints": ["복용 시간 준수 여부"], "source": "sample", "effect": "혈당을 낮추는 약입니다", "timing": "식사와 관계없이 일정한 시간에"}, {"drugId": "D027", "drugName": "씬지로이드정0.15mg", "ingredient": "레보티록신", "ingredientCode": "ING-023", "strength": "0.15mg", "atcCode": "H03AA01", "precautions": ["아침 공복에 복용", "다른 약과 시간 간격을 둘 것"], "counselingPoints": ["복용 시점 준수 여부", "두근거림 여부"], "source": "sample", "effect": "갑상선 호르몬을 보충하는 약입니다", "timing": "아침 공복에, 복용 후 30분간 식사 전"}], "patients": [{"patientId": "P001", "name": "환자 A", "case": "CHANGED(1회 투여량 1정→2정) · CONTINUE · 이력 4묶음 — 반복 처방 확인용 · 영수증", "summary": "혈압약 용량이 2배로 늘어난 고객 · 지난 처방 4번"}, {"patientId": "P002", "name": "환자 B", "case": "NEW · CONTINUE · 미포함(투약일수 종료)", "summary": "당뇨약이 하나 늘고, 다 먹은 약 하나가 빠진 고객"}, {"patientId": "P003", "name": "환자 C", "case": "CHANGED(제품) — 같은 성분 다른 제품, 비교표 제품 행 확인용", "summary": "같은 성분인데 제조사만 바뀐 고객"}, {"patientId": "P004", "name": "환자 D", "case": "CONTINUE · 미포함(투약일수 남음)", "summary": "아직 남은 약이 이번 처방에서 빠진 고객"}, {"patientId": "P005", "name": "환자 E", "case": "비교할 이력 없음 — 처음 등록 · DUR 병용주의·중복 · 영수증", "summary": "처방전을 처음 등록해 비교할 지난 처방이 없는 고객 · 함께 먹을 때 주의가 필요한 조합"}, {"patientId": "P006", "name": "환자 F", "case": "CHANGED(1일 횟수 1회→2회) · NEW", "summary": "복용 횟수가 하루 1번에서 2번으로 늘고, 새 약도 생긴 고객"}, {"patientId": "P007", "name": "환자 G", "case": "CONTINUE · 미포함(투약일수 남음) — 두 번째 사례", "summary": "아직 남은 약이 빠진 두 번째 고객 · 다른 약·기간"}, {"patientId": "P009", "name": "환자 I", "case": "CHANGED(제품·함량 0.1mg→0.15mg) — 같은 성분 함량 변경", "summary": "같은 약인데 함량이 한 단계 올라간 고객"}, {"patientId": "P010", "name": "환자 J", "case": "NEW · 미포함(투약일수 종료) — 같은 치료군 다른 성분으로 교체 · 영수증", "summary": "같은 치료군의 다른 약으로 바뀐 고객"}, {"patientId": "P012", "name": "환자 L", "case": "CONTINUE — 1회 투여량 표기 차이(`1정` / `1 정`)가 변경으로 잡히지 않는지 확인", "summary": "처방 내용은 그대로이고 표기 방식만 다른 고객"}], "otc": [{"otcId": "O001", "productName": "타이레놀정500mg", "ingredient": "아세트아미노펜", "ingredientCode": "ING-015", "strength": "500mg", "purpose": "해열·진통", "precautions": ["다른 감기약과 성분이 겹칠 수 있습니다", "하루 최대 복용량을 넘기지 않습니다"], "counselingPoints": ["다른 해열진통제 복용 여부"], "source": "sample"}, {"otcId": "O002", "productName": "판콜에이내복액", "ingredient": "아세트아미노펜 외 복합", "ingredientCode": "ING-101", "strength": "30mL", "purpose": "감기 증상", "precautions": ["졸음이 올 수 있습니다", "해열진통제와 성분이 겹칠 수 있습니다"], "counselingPoints": ["운전 여부", "다른 감기약 복용 여부"], "source": "sample", "components": [{"code": "ING-015", "name": "아세트아미노펜"}, {"code": "ING-109", "name": "클로르페니라민"}]}, {"otcId": "O003", "productName": "베나치오에프액", "ingredient": "은행엽 외", "ingredientCode": "ING-102", "strength": "20mL", "purpose": "소화 불량", "precautions": ["식후 복용합니다"], "counselingPoints": ["증상 지속 기간"], "source": "sample"}, {"otcId": "O004", "productName": "이지엔6이브연질캡슐", "ingredient": "이부프로펜", "ingredientCode": "ING-103", "strength": "200mg", "purpose": "진통", "precautions": ["속이 불편할 수 있습니다", "다른 소염진통제와 겹칠 수 있습니다"], "counselingPoints": ["위장 불편감 여부"], "source": "sample"}, {"otcId": "O005", "productName": "훼스탈플러스정", "ingredient": "소화효소 복합", "ingredientCode": "ING-104", "strength": "1정", "purpose": "소화 불량", "precautions": ["식후 복용합니다"], "counselingPoints": ["복용 시점"], "source": "sample", "components": [{"code": "ING-110", "name": "판크레아틴"}]}, {"otcId": "O006", "productName": "지르텍정10mg", "ingredient": "세티리진", "ingredientCode": "ING-017", "strength": "10mg", "purpose": "알레르기", "precautions": ["졸음이 올 수 있습니다"], "counselingPoints": ["운전 여부"], "source": "sample"}, {"otcId": "O007", "productName": "까스활명수큐액", "ingredient": "생약 복합", "ingredientCode": "ING-105", "strength": "75mL", "purpose": "소화 불량", "precautions": ["식후 복용합니다"], "counselingPoints": ["증상 지속 기간"], "source": "sample", "components": [{"code": "ING-111", "name": "현호색 추출물"}]}, {"otcId": "O008", "productName": "마데카솔연고", "ingredient": "센텔라아시아티카", "ingredientCode": "ING-106", "strength": "10g", "purpose": "상처", "precautions": ["상처 부위에만 바릅니다"], "counselingPoints": ["상처 상태"], "source": "sample"}, {"otcId": "O009", "productName": "대웅비타민씨정", "ingredient": "아스코르브산", "ingredientCode": "ING-107", "strength": "500mg", "purpose": "비타민 보충", "precautions": ["하루 권장량을 지킵니다"], "counselingPoints": ["다른 비타민 복용 여부"], "source": "sample"}, {"otcId": "O010", "productName": "인사돌플러스정", "ingredient": "옥수수불검화정량추출물", "ingredientCode": "ING-108", "strength": "1정", "purpose": "잇몸", "precautions": ["꾸준히 복용합니다"], "counselingPoints": ["복용 기간"], "source": "sample"}], "receipts": [{"patientId": "P001", "purchaseDate": "2026-09-02", "pharmacy": "한일약국", "items": [{"kind": "처방조제", "label": "처방조제료 및 약제비", "amount": 8200}, {"kind": "일반약", "otcId": "O001", "qty": 1, "amount": 3800}, {"kind": "일반약", "otcId": "O009", "qty": 1, "amount": 9000}]}, {"patientId": "P005", "purchaseDate": "2026-09-09", "pharmacy": "한일약국", "items": [{"kind": "처방조제", "label": "처방조제료 및 약제비", "amount": 5400}, {"kind": "일반약", "otcId": "O002", "qty": 1, "amount": 4800}, {"kind": "일반약", "otcId": "O006", "qty": 1, "amount": 6000}]}, {"patientId": "P010", "purchaseDate": "2026-09-03", "pharmacy": "한일약국", "items": [{"kind": "일반약", "otcId": "O002", "qty": 2, "amount": 7000}, {"kind": "일반약", "otcId": "O005", "qty": 1, "amount": 5000}]}], "dur": {"note": "샘플 데이터입니다. 실제 서비스는 심평원 DUR 기준을 받아 씁니다.", "병용주의": [{"a": "ING-009", "b": "ING-010", "reason": "함께 복용할 때 출혈 경향이 커질 수 있는 조합으로 등록되어 있습니다"}, {"a": "ING-013", "b": "ING-014", "reason": "같은 계열의 소염진통제가 겹치는 조합으로 등록되어 있습니다"}, {"a": "ING-013", "b": "ING-103", "reason": "같은 계열의 소염진통제가 겹치는 조합으로 등록되어 있습니다"}, {"a": "ING-015", "b": "ING-101", "reason": "함께 복용할 때 주의가 필요한 조합으로 등록되어 있습니다"}], "임부금기": [{"code": "ING-013", "level": "2", "reason": "임신 후기 사용에 주의가 필요한 성분으로 등록되어 있습니다"}, {"code": "ING-007", "level": "1", "reason": "임신 중 사용에 주의가 필요한 성분으로 등록되어 있습니다"}, {"code": "ING-008", "level": "1", "reason": "임신 중 사용에 주의가 필요한 성분으로 등록되어 있습니다"}], "연령주의": [{"code": "ING-014", "ageGroup": "소아", "reason": "소아 복용에 주의가 필요한 성분으로 등록되어 있습니다"}, {"code": "ING-016", "ageGroup": "소아", "reason": "소아 복용에 주의가 필요한 성분으로 등록되어 있습니다"}], "중복성분": [{"rule": "같은 성분코드가 이번 처방과 구매 내역에 함께 있으면 알린다"}]}, "lookups": {"recentViewed": ["O004", "O003"], "oftenChecked": ["O007"]}, "pharmacies": [{"pharmacyId": "PH01", "name": "굿팜한일약국", "distance": "350m", "updatedAt": "2026-09-17 09:20", "stock": [{"otcId": "O001", "qty": 8}, {"otcId": "O004", "qty": 3}, {"otcId": "O006", "qty": 5}, {"otcId": "O009", "qty": 12}, {"drugId": "D001", "qty": 4}, {"drugId": "D003", "qty": 6}], "address": "서울 성동구 성수이로 12", "closeAt": "19:00", "open": true, "mapX": 44, "mapY": 46, "meters": 350}, {"pharmacyId": "PH02", "name": "굿팜역삼온누리약국", "distance": "620m", "updatedAt": "2026-09-17 08:45", "stock": [{"otcId": "O001", "qty": 2}, {"otcId": "O002", "qty": 6}, {"otcId": "O005", "qty": 4}, {"otcId": "O007", "qty": 9}], "address": "서울 성동구 왕십리로 88", "closeAt": "20:00", "open": true, "mapX": 66, "mapY": 30, "meters": 620}, {"pharmacyId": "PH03", "name": "굿팜강남중앙약국", "distance": "1.2km", "updatedAt": "2026-09-16 18:10", "stock": [{"otcId": "O004", "qty": 7}, {"otcId": "O006", "qty": 1}, {"otcId": "O008", "qty": 3}, {"otcId": "O010", "qty": 5}, {"drugId": "D001", "qty": 2}], "address": "서울 성동구 뚝섬로 301", "closeAt": "18:30", "open": true, "mapX": 24, "mapY": 70, "meters": 1200}, {"pharmacyId": "PH04", "name": "굿팜삼성백제약국", "distance": "1.8km", "updatedAt": "2026-09-17 07:55", "stock": [{"otcId": "O001", "qty": 15}, {"otcId": "O003", "qty": 2}, {"otcId": "O009", "qty": 6}], "address": "서울 성동구 아차산로 45", "closeAt": "21:00", "open": false, "mapX": 78, "mapY": 74, "meters": 1800}], "faq": [{"q": "포인트는 어디서 확인하나요?", "a": "굿팜앱 홈에서 내 포인트를 확인할 수 있습니다."}, {"q": "내 약국은 어떻게 등록하나요?", "a": "홈의 내 약국 영역에서 자주 이용하는 약국을 등록할 수 있습니다."}, {"q": "처방전 요청은 어떻게 하나요?", "a": "홈의 처방전 요청에서 이용 건을 고르면 약국이 확인한 뒤 앱으로 보내드립니다."}, {"q": "영수증은 어디서 받나요?", "a": "홈의 영수증 요청에서 이용 건을 고르면 약국이 확인한 뒤 앱으로 보내드립니다."}], "rx": [{"patientId": "P001", "prescriptionDate": "2026-03-05", "drugId": "D001", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-03-05", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-05-12", "drugId": "D001", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-05-12", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-07-14", "drugId": "D001", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-07-14", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-09-02", "drugId": "D001", "dosePerTime": "2정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-09-02", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-06-20", "drugId": "D006", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-06-20", "drugId": "D007", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-08-25", "drugId": "D006", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-08-25", "drugId": "D008", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P003", "prescriptionDate": "2026-07-10", "drugId": "D003", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P003", "prescriptionDate": "2026-09-05", "drugId": "D004", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P004", "prescriptionDate": "2026-08-20", "drugId": "D015", "dosePerTime": "1캡슐", "frequency": "1일 2회", "duration": 30}, {"patientId": "P004", "prescriptionDate": "2026-08-20", "drugId": "D021", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 30}, {"patientId": "P004", "prescriptionDate": "2026-09-08", "drugId": "D021", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 30}, {"patientId": "P005", "prescriptionDate": "2026-09-09", "drugId": "D017", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 5}, {"patientId": "P005", "prescriptionDate": "2026-09-09", "drugId": "D019", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 5}, {"patientId": "P006", "prescriptionDate": "2026-05-02", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P006", "prescriptionDate": "2026-07-06", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P006", "prescriptionDate": "2026-09-04", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P006", "prescriptionDate": "2026-09-04", "drugId": "D016", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 14}, {"patientId": "P007", "prescriptionDate": "2026-08-28", "drugId": "D011", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P007", "prescriptionDate": "2026-08-28", "drugId": "D012", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P007", "prescriptionDate": "2026-09-10", "drugId": "D011", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P009", "prescriptionDate": "2026-03-20", "drugId": "D025", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P009", "prescriptionDate": "2026-06-18", "drugId": "D025", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P009", "prescriptionDate": "2026-09-06", "drugId": "D027", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P010", "prescriptionDate": "2026-07-22", "drugId": "D014", "dosePerTime": "1캡슐", "frequency": "1일 1회", "duration": 28}, {"patientId": "P010", "prescriptionDate": "2026-09-03", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 28}, {"patientId": "P012", "prescriptionDate": "2026-08-01", "drugId": "D018", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 7}, {"patientId": "P012", "prescriptionDate": "2026-09-07", "drugId": "D018", "dosePerTime": "1 정", "frequency": "1일 3회", "duration": 7}], "prescriptions": [{"patientId": "P001", "prescriptionDate": "2026-03-05", "drugId": "D001", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-03-05", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-05-12", "drugId": "D001", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-05-12", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-07-14", "drugId": "D001", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-07-14", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-09-02", "drugId": "D001", "dosePerTime": "2정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P001", "prescriptionDate": "2026-09-02", "drugId": "D009", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-06-20", "drugId": "D006", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-06-20", "drugId": "D007", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-08-25", "drugId": "D006", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P002", "prescriptionDate": "2026-08-25", "drugId": "D008", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P004", "prescriptionDate": "2026-08-20", "drugId": "D015", "dosePerTime": "1캡슐", "frequency": "1일 2회", "duration": 30}, {"patientId": "P004", "prescriptionDate": "2026-08-20", "drugId": "D021", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 30}, {"patientId": "P004", "prescriptionDate": "2026-09-08", "drugId": "D021", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 30}, {"patientId": "P005", "prescriptionDate": "2026-09-09", "drugId": "D017", "dosePerTime": "1정", "frequency": "1일 3회", "duration": 5}, {"patientId": "P005", "prescriptionDate": "2026-09-09", "drugId": "D019", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 5}, {"patientId": "P006", "prescriptionDate": "2026-05-02", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P006", "prescriptionDate": "2026-07-06", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P006", "prescriptionDate": "2026-09-04", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 30}, {"patientId": "P006", "prescriptionDate": "2026-09-04", "drugId": "D016", "dosePerTime": "1정", "frequency": "1일 2회", "duration": 14}, {"patientId": "P007", "prescriptionDate": "2026-08-28", "drugId": "D011", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P007", "prescriptionDate": "2026-08-28", "drugId": "D012", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P007", "prescriptionDate": "2026-09-10", "drugId": "D011", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P008", "prescriptionDate": "2026-06-15", "drugId": "D020", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 14}, {"patientId": "P008", "prescriptionDate": "2026-06-15", "drugId": "D023", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P008", "prescriptionDate": "2026-09-01", "drugId": "D023", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 30}, {"patientId": "P009", "prescriptionDate": "2026-03-20", "drugId": "D025", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P009", "prescriptionDate": "2026-06-18", "drugId": "D025", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P009", "prescriptionDate": "2026-09-06", "drugId": "D027", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 90}, {"patientId": "P010", "prescriptionDate": "2026-07-22", "drugId": "D014", "dosePerTime": "1캡슐", "frequency": "1일 1회", "duration": 28}, {"patientId": "P010", "prescriptionDate": "2026-09-03", "drugId": "D013", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 28}, {"patientId": "P011", "prescriptionDate": "2026-04-10", "drugId": "D026", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 60}, {"patientId": "P011", "prescriptionDate": "2026-04-10", "drugId": "D010", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 60}, {"patientId": "P011", "prescriptionDate": "2026-06-12", "drugId": "D026", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 60}, {"patientId": "P011", "prescriptionDate": "2026-06-12", "drugId": "D010", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 60}, {"patientId": "P011", "prescriptionDate": "2026-08-14", "drugId": "D026", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 60}, {"patientId": "P011", "prescriptionDate": "2026-08-14", "drugId": "D010", "dosePerTime": "1정", "frequency": "1일 1회", "duration": 60}]};
+const drugById = Object.fromEntries(DB.drugs.map(d=>[d.drugId,d]));
+const S={pick:false,recent:[],mode:'in',pid:DB.patients[0].patientId,screen:'list',cust:'home',gen:false,opened:{},ans:{},ctx:{},path:'rx',hasRx:true,perm:'first',onlyStock:true,selPh:null,addr:null,listView:false,phStockQ:null,q:'',drug:null,pharm:null,loc:false};
+
+const pd=s=>new Date(s+'T00:00:00');
+const minus6=d=>{const x=new Date(d);x.setMonth(x.getMonth()-6);return x};
+const qty=s=>{const m=String(s).match(/^\s*([\d.\/]+)\s*(\S+)\s*$/);return m?m[1]+'|'+m[2]:String(s).trim()};
+const fq=s=>String(s).replace(/\s+/g,'');
+const rxOf=p=>DB.rx.filter(r=>r.patientId===p);
+const lastDate=p=>rxOf(p).map(r=>r.prescriptionDate).sort().pop();
+
+function analyze(pid){
+  const rows=rxOf(pid); if(!rows.length) return null;
+  const today=pd(lastDate(pid)), lo=minus6(today);
+  const cur={},past={};
+  rows.forEach(r=>{const k=drugById[r.drugId].ingredientCode,d=pd(r.prescriptionDate);
+    if(+d===+today) cur[k]=r; });
+  rows.filter(r=>{const d=pd(r.prescriptionDate);return d>=lo&&d<today})
+      .sort((a,b)=>a.prescriptionDate<b.prescriptionDate?-1:1)
+      .forEach(r=>past[drugById[r.drugId].ingredientCode]=r);
+  const noHistory=Object.keys(past).length===0;
+  const out=[];
+  new Set([...Object.keys(cur),...Object.keys(past)]).forEach(k=>{
+    const c=cur[k],q=past[k];
+    let state,detail='',diffs=[];
+    if(c&&!q){state='NEW'}
+    else if(c&&q){
+      const dc=drugById[c.drugId],dq=drugById[q.drugId];
+      if(c.drugId!==q.drugId) diffs.push(['제품',dq.drugName,dc.drugName]);
+      if(qty(dc.strength)!==qty(dq.strength)) diffs.push(['함량',dq.strength,dc.strength]);
+      if(qty(c.dosePerTime)!==qty(q.dosePerTime)) diffs.push(['1회 투여량',q.dosePerTime,c.dosePerTime]);
+      if(fq(c.frequency)!==fq(q.frequency)) diffs.push(['1일 횟수',q.frequency,c.frequency]);
+      state=diffs.length?'CHANGED':'CONTINUE';
+    } else {
+      state='OUT';
+      const end=pd(q.prescriptionDate); end.setDate(end.getDate()+q.duration);
+      detail = end>=today ? '투약일수 남음' : '투약일수 종료';
+    }
+    out.push({key:k,state,detail,diffs,cur:c,past:q,drug:drugById[(c||q).drugId]});
+  });
+  return {today:lastDate(pid),noHistory,items:out,curCount:Object.keys(cur).length,
+          pastGroups:new Set(rows.filter(r=>{const d=pd(r.prescriptionDate);return d>=lo&&d<today}).map(r=>r.prescriptionDate)).size};
+}
+const ORDER={NEW:1,CHANGED:2,'OUT_남':3,CONTINUE:5,'OUT_종':6};
+const rank=i=>i.state==='OUT'?(i.detail==='투약일수 남음'?3:6):ORDER[i.state];
+const label=i=>i.state==='OUT'?'최근 처방 미포함':i.state;
+const cls=i=>'t-'+i.state;
+
+function diffText(i){return i.diffs.map(d=>d[0]+' '+d[1]+' → '+d[2]).join(' · ')}
+
+function cardText(i,who){
+  const n=i.drug.drugName;
+  const T={
+    NEW:{what:'복용 목적과 복용 후 몸의 변화',why:'이번 처방에 새로 추가된 약입니다.',
+         qa:'이번에 새로 받은 약을 복용한 뒤 불편한 점이 있었나요?'},
+    CHANGED:{what:'달라진 용법대로 복용하고 있는지',why:'지난 처방과 비교해 '+diffText(i)+'가 달라졌습니다.',
+         qa:'달라진 용법대로 복용하고 계신가요?'},
+    OUT:{what:'지난 처방의 남은 약을 어떻게 할지',why:'지난 처방에 있던 약이 이번 처방에서는 확인되지 않습니다. ('+i.detail+')',
+         qa:'남은 약을 어떻게 할지 확인해 보셨나요?'},
+    CONTINUE:{what:'복용 중 불편한 점이 있었는지',why:'지난 처방과 같은 내용으로 이어집니다.',
+         qa:'복용 중 불편한 점은 없으셨나요?'}
+  }[i.state];
+  return {title:label(i),drug:n,what:T.what,why:T.why,
+    q:T.qa, qLabel: who==='cust'?'약국에 물어볼 질문':'환자에게 물어볼 질문',
+    whatLabel: who==='cust'?'알아두면 좋은 내용':'확인할 내용',
+    whyLabel: who==='cust'?'이번 처방에서 달라진 점':'확인 이유'};
+}
+const FQS={NEW:['이 약은 어떤 성분인가요?','복용할 때 알아둘 점이 있나요?','며칠분 받았나요?'],
+  CHANGED:['무엇이 달라졌나요?','지난번 약과 같은 성분인가요?','복용 방법이 달라졌나요?'],
+  OUT:['지난번에 받은 이 약은 며칠분이었나요?','남은 약은 어떻게 하나요?','이 약은 어떤 성분이었나요?'],
+  CONTINUE:['지난번과 같은 용량인가요?','복용할 때 알아둘 점이 있나요?']};
+function fqAnswer(i,q){
+  const d=i.drug, c=i.cur||i.past, p=i.past;
+  if(q.includes('성분')) return d.drugName+'의 성분은 '+d.ingredient+'이고 함량은 '+d.strength+'입니다.';
+  if(q.includes('며칠분')) return (p||c).duration+'일분으로 처방되었고, '+(p||c).frequency+' 복용입니다.';
+  if(q.includes('무엇이 달라')) return diffText(i)+' 입니다.';
+  if(q.includes('복용 방법')) return '이번 처방은 '+c.dosePerTime+' · '+c.frequency+'입니다.';
+  if(q.includes('같은 용량')) return '지난 처방과 같은 '+d.strength+' · '+c.dosePerTime+' · '+c.frequency+'입니다.';
+  if(q.includes('남은 약')) return '지난 처방일은 '+p.prescriptionDate+'이고 '+p.duration+'일분이었습니다. ('+i.detail+') 남은 약을 어떻게 할지는 약국에 문의해 주세요.';
+  if(q.includes('알아둘 점')) return (d.precautions||[]).join(' ') || '현재 제공된 정보만으로는 판단하기 어렵습니다.';
+  return '현재 제공된 정보만으로는 판단하기 어렵습니다.';
+}
+
+/* ---------- 영수증 · 일반약 · DUR ---------- */
+const otcById=Object.fromEntries(DB.otc.map(o=>[o.otcId,o]));
+const nameOf=id=>otcById[id]?otcById[id].productName:drugById[id].drugName;
+const stockOf=(x,id)=>x.stock.find(s=>(s.otcId||s.drugId)===id);
+const receiptOf=p=>DB.receipts.find(r=>r.patientId===p);
+function codesOf(pid,path){
+  const out=[];
+  if(path==='rx'){const a=analyze(pid); if(a) a.items.filter(i=>i.cur).forEach(i=>out.push({code:i.drug.ingredientCode,name:i.drug.drugName,from:'처방'}));}
+  const rc=receiptOf(pid);
+  if(rc) rc.items.filter(i=>i.kind==='일반약').forEach(i=>{const o=otcById[i.otcId];out.push({code:o.ingredientCode,name:o.productName,from:'구매'})});
+  return out;
+}
+const nameFrom=m=>m.from==='구매'?('최근 구매 기록에 있는 '+m.name):m.name;
+function durCheck(pid,path){
+  const list=codesOf(pid,path), hits=[];
+  for(let x=0;x<list.length;x++)for(let y=x+1;y<list.length;y++){
+    if(list[x].code===list[y].code){hits.push({type:'중복 성분',a:list[x],b:list[y],reason:'같은 성분이 두 번 확인됩니다'});continue}
+    const m=DB.dur.병용주의.find(d=>(d.a===list[x].code&&d.b===list[y].code)||(d.b===list[x].code&&d.a===list[y].code));
+    if(m) hits.push({type:'병용주의',a:list[x],b:list[y],reason:m.reason});
+  }
+  return hits;
+}
+function durFlags(pid,path,kind){
+  const list=codesOf(pid,path), out=[];
+  list.forEach(it=>{
+    if(kind==='임부'){const g=DB.dur.임부금기.find(d=>d.code===it.code); if(g) out.push({a:it,reason:g.reason})}
+    else {const g=DB.dur.연령주의.find(d=>d.code===it.code); if(g) out.push({a:it,reason:g.reason+' ('+g.ageGroup+')'})}
+  });
+  return out;
+}
+const CHIPS={
+  otc:['이 약은 어떤 약인가요?','복용할 때 알아둘 점이 있나요?','언제 먹는 게 좋나요?'],
+  receipt:['언제 무엇을 샀나요?','같이 산 약들을 함께 먹어도 되나요?'],
+  rxCard:{NEW:['처음 복용할 때 주의할 점이 있나요?','지금 먹는 다른 약과 같이 복용해도 되나요?','어떤 증상이 생기면 약국에 물어봐야 하나요?'],
+    CHANGED:['달라진 복용법에서 주의할 점이 있나요?','기존에 남아 있는 약은 어떻게 해야 하나요?','변경 후 확인해야 할 증상이 있나요?'],
+    CONTINUE:['계속 복용할 때 확인할 점이 있나요?','다른 약과 같이 복용할 때 주의할 점이 있나요?','복용 중 어떤 증상이 있으면 약국에 물어봐야 하나요?'],
+    LONG_TERM:['오래 복용할 때 확인해야 할 점이 있나요?','정기적으로 확인할 내용이 있나요?','최근 불편한 증상과 관련이 있을 수 있나요?'],
+    OUT:['이번 처방에 없는 이유를 알 수 있나요?','남아 있는 약은 어떻게 해야 하나요?','약국에 어떤 내용을 확인하면 좋나요?']},
+  dur:['지금 먹는 약들을 같이 먹어도 되나요?','같은 성분이 두 번 들어가 있나요?','임신 중에도 먹을 수 있나요?','아이가 먹어도 되나요?']
+};
+const LIMIT2='개인의 건강상태나 다른 복용약에 따라 달라질 수 있으므로, 복용 전 약사에게 확인해 주세요.';
+function cardChipAnswer(q,i,pid){
+  const pre=(i.drug.precautions||[]).join(' ');
+  if(q.includes('이번 처방에 없는 이유')) return '이번 처방 기록만으로는 제외된 이유를 확인하기 어렵습니다. 복용 지속 여부는 처방한 의료기관 또는 약국에 확인해 주세요.';
+  if(q.includes('남아 있는 약')){
+    const a=analyze(pid), p=i.past; if(!p) return '현재 제공된 정보만으로는 판단하기 어렵습니다.';
+    const end=new Date(p.prescriptionDate+'T00:00:00'); end.setDate(end.getDate()+p.duration);
+    const left=Math.round((end-new Date(a.today+'T00:00:00'))/86400000);
+    return '지난 처방은 '+p.duration+'일분이었고, 이번 처방일 기준으로 '+(left>0?left+'일분이 남은 것으로 계산됩니다.':'투약일수를 채운 것으로 계산됩니다.')+' 남은 약을 어떻게 할지는 약국에 확인해 주세요.';
+  }
+  if(q.includes('약국에 어떤 내용을 확인')) return '이 약의 복용을 계속할지, 남은 약을 어떻게 할지 약국에 확인해 보세요.';
+  if(q.includes('같이 복용')){
+    const h=durCheck(pid,'rx').filter(x=>(x.type==='병용주의'||x.type==='중복 성분')&&(x.a.name===i.drug.drugName||(x.b&&x.b.name===i.drug.drugName)));
+    return (h.length?'현재 확인 가능한 DUR 기준에서 '+h.map(x=>x.a.name+'과 '+x.b.name+'은 '+x.reason).join(', ')+'.'
+      :'현재 확인 가능한 DUR 기준에서는 이 약과 병용금기 정보가 확인되지 않습니다.')+' '+LIMIT2;
+  }
+  if(q.includes('증상')&&q.includes('관련이 있을')) return '등록된 정보에서 이 약에 대해 안내된 내용은 "'+pre+'"입니다. 지금 겪는 증상과 관련이 있는지는 약사에게 확인해 주세요.';
+  if(q.includes('증상')) return '등록된 정보에서 이 약에 대해 안내된 내용은 "'+pre+'"입니다. 복용 중 불편한 증상이 있으면 약국에 물어봐 주세요.';
+  if(q.includes('달라진 복용법')) return '이번에 '+diffText(i)+'가 달라졌습니다. 등록된 주의사항은 "'+pre+'"입니다. '+LIMIT2;
+  if(q.includes('정기적으로')) return pre?('등록된 주의사항은 "'+pre+'"입니다. 정기적으로 확인할 내용은 약국에 물어봐 주세요.'):'현재 제공된 정보만으로는 판단하기 어렵습니다. 약국에 확인해 주세요.';
+  return '등록된 주의사항은 "'+pre+'"입니다. '+LIMIT2;
+}
+function chipAnswer(q,ctx){
+  const {item,otc,pid,path}=ctx;
+  if(item && ctx.card) return cardChipAnswer(q,item,pid);
+  if(otc){
+    if(q.includes('어떤 약')) return otc.productName+'은 '+otc.purpose+'에 쓰는 약으로 등록되어 있습니다. 성분은 '+otc.ingredient+' '+otc.strength+'입니다.';
+    if(q.includes('알아둘 점')) return (otc.precautions||[]).join(' ');
+    if(q.includes('언제 먹')) return (otc.precautions||[]).join(' ')+' 자세한 복용 시점은 약국에 확인해 주세요.';
+  }
+  if(q.includes('언제 무엇을')){const r=receiptOf(pid);
+    return r.purchaseDate+' '+r.pharmacy+'에서 '+r.items.map(i=>i.kind==='일반약'?otcById[i.otcId].productName:i.label).join(', ')+'를 구매한 것으로 확인됩니다.';}
+  if(q.includes('같이 먹어도')||q.includes('함께 먹어도')){
+    const h=durCheck(pid,path).filter(x=>x.type==='병용주의');
+    return h.length? h.map(x=>x.a.name+'과 '+x.b.name+'은 '+x.reason+'.').join(' ')+' 함께 복용해도 되는지는 약국에 확인해 주세요.'
+      : '등록된 정보에서 함께 복용할 때 주의가 필요한 조합은 확인되지 않습니다. 복용 여부는 약국에 확인해 주세요.';}
+  if(q.includes('같은 성분이 두 번')){
+    const h=durCheck(pid,path).filter(x=>x.type==='중복 성분');
+    return h.length? h.map(x=>x.a.name+'과 '+x.b.name+'에서 '+x.reason+'.').join(' ')+' 약국에 확인해 주세요.'
+      : '등록된 정보에서 성분이 겹치는 항목은 확인되지 않습니다.';}
+  if(q.includes('임신')){
+    const h=durFlags(pid,path,'임부');
+    return h.length? h.map(x=>x.a.name+'은 '+x.reason+'.').join(' ')+' 임신 중 복용 여부는 약국에 확인해 주세요.'
+      : '등록된 정보에서 임신 관련 주의 항목은 확인되지 않습니다. 복용 여부는 약국에 확인해 주세요.';}
+  if(q.includes('아이가')){
+    const h=durFlags(pid,path,'연령');
+    return h.length? h.map(x=>x.a.name+'은 '+x.reason+'.').join(' ')+' 약국에 확인해 주세요.'
+      : '등록된 정보에서 연령 관련 주의 항목은 확인되지 않습니다.';}
+  if(q.includes('지금도 재고')) return '표시된 수량은 기준 시각의 값입니다. 판매·조제 등 약국 상황에 따라 실제와 다를 수 있으니, 정확한 재고 여부는 약국에 문의해 주세요.';
+  if(q.includes('다른 약국에도')) return '약 정보찾기에서 그 약을 찾으면 보유로 등록된 약국을 가까운 순으로 볼 수 있습니다.';
+  if(item) return fqAnswer(item,q);
+  return '현재 제공된 정보만으로는 판단하기 어렵습니다.';
+}
+
+function points(a,who){const list=who==='cu'?a.items.filter(i=>!(i.state==='OUT'&&i.detail==='투약일수 종료')):a.items;
+  return list.slice().sort((x,y)=>rank(x)-rank(y)).slice(0,5).slice(0,3)}
+
+/* ---------- 렌더 ---------- */
+/* ---------- Guided Chat ---------- */
+const START={
+  has:[['CHANGE','이번 처방에서 달라진 점'],['NEW_DRUG','새로 추가된 약'],['INTERACTION','같이 먹어도 되는지 확인'],['STOCK_Q','약국에서 약 찾기']],
+  first:[['THIS_RX','이번에 받은 약은 어떤 약인가요?'],['INTERACTION','같이 먹어도 되는지 확인'],['STOCK_Q','약국에서 약 찾기'],['GUIDE_MENU','굿팜 이용 문의']],
+  none:[['GO_REGISTER','처방전 등록하기'],['DRUG_MENU','약품 정보 문의'],['STOCK_Q','약국에서 약 찾기'],['GUIDE_MENU','굿팜 이용 문의']]
+};
+/* 단말에 쌓인 처방 묶음 수로 첫 화면을 고른다 (09 4장) */
+function chatMode(pid){ if(!S.hasRx) return 'none';
+  const a=analyze(pid); return (a&&!a.noHistory)?'has':'first'; }
+const INTRO={
+  has:'최근 등록한 처방을 기준으로 궁금한 내용을 확인할 수 있어요.',
+  first:'등록하신 처방을 기준으로 궁금한 내용을 확인할 수 있어요.<br>다음 처방을 등록하면 달라진 점도 알려드립니다.',
+  none:'궁금한 약이나 약국 정보를 확인할 수 있어요.<br>처방전을 등록하면 이전 처방과 비교해 달라진 점도 확인할 수 있습니다.'
+};
+const INTENT={THIS_RX:'PRESCRIPTION_CHANGE',ADD_DRUG:'INTERACTION',ADD_CHECK:'INTERACTION',MISSING:'PRESCRIPTION_CHANGE',STOCK_Q:'PHARMACY_STOCK',STOCK_DRUG:'PHARMACY_STOCK',CHANGE:'PRESCRIPTION_CHANGE',NEW_DRUG:'PRESCRIPTION_CHANGE',INTERACTION:'INTERACTION',CHECK:'DRUG_INFO',DRUG:'DRUG_INFO',GUIDE:'GOODPHARM_GUIDE'};
+const MORE=['MORE','다른 질문하기'];
+const LIMIT='개인의 건강상태나 다른 복용약에 따라 달라질 수 있으므로, 복용 전 약사에게 확인해 주세요.';
+const fmt=d=>d.replace(/^\d{4}-(\d{2})-(\d{2})/,'$1.$2');
+function evidence(items){
+  return items.map(i=>`${i.drug.drugName} · 이전 ${i.past?i.past.dosePerTime+' · '+i.past.frequency+' · '+i.past.duration+'일분':'없음'} / 현재 ${i.cur?i.cur.dosePerTime+' · '+i.cur.frequency+' · '+i.cur.duration+'일분':'없음'}`).join('<br>');
+}
+/* ---------- 함께 복용 확인 (성분 비교 · DUR을 근거별로 나눈다) ---------- */
+const SRC_MINE='내 처방·구매 기록의 성분 비교', SRC_DUR='식약처·심평원 DUR 기준 (샘플)';
+const LIMIT_ADD='개인의 건강상태나 실제 복용 중인 다른 약에 따라 추가 확인이 필요할 수 있으므로, 복용 전 약사에게 확인해 주세요.';
+const NOT_SAFE='DUR에 등록되지 않은 모든 조합이 안전하다는 뜻은 아닙니다. 실제 복용 중인 다른 약이나 건강상태에 따라 추가 확인이 필요할 수 있습니다.';
+/* 약 하나를 성분 목록으로 편다 — 복합제는 구성성분까지 */
+const josa=(w,a,b)=>{const c=w.charCodeAt(w.length-1); return (c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28)?a:b};
+/* 성분 비교용 — 복합제는 구성성분만 쓴다. DUR 비교는 등록된 코드까지 함께 본다 */
+function spread(item,forDup){
+  if(forDup&&item.components&&item.components.length) return item.components.map(c=>({code:c.code,name:c.name}));
+  const out=[{code:item.code,name:item.ingName}];
+  (item.components||[]).forEach(c=>out.push({code:c.code,name:c.name}));
+  return out;
+}
+function myItems(pid){
+  const out=[];
+  const a=analyze(pid);
+  if(a) a.items.filter(i=>i.cur).forEach(i=>out.push({id:i.drug.drugId,name:i.drug.drugName,ingName:i.drug.ingredient,code:i.drug.ingredientCode,from:'처방',label:i.drug.drugName}));
+  const rc=receiptOf(pid);
+  if(rc) rc.items.filter(i=>i.kind==='일반약').forEach(i=>{const o=otcById[i.otcId];
+    out.push({id:o.otcId,name:o.productName,ingName:o.ingredient,code:o.ingredientCode,components:o.components,from:'최근 구매',label:o.productName+' · 최근 구매'})});
+  return out;
+}
+const refer=m=>m.from==='최근 구매'?('최근 구매 기록에 있는 '+m.name):m.name;
+/* 추가로 고를 약 후보 — 이미 비교 대상인 약은 뺀다 (09 5.2) */
+function addCandidates(pid){
+  const mine=myItems(pid), have=new Set(mine.map(m=>m.id));
+  const out=[];
+  (S.recent||[]).forEach(id=>{ if(have.has(id)||out.some(c=>c.id===id)) return;
+    const o=otcById[id]||drugById[id]; if(o) out.push({id,label:(o.productName||o.drugName)+' · 최근 조회'})});
+  DB.otc.forEach(o=>{ if(have.has(o.otcId)||out.some(c=>c.id===o.otcId)||out.length>=3) return;
+    out.push({id:o.otcId,label:o.productName})});
+  return out.slice(0,3);
+}
+/* extraId가 있으면 그 약과 내 약들을 비교하고, 없으면 내 약들끼리 비교한다 */
+function interCheck(pid,extraId){
+  const mine=myItems(pid);
+  const ex=extraId?(otcById[extraId]||drugById[extraId]):null;
+  const extra=ex?{id:extraId,name:ex.productName||ex.drugName,ingName:ex.ingredient,code:ex.ingredientCode,components:ex.components,from:'선택'}:null;
+  const pairs=[];
+  if(extra){ mine.forEach(m=>pairs.push([extra,m])); }
+  else { for(let x=0;x<mine.length;x++) for(let y=x+1;y<mine.length;y++) pairs.push([mine[x],mine[y]]); }
+  const dup=[], dur=[];
+  pairs.forEach(([A,B])=>{
+    if(A.id===B.id) return;
+    const left=extra&&A===extra?('함께 복용하려는 '+A.name):refer(A);
+    spread(A,true).forEach(sa=>spread(B,true).forEach(sb=>{
+      if(sa.code===sb.code) dup.push(left+'과 '+refer(B)+'에 같은 성분인 '+sa.name+josa(sa.name,'이','가')+' 포함되어 있습니다.');
+    }));
+    spread(A).forEach(sa=>spread(B).forEach(sb=>{
+      const d=DB.dur.병용주의.find(x=>(x.a===sa.code&&x.b===sb.code)||(x.b===sa.code&&x.a===sb.code));
+      if(d) dur.push(left+'과 '+refer(B)+' — 함께 복용할 때 주의가 필요한 조합으로 등록되어 있습니다.');
+    }));
+  });
+  const uniq=a=>[...new Set(a)];
+  const blocks=[];
+  if(uniq(dup).length) blocks.push('<b>성분 중복</b><br>'+uniq(dup).join('<br>')+'<div class="src">출처 · '+SRC_MINE+'</div>');
+  if(uniq(dur).length) blocks.push('<b>병용 주의</b><br>'+uniq(dur).join('<br>')+'<div class="src">출처 · '+SRC_DUR+'</div>');
+  let tail=LIMIT_ADD;
+  if(!blocks.length){
+    const head=extra?('함께 복용하려는 '+extra.name+'과 현재 등록된 처방약·구매 기록 사이에서 확인된 성분 중복과 주의 조합은 없습니다.')
+                    :'현재 등록된 처방약과 구매 기록 기준으로 확인된 성분 중복과 주의 조합은 없습니다.';
+    blocks.push(head+'<div class="src">출처 · '+SRC_MINE+' · '+SRC_DUR+'</div>');
+    tail=NOT_SAFE+'<br>복용 전 약사에게 확인해 주세요.';
+  }
+  const detail='비교한 약 · '+mine.map(m=>m.name+(m.from==='최근 구매'?' (최근 구매 기록)':'')).join(', ')
+    +(extra?'<br>함께 복용하려는 약 · '+extra.name:'')
+    +'<br>성분 비교 · 복합제는 구성성분까지 펼쳐 비교했습니다'
+    +'<br>DUR 기준 · 식약처·심평원 병용주의 (샘플)';
+  return {text:blocks.join('<br><br>')+'<br><br>'+tail, detail};
+}
+
+/* 일반 주의사항보다 내 구매 기록의 사실을 먼저 쓴다 (09 9.3) */
+function sameBought(pid,drug){
+  const rc=receiptOf(pid); if(!rc) return null;
+  const mine=[{code:drug.ingredientCode,name:drug.ingredient}];
+  let hit=null;
+  rc.items.filter(i=>i.kind==='일반약').forEach(i=>{const o=otcById[i.otcId];
+    const codes=(o.components&&o.components.length)?o.components:[{code:o.ingredientCode,name:o.ingredient}];
+    codes.forEach(c=>{ if(!hit&&mine.some(m=>m.code===c.code)) hit={product:o.productName,ing:c.name}; });});
+  return hit;
+}
+function knowPoint(pid,drug){
+  const b=sameBought(pid,drug);
+  if(b) return '최근 구매 기록에 있는 '+b.product+'과 같은 성분인 '+b.ing+josa(b.ing,'이','가')+' 함께 포함되어 있습니다.';
+  return (drug.precautions||[])[0]||'';
+}
+const buyLine=(pid,drug)=>{const b=sameBought(pid,drug);return b?'<br>최근 구매 기록 · '+b.product:''};
+
+function chatAnswer(key,arg){
+  const pid=S.pid, a=analyze(pid), rec='내 처방 기록 · '+a.today.replace(/-/g,'.');
+  if(key==='CHANGE'){
+    if(a.noHistory) return {t:'처음 등록한 처방이라 비교할 이전 처방이 없습니다. 다음 처방을 등록하면 달라진 점을 알려드립니다.',src:rec,
+      follow:[['CHECK','복용할 때 확인할 점'],['INTERACTION','같이 먹어도 되는지 확인']]};
+    const ch=a.items.filter(i=>i.state!=='CONTINUE').sort((x,y)=>rank(x)-rank(y));
+    if(!ch.length) return {t:'이전 처방과 비교해 달라진 약은 확인되지 않습니다.',src:rec,follow:[['CHECK','복용할 때 확인할 점'],['INTERACTION','같이 먹어도 되는지 확인']]};
+    const line=i=> i.state==='CHANGED'?`<b>${i.drug.drugName}</b> — ${diffText(i)}`
+      : i.state==='NEW'?`<b>${i.drug.drugName}</b> — 이번 처방에 새로 추가`
+      : `<b>${i.drug.drugName}</b> — 이번 처방에서 확인되지 않음 (${i.detail})`;
+    const shown=ch.filter(i=>!(i.state==='OUT'&&i.detail==='투약일수 종료'));
+    const f=[['INTERACTION','같이 먹어도 되는지 확인'],['CHECK','복용할 때 확인할 점']];
+    if(ch.some(i=>i.state==='OUT')) f.unshift(['MISSING','빠진 약이 있나요?']);
+    return {t:`이전 처방과 비교해 달라진 약이 ${shown.length}개 있어요.<br>`+shown.map(line).join('<br>'),src:rec,detail:evidence(shown),follow:f};
+  }
+  if(key==='THIS_RX'){
+    const cur=rxOf(pid).filter(x=>x.prescriptionDate===a.today);
+    const body=cur.map(x=>{const g=drugById[x.drugId];
+      return `<b>${g.drugName}</b><br><b>어떤 약인가요?</b><br>${g.effect||''}`
+        +`<br><b>복용하면서 알아둘 점</b><br>${knowPoint(pid,g)}`
+        +`<br><b>이럴 땐 확인하세요</b><br>${(g.counselingPoints||[])[0]||'복용 중 불편한 점이 있으면 약국에 확인해 주세요.'}`
+        +`<br><b>복용 방법</b><br>이번 처방에 안내된 용법(${x.dosePerTime} · ${x.frequency})을 따라 복용하세요.`
+        +(g.timing?`<br><span class="det">일반적으로 ${g.timing} 복용하는 경우가 많지만, 실제 복용은 이번 처방 용법을 따릅니다.</span>`:'')}).join('<br><br>');
+    return {t:body+'<br><br>다음 처방을 등록하면 이전 처방과 달라진 점도 알려드립니다.',
+      src:'식약처 의약품 정보 (샘플) · 내 처방 기록',
+      detail:'내 처방 기록 · '+a.today.replace(/-/g,'.')+'<br>식약처 의약품 정보 · 효능 · 주의',
+      follow:[['INTERACTION','같이 먹어도 되는지 확인'],['CHECK','복용할 때 확인할 점']]};
+  }
+  if(key==='MISSING'){
+    const out=a.items.filter(i=>i.state==='OUT').sort((x,y)=>rank(x)-rank(y));
+    if(!out.length) return {t:'등록하신 처방을 기준으로, 이번 처방에서 빠진 약은 확인되지 않습니다.',src:rec};
+    return {t:'등록하신 처방을 기준으로 이번 처방에서 확인되지 않는 약이에요.<br>'
+      +out.map(i=>`<b>${i.drug.drugName}</b> — ${i.detail==='투약일수 남음'?'처방된 일수가 남아 있습니다':'처방된 일수를 채웠습니다'}`).join('<br>')
+      +'<br>다른 곳에서 받은 처방이 있다면 등록해 주세요. 복용을 이어갈지는 약사가 판단합니다.',
+      src:rec,detail:evidence(out),follow:[['CALL','약국에 문의하기']]};
+  }
+  if(key==='NEW_DRUG'){
+    if(a.noHistory) return {t:'처음 등록한 처방이라 새로 추가된 약인지 비교할 수 없습니다.',src:rec,follow:[['CHECK','복용할 때 확인할 점']]};
+    const nw=a.items.filter(i=>i.state==='NEW');
+    return {t:nw.length?'이번 처방에 새로 추가된 약은 '+nw.map(i=>'<b>'+i.drug.drugName+'</b>').join(', ')+'입니다.':'이번 처방에 새로 추가된 약은 확인되지 않습니다.',
+      src:rec,detail:nw.length?evidence(nw):null,follow:[['CHECK','복용할 때 확인할 점'],['INTERACTION','같이 먹어도 되는지 확인']]};
+  }
+  if(key==='INTERACTION'){
+    const r=interCheck(pid,null);
+    return {t:r.text,detail:r.detail,follow:[['ADD_DRUG','다른 약과 같이 먹어도 되는지'],['CALL','약국에 문의하기'],['CHECK','복용할 때 확인할 점']]};
+  }
+  if(key==='ADD_DRUG'){
+    const cand=addCandidates(pid);
+    return {t:'함께 드실 약을 골라 주세요. 지금 등록된 처방·구매 기록과 비교해 드릴게요.',
+      follow:cand.map(c=>['ADD_CHECK',c.label,c.id]).concat([['GO_SEARCH','약품 검색에서 고르기']])};
+  }
+  if(key==='ADD_CHECK'){
+    const r=interCheck(pid,arg);
+    return {t:r.text,detail:r.detail,follow:[['ADD_DRUG','다른 약도 확인하기'],['CALL','약국에 문의하기']]};
+  }
+  if(key==='CHECK'){
+    const tg=(a.noHistory?a.items:a.items.filter(i=>i.state==='NEW'||i.state==='CHANGED')).filter(i=>i.cur).slice(0,2);
+    const list=(tg.length?tg:a.items.filter(i=>i.cur).slice(0,2));
+    return {t:list.map(i=>`<b>${i.drug.drugName}</b> — ${(i.drug.precautions||[]).join(' ')}`).join('<br>')+'<br><br>'+LIMIT,
+      src:'식약처 의약품 정보 (샘플)',follow:[['INTERACTION','같이 먹어도 되는지 확인'],['CALL','약국에 문의하기']]};
+  }
+  if(key==='CALL') return {t:'조제한 한일약국으로 연결할 수 있어요. 답변 내용은 이 기기에 남아 있으니, 보면서 약사에게 직접 물어보세요.<div class="linkrow"><button>📞 약국 전화하기</button><button>💬 약국과 채팅</button></div>',follow:[]};
+  if(key==='DRUG_MENU') return {t:'어떤 약이 궁금하세요?',follow:DB.otc.slice(0,3).map(o=>['DRUG',o.productName,o.otcId])};
+  if(key==='DRUG'){const o=otcById[arg];
+    return {t:`<b>${o.productName}</b><br>성분 ${o.ingredient} · ${o.strength}<br>용도 ${o.purpose}<br>${(o.precautions||[]).join(' ')}`,
+      src:'식약처 의약품 정보 (샘플)',follow:[['GO_MAP','내 주변 약국 재고 보기',arg]]};}
+  if(key==='STOCK_Q') return {t:'주변 굿팜 약국의 현재 재고를 확인할 수 있어요. 찾는 약을 먼저 골라 주세요.',follow:DB.otc.slice(0,3).map(o=>['STOCK_DRUG',o.productName,o.otcId])};
+  if(key==='STOCK_DRUG') return {t:'주변 굿팜 약국의 <b>'+otcById[arg].productName+'</b> 현재 재고를 확인할 수 있어요.',follow:[['GO_MAP','내 주변 약국 재고 보기',arg]]};
+  if(key==='GUIDE_MENU') return {t:'무엇이 궁금하세요?',follow:DB.faq.slice(0,3).map((f,ix)=>['GUIDE',f.q,ix])};
+  if(key==='GUIDE') return {t:DB.faq[arg].a,src:'굿팜 서비스 안내',follow:[]};
+  return {t:'현재 제공된 정보만으로는 판단하기 어렵습니다.',follow:[]};
+}
+function render(){
+  const sel=document.getElementById('sel');
+  if(!sel.options.length){DB.patients.forEach(p=>{const o=document.createElement('option');o.value=p.patientId;o.textContent=p.patientId+' · '+p.name;sel.appendChild(o)})}
+  sel.value=S.pid;
+  const cp=DB.patients.find(p=>p.patientId===S.pid);
+  document.getElementById('case').textContent=cp?(cp.summary+' — '+cp.case):'';
+  document.getElementById('m-in').className=S.mode==='in'?'on':'';
+  document.getElementById('m-cu').className=S.mode==='cu'?'on':'';
+  document.getElementById('rx-has').className=S.hasRx?'on':'';
+  document.getElementById('rx-none').className=S.hasRx?'':'on';
+  ['allow','first','deny'].forEach(k=>document.getElementById('pm-'+k).className=S.perm===k?'on':'');
+  document.getElementById('steps').innerHTML = S.mode==='cu' ? `<h2>단계</h2><div class="stepbar">
+   ${['home:홈','search:약품 검색','map:재고 지도','stock:약국 찾기','chat:챗봇','consent:동의','cam:촬영','check:값 확인','card:처방 카드'].map(s=>{const[k,t]=s.split(':');
+     return `<button data-c="${k}" class="${S.cust===k?'on':''}">${t}</button>`}).join('')}</div>` : '';
+  document.getElementById('stage').innerHTML = S.mode==='in' ? renderInternal() : renderCustomer();
+  bind();
+}
+function renderInternal(){
+  if(S.screen==='list'){
+    return `<div class="desktop"><div class="hd"><b>고객 목록</b> <span>AI 차트 · 처방전 접수 목록에 해당</span></div>
+     ${DB.patients.slice().sort((a,b)=>lastDate(b.patientId).localeCompare(lastDate(a.patientId)))
+       .map(p=>{const a=analyze(p.patientId);
+         const n=st=>a?a.items.filter(i=>i.state===st).length:0;
+         const out=a?a.items.filter(i=>i.state==='OUT'):[];
+         const parts=[];
+         if(a&&a.noHistory) parts.push('처음 등록한 처방');
+         if(n('NEW')) parts.push('새로 추가 '+n('NEW'));
+         if(n('CHANGED')) parts.push('달라진 약 '+n('CHANGED'));
+         if(n('CONTINUE')) parts.push('그대로 '+n('CONTINUE'));
+         out.forEach(()=>{});
+         const rem=out.filter(i=>i.detail==='투약일수 남음').length, fin=out.length-rem;
+         if(rem) parts.push('빠진 약 '+rem+' (아직 남음)');
+         if(fin) parts.push('빠진 약 '+fin+' (다 먹음)');
+         return `<div class="row" data-p="${p.patientId}"><span><b>${p.name}</b> <span class="det">${p.patientId}</span><br>
+         <span class="det">${p.summary||''}</span><br><span class="det">${parts.join(' · ')}</span></span>
+         <span class="det">최근 처방일 ${lastDate(p.patientId)}<br>이번 ${a?a.curCount:0}개 · 지난 ${a?a.pastGroups:0}묶음</span></div>`}).join('')}</div>`;
+  }
+  const a=analyze(S.pid), p=DB.patients.find(x=>x.patientId===S.pid);
+  let h=`<div class="desktop"><div class="hd"><b>${p.name}</b> <span>· 최근 처방일 ${a.today} · 이번 처방 ${a.curCount}개</span>
+    <div style="margin-top:8px"><button class="btn ghost" style="width:auto;padding:6px 12px" data-back="1">목록으로</button></div></div>`;
+  h+=`<h3 class="sec">처방 변화</h3>`;
+  if(a.noHistory){ h+=`<div class="empty">최근 6개월 동안 비교할 처방 이력이 없습니다.</div>`; }
+  else{
+    const order=['NEW','CHANGED','OUT','CONTINUE'];
+    order.forEach(st=>a.items.filter(i=>i.state===st).forEach(i=>{
+      h+=`<div class="chg-row"><span class="tag ${cls(i)}">${label(i)}</span>
+        <span class="nm">${i.drug.drugName}</span>
+        <span class="det">${i.state==='CHANGED'?diffText(i):(i.detail||'')}</span>
+        <details style="width:100%"><summary>근거 보기</summary>
+         이번 처방 ${i.cur?`${i.cur.prescriptionDate} · ${i.cur.dosePerTime} · ${i.cur.frequency} · ${i.cur.duration}일분`:'없음'}<br>
+         과거 처방 ${i.past?`${i.past.prescriptionDate} · ${i.past.dosePerTime} · ${i.past.frequency} · ${i.past.duration}일분`:'없음'}
+        </details></div>`;
+    }));
+  }
+  h+=`<h3 class="sec">AI 상담 포인트</h3>`;
+  if(a.noHistory){ h+=`<div class="empty">비교할 처방 이력이 있을 때 상담 포인트를 만듭니다.</div>`; }
+  else if(!S.gen){ h+=`<button class="btn" data-gen="1">상담 포인트 생성</button>`; }
+  else{
+    h+=`<div class="note">AI 연동 전이라 아래 문장은 샘플 템플릿입니다. 판정 결과와 근거 값은 실제 데이터입니다.</div>`;
+    points(a).forEach(i=>{const c=cardText(i,'ph');
+      h+=`<div class="card"><span class="tag ${cls(i)}">${c.title}</span> <b>${c.drug}</b>
+        <div class="k">${c.whatLabel}</div><div class="v">${c.what}</div>
+        <div class="k">${c.whyLabel}</div><div class="v">${c.why}</div>
+        <div class="k">${c.qLabel}</div><div class="q">"${c.q}"</div>
+        <details><summary>근거 보기</summary>
+         이번 처방 ${i.cur?`${i.cur.dosePerTime} · ${i.cur.frequency} · ${i.cur.duration}일분`:'없음'} /
+         과거 처방 ${i.past?`${i.past.dosePerTime} · ${i.past.frequency} · ${i.past.duration}일분`:'없음'}</details></div>`;
+    });
+  }
+  h+=`<h3 class="sec">처방 이력</h3>`;
+  const groups={}; rxOf(S.pid).forEach(r=>{(groups[r.prescriptionDate]=groups[r.prescriptionDate]||[]).push(r)});
+  Object.keys(groups).sort().reverse().forEach(d=>{
+    h+=`<div style="margin:10px 0"><b>${d}</b>${groups[d].map(r=>{const g=drugById[r.drugId];
+      return `<div class="det" style="padding:3px 0">${g.drugName} · ${g.ingredient} · ${g.strength} · ${r.dosePerTime} · ${r.frequency} · ${r.duration}일분</div>`}).join('')}</div>`;
+  });
+  return h+`</div>`;
+}
+function renderCustomer(){
+  const box=inner=>`<div class="phone">${inner}</div>`;
+  const pid=S.pid, path=S.path||'receipt';
+  const chip=(q,tagid)=>{const op=(S.opened[tagid]||[]).includes(q);
+    return `<div><span class="chip" data-chip="${tagid}|${q}">${q}</span>${op?`<div class="ansbox">${S.ans[tagid+'|'+q]}</div>`:''}</div>`};
+  const otcOf=id=>otcById[id];
+  const fab=`<div style="position:relative"><div style="position:absolute;right:0;bottom:-6px">
+    <button class="btn" style="width:auto;padding:10px 14px;border-radius:999px" data-c="chat">💬 굿팜 챗봇</button></div></div>`;
+  if(S.cust==='home') return box(`<div class="hd"><b>굿팜</b> <span>홈</span></div>
+    <div class="det">내 약국 · 한일약국</div>
+    <button class="pathbtn" data-c="order"><b>처방 오더</b><span>처방전을 올려 조제를 요청합니다</span></button>
+    <button class="pathbtn" data-c="receipt-req"><b>영수증 요청</b><span>약국에 영수증을 요청합니다</span></button>
+    <button class="pathbtn" data-c="search"><b>약품 정보 검색</b><span>약을 찾아 정보를 보고, 내 주변 약국 재고를 찾습니다</span></button>
+    ${fab}
+    <div class="tabbar" style="margin-top:44px"><button data-c="home">홈</button><button data-c="stock">약국 찾기</button><button data-c="chat">채팅</button><button>전체메뉴</button></div>
+    <div class="legend" style="margin-top:10px">챗봇은 오른쪽 하단 플로팅 버튼으로 엽니다. 재고 찾기는 약품 상세의 Action입니다 (11 3장).</div>`);
+  if(S.cust==='order') return box(`<div class="hd"><b>처방 오더</b></div>
+    <div class="v">처방전을 올리면 약국이 확인한 뒤 조제합니다. 판독은 지킴 OCR을 씁니다.</div>
+    <div class="legend" style="margin-top:10px">기존 기능입니다. 이 프로토타입에서는 화면만 표시합니다.</div>
+    <button class="btn ghost" data-c="home">홈으로</button>`);
+  if(S.cust==='receipt-req') return box(`<div class="hd"><b>영수증 요청</b></div>
+    <div class="v">이용 건을 고르면 약국이 확인한 뒤 앱으로 보내드립니다.</div>
+    <div class="legend" style="margin-top:10px">기존 기능입니다. 이 프로토타입에서는 화면만 표시합니다.</div>
+    <button class="btn ghost" data-c="home">홈으로</button>`);
+  if(S.cust==='drughub') return box(`<div class="hd"><b>약품 정보 검색</b></div>
+    <button class="pathbtn" data-c="search"><b>정보 검색</b><span>약을 찾아 성분·함량·주의사항을 봅니다</span></button>
+    <button class="pathbtn" data-c="stockhub"><b>재고 검색</b><span>약품으로 찾기 · 약국으로 찾기</span></button>`);
+  if(S.cust==='stockhub') return box(`<div class="hd"><b>재고 검색</b> <span>어떻게 찾을까요?</span></div>
+    <button class="pathbtn" data-c="stocksearch"><b>약품으로 찾기</b><span>약을 찾고, 그 약을 보유한 약국을 가까운 순으로 봅니다</span></button>
+    <button class="pathbtn" data-c="stock"><b>약국으로 찾기</b><span>약국을 고르고, 그 약국이 보유한 약을 봅니다</span></button>
+    <div class="legend" style="margin-top:14px">두 갈래 모두 같은 실재고 최신값(수량 · 기준 시각)을 씁니다 (09 7.4).</div>`);
+  if(S.cust==='chat'){
+    const mode=chatMode(pid);
+    if(!S.msgs) S.msgs=[{who:'bot',text:INTRO[mode]}];
+    const chips=S.chips||START[mode];
+    return box(`<div class="hd"><b>굿팜 챗봇</b></div>
+      ${S.msgs.map(m=>`<div class="msg ${m.who}"><div class="bub">${m.text}
+        ${m.src?`<div class="src">출처 · ${m.src}</div>`:''}
+        ${m.detail?`<details><summary>근거 보기</summary>${m.detail}</details>`:''}</div></div>
+        ${m.intent?`<div class="legend" style="margin:-4px 0 6px">Intent · ${m.intent}</div>`:''}`).join('')}
+      <div style="margin-top:10px">${chips.map((c,ix)=>`<span class="chip" data-say="${ix}">${c[1]}</span>`).join('')}</div>
+      <div class="kv" style="margin-top:12px"><div><span class="det">궁금한 내용을 입력하세요</span><span class="det">보조</span></div></div>
+      <div class="legend" style="margin-top:12px;border-top:1px solid var(--line);padding-top:8px">상담 및 문의 기록은 현재 기기에만 저장됩니다.<br>기기 변경 또는 앱 삭제 시 이전 기록을 확인할 수 없습니다.</div>`);
+  }
+  if(S.cust==='search'||S.cust==='stocksearch'){
+    const stockMode=S.cust==='stocksearch';
+    const q=S.q.trim();
+    const hitOtc=DB.otc.filter(o=>!q||o.productName.includes(q)||o.ingredient.includes(q));
+    const otcNames=new Set(DB.otc.map(o=>o.productName));
+    const hitRx=DB.drugs.filter(d=>!otcNames.has(d.drugName)&&(!q||d.drugName.includes(q)||d.ingredient.includes(q)));
+    return box(`<div class="hd"><b>${stockMode?'약품으로 재고 찾기':(S.pick?'함께 복용할 약 고르기':'정보 검색')}</b> <span>${stockMode?'약을 고르면 보유 약국이 나옵니다':(S.pick?'약을 고르면 지금 등록된 처방·구매 기록과 비교합니다':'약을 고르면 정보가 나옵니다')}</span></div>
+      <div class="kv"><div><span>🔍 ${q||'약 이름을 입력하세요'}</span><span class="det">${q?'검색됨':''}</span></div></div>
+      <div style="margin-top:8px">${['타이레놀','지르텍','넥시움','판콜'].map(k=>`<span class="chip" data-q="${k}">${k}</span>`).join('')}</div>
+      ${q?`<div class="k" style="margin-top:14px">검색 결과 ${hitOtc.length+hitRx.length}건</div>
+      ${hitOtc.map(o=>`<div class="row" data-drug="O:${o.otcId}" data-stock="${stockMode?1:0}"><span><b>${o.productName}</b><br><span class="det">${o.ingredient} · 일반의약품</span></span><span class="det">›</span></div>`).join('')}
+      ${hitRx.map(d=>`<div class="row" data-drug="D:${d.drugId}" data-stock="${stockMode?1:0}"><span><b>${d.drugName}</b><br><span class="det">${d.ingredient} · 전문의약품</span></span><span class="det">›</span></div>`).join('')}`:''}`);
+  }
+  if(S.cust==='drug'){
+    const [kind,id]=S.drug.split(':');
+    const isOtc=kind==='O'; const d=isOtc?otcOf(id):drugById[id];
+    return box(`<div class="hd"><b>${isOtc?d.productName:d.drugName}</b> <span>${isOtc?'일반의약품':'전문의약품'}</span></div>
+      <div class="kv"><div><span>성분</span><span>${d.ingredient}</span></div>
+        <div><span>함량</span><span>${d.strength}</span></div>
+        ${isOtc?`<div><span>용도</span><span>${d.purpose}</span></div>`:''}</div>
+      <div class="k" style="margin-top:12px">알아두면 좋은 내용</div><div class="v">${(d.precautions||[]).join(' ')}</div>
+      <div class="legend" style="margin-top:10px">약품 정보는 현재 앱의 약학정보원 정보 화면을 그대로 씁니다 (11 6장).</div>
+      ${S.pick?`<button class="btn" data-pick="${id}">이 약과 함께 복용해도 되는지 확인</button>`:''}
+      ${isOtc?'':`<div class="ansbox" style="margin-top:12px">처방전이 있어야 조제되는 약입니다.</div>`}
+      <button class="btn" data-find="${id}">내 주변 약국 재고 찾기</button>
+      <div class="legend" style="margin-top:6px">재고 찾기는 약학정보원에 등록된 약(일반·전문)에 둡니다 (11 10장).</div>`);
+  }
+  if(S.cust==='loc'){
+    if(S.perm==='deny') return box(`<div class="hd"><b>위치 이용 안내</b></div>
+      <div class="v">현재 위치 권한이 꺼져 있습니다.<br>앱 설정에서 위치 권한을 허용하거나 주소를 직접 검색해 주세요.</div>
+      <div class="linkrow"><button data-settings="1">설정으로 이동</button><button data-c="addr">주소 검색</button></div>
+      ${S.settingsNote?'<div class="legend" style="margin-top:8px">앱 설정 화면으로 이동합니다 (프로토타입에서는 이동하지 않음).</div>':''}`);
+    return box(`<div class="hd"><b>가까운 약국의 재고를 찾아드릴게요.</b></div>
+      <div class="v">현재 위치를 이용해 주변 굿팜 약국과 선택한 의약품의 재고를 확인합니다.</div>
+      <div class="linkrow"><button data-useloc="1">현재 위치 사용</button><button data-c="addr">주소로 찾기</button></div>
+      <div class="legend" style="margin-top:10px">위치 좌표는 거리 계산에 쓰고 곧바로 파기합니다 (11 6.3).</div>`);
+  }
+  if(S.cust==='addr') return box(`<div class="hd"><b>주소 검색</b></div>
+    <div class="kv"><div><span>🔍 서울 성동구 성수동</span><span class="det">검색됨</span></div></div>
+    <div class="row" data-addr="서울 성동구 성수동"><span><b>서울 성동구 성수동</b><br><span class="det">이 주소를 기준으로 찾기</span></span><span class="det">›</span></div>`);
+  if(S.cust==='map'){
+    const id=(S.drug||'O:O001').split(':')[1]; const o={productName:nameOf(id)};
+    const all=DB.pharmacies.map(x=>({x,s:stockOf(x,id)})).sort((p,q)=>p.x.meters-q.x.meters);
+    const shown=S.onlyStock?all.filter(v=>v.s):all;
+    const dist=m=>m>=1000?(m/1000).toFixed(1)+'km':m+'m';
+    const sel=shown.find(v=>v.x.pharmacyId===S.selPh);
+    const sheet=sel?(sel.s
+      ?`<div class="sheet"><b>${sel.x.name}</b> <span class="det" style="float:right">${dist(sel.x.meters)}</span><br><span class="badge on">재고 보유</span>
+         <div class="v" style="margin-top:6px"><b>${o.productName} · ${sel.s.qty}개</b><br><span class="det">${fmt(sel.x.updatedAt)} 기준</span></div>${otcById[id]?'':'<div class="det" style="margin-top:4px">처방전이 있어야 조제되는 약입니다.</div>'}
+         <div class="det" style="margin-top:6px">${sel.x.address}<br>${sel.x.open?'영업중 · '+sel.x.closeAt+'까지':'영업 종료'}</div>
+         <div class="ansbox">재고는 판매·조제 상황에 따라 실제와 다를 수 있습니다.<br>정확한 재고 여부는 약국에 확인해 주세요.</div>
+         <div class="linkrow"><button>📞 전화</button><button>💬 채팅</button><button>길찾기</button></div></div>`
+      :`<div class="sheet"><b>${sel.x.name}</b> <span class="det" style="float:right">${dist(sel.x.meters)}</span><br><span class="badge off">현재 확인된 재고 없음</span>
+         <div class="ansbox">입고 예정이나 재고 상황은 약국에 직접 확인해 주세요.</div>
+         <div class="linkrow"><button>📞 전화</button><button>💬 채팅</button></div></div>`):'';
+    const head=`<div class="hd"><b>${o.productName} 재고 찾기</b><br><span>기준 · ${S.addr||'현재 위치'}</span></div>
+      <div class="kv"><div><span class="det">🔍 지역 · 약국 검색</span><span class="det"></span></div></div>
+      <label class="det" style="display:block;margin-top:8px;cursor:pointer"><input type="checkbox" data-only="1" ${S.onlyStock?'checked':''}> 재고 있는 약국만 보기</label>`;
+    if(S.listView) return box(head+`
+      ${shown.map(v=>`<div class="row" data-selph="${v.x.pharmacyId}"><span><b>${v.x.name}</b><br><span class="det">${dist(v.x.meters)} · ${v.s?'재고 보유 · '+v.s.qty+'개 · '+fmt(v.x.updatedAt)+' 기준':'현재 확인된 재고 없음'}</span></span><span class="det">›</span></div>`).join('')||'<div class="empty">조건에 맞는 약국이 없습니다.</div>'}
+      <button class="btn ghost" data-list="0">지도보기</button>${sheet}`);
+    return box(head+`
+      <div class="map"><div class="me" title="내 위치"></div>
+        ${shown.map(v=>`<div class="mk ${v.s?'on':'off'} ${v.x.pharmacyId===S.selPh?'sel':''}" style="left:${v.x.mapX}%;top:${v.x.mapY}%" data-selph="${v.x.pharmacyId}">${v.s?'재고':'●'}</div>`).join('')}
+      </div>
+      <button class="btn ghost" data-list="1">목록보기</button>${sheet}
+      <div class="legend">Marker는 색과 라벨을 함께 씁니다 — 재고 보유 = 초록 + "재고", 현재 확인된 재고 없음 = 회색, 선택 중 = 확대 + 테두리 (11 7.2).</div>`);
+  }
+  if(S.cust==='stock'){
+    const ph=S.pharm?DB.pharmacies.find(x=>x.pharmacyId===S.pharm):null;
+    const dist=m=>m>=1000?(m/1000).toFixed(1)+'km':m+'m';
+    if(!ph) return box(`<div class="hd"><b>약국 찾기</b> <span>가까운 순</span></div>
+      ${DB.pharmacies.slice().sort((a,b)=>a.meters-b.meters).map(x=>`<div class="row" data-pharm="${x.pharmacyId}"><span><b>${x.name}</b><br><span class="det">${dist(x.meters)} · ${x.open?'영업중':'영업 종료'}</span></span><span class="det">›</span></div>`).join('')}`);
+    const q=S.phStockQ, hit=q?[...DB.otc.map(o=>({id:o.otcId,productName:o.productName,ingredient:o.ingredient})),...DB.drugs.map(d=>({id:d.drugId,productName:d.drugName,ingredient:d.ingredient}))].filter((o,i,a)=>(o.productName.includes(q)||o.ingredient.includes(q))&&a.findIndex(b=>b.productName===o.productName)===i):[];
+    return box(`<div class="hd"><b>${ph.name}</b> <span>${dist(ph.meters)}</span>
+      <div class="det" style="margin-top:4px">${ph.address} · ${ph.open?'영업중 · '+ph.closeAt+'까지':'영업 종료'}</div>
+      <div style="margin-top:8px"><button class="btn ghost" style="width:auto;padding:6px 12px" data-pharm="">약국 목록</button></div></div>
+      <div class="linkrow"><button>📞 전화</button><button>💬 채팅</button><button>길찾기</button></div>
+      <div class="k" style="margin-top:14px">약품 재고 검색</div>
+      <div class="kv"><div><span>🔍 ${q||'약 이름을 입력하세요'}</span><span class="det">${q?'검색됨':''}</span></div></div>
+      <div style="margin-top:8px">${['타이레놀','지르텍','판콜','인데놀'].map(k=>`<span class="chip" data-phq="${k}">${k}</span>`).join('')}</div>
+      ${hit.map(o=>{const s=stockOf(ph,o.id);return `<div class="card"><b>${o.productName}</b>
+        ${s?`<br><span class="badge on">재고 보유</span><div class="v" style="margin-top:4px"><b>현재 재고 ${s.qty}개</b> · ${fmt(ph.updatedAt)} 기준</div>`
+           :`<br><span class="badge off">현재 확인된 재고 없음</span><div class="det" style="margin-top:4px">입고 예정이나 재고 상황은 약국에 직접 확인해 주세요.</div>`}</div>`}).join('')}
+      ${hit.length?'<div class="ansbox">재고는 판매·조제 상황에 따라 실제와 다를 수 있습니다.<br>정확한 재고 여부는 약국에 확인해 주세요.</div>':''}`);
+  }
+  if(S.cust==='consent') return box(`<div class="hd"><b>${path==='rx'?'처방 데이터':'구매 내역'}로 상담 내용을 정리합니다</b></div>
+    <div class="k det">무엇을 사용하나요</div><div>${path==='rx'?'내가 올린 처방전의 처방 기록':'내가 촬영한 영수증의 구매 내역'}</div>
+    <div class="k det" style="margin-top:12px">무엇에 쓰나요</div><div>${path==='rx'?'이번 처방에서 달라진 점과 함께 복용 확인':'구매한 약의 정보 정리'}<br>그리고 약국에 물어볼 내용을 만듭니다</div>
+    <div class="k det" style="margin-top:12px">어떻게 처리되나요</div><div>정리하는 동안에만 사용하고 끝나면 파기합니다</div>
+    <div class="k det" style="margin-top:12px">결과는 어디에 남나요</div><div>내 휴대전화에 보관됩니다</div>
+    <button class="btn" data-c="cam">동의하고 시작하기</button>`);
+  if(S.cust==='cam') return box(`<div class="hd"><b>${path==='rx'?'처방전을 촬영해 주세요':'영수증을 촬영해 주세요'}</b></div>
+    <div class="cam">촬영 영역</div><div class="det">${path==='rx'?'처방전':'약국 영수증'}</div>
+    <button class="btn" data-c="check">촬영하기</button>`);
+  if(S.cust==='check'){
+    const r=receiptOf(pid);
+    if(path==='receipt'){
+      if(!r) return box(`<div class="hd"><b>이 내용이 맞나요?</b></div><div class="empty">이 고객의 영수증 샘플이 없습니다. 다른 고객을 골라 주세요.</div>`);
+      return box(`<div class="hd"><b>이 내용이 맞나요?</b></div>
+        <div class="kv"><div><span>구매일</span><span>${r.purchaseDate}</span></div><div><span>약국</span><span>${r.pharmacy}</span></div></div>
+        ${r.items.map(i=>i.kind==='일반약'
+          ? `<div class="kv"><div><span>${otcById[i.otcId].productName}</span><span class="det">고치기</span></div>
+             <div><span>구분</span><span>일반약 · ${i.qty}개</span></div></div>`
+          : `<div class="kv"><div><span>${i.label}</span><span class="det">고치기</span></div>
+             <div><span>구분</span><span>처방조제 · 금액만 확인됨</span></div></div>`).join('')}
+        <button class="btn" data-c="card">맞습니다</button>`);
+    }
+    const a=analyze(pid), cur=rxOf(pid).filter(x=>x.prescriptionDate===a.today);
+    return box(`<div class="hd"><b>이 내용이 맞나요?</b></div>
+      <div class="kv"><div><span>처방일</span><span>${a.today} <span class="det">달력에서 고르기</span></span></div><div><span>약국</span><span>한일약국</span></div></div>
+      ${cur.map(x=>{const g=drugById[x.drugId];return `<div class="kv"><div><span><b>${g.drugName}</b></span><span class="det">약품 검색에서 고르기</span></div>
+        <div><span>함량</span><span>${g.strength} <span class="det">등록된 값에서 고르기</span></span></div>
+        <div><span>1회 투여량</span><span>${x.dosePerTime} <span class="det">− +</span></span></div>
+        <div><span>1일 횟수</span><span>${x.frequency} <span class="det">1·2·3·4회</span></span></div>
+        <div><span>투약일수</span><span>${x.duration}일분 <span class="det">숫자 입력</span></span></div>
+        <div><span class="det">이 약 빼기</span><span></span></div></div>`}).join('')}
+      <div class="kv"><div><span class="det">＋ 약 추가하기 — 읽히지 않은 약을 약품 검색에서 고릅니다</span><span></span></div></div>
+      <div class="legend">항목마다 고치는 방식이 정해져 있습니다. 약품명은 검색에서 골라 성분코드가 함께 들어옵니다 (07 4.4.1).<br>고친 값은 근거 보기에 <b>직접 고친 값</b>으로 표시되고, 파일럿에서 OCR 판독 정확도로 집계됩니다.</div>
+      <button class="btn" data-c="card">맞습니다</button>`);
+  }
+  /* ---- 카드 ---- */
+  const hits=durCheck(pid,path);
+  let h=`<div class="note">AI 연동 전이라 문장은 샘플 템플릿입니다. DUR 정보도 샘플입니다.</div>`;
+  if(path==='receipt'){
+    const r=receiptOf(pid);
+    if(!r) return box(`<div class="empty">이 고객의 영수증 샘플이 없습니다.</div>`);
+    h=`<div class="hd"><b>${r.purchaseDate} 구매</b><br><span>${r.pharmacy} · 영수증에서 확인한 내용입니다</span></div>`+h;
+    r.items.filter(i=>i.kind==='처방조제').forEach(i=>{
+      h+=`<div class="card"><b>처방조제</b>
+        <div class="k">영수증에서 확인된 것</div><div class="v">${r.purchaseDate}에 조제를 받은 사실과 금액까지 확인됩니다.</div>
+        <div class="k">더 자세히 보려면</div><div class="v">처방전을 올리면 이번 처방에서 달라진 점까지 확인할 수 있습니다.</div>
+        <button class="btn ghost" data-path2="rx">처방전 올리고 상담하기</button></div>`});
+    r.items.filter(i=>i.kind==='일반약').forEach((i,ix)=>{const o=otcById[i.otcId];const tag='otc'+ix;
+      h+=`<div class="card"><span class="tag t-CONTINUE">일반약</span> <b>${o.productName}</b>
+        <div class="k">성분 · 함량</div><div class="v">${o.ingredient} · ${o.strength}</div>
+        <div class="k">용도</div><div class="v">${o.purpose}</div>
+        <div class="k">알아두면 좋은 내용</div><div class="v">${(o.precautions||[]).join(' ')}</div>
+        <div class="k" style="margin-top:12px">더 물어보기</div>
+        ${CHIPS.otc.map(q=>chip(q,tag)).join('')}
+        <div class="linkrow"><button>📞 약국에 전화</button><button>💬 약국과 채팅</button></div></div>`});
+    h+=`<div class="card"><b>구매 내역 전체</b>
+      <div class="k" style="margin-top:6px">더 물어보기</div>
+      ${CHIPS.receipt.map(q=>chip(q,'rcp')).join('')}</div>`;
+    return box(h);
+  }
+  const a=analyze(pid);
+  h=`<div class="hd"><b>${a.today} 처방</b><br><span>${a.noHistory?'이번 처방을 정리했습니다 · 다음 처방부터 달라진 점을 알려드립니다':'최근 6개월 처방 '+a.pastGroups+'건과 비교했습니다'}</span></div>`+h;
+  if(hits.length){
+    h+=`<div class="dur"><b>함께 확인할 내용 ${hits.length}건</b>
+      ${hits.map(x=>`<div style="margin-top:6px">· [${x.type}] ${x.a.name}${x.b?' + '+x.b.name:''} — ${x.reason}</div>`).join('')}
+      <div style="margin-top:8px">복용 여부는 약국에 확인해 주세요. 임신·연령 관련 내용은 아래에서 물어보면 확인해 드립니다.</div>
+      <div style="margin-top:8px">${CHIPS.dur.map(q=>chip(q,'dur')).join('')}</div></div>`;
+  }
+  if(a.noHistory){
+    rxOf(pid).filter(r=>r.prescriptionDate===a.today).forEach((r,ix)=>{const g=drugById[r.drugId];
+      h+=`<div class="card"><b>${g.drugName}</b>
+        <div class="k">성분 · 함량</div><div class="v">${g.ingredient} · ${g.strength}</div>
+        <div class="k">복용</div><div class="v">${r.dosePerTime} · ${r.frequency} · ${r.duration}일분</div>
+        <div class="k">알아두면 좋은 내용</div><div class="v">${(g.precautions||[]).join(' ')}</div>
+        <div class="linkrow"><button>📞 약국에 전화</button><button>💬 약국과 채팅</button></div></div>`});
+    return box(h);
+  }
+  points(a,'cu').forEach((i,ix)=>{const tag='rx'+ix;
+    const summary={NEW:'이번 처방에 새로 추가된 약입니다.',CONTINUE:'지난 처방과 같은 내용으로 이어집니다.',
+      CHANGED:'지난 처방과 비교해 '+i.diffs.map(d=>d[0]).join(' · ')+'이(가) 달라졌습니다.',
+      OUT:'등록하신 처방을 기준으로, 이번 처방에서는 확인되지 않습니다. ('+i.detail+') 다른 곳에서 받은 처방이 있다면 등록해 주세요.'}[i.state];
+    const dp=i.past?drugById[i.past.drugId]:null, dc=i.cur?drugById[i.cur.drugId]:null;
+    const row=(label,pv,cv)=>`<tr><td>${label}</td><td>${pv??'—'}</td><td class="${pv!=null&&cv!=null&&String(pv).replace(/\s/g,'')!==String(cv).replace(/\s/g,'')?'dif':''}">${cv??'—'}</td></tr>`;
+    const dates=[i.past&&i.past.prescriptionDate,i.cur&&i.cur.prescriptionDate].filter(Boolean).map(d=>d.replace(/-/g,'.')).join(' / ');
+    h+=`<div class="card"><span class="tag ${cls(i)}">${label(i)}</span> <b>${i.drug.drugName}</b>
+      <button class="chip" data-find="${i.drug.drugId}" style="float:right">재고 찾기</button>
+      <div class="v" style="margin-top:6px">${summary}</div>
+      <table class="cmp"><tr><th></th><th>이전 처방</th><th>이번 처방</th></tr>
+        ${row('제품',dp&&dp.drugName,dc&&dc.drugName)}
+        ${row('1회 투여량',i.past&&i.past.dosePerTime,i.cur&&i.cur.dosePerTime)}
+        ${row('복용 횟수',i.past&&i.past.frequency,i.cur&&i.cur.frequency)}
+        ${row('투약일수',i.past&&(i.past.duration+'일'),i.cur&&(i.cur.duration+'일'))}
+        ${row('함량',dp&&dp.strength,dc&&dc.strength)}</table>
+      <div class="k">어떤 약인가요?</div><div class="v">${i.drug.effect||''}</div>
+      <div class="k">복용 방법</div><div class="v">이번 처방에 안내된 용법(${i.cur?i.cur.dosePerTime+' · '+i.cur.frequency:'처방 용법'})을 따라 복용하세요.${i.drug.timing?`<br><span class="det">일반적으로 ${i.drug.timing} 복용하는 경우가 많지만, 실제 복용은 이번 처방 용법을 따릅니다.</span>`:''}</div>
+      <div class="k">복용하면서 알아둘 점</div><div class="v">${knowPoint(pid,i.drug)}</div>
+      <div class="k" style="margin-top:12px">더 궁금한 점</div>
+      ${(CHIPS.rxCard[i.state]||[]).slice(0,3).map(q=>chip(q,tag)).join('')}
+      <div class="linkrow"><button>📞 약국에 전화</button><button>💬 약국과 채팅</button></div>
+      <details><summary>근거 보기</summary>내 처방 기록 · ${dates} 처방 비교<br>성분 비교 · ${i.drug.ingredient} (성분코드 앞 4자리)<br>식약처 의약품 정보 · 효능 · 주의${buyLine(pid,i.drug)}</details></div>`;
+    S.ctx[tag]={item:i,pid,path,card:true};
+  });
+  return box(h);
+}
+function bind(){
+  document.getElementById('m-in').onclick=()=>{S.mode='in';S.screen='list';render()};
+  document.getElementById('m-cu').onclick=()=>{S.mode='cu';S.cust='home';S.opened={};S.ans={};S.svcCat=undefined;S.msgs=null;S.chips=null;render()};
+  document.getElementById('sel').onchange=e=>{S.pid=e.target.value;S.gen=false;S.opened={};S.ans={};S.ctx={};S.msgs=null;S.chips=null;if(S.mode==='cu')S.cust='home';if(S.mode==='in')S.screen='detail';render()};
+  document.querySelectorAll('[data-p]').forEach(el=>el.onclick=()=>{S.pid=el.dataset.p;S.screen='detail';S.gen=false;render()});
+  document.querySelectorAll('[data-back]').forEach(el=>el.onclick=()=>{S.screen='list';render()});
+  document.querySelectorAll('[data-gen]').forEach(el=>el.onclick=()=>{S.gen=true;render()});
+  document.querySelectorAll('[data-c]').forEach(el=>el.onclick=()=>{S.cust=el.dataset.c;render()});
+  document.querySelectorAll('[data-path]').forEach(el=>el.onclick=()=>{S.path=el.dataset.path;S.cust='consent';S.opened={};S.ans={};render()});
+  document.querySelectorAll('[data-path2]').forEach(el=>el.onclick=()=>{S.path=el.dataset.path2;S.cust='cam';S.opened={};S.ans={};render()});
+  document.querySelectorAll('[data-q]').forEach(el=>el.onclick=()=>{S.q=el.dataset.q;
+    if(S.cust!=='stocksearch') S.cust='search'; render()});
+  document.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{
+    const id=el.dataset.pick, o=otcById[id]||drugById[id], nm=o.productName||o.drugName;
+    S.pick=false; S.cust='chat';
+    const mode=chatMode(S.pid);
+    S.msgs=(S.msgs||[{who:'bot',text:INTRO[mode]}]).concat({who:'me',text:nm});
+    const r=chatAnswer('ADD_CHECK',id);
+    S.msgs.push({who:'bot',text:r.t,src:r.src,detail:r.detail});
+    S.chips=(r.follow||[]).concat([['MORE','다른 질문하기']]);
+    render()});
+  document.querySelectorAll('[data-drug]').forEach(el=>el.onclick=()=>{
+    S.drug=el.dataset.drug;
+    const pid0=el.dataset.drug.split(':')[1];
+    S.recent=[pid0].concat((S.recent||[]).filter(x=>x!==pid0)).slice(0,5);
+    const isStock=el.dataset.stock==='1', isOtc=S.drug.startsWith('O:');
+    S.cust = 'drug';
+    render()});
+  document.querySelectorAll('[data-loc]').forEach(el=>el.onclick=()=>{S.loc=true});
+  document.querySelectorAll('[data-pharm]').forEach(el=>el.onclick=()=>{S.pharm=el.dataset.pharm||null;S.phStockQ=null;S.cust='stock';render()});
+  document.querySelectorAll('[data-say]').forEach(el=>el.onclick=()=>{
+    const mode=chatMode(S.pid);
+    const chips=S.chips||START[mode];
+    const [key,label,arg]=chips[+el.dataset.say];
+    if(key==='GO_MAP'){S.drug='O:'+arg;S.selPh=null;S.listView=false;S.cust=(S.perm==='allow'||S.addr)?'map':'loc';render();return}
+    if(key==='GO_REGISTER'){S.path='rx';S.cust='consent';render();return}
+    if(key==='GO_SEARCH'){S.q='';S.pick=true;S.cust='search';render();return}
+    S.msgs=(S.msgs||[{who:'bot',text:INTRO[mode]}]).concat({who:'me',text:label});
+    if(key==='MORE'){S.msgs.push({who:'bot',text:'다른 질문을 골라 주세요.'});S.chips=START[mode];render();return}
+    const r=chatAnswer(key,arg);
+    S.msgs.push({who:'bot',text:r.t,src:r.src,detail:r.detail,intent:INTENT[key]});
+    S.chips=(r.follow||[]).slice(0,3).concat([MORE]);
+    render()});
+  document.querySelectorAll('[data-find]').forEach(el=>el.onclick=()=>{const fid=el.dataset.find;S.drug=(fid[0]==='D'?'D:':'O:')+fid;S.selPh=null;S.listView=false;S.cust=(S.perm==='allow'||S.addr)?'map':'loc';render()});
+  document.querySelectorAll('[data-useloc]').forEach(el=>el.onclick=()=>{S.perm='allow';S.addr=null;S.cust='map';render()});
+  document.querySelectorAll('[data-settings]').forEach(el=>el.onclick=()=>{S.settingsNote=true;render()});
+  document.querySelectorAll('[data-addr]').forEach(el=>el.onclick=()=>{S.addr=el.dataset.addr;S.cust='map';render()});
+  document.querySelectorAll('[data-selph]').forEach(el=>el.onclick=()=>{S.selPh=el.dataset.selph;render()});
+  document.querySelectorAll('[data-list]').forEach(el=>el.onclick=()=>{S.listView=el.dataset.list==='1';render()});
+  document.querySelectorAll('[data-only]').forEach(el=>el.onchange=()=>{S.onlyStock=el.checked;S.selPh=null;render()});
+  document.querySelectorAll('[data-phq]').forEach(el=>el.onclick=()=>{S.phStockQ=el.dataset.phq;render()});
+  ['allow','first','deny'].forEach(k=>{document.getElementById('pm-'+k).onclick=()=>{S.perm=k;S.addr=null;S.settingsNote=false;render()}});
+  document.getElementById('rx-has').onclick=()=>{S.hasRx=true;S.msgs=null;S.chips=null;render()};
+  document.getElementById('rx-none').onclick=()=>{S.hasRx=false;S.msgs=null;S.chips=null;render()};
+  document.querySelectorAll('[data-svc]').forEach(el=>el.onclick=()=>{
+    S.svcCat = el.dataset.svc===''?undefined:+el.dataset.svc; S.cust='svc'; render()});
+  document.querySelectorAll('[data-faq]').forEach(el=>el.onclick=()=>{const i=+el.dataset.faq;
+    S.opened['faq']=(S.opened['faq']||[]).concat(i);render()});
+  document.querySelectorAll('[data-chip]').forEach(el=>el.onclick=()=>{
+    const [tag,q]=el.dataset.chip.split('|');
+    const ctx=S.ctx[tag]||{pid:S.pid,path:S.path};
+    if(tag.startsWith('otc')){const r=receiptOf(S.pid);const list=r?r.items.filter(i=>i.kind==='일반약'):[];
+      ctx.otc=otcById[(list[+tag.slice(3)]||{}).otcId];}
+    S.ans[tag+'|'+q]=chipAnswer(q,{...ctx,pid:S.pid,path:S.path});
+    S.opened[tag]=(S.opened[tag]||[]).concat(q); render();});
+  document.querySelectorAll('[data-fq]').forEach(el=>el.onclick=()=>{const[ix,qi]=el.dataset.fq.split(':').map(Number);
+    const k=S.pid+'-'+ix;S.opened[k]=(S.opened[k]||[]).concat(qi);render()});
+}
+render();
+</script></body></html>
