@@ -181,50 +181,67 @@
   .kpi td{padding:7px 10px;border-bottom:1px solid #eef1f4;vertical-align:top}
   .ok{color:#23935f;font-weight:800}.wait{color:#b87a0c;font-weight:800}
   .auto{font-size:9.5px;color:var(--teal-d);background:var(--teal-soft);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px}
+  .fb{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;padding:10px 13px;font-size:12.5px;margin-bottom:8px}
+  .fb b{color:var(--ink)}
+  .rs{font-size:9.5px;font-weight:800;border-radius:4px;padding:1px 6px;white-space:nowrap}
+  .rs.y{background:#e7f6ee;color:#23935f}
+  .rs.n{background:#f1f2f4;color:#6b7682}
+  .flag{font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;background:#fdf2dc;color:#a8710a;white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="doc">
   <div class="doc-head">
     <h1>A/S 관리 고도화 · 화면설계서 (스토리보드)</h1>
-    <p>플랫폼 — <b>슈퍼어드민(WEB, 내부 전용)</b> · 현재 운영 중인 <b>A/S 관리</b>(목록 + A/S 수정 Modal) 기반. 원칙 — <b>CS가 입력하는 것은 최소화, 시스템이 알 수 있는 것은 전부 자동 기록</b>. 화면의 <b>번호</b>나 우측 <b>디스크립션</b>에 hover 하면 짝이 하이라이트되고, 클릭하면 고정됩니다.</p>
+    <p>플랫폼 — <b>슈퍼어드민(WEB, 내부 전용)</b> · 현재 운영 중인 <b>A/S 관리</b> 기반. 원칙 — <b>CS가 입력하는 것은 최소화, 시스템이 알 수 있는 것은 전부 자동 기록</b>. 2026-09-22 CS팀 확인 의견 반영본. 화면의 <b>번호</b>나 우측 <b>디스크립션</b>에 hover 하면 짝이 하이라이트되고, 클릭하면 고정됩니다.</p>
   </div>
   <div class="ptabs"><div class="ptab on"><span class="pn">P1</span>슈퍼어드민 · A/S 관리 (WEB)</div></div>
   <div class="hint-bar">💡 번호(①②③…) 또는 디스크립션에 <b>hover</b> = 미리보기 · <b>click</b> = 고정. <span class="auto">자동</span> = 시스템이 채우는 값 · <span class="tbu">빨간 글씨</span> = 확인 필요 항목.</div>
   <nav class="toc">
+    <a href="#FB"><b>CS 의견</b>반영 내역</a>
     <a href="#MAP"><b>AS-00</b>As-Is → To-Be</a>
     <a href="#DATA"><b>DATA</b>데이터 구조 · 지표</a>
     <a href="#AS-01"><b>AS-01</b>A/S 목록</a>
     <a href="#AS-02"><b>AS-02</b>A/S 등록</a>
     <a href="#AS-03"><b>AS-03</b>A/S 상세</a>
     <a href="#AS-04"><b>AS-04</b>이관 · 보완 요청</a>
-    <a href="#AS-05"><b>AS-05</b>상태별 화면</a>
-    <a href="#AS-06"><b>AS-06</b>알림</a>
+    <a href="#AS-05"><b>AS-05</b>상태 · 결과</a>
   </nav>
+
+  <!-- CS 의견 반영 -->
+  <section class="card" id="FB">
+    <h2>CS팀 확인 의견 반영 내역 (2026-09-22)</h2>
+    <p class="sub">CS 3명의 답변으로 초안에서 바뀐 부분.</p>
+    <div class="fb"><b>상태를 2개로</b> — “확인 가능 여부를 개발팀·영업팀에 묻는 과정이 접수도 처리중도 아니다”, “종료는 없어도 된다”에 따라 <b>확인중 · 처리완료</b>만 둔다. 등록하면 바로 <b>확인중</b>이고, 완료할 때 결과를 <b>해결 / 처리 불가</b>로 한 번 고른다.</div>
+    <div class="fb"><b>목록 진행내역 유지</b> — 3명 모두 목록에서 내용을 본다고 해서 제거안을 접었다. 셀을 누르면 상세의 처리 정보가 열리고, 상담사·엔지니어는 <b>담당 한 칸</b>으로 합쳐 자리를 만든다.</div>
+    <div class="fb"><b>접수내용은 선택</b> — “내용 없이 등록만 하고 해결 후 작성”하는 실제 흐름에 맞춰 공란 등록·공란 이관을 모두 허용한다. 이관 창에서 접수내용을 바로 적을 수도 있다. 적어야 할 건은 목록에서 <b>내용 미작성</b>으로 보인다.</div>
+    <div class="fb"><b>접수일시 빠른 버튼 제거</b> — “인입과 동시에 기록이 어렵고 시간을 일일이 맞출 수 없다”에 따라 현행처럼 <b>일시 직접 수정</b>만 둔다.</div>
+    <div class="fb"><b>알림은 화면 표시로</b> — CS팀이 슬랙을 쓰지 않으므로 메신저 발송을 빼고, 목록의 <b>내 처리 건 · 미확인</b> 표시로 넘겨받은 건을 알린다. <span class="tbu">즉시 알림이 필요하면 카카오톡 알림톡(건당 비용) 별도 검토</span></div>
+  </section>
 
   <!-- AS-00 -->
   <section class="card" id="MAP">
     <h2>AS-00 · As-Is → To-Be 변경표</h2>
-    <p class="sub"><b>상담사</b> = 전화를 받아 등록한 사람 · <b>엔지니어</b> = 기술로 해결하는 사람. 등록은 지금처럼 약국 관리의 `A/S 등록`에서 시작하고, CS가 새로 입력하는 칸은 <b>엔지니어 변경(필요할 때만)</b>과 <b>처리내용 1칸</b>뿐이다. 나머지 추가 기능은 모두 자동. <span class="tag k">유지</span> <span class="tag c">변경</span> <span class="tag a">추가</span> <span class="tag d">제거</span></p>
+    <p class="sub"><b>상담사</b> = 전화를 받아 등록한 사람 · <b>엔지니어</b> = 기술로 해결하는 사람. CS가 새로 입력하는 칸은 <b>처리내용 1칸</b>과 <b>완료 시 결과 선택</b>뿐이다. <span class="tag k">유지</span> <span class="tag c">변경</span> <span class="tag a">추가</span> <span class="tag d">제거</span></p>
     <div class="tw"><table class="map">
       <thead><tr><th>As-Is 항목</th><th>구분</th><th>To-Be</th><th>근거</th></tr></thead>
       <tbody>
         <tr class="grp"><td colspan="4">목록</td></tr>
         <tr><td>적용된 필터 · 초기화 · 상세▼ · 엑셀 · 페이지네이션</td><td><span class="tag k">유지</span></td><td>구조 그대로. 상세▼ 안에 상태·엔지니어·카테고리·기간 필터.</td><td>익숙한 방식 유지.</td></tr>
-        <tr><td>검색 조건 (약국명)</td><td><span class="tag c">변경</span></td><td>약국명 / <b>전화번호</b></td><td>전화 받은 번호로 약국을 바로 찾는다. 전화 시스템 연동 없이 가능한 가장 간단한 자동화.</td></tr>
-        <tr><td>약국 관리 › <b>A/S 등록</b> 버튼</td><td><span class="tag k">유지</span></td><td>등록 진입은 지금처럼 약국 관리 페이지에서. 약국이 이미 정해져 있어 등록 입력은 <b>카테고리 · 접수내용 2개</b>.</td><td>약국을 찾아 고르는 단계가 없어 가장 빠른 경로. A/S 목록에는 등록 버튼을 두지 않는다.</td></tr>
-        <tr><td>약국명(지역) · 카테고리 · 접수내용 · 접수일자 · 상태</td><td><span class="tag k">유지</span></td><td>그대로. 카테고리는 <b>기존 1단 그대로 필수</b>.</td><td>원래 있던 칸이라 부담이 늘지 않는다. 세부 분류는 종료 후 AI가 따로 만든다(DATA).</td></tr>
-        <tr><td>진행내역 컬럼</td><td><span class="tag d">제거</span></td><td>상세 › 진행내용 탭에서 확인.</td><td>누적 기록이라 한 칸에 요약되지 않는다. 그 자리에 엔지니어·처리시간을 둔다.</td></tr>
-        <tr><td>처리일자(관리자) 컬럼</td><td><span class="tag c">변경</span></td><td><b>상담사</b> · <b>엔지니어</b> 컬럼 + <b>접수 ~ 종료</b></td><td>현재 처리일자가 모든 행에서 접수일자와 같게 찍혀 처리 시점을 보여주지 못한다. 전화를 받은 상담사와 실제 엔지니어를 나눠 표기해 지금 누가 잡고 있는지 목록에서 바로 보이게 한다.</td></tr>
-        <tr><td>상태 3종 (접수요청 · 확인중 · 처리완료)</td><td><span class="tag c">변경</span></td><td>4종 — 접수 · 처리중 · 처리완료 · 종료</td><td>`확인중` → `처리중`. 처리완료(엔지니어 조치 완료)와 종료(고객 안내 완료)는 개발팀에 넘긴 건에서만 나뉜다.</td></tr>
+        <tr><td>검색 조건 (약국명)</td><td><span class="tag c">변경</span></td><td>약국명 / <b>전화번호</b></td><td>전화 받은 번호로 그 약국의 지난 A/S를 바로 찾는다.</td></tr>
+        <tr><td>약국명(지역) · 카테고리 · 접수내용 · <b>진행내역</b> · 접수일자 · 처리일자</td><td><span class="tag k">유지</span></td><td>그대로. 진행내역 셀을 누르면 상세의 처리 정보가 열린다.</td><td>CS 3명 모두 목록에서 내용을 확인한다고 답했다.</td></tr>
+        <tr><td>처리일자 옆 (관리자)</td><td><span class="tag c">변경</span></td><td><b>담당</b> 컬럼 — `상담사 → 엔지니어`</td><td>전화를 받은 사람과 해결한 사람을 구분해 1차 해결률·이관율을 낼 수 있다.</td></tr>
+        <tr><td>상태 3종 (접수요청 · 확인중 · 처리완료)</td><td><span class="tag c">변경</span></td><td>2종 — <b>확인중 · 처리완료</b> + 완료 시 결과 <b>해결 / 처리 불가</b></td><td>받으면 바로 확인중이라 `접수`가 따로 필요하지 않다. 확인했지만 처리가 안 되는 건은 결과로 남긴다.</td></tr>
+        <tr><td>(없음)</td><td><span class="tag a">추가</span></td><td><b>내 처리 건 · 미확인 · 내용 미작성</b> 필터</td><td>넘겨받은 건을 놓치지 않고, 나중에 적으려 미뤄둔 건이 눈에 남아 중복 등록이 줄어든다.</td></tr>
         <tr class="grp"><td colspan="4">A/S 수정 Modal → A/S 상세 Modal</td></tr>
-        <tr><td>접수 정보 (약국명·연락처·접수일자·카테고리·접수내용)</td><td><span class="tag k">유지</span></td><td>그대로. <b>접수일시는 접수 정보</b>에 두고(기본값 현재 시각, 필요할 때만 버튼으로 당김), <b>처리일자는 처리 정보</b>에 둔다.</td><td>—</td></tr>
-        <tr><td>업체명 · 엔지니어정보</td><td><span class="tag c">변경</span></td><td><b>상담사 · 엔지니어</b>(이관 횟수)</td><td>A/S는 모두 내부 인원이 처리하므로 업체명 대신 상담사·엔지니어로 이관 흐름을 본다. 엔지니어 기본값 = 상담사라 따로 고를 일이 적다.</td></tr>
-        <tr><td>처리일자</td><td><span class="tag k">유지</span></td><td>처리 정보에 그대로 두고, 상태가 바뀔 때 자동으로 찍는다(첫 진행·처리완료·종료). `⟳`로 현재 시각 갱신.</td><td>지금은 접수일자와 같게만 찍혀 처리 시점을 못 보여준다. 자동 기록으로 대기·처리·안내 시간을 나눠 본다.</td></tr>
-        <tr><td>AS 진행내역 (덮어쓰는 한 칸)</td><td><span class="tag c">변경</span></td><td>① <b>진행내용</b> — 한 줄씩 쌓임(작성자·시각 자동) ② <b>처리내용</b> — 완료 시 1칸 필수</td><td>경과와 최종 해결 방법이 남아야 재발 대응·챗봇 데이터로 쓸 수 있다.</td></tr>
-        <tr><td>(없음)</td><td><span class="tag a">추가</span></td><td>변경 이력 · 이 약국의 다른 A/S (탭, 자동)</td><td>엔지니어·상태 변경 추적, 재발 확인.</td></tr>
-        <tr><td>수정 버튼</td><td><span class="tag c">변경</span></td><td>상태별 버튼(완료 · 이관 · 보완 요청 등)</td><td>버튼으로 바꿔야 누가 언제 바꿨는지 기록된다.</td></tr>
-        <tr><td>삭제 버튼</td><td><span class="tag k">유지</span></td><td>그대로 둔다. 삭제한 A/S는 목록·엑셀·통계에서 빠진다.</td><td>잘못 등록한 건을 정리하는 방법. 화면에 삭제 내역을 보여주지 않는다 — 복구가 필요할 때만 데이터로 되살린다.</td></tr>
+        <tr><td>약국 관리 › <b>A/S 등록</b> 버튼</td><td><span class="tag k">유지</span></td><td>등록 진입은 지금처럼 약국 관리에서. 약국이 정해져 있어 등록 입력은 <b>카테고리</b>뿐이고 접수내용은 선택이다.</td><td>약국을 찾아 고르는 단계가 없다. <span class="tbu">약국을 모른 채 받은 문의의 등록 경로는 확인 필요</span></td></tr>
+        <tr><td>접수 정보 (약국명·연락처·접수일자·카테고리·접수내용)</td><td><span class="tag k">유지</span></td><td>그대로. <b>접수일시는 접수 정보</b>에 두고 필요할 때 직접 수정한다.</td><td>—</td></tr>
+        <tr><td>업체명 · 엔지니어정보</td><td><span class="tag c">변경</span></td><td><b>상담사 · 엔지니어</b>(이관 횟수)</td><td>A/S는 모두 내부 인원이 처리하므로 업체명 자리에 두 역할을 넣는다.</td></tr>
+        <tr><td>처리일자</td><td><span class="tag k">유지</span></td><td>처리 정보에 그대로. 상태가 바뀔 때 자동으로 찍고 `⟳`로 현재 시각 갱신.</td><td>지금은 접수일자와 같게만 찍혀 처리 시점을 못 보여준다.</td></tr>
+        <tr><td>AS 진행내역 (덮어쓰는 한 칸)</td><td><span class="tag c">변경</span></td><td>① <b>진행내용</b> — 한 줄씩 쌓임(작성자·시각 자동) ② <b>처리내용</b> — 완료 시 입력</td><td>“다음 상담사를 위해 어떤 처리를 했는지 자세히 적어야 한다”는 의견에 맞춰 기록이 덮이지 않게 한다. 완료 후에도 진행내용을 덧붙일 수 있다.</td></tr>
+        <tr><td>(없음)</td><td><span class="tag a">추가</span></td><td>변경 이력 · 이 약국의 다른 A/S (탭, 자동)</td><td>담당·상태 변경 추적, 재발 확인.</td></tr>
+        <tr><td>수정 버튼</td><td><span class="tag c">변경</span></td><td>상태 버튼(보완 요청 · 이관 · 처리완료)</td><td>버튼으로 바꿔야 누가 언제 바꿨는지와 시각이 기록된다.</td></tr>
+        <tr><td>삭제 버튼</td><td><span class="tag k">유지</span></td><td>그대로 둔다. 삭제한 A/S는 목록·엑셀·통계에서 빠진다.</td><td>삭제 사유가 중복 등록이므로 버튼은 남기고, 중복이 생기지 않게 `내용 미작성` 안내로 막는다.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -234,17 +251,17 @@
     <h2>DATA · 데이터 구조 · 지표 기준</h2>
     <p class="sub">화면은 단순하게, 저장은 나눠서. AI 가공 데이터는 2차 범위이며 <b>원본 A/S 기록과 별도로 저장</b>한다.</p>
     <div class="dgrid">
-      <div class="dbox u"><h3>① CS 입력 (1차)</h3><div class="cap">사람이 직접 쓰는 것</div><ul><li>카테고리 1단</li><li>접수내용</li><li>진행내용(한 줄씩)</li><li>처리내용(완료 시)</li></ul></div>
-      <div class="dbox s"><h3>② 시스템 자동 (1차)</h3><div class="cap">사람이 입력하지 않는 것</div><ul><li><b>약국</b>(약국 관리에서 진입) · A/S 번호 · <b>상담사</b>(등록한 사람) · <b>엔지니어</b>(기본 = 상담사, 넘기면 바뀜)</li><li>연락처 · 지역 (약국 정보)</li><li>상태 · 등록 시각 · 첫 진행 시각 · 처리완료 시각 · 종료 시각</li><li>이관 이력 · 변경 이력</li></ul></div>
-      <div class="dbox ai"><h3>③ AI 가공 (2차 · 화면 없음)</h3><div class="cap">종료된 A/S에서 자동 생성 · 별도 저장</div><ul><li>문의 요약 · 세부 카테고리 · 제품/기능</li><li>증상 · 원인 후보 · 조치 방법 · 해결 여부</li><li>검색용 키워드 · 원본 A/S 번호</li></ul></div>
+      <div class="dbox u"><h3>① CS 입력 (1차)</h3><div class="cap">사람이 직접 쓰는 것</div><ul><li>카테고리 1단 (필수)</li><li>접수내용 (선택 · 나중에 작성 가능)</li><li>진행내용 (한 줄씩)</li><li>처리내용 + 결과 (완료 시)</li></ul></div>
+      <div class="dbox s"><h3>② 시스템 자동 (1차)</h3><div class="cap">사람이 입력하지 않는 것</div><ul><li><b>약국</b>(약국 관리에서 진입) · 연락처 · 지역</li><li>A/S 번호 · <b>상담사</b>(등록한 사람) · <b>엔지니어</b>(기본 = 상담사)</li><li>상태 · 접수일시 · 처리일자 · 완료 시각</li><li>이관 이력 · 변경 이력</li></ul></div>
+      <div class="dbox ai"><h3>③ AI 가공 (2차 · 화면 없음)</h3><div class="cap">완료된 A/S에서 자동 생성 · 별도 저장</div><ul><li>문의 요약 · 세부 카테고리 · 제품/기능</li><li>증상 · 원인 후보 · 조치 방법 · 해결 여부</li><li>검색용 키워드 · 원본 A/S 번호</li></ul></div>
     </div>
     <div class="tw"><table class="kpi">
       <thead><tr><th>지표</th><th>계산</th><th>1차 신뢰도</th></tr></thead>
       <tbody>
-        <tr><td>당일 해결률 · 1차 해결률(이관 없이 종료) · 이관율</td><td>건수 기준</td><td class="ok">지금부터 정확</td></tr>
-        <tr><td>개발팀 처리시간</td><td>이관 시각 → 처리완료 시각</td><td class="ok">지금부터 정확</td></tr>
-        <tr><td>접수 ~ 종료 시간</td><td>접수일시 → 종료 시각</td><td class="wait">참고값 — 접수일시를 수정하지 않은 건은 등록 시각 기준</td></tr>
-        <tr><td>실제 전화 수신 → 종료 시간</td><td>통화 시작 → 종료 시각</td><td class="wait">측정 범위 밖 — 전화 시스템과 연동하지 않으므로 접수 ~ 종료 참고값으로 대신한다</td></tr>
+        <tr><td>당일 해결률 · 1차 해결률(이관 없이 완료) · 이관율 · <b>처리 불가율</b></td><td>건수 기준</td><td class="ok">지금부터 정확</td></tr>
+        <tr><td>엔지니어 처리시간</td><td>이관 시각 → 처리완료 시각</td><td class="ok">지금부터 정확</td></tr>
+        <tr><td>접수 ~ 완료 시간</td><td>접수일시 → 처리완료 시각</td><td class="wait">참고값 — 접수일시를 고치지 않은 건은 등록 시각 기준</td></tr>
+        <tr><td>실제 전화 수신 → 완료 시간</td><td>통화 시작 → 완료 시각</td><td class="wait">측정 범위 밖 — 전화 시스템과 연동하지 않는다</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -252,7 +269,7 @@
   <!-- AS-01 -->
   <section class="screen" id="AS-01">
     <div class="sc-head"><span class="sid">AS-01</span><span class="nm">A/S 목록</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — 현재 목록 구조를 유지하고 <b>전화번호 검색 · 상세▼ 필터 · 내 처리 건 · 상담사·엔지니어 · 접수 ~ 종료</b>를 더한다. 등록은 약국 관리에서 하므로 이 화면에는 등록 버튼이 없다. 행을 누르면 <b>AS-03 A/S 상세</b>가 열린다.</div>
+    <div class="sc-ov"><b>개요</b> — 현재 목록 컬럼을 그대로 두고 <b>전화번호 검색 · 상세▼ 필터 · 담당 컬럼 · 내 처리 건/미확인/내용 미작성</b>을 더한다. 행을 누르면 <b>AS-03 A/S 상세</b>가 열리고, 진행내역 셀을 누르면 상세의 처리 정보가 열린다. 등록은 약국 관리에서 하므로 이 화면에는 등록 버튼이 없다.</div>
     <div class="sc-grid">
       <div class="mock">
         <div class="page">
@@ -264,29 +281,29 @@
               <span class="selb" style="margin-left:auto">상세 ▲</span>
             </div>
             <div class="adv hot" data-n="3"><span class="num">3</span>
-              <span class="k">상태</span><div class="row"><span class="qb on">전체</span><span class="qb">접수</span><span class="qb">처리중</span><span class="qb">처리완료</span><span class="qb">종료</span></div>
+              <span class="k">상태</span><div class="row"><span class="qb on">전체</span><span class="qb">확인중</span><span class="qb">처리완료</span><span class="qb">결과 · 해결</span><span class="qb">결과 · 처리 불가</span></div>
               <span class="k">엔지니어</span><div class="row"><span class="selb">전체 ▾</span></div>
               <span class="k">카테고리</span><div class="row"><span class="selb">전체 ▾</span></div>
-              <span class="k">기간</span><div class="row"><span class="selb">접수일 2026-03-18 ~ 09-18</span><span class="qb">1개월</span><span class="qb">3개월</span><span class="qb on">6개월</span></div>
+              <span class="k">기간</span><div class="row"><span class="selb">접수일 2026-03-22 ~ 09-22</span><span class="qb">1개월</span><span class="qb">3개월</span><span class="qb on">6개월</span></div>
             </div>
           </div>
           <div class="panel">
             <div class="row" style="margin-bottom:8px">
               <span class="tot">전체 <b>13</b> 건</span>
-              <div class="hot" data-n="5" style="margin-left:8px"><span class="num">5</span><span class="qb on">내 처리 건 3</span><span class="qb">미확인 1</span></div>
+              <div class="hot" data-n="4" style="margin-left:8px"><span class="num">4</span><span class="qb on">내 처리 건 3</span><span class="qb">미확인 1</span><span class="qb">내용 미작성 2</span></div>
               <span style="flex:1"></span>
               <span class="seg"><span class="on">10개</span><span>30개</span><span>50개</span><span>100개</span></span>
-              <div class="hot" data-n="4"><span class="num" style="left:auto;right:-13px">4</span><span class="bn">엑셀 내보내기</span></div>
+              <div class="hot" data-n="5"><span class="num" style="left:auto;right:-13px">5</span><span class="bn">엑셀 내보내기</span></div>
             </div>
             <div class="hot" data-n="6"><span class="num">6</span><div class="tw">
               <table class="m"><thead><tr>
-                <th>약국명</th><th>카테고리</th><th>접수내용</th><th>상담사</th><th>엔지니어</th><th class="on">접수일자 ▼</th><th>접수 ~ 종료</th><th>상태</th>
+                <th>약국명</th><th>카테고리</th><th>접수내용</th><th>진행내역</th><th>담당</th><th class="on">접수일자 ▼</th><th>처리일자</th><th>상태</th>
               </tr></thead><tbody>
-                <tr><td><span class="rg">(경기 성남시 분당구)</span><span class="ph">솔아약국</span> <span class="st s1" style="font-size:8.5px">NEW</span></td><td>기기</td><td>카드 결제를 누르면 반응 없음</td><td>운영팀 홍길동</td><td>개발팀 김철수</td><td class="t">26-09-18</td><td class="t">10:02 ~ 진행중<span class="dur">(2시간 10분 경과)</span></td><td><span class="st s2">처리중</span></td></tr>
-                <tr><td><span class="rg">(서울 성동구)</span><span class="ph">한일약국</span></td><td>기기</td><td>처방전 출력 안 됨</td><td>운영팀 홍길동</td><td>운영팀 홍길동</td><td class="t">26-09-18</td><td class="t">11:40 ~ 진행중<span class="dur">(32분 경과)</span></td><td><span class="st s1">접수</span></td></tr>
-                <tr><td><span class="rg">(경기 화성시 효행구)</span><span class="ph">굿팜온비타약국</span></td><td>향정</td><td>향정 보고 전송 실패</td><td>운영팀 이수진</td><td>운영팀 홍길동</td><td class="t">26-09-18</td><td class="t">09:15 ~ 09:51<span class="dur">(36분)</span></td><td><span class="st s6">종료</span></td></tr>
-                <tr><td><span class="rg">(서울 강남구)</span><span class="ph">test123</span></td><td>기기</td><td>포인트 사용 후 금액 불일치</td><td>운영팀 이수진</td><td>개발팀 이영희</td><td class="t">26-09-17</td><td class="t">09-17 16:20 ~ 진행중<span class="dur">(18시간 경과)</span></td><td><span class="st s5">처리완료</span></td></tr>
-                <tr><td><span class="rg">(전북 고창군)</span><span class="ph">test약국</span></td><td>기기</td><td>현금영수증 발행 오류</td><td>운영팀 홍길동</td><td>개발팀 김철수</td><td class="t">26-09-16</td><td class="t">09-16 10:02 ~ 09-17 14:10<span class="dur">(1일 4시간)</span></td><td><span class="st s6">종료</span></td></tr>
+                <tr><td><span class="rg">(경기 성남시 분당구)</span><span class="ph">솔아약국</span> <span class="st s2" style="font-size:8.5px">NEW</span></td><td>기기</td><td class="wr">카드 결제를 누르면 반응 없음</td><td class="wr">원격 접속하여 카드단말 연결 상태 확인</td><td class="wr">홍길동 → <b>김철수</b></td><td class="t">26-09-22</td><td class="t">26-09-22 11:23</td><td><span class="st s2">확인중</span></td></tr>
+                <tr><td><span class="rg">(서울 성동구)</span><span class="ph">한일약국</span></td><td>기기</td><td class="wr" style="color:var(--faint)">— <span class="flag">내용 미작성</span></td><td class="wr" style="color:var(--faint)">—</td><td class="wr">홍길동</td><td class="t">26-09-22</td><td class="t">26-09-22 11:40</td><td><span class="st s2">확인중</span></td></tr>
+                <tr><td><span class="rg">(경기 화성시 효행구)</span><span class="ph">굿팜온비타약국</span></td><td>향정</td><td class="wr">향정 보고 전송 실패</td><td class="wr">님스 재전송 후 정상 확인</td><td class="wr">이수진</td><td class="t">26-09-22</td><td class="t">26-09-22 09:51</td><td><span class="st s5">처리완료</span> <span class="rs y">해결</span></td></tr>
+                <tr><td><span class="rg">(서울 강남구)</span><span class="ph">test123</span></td><td>기기</td><td class="wr">포인트 사용 후 금액 불일치</td><td class="wr">개발팀 확인 — 다음 배포 반영 예정</td><td class="wr">이수진 → <b>이영희</b></td><td class="t">26-09-21</td><td class="t">26-09-22 10:05</td><td><span class="st s5">처리완료</span> <span class="rs n">처리 불가</span></td></tr>
+                <tr><td><span class="rg">(전북 고창군)</span><span class="ph">test약국</span></td><td>기기</td><td class="wr">현금영수증 발행 오류</td><td class="wr">VAN 모듈 재설치 후 정상</td><td class="wr">홍길동 → <b>김철수</b></td><td class="t">26-09-19</td><td class="t">26-09-20 14:10</td><td><span class="st s5">처리완료</span> <span class="rs y">해결</span></td></tr>
               </tbody></table>
             </div></div>
             <div class="pager"><span>10개 씩 · 1 / 2 페이지</span><span style="flex:1"></span><span class="pg">«</span><span class="pg">‹</span><span class="pg on">1</span><span class="pg">2</span><span class="pg">›</span><span class="pg">»</span></div>
@@ -297,11 +314,11 @@
       <ol class="desc">
         <div class="dh">AS-01 · 컴포넌트</div>
         <li data-n="1"><span class="di">1</span><span class="dt"><b>적용된 필터</b> — 현재 방식 유지. 기본값 = 기간 6개월.</span></li>
-        <li data-n="2"><span class="di">2</span><span class="dt"><b>검색</b> — 검색 조건에 <b>전화번호</b> 추가(약국명 / 전화번호). 하이픈 유무와 관계없이 찾는다. 전화 받은 번호로 약국의 A/S를 바로 찾는다.</span></li>
-        <li data-n="3"><span class="di">3</span><span class="dt"><b>상세▼ 필터</b> — 상태(전체/접수/처리중/처리완료/종료) · 엔지니어 · 카테고리(기존 1단) · 기간(접수일 기준).</span></li>
-        <li data-n="4"><span class="di">4</span><span class="dt"><b>엑셀 내보내기</b> — 현재 항목에 엔지니어 · 접수일시 · 처리완료 일시 · 종료 일시 · 처리내용 · 이관 횟수를 더한다.</span></li>
-        <li data-n="5"><span class="di">5</span><span class="dt"><b>내 처리 건 · 미확인</b>(추가) — `내 처리 건`은 내가 엔지니어인 A/S만 모아 본다(기본 켜짐). `미확인`은 넘겨받고 아직 열어보지 않은 건이며, 목록에서 약국명 옆에 `NEW`로 표시된다.</span></li>
-        <li data-n="6"><span class="di">6</span><span class="dt"><b>목록</b> — 약국명(지역) · 카테고리 · 접수내용 · <b>상담사</b> · <b>엔지니어</b> · 접수일자 · <b>접수 ~ 종료</b> · 상태. 전화를 받은 상담사와 실제로 처리하는 엔지니어를 나눠 보여준다. 기본 정렬 = 접수일자 최신순. 행 클릭 → AS-03.<br/>· 진행내역 컬럼 → 상세의 진행내용 탭으로 이동<br/>· 처리일자(관리자) → 엔지니어 + 접수 ~ 종료<br/>· 접수 ~ 종료 표기: 당일 `09:15 ~ 09:51 (36분)` / 여러 날 `09-16 10:02 ~ 09-17 14:10 (1일 4시간)` / 진행 중 `10:02 ~ 진행중 (2시간 10분 경과)`</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>검색</b> — 검색 조건에 <b>전화번호</b> 추가(약국명 / 전화번호). 하이픈 유무와 관계없이 찾는다.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>상세▼ 필터</b> — 상태(전체 / 확인중 / 처리완료)와 결과(해결 / 처리 불가) · 엔지니어 · 카테고리(기존 1단) · 기간(접수일 기준).</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>내 처리 건 · 미확인 · 내용 미작성</b>(추가)<br/>· <b>내 처리 건</b>: 내가 엔지니어인 A/S만 모아 본다(기본 켜짐)<br/>· <b>미확인</b>: 넘겨받고 아직 열어보지 않은 건. 약국명 옆에 `NEW`로 표시되고 열면 사라진다<br/>· <b>내용 미작성</b>: 접수내용이 비어 있는 건. 나중에 적으려 미뤄둔 건을 찾아 중복 등록을 막는다</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>엑셀 내보내기</b> — 현재 항목에 상담사 · 엔지니어 · 결과(해결/처리 불가) · 완료 시각 · 처리내용 · 이관 횟수를 더한다.</span></li>
+        <li data-n="6"><span class="di">6</span><span class="dt"><b>목록</b> — 약국명(지역) · 카테고리 · 접수내용 · <b>진행내역</b> · <b>담당</b> · 접수일자 · 처리일자 · 상태.<br/>· <b>진행내역 유지</b>: 셀을 누르면 상세의 처리 정보가 열린다<br/>· <b>담당</b>: `상담사 → 엔지니어`. 한 명만 보이면 상담사가 직접 처리하는 건<br/>· <b>상태</b>: 확인중 / 처리완료 + 결과 배지(<span class="rs y">해결</span> <span class="rs n">처리 불가</span>)<br/>· 기본 정렬 = 접수일자 최신순. 행 클릭 → AS-03</span></li>
       </ol>
     </div>
   </section>
@@ -309,7 +326,7 @@
   <!-- AS-02 -->
   <section class="screen" id="AS-02">
     <div class="sc-head"><span class="sid">AS-02</span><span class="nm">A/S 등록 (Modal)</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — <b>약국 관리 페이지의 `A/S 등록` 버튼</b>으로 진입한다(현행 그대로). 약국이 이미 정해져 있어 CS가 채우는 칸은 <b>카테고리 · 접수내용 2개</b>다. 등록하면 상태 <span class="st s1">접수</span>, 상담사·엔지니어 = 로그인한 사용자.</div>
+    <div class="sc-ov"><b>개요</b> — <b>약국 관리 페이지의 `A/S 등록` 버튼</b>으로 진입한다(현행 그대로). 약국이 이미 정해져 있어 <b>카테고리만 고르면 등록</b>되고, 접수내용은 나중에 적어도 된다. 등록하면 상태 <span class="st s2">확인중</span>, 상담사·엔지니어 = 로그인한 사용자.</div>
     <div class="sc-grid">
       <div class="mock">
         <div class="dimbg"><div class="mdl">
@@ -320,33 +337,36 @@
               <div class="kv">
                 <span class="k">약국명</span><div class="v hot" data-n="1"><span class="num">1</span><b>솔아약국</b> <span class="help">(경기 성남시 분당구)</span> <span class="auto">자동</span></div>
                 <span class="k">연락처</span><div class="v">031-123-4567 <span class="auto">자동</span></div>
-                <span class="k">접수일시</span><div class="v hot" data-n="5"><span class="num">5</span>2026-09-18 10:02 <span class="auto">자동</span><div class="row" style="margin-top:4px"><span class="qb">10분 전</span><span class="qb">30분 전</span><span class="qb">1시간 전</span><span class="qb">직접 입력</span></div></div>
-                <span class="k">카테고리<span class="tbu">*</span></span><div class="v hot" data-n="2"><span class="num">2</span><span class="selb">기기 ▾</span></div>
+                <span class="k">접수일시</span><div class="v hot" data-n="2"><span class="num">2</span><span class="row"><span class="inp">2026-09-22</span><span class="inp">11:02</span></span></div>
+                <span class="k">카테고리<span class="tbu">*</span></span><div class="v hot" data-n="3"><span class="num">3</span><span class="selb">기기 ▾</span></div>
               </div>
-              <div class="lbx">접수내용<i>*</i></div>
-              <div class="hot" data-n="3"><span class="num">3</span><div class="ta f" style="min-height:52px">카드 결제를 누르면 아무 반응이 없어요.</div></div>
+              <div class="lbx">접수내용 <span class="help">(선택 — 나중에 적어도 됩니다)</span></div>
+              <div class="hot" data-n="4"><span class="num">4</span><div class="ta" style="min-height:52px">카드 결제를 누르면 아무 반응이 없어요.</div></div>
             </div>
             <div class="sec">
               <div class="sh">처리 정보</div>
               <div class="kv">
                 <span class="k">상담사</span><div class="v">운영팀 홍길동 <span class="auto">자동</span></div>
-                <span class="k">엔지니어</span><div class="v hot" data-n="4"><span class="num">4</span><span class="selb">운영팀 홍길동 (나) ▾</span></div>
-                <span class="k">상태</span><div class="v"><span class="st s1">접수</span> <span class="auto">자동</span></div>
+                <span class="k">엔지니어</span><div class="v hot" data-n="5"><span class="num">5</span><span class="selb">운영팀 홍길동 (나) ▾</span></div>
+                <span class="k">상태</span><div class="v"><span class="st s2">확인중</span> <span class="auto">자동</span></div>
               </div>
+              <div class="lbx">진행내용</div>
+              <div class="hot" data-n="6"><span class="num">6</span><div class="ta" style="min-height:52px">첫 메모 (선택)</div></div>
             </div>
           </div></div>
-          <div class="mf hot" data-n="6"><span class="num" style="left:auto;right:-13px">6</span><span class="bn g lg">취소</span><span class="bn b lg">등록</span></div>
+          <div class="mf hot" data-n="7"><span class="num" style="left:auto;right:-13px">7</span><span class="bn g lg">취소</span><span class="bn b lg">등록</span></div>
         </div></div>
       </div>
 
       <ol class="desc">
         <div class="dh">AS-02 · 컴포넌트</div>
         <li data-n="1"><span class="di">1</span><span class="dt"><b>약국명</b>(자동) — 약국 관리에서 그 약국의 `A/S 등록`을 눌러 들어오므로 약국·연락처·지역이 채워진 상태로 열린다. 약국을 찾아 고르는 단계가 없다.</span></li>
-        <li data-n="2"><span class="di">2</span><span class="dt"><b>카테고리</b>(필수) — <b>기존 1단 카테고리</b> 그대로(기기 · 향정 …). 세부 분류는 종료 후 AI가 따로 만든다(2차, DATA ③). <span class="tbu">카테고리 목록은 기존 A/S 접수내용을 벡터화해 비슷한 패턴끼리 묶은 뒤 확정</span></span></li>
-        <li data-n="3"><span class="di">3</span><span class="dt"><b>접수내용</b>(필수) — 약국이 말한 증상을 그대로 적는다.</span></li>
-        <li data-n="4"><span class="di">4</span><span class="dt"><b>엔지니어</b> — 기본값 = <b>등록한 사람</b>. CS가 직접 처리하면 그대로 두고, 개발팀에 넘길 때만 바꾼다. 바꾸면 그 엔지니어에게 알림.</span></li>
-        <li data-n="5"><span class="di">5</span><span class="dt"><b>접수일시</b> — 기본값 = 현재 시각(자동)이고 그대로 등록한다. 통화가 길었던 건은 <b>`10분 전`·`30분 전`·`1시간 전` 버튼 한 번</b>으로 시각을 당긴다(분 단위로 정확히 넣으려면 `직접 입력`). 등록 시각은 따로 자동 저장해 둘을 구분한다.</span></li>
-        <li data-n="6"><span class="di">6</span><span class="dt"><b>등록</b> — 필수 3개가 채워지면 활성화. 등록 후 AS-03 상세가 열리고 변경 이력에 `A/S 등록`이 기록된다.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>접수일시</b> — 기본값 = 현재 시각. 기록이 늦어진 건은 <b>일시를 직접 수정</b>한다(현행과 같은 방식). 등록 시각은 따로 자동 저장해 둘을 구분한다.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>카테고리</b>(필수) — <b>기존 1단 카테고리</b> 그대로(기기 · 향정 …). 세부 분류는 완료 후 AI가 따로 만든다(2차, DATA ③). <span class="tbu">카테고리 목록은 기존 접수내용을 패턴별로 묶어 확정</span></span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>접수내용</b>(선택) — 비워두고 등록할 수 있다. 통화 중에 적기 어렵거나 개발팀·영업팀에 확인한 뒤 적는 경우를 그대로 지원한다. 비어 있는 동안 목록에 <b>내용 미작성</b>으로 표시된다.</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>엔지니어</b> — 기본값 = 등록한 사람. 직접 처리하면 그대로 두고, 다른 사람이 봐야 할 때만 바꾼다.</span></li>
+        <li data-n="6"><span class="di">6</span><span class="dt"><b>진행내용</b>(선택) — 첫 메모. 이후 기록은 AS-03에서 한 줄씩 쌓인다.</span></li>
+        <li data-n="7"><span class="di">7</span><span class="dt"><b>등록</b> — 카테고리만 고르면 활성화된다. 등록 후 AS-03 상세가 열리고 변경 이력에 `A/S 등록`이 기록된다.<br/>그 약국에 <b>내용 미작성 A/S가 있으면</b> “이어서 작성하시겠어요?”로 알려 중복 등록을 막는다.</span></li>
       </ol>
     </div>
   </section>
@@ -354,11 +374,11 @@
   <!-- AS-03 -->
   <section class="screen" id="AS-03">
     <div class="sc-head"><span class="sid">AS-03</span><span class="nm">A/S 상세 (Modal · 기존 A/S 수정 대체)</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — 현재 A/S 수정 Modal의 2단 구성(접수 정보 | 처리 정보) 유지. CS가 쓰는 칸은 <b>진행내용(한 줄씩)</b>과 <b>처리내용(완료 시)</b>. 예시는 개발팀에 넘긴 A/S를 엔지니어(김철수)가 보는 화면.</div>
+    <div class="sc-ov"><b>개요</b> — 현재 A/S 수정 Modal의 2단 구성(접수 정보 | 처리 정보)을 유지하고, 아래에 탭 3개를 더한다. CS가 쓰는 칸은 <b>진행내용</b>과 <b>완료 시 처리내용 + 결과</b>다. 예시는 엔지니어에게 넘긴 A/S를 그 엔지니어가 보는 화면.</div>
     <div class="sc-grid">
       <div class="mock">
         <div class="dimbg"><div class="mdl">
-          <div class="mh hot" data-n="1"><span class="num">1</span>솔아약국 · 카드 결제 반응 없음 <span class="st s2">처리중</span><span class="el">담당 김철수 · 09-18 10:02 ~ 진행중 (2시간 10분 경과)</span><span class="x">✕</span></div>
+          <div class="mh hot" data-n="1"><span class="num">1</span>솔아약국 · 카드 결제 반응 없음 <span class="st s2">확인중</span><span class="el">담당 김철수 · 접수 09-22 11:02 (2시간 10분 경과)</span><span class="x">✕</span></div>
           <div class="mb">
             <div class="cols">
               <div class="sec hot" data-n="2"><span class="num">2</span>
@@ -366,7 +386,7 @@
                 <div class="kv">
                   <span class="k">약국명</span><div class="v">솔아약국 <a>(202608999884)</a></div>
                   <span class="k">연락처</span><div class="v">031-123-4567</div>
-                  <span class="k">접수일시</span><div class="v">2026-09-18 10:02</div>
+                  <span class="k">접수일시</span><div class="v">2026-09-22 11:02</div>
                   <span class="k">카테고리</span><div class="v">기기</div>
                 </div>
                 <div class="lbx">접수내용</div>
@@ -380,32 +400,34 @@
                   <span class="k">처리일자</span><div class="v"><span class="row"><span class="inp">2026-09-22 11:23</span><span class="bn g sm" title="현재 시각으로">⟳</span></span></div>
                 </div>
                 <div class="hot" data-n="4" style="margin-top:6px"><span class="num">4</span>
-                  <div class="lbx">처리내용<i>*</i> <span class="help">완료할 때 입력</span></div>
-                  <div class="ta" style="min-height:60px">예) 단말 연결 끊김 확인. 재연결 후 Client 재시작하여 정상 결제 확인.</div>
+                  <div class="lbx">처리내용 <span class="help">완료할 때 입력</span></div>
+                  <div class="ta" style="min-height:56px">예) 단말 연결 끊김 확인. 재연결 후 Client 재시작하여 정상 결제 확인.</div>
+                  <div class="lbx">결과</div>
+                  <div class="rd"><span><i class="dot on"></i>해결</span><span><i class="dot"></i>처리 불가</span></div>
                 </div>
               </div>
             </div>
             <div class="tabs"><span class="on">진행내용 2</span><span>변경 이력 4</span><span>이 약국의 다른 A/S 12</span></div>
             <div class="tabbody hot" data-n="5"><span class="num">5</span>
               <div class="row" style="margin-bottom:8px"><span class="inp w">진행 내용 입력</span><span class="bn sm">내용 추가</span></div>
-              <div class="note"><span class="mt">09-18 11:02 · 개발팀 김철수</span><br/>원격 접속하여 카드단말 연결 상태 확인</div>
-              <div class="note"><span class="mt">09-18 10:21 · 운영팀 홍길동</span><br/>단말 연동 문제로 보여 개발팀 이관</div>
+              <div class="note"><span class="mt">09-22 11:23 · 개발팀 김철수</span><br/>원격 접속하여 카드단말 연결 상태 확인</div>
+              <div class="note"><span class="mt">09-22 11:10 · 운영팀 홍길동</span><br/>단말 연동 문제로 보여 개발팀에 넘김</div>
             </div>
             <div class="tabs" style="margin-top:10px"><span>진행내용 2</span><span class="on">변경 이력 4</span><span>이 약국의 다른 A/S 12</span></div>
             <div class="tabbody hot" data-n="6"><span class="num">6</span><div class="tw">
               <table class="m"><thead><tr><th>일시</th><th>이벤트</th><th>내용</th><th>사용자</th></tr></thead><tbody>
-                <tr><td class="t">09-18 10:05</td><td>A/S 등록</td><td>접수일시 10:02 · 담당 홍길동</td><td>운영팀 홍길동</td></tr>
-                <tr><td class="t">09-18 10:20</td><td>엔지니어 이관</td><td>홍길동 → 김철수</td><td>운영팀 홍길동</td></tr>
-                <tr><td class="t">09-18 11:02</td><td>상태 변경</td><td>접수 → 처리중 (첫 진행내용)</td><td>개발팀 김철수</td></tr>
-                <tr><td class="t">09-18 11:02</td><td>진행내용 추가</td><td>원격 접속하여 …</td><td>개발팀 김철수</td></tr>
+                <tr><td class="t">09-22 11:05</td><td>A/S 등록</td><td>접수일시 11:02 · 담당 홍길동</td><td>운영팀 홍길동</td></tr>
+                <tr><td class="t">09-22 11:10</td><td>엔지니어 이관</td><td>홍길동 → 김철수</td><td>운영팀 홍길동</td></tr>
+                <tr><td class="t">09-22 11:18</td><td>정보 수정</td><td>접수내용 작성</td><td>운영팀 홍길동</td></tr>
+                <tr><td class="t">09-22 11:23</td><td>진행내용 추가</td><td>원격 접속하여 …</td><td>개발팀 김철수</td></tr>
               </tbody></table>
             </div></div>
             <div class="tabs" style="margin-top:10px"><span>진행내용 2</span><span>변경 이력 4</span><span class="on">이 약국의 다른 A/S 12</span></div>
             <div class="tabbody hot" data-n="7"><span class="num">7</span>
               <div class="row" style="margin-bottom:6px"><span class="seg"><span class="on">같은 카테고리 5</span><span>전체 12</span></span><span style="flex:1"></span><span class="help" style="color:var(--teal-d);font-weight:700">목록에서 전체 보기 →</span></div>
-              <div class="tw"><table class="m"><thead><tr><th>접수일자</th><th>접수내용</th><th>처리내용</th><th>상태</th></tr></thead><tbody>
-                <tr><td class="t">26-09-02</td><td>카드결제 오류</td><td>VAN 모듈 재설치 후 정상</td><td><span class="st s6">종료</span></td></tr>
-                <tr><td class="t">26-08-21</td><td>카드단말 인식 안 됨</td><td>USB 포트 변경 후 인식</td><td><span class="st s6">종료</span></td></tr>
+              <div class="tw"><table class="m"><thead><tr><th>접수일자</th><th>접수내용</th><th>처리내용</th><th>결과</th></tr></thead><tbody>
+                <tr><td class="t">26-09-02</td><td>카드결제 오류</td><td>VAN 모듈 재설치 후 정상</td><td><span class="rs y">해결</span></td></tr>
+                <tr><td class="t">26-08-21</td><td>카드단말 인식 안 됨</td><td>USB 포트 변경 후 인식</td><td><span class="rs y">해결</span></td></tr>
               </tbody></table></div>
             </div>
           </div>
@@ -416,14 +438,14 @@
 
       <ol class="desc">
         <div class="dh">AS-03 · 컴포넌트</div>
-        <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — 약국명 · 접수내용 요약 · 상태 · 엔지니어 · <b>접수 ~ 종료 시간</b>. 종료되면 `10:02 ~ 12:01 (1시간 59분)`으로 고정.</span></li>
-        <li data-n="2"><span class="di">2</span><span class="dt"><b>접수 정보</b> — 현재 항목 그대로. `편집`으로 종료 전까지 고칠 수 있고, 고치면 변경 이력에 남는다.</span></li>
-        <li data-n="3"><span class="di">3</span><span class="dt"><b>상담사 · 엔지니어 · 처리일자</b> — 현재 `업체명·엔지니어정보·처리일자` 자리. 엔지니어 옆에 이관 횟수. <b>처리일자</b>는 상태가 바뀔 때 자동으로 찍히고, `⟳`를 누르면 현재 시각으로 갱신한다(지금 화면과 같은 자리).</span></li>
-        <li data-n="4"><span class="di">4</span><span class="dt"><b>처리내용</b>(완료 시 필수) — 최종 해결 방법 1칸. 원인·조치·결과를 나눠 쓰지 않는다. 종료 후 AI가 이 문장에서 원인·조치·결과를 따로 뽑아 별도 저장한다(2차, 원본은 그대로 보존).</span></li>
-        <li data-n="5"><span class="di">5</span><span class="dt"><b>진행내용</b> 탭 — 현재 `AS 진행내역`을 <b>한 줄씩 쌓이는 방식</b>으로 바꾼다. 작성자·시각 자동. 엔지니어가 <b>처음 진행내용을 추가하면 상태가 자동으로 처리중</b>이 된다(별도 버튼 없음).</span></li>
+        <li data-n="1"><span class="di">1</span><span class="dt"><b>헤더</b> — 약국명 · 접수내용 요약 · 상태 · 담당 엔지니어 · 접수일시와 경과 시간. 완료되면 `접수 09-22 11:02 → 완료 13:01 (1시간 59분)`으로 고정된다.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>접수 정보</b> — 현재 항목 그대로. `편집`으로 접수내용을 나중에 채우거나 고칠 수 있고, 고치면 변경 이력에 남는다.</span></li>
+        <li data-n="3"><span class="di">3</span><span class="dt"><b>상담사 · 엔지니어 · 처리일자</b> — 현재 `업체명·엔지니어정보·처리일자` 자리. 엔지니어 옆에 이관 횟수. 처리일자는 상태가 바뀔 때 자동으로 찍히고 `⟳`로 현재 시각으로 갱신한다.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>처리내용 · 결과</b> — 완료할 때 해결 방법을 문장으로 적고 결과를 <b>해결 / 처리 불가</b> 중에 고른다. 정기 업무(청구·보고)도 다음 상담사가 이어받을 수 있게 처리 내용을 적는다. 완료 후에도 진행내용은 계속 덧붙일 수 있다.</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>진행내용</b> 탭 — 현재 `AS 진행내역`을 <b>한 줄씩 쌓이는 방식</b>으로 바꾼다. 작성자·시각 자동, 최신순. 목록의 진행내역 칸은 이 중 가장 최근 내용을 보여준다.</span></li>
         <li data-n="6"><span class="di">6</span><span class="dt"><b>변경 이력</b> 탭(자동) — 등록 · 이관 · 보완 요청 · 상태 변경 · 정보 수정을 시간순으로 기록. 기록은 추가만 된다.</span></li>
-        <li data-n="7"><span class="di">7</span><span class="dt"><b>이 약국의 다른 A/S</b> 탭(자동) — `같은 카테고리`(기본) / `전체`. <b>지난 처리내용</b>까지 보여 같은 문제의 해결 방법을 바로 참고한다. 행 클릭 → 그 A/S 상세.</span></li>
-        <li data-n="8"><span class="di">8</span><span class="dt"><b>하단 버튼</b> — 왼쪽 `삭제`는 현재와 같이 유지, `수정` 자리에 상태 버튼. 상태·사용자별 조합은 AS-05.<br/>· 삭제: 확인 후 목록·엑셀·통계에서 빠진다(화면에 삭제 내역은 두지 않는다)<br/>· 엔지니어 ≠ 상담사(개발팀 건): `보완 요청` · `이관` · `처리완료`<br/>· 엔지니어 = 상담사(CS 직접 처리): `이관` · <b>`완료`</b> — 한 번에 종료까지</span></li>
+        <li data-n="7"><span class="di">7</span><span class="dt"><b>이 약국의 다른 A/S</b> 탭(자동) — `같은 카테고리`(기본) / `전체`. 지난 <b>처리내용과 결과</b>까지 보여 같은 문제의 해결 방법을 바로 참고한다. 행 클릭 → 그 A/S 상세.</span></li>
+        <li data-n="8"><span class="di">8</span><span class="dt"><b>하단 버튼</b> — 왼쪽 `삭제`는 현재와 같이 유지(중복 등록 정리용). 오른쪽은 상태 버튼: `보완 요청`(넘겨받은 엔지니어) · `이관` · `처리완료`. 처리완료는 처리내용과 결과가 채워지면 눌린다. 완료된 A/S는 상담사가 `확인중으로 되돌림`으로 다시 열 수 있다.</span></li>
       </ol>
     </div>
   </section>
@@ -431,7 +453,7 @@
   <!-- AS-04 -->
   <section class="screen" id="AS-04">
     <div class="sc-head"><span class="sid">AS-04</span><span class="nm">이관 · 보완 요청 (Modal)</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — AS-03에서 여는 작은 Modal 2종. 둘 다 <b>엔지니어가 바뀌는 동작</b>이며 변경 이력에 남고 새 엔지니어에게 <b>슈퍼어드민 내부 알림</b>이 간다.</div>
+    <div class="sc-ov"><b>개요</b> — AS-03 하단 버튼으로 여는 작은 Modal 2종. 둘 다 <b>엔지니어가 바뀌는 동작</b>이며 변경 이력에 남고, 넘겨받은 사람 목록에 <b>미확인</b>으로 표시된다.</div>
     <div class="sc-grid">
       <div class="mock">
         <div class="dimbg"><div class="mini" style="grid-template-columns:repeat(2,minmax(0,1fr))">
@@ -440,9 +462,9 @@
             <div class="mb">
               <div class="lbx">현재 엔지니어</div><div style="font-size:10.5px">운영팀 홍길동</div>
               <div class="lbx">새 엔지니어<i>*</i></div><span class="selb" style="width:100%">개발팀 김철수 ▾</span>
-              <div class="lbx">메모 <span class="help">(선택)</span></div>
-              <div class="ta">단말 연동 확인 필요</div>
-              <div class="noti">🔔 [A/S 이관] 솔아약국 카드 결제 반응 없음 A/S가 배정되었습니다.</div>
+              <div class="lbx">접수내용 <span class="help">(비어 있으면 여기서 적을 수 있습니다)</span></div>
+              <div class="ta f">카드 결제를 누르면 반응 없음 — 단말 연동 확인 요청</div>
+              <div class="noti">넘긴 A/S는 새 엔지니어 목록에 `미확인`으로 표시됩니다</div>
             </div>
             <div class="mf"><span class="bn g sm">취소</span><span class="bn b sm">이관</span></div>
           </div>
@@ -451,8 +473,8 @@
             <div class="mb">
               <div class="lbx">요청 내용<i>*</i></div>
               <div class="ta f" style="min-height:60px">카드단말 모델명과 오류 발생 시각 확인 부탁드립니다.</div>
-              <div class="help" style="margin-top:6px">엔지니어가 상담사(운영팀 홍길동)로 돌아갑니다.</div>
-              <div class="noti">🔔 상담사에게 보완 요청 알림</div>
+              <div class="help" style="margin-top:6px">엔지니어가 상담사로 되돌아갑니다.</div>
+              <div class="noti">상담사 목록에 `미확인`으로 표시됩니다</div>
             </div>
             <div class="mf"><span class="bn g sm">취소</span><span class="bn b sm">요청</span></div>
           </div>
@@ -461,73 +483,42 @@
 
       <ol class="desc">
         <div class="dh">AS-04 · 컴포넌트</div>
-        <li data-n="1"><span class="di">1</span><span class="dt"><b>이관(엔지니어 넘기기)</b> — 새 엔지니어만 고르면 된다(메모는 선택). 넘기면 <b>새 엔지니어에게 메신저 알림이 즉시</b> 가고, 그 사람이 처리를 마치면 <b>상담사에게 알림</b>이 간다(AS-06). 메모는 진행내용에도 한 줄로 남는다. 상태는 그대로 유지.</span></li>
-        <li data-n="2"><span class="di">2</span><span class="dt"><b>보완 요청</b> — 접수 정보가 부족할 때. 요청 내용 필수. <b>엔지니어가 상담사로 돌아가</b> 목록에서 지금 누가 잡고 있는지 바로 보인다. 요청 내용은 진행내용에 남는다. 상담사가 보완한 뒤 다시 `이관`으로 넘긴다.</span></li>
+        <li data-n="1"><span class="di">1</span><span class="dt"><b>이관</b> — 새 엔지니어만 고르면 된다. <b>접수내용이 비어 있어도 넘길 수 있고</b>, 개발팀·영업팀에 확인한 내용을 이 창에서 바로 적어 넘길 수도 있다. 적은 내용은 접수내용에 저장되고 변경 이력에 남는다. 상태는 <span class="st s2">확인중</span> 그대로.</span></li>
+        <li data-n="2"><span class="di">2</span><span class="dt"><b>보완 요청</b> — 넘겨받은 엔지니어가 정보가 부족할 때 상담사에게 돌려보낸다. 요청 내용 필수, 진행내용에도 한 줄로 남는다. 엔지니어가 상담사로 되돌아가 목록에서 누가 잡고 있는지 바로 보인다.</span></li>
       </ol>
     </div>
   </section>
 
   <!-- AS-05 -->
   <section class="screen" id="AS-05">
-    <div class="sc-head"><span class="sid">AS-05</span><span class="nm">상태별 화면 — 버튼 · 알림</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — 상태 4개. 상태가 바뀌는 시각은 모두 자동 저장된다. CS가 직접 처리하는 건은 <b>등록 → (진행내용) → 완료</b>로 끝난다.</div>
+    <div class="sc-head"><span class="sid">AS-05</span><span class="nm">상태 · 결과 · 버튼</span><span class="pf">슈퍼어드민 · WEB</span></div>
+    <div class="sc-ov"><b>개요</b> — 상태는 <b>확인중 · 처리완료</b> 2개. 등록하면 바로 확인중이고, 완료할 때 결과를 <b>해결 / 처리 불가</b> 중에 고른다. 상태가 바뀌는 시각은 모두 자동 저장된다.</div>
     <div class="mock" style="margin-left:26px">
       <div class="flow hot" data-n="1"><span class="num">1</span>
-        <b style="font-size:11px">CS 직접 처리</b>
-        <span class="st s1">접수</span><span class="ar">→ 첫 진행내용(자동) →</span><span class="st s2">처리중</span><span class="ar">→ 완료 →</span><span class="st s6">종료</span>
+        <b style="font-size:11px">상담사가 직접 처리</b>
+        <span class="ar">등록 →</span><span class="st s2">확인중</span><span class="ar">→ 처리완료 →</span><span class="st s5">처리완료</span><span class="rs y">해결</span>
         <span style="flex-basis:100%;height:0"></span>
-        <b style="font-size:11px">개발팀 이관</b>
-        <span class="st s1">접수</span><span class="ar">→ 이관 →</span><span class="st s1">접수</span><span class="ar">→ 첫 진행내용(자동) →</span><span class="st s2">처리중</span><span class="ar">→ 처리완료 →</span><span class="st s5">처리완료</span><span class="ar">→ 종료(상담사) →</span><span class="st s6">종료</span>
+        <b style="font-size:11px">엔지니어에게 넘김</b>
+        <span class="ar">등록 →</span><span class="st s2">확인중</span><span class="ar">→ 이관 →</span><span class="st s2">확인중</span><span class="ar">→ 처리완료 →</span><span class="st s5">처리완료</span><span class="rs y">해결</span><span class="ar">또는</span><span class="rs n">처리 불가</span>
+        <span style="flex-basis:100%;height:0"></span>
+        <span class="ar">되돌리기:</span><span class="st s5">처리완료</span><span class="ar">→ 확인중으로 되돌림(상담사) →</span><span class="st s2">확인중</span>
       </div>
       <div class="hot" data-n="2"><span class="num">2</span><div class="tw">
         <table class="stt">
-          <thead><tr><th>상태</th><th>버튼 (누가)</th><th>알림</th></tr></thead>
+          <thead><tr><th>상태</th><th>버튼 (누가)</th><th>목록 표시</th></tr></thead>
           <tbody>
-            <tr><td><span class="st s1">접수</span> · <span class="st s2">처리중</span><br/><span class="help">엔지니어 = 상담사</span></td><td><span class="bn g sm">이관</span><span class="bn b sm">완료</span> 엔지니어</td><td>이관 → 새 엔지니어에게 메신저 알림(즉시)</td></tr>
-            <tr><td><span class="st s1">접수</span> · <span class="st s2">처리중</span><br/><span class="help">엔지니어 ≠ 상담사</span></td><td><span class="bn g sm">보완 요청</span><span class="bn g sm">이관</span><span class="bn b sm">처리완료</span> 엔지니어</td><td>보완 요청 → 상담사<br/>이관 → 새 엔지니어<br/>처리완료 → 상담사<br/><span class="help">모두 메신저 알림(즉시) + 목록 `미확인` 표시</span></td></tr>
-            <tr><td><span class="st s5">처리완료</span></td><td><span class="bn b sm">종료</span><span class="bn g sm">처리중으로 되돌림</span> 상담사</td><td><span class="tbu">되돌림 시 엔지니어 알림 여부 확인 필요</span></td></tr>
-            <tr><td><span class="st s6">종료</span></td><td>조회 전용</td><td>—</td></tr>
+            <tr><td><span class="st s2">확인중</span><br/><span class="help">엔지니어 = 상담사</span></td><td><span class="bn g sm">이관</span><span class="bn b sm">처리완료</span> 상담사</td><td>담당 한 명만 표시</td></tr>
+            <tr><td><span class="st s2">확인중</span><br/><span class="help">엔지니어 ≠ 상담사</span></td><td><span class="bn g sm">보완 요청</span><span class="bn g sm">이관</span><span class="bn b sm">처리완료</span> 엔지니어</td><td>담당 `상담사 → 엔지니어` · 넘겨받은 직후 `NEW`(미확인)</td></tr>
+            <tr><td><span class="st s5">처리완료</span></td><td><span class="bn g sm">확인중으로 되돌림</span> 상담사 · 엔지니어</td><td>결과 배지 <span class="rs y">해결</span> / <span class="rs n">처리 불가</span></td></tr>
           </tbody>
         </table>
       </div></div>
     </div>
     <ol class="desc" style="margin-top:14px">
       <div class="dh">AS-05 · 정책</div>
-      <li data-n="1"><span class="di">1</span><span class="dt"><b>상태 흐름</b> — <b>처리중</b>은 엔지니어가 첫 진행내용을 추가할 때 자동으로 바뀐다. <b>완료</b>(엔지니어 = 상담사)는 처리완료·종료 시각을 함께 기록하고 바로 종료한다. 개발팀에 넘긴 건만 처리완료 후 상담사가 고객 안내를 마치고 `종료`한다. 고객 확인에서 해결되지 않았으면 상담사가 `처리중으로 되돌림`.</span></li>
-      <li data-n="2"><span class="di">2</span><span class="dt"><b>버튼·알림</b><br/>· 완료 · 처리완료: <b>처리내용</b>이 채워져야 누를 수 있다<br/>· 종료 엔지니어 = 상담사, 이 시각이 `접수 ~ 종료`의 끝 시각<br/>· 알림: 슈퍼어드민 내부 알림(Slack·메일·SMS는 후속 범위)<br/>· 종료 뒤 같은 문제가 다시 생기면 새 A/S로 등록 — 이 약국의 다른 A/S 탭에서 지난 건이 자동으로 보인다</span></li>
+      <li data-n="1"><span class="di">1</span><span class="dt"><b>상태 흐름</b> — 받으면 바로 <b>확인중</b>이다(별도 `접수` 상태를 두지 않는다). 개발팀·영업팀에 처리 가능 여부를 묻는 동안도 확인중이며, 확인 결과 처리할 수 없으면 <b>처리완료 + 처리 불가</b>로 닫는다. 고객 안내까지 끝난 뒤 다시 문제가 되면 상담사가 `확인중으로 되돌림`으로 다시 연다.</span></li>
+      <li data-n="2"><span class="di">2</span><span class="dt"><b>버튼 · 표시</b><br/>· <b>처리완료</b>: 처리내용과 결과가 채워지면 눌린다<br/>· <b>이관</b>: 누구나 가능. 접수내용이 비어 있어도 넘길 수 있다<br/>· <b>보완 요청</b>: 넘겨받은 엔지니어만 — 엔지니어가 상담사로 되돌아간다<br/>· <b>삭제</b>: 중복 등록 정리용으로 유지(AS-03 하단 왼쪽)<br/>· <b>알림</b>: 목록의 `내 처리 건`·`미확인` 표시로 대신한다(CS팀 슬랙 미사용). <span class="tbu">즉시 알림이 필요하면 카카오톡 알림톡 별도 검토</span></span></li>
     </ol>
-  </section>
-
-  <!-- AS-06 -->
-  <section class="screen" id="AS-06">
-    <div class="sc-head"><span class="sid">AS-06</span><span class="nm">알림 — 화면 표시 + 메신저</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — 넘긴 A/S를 바로 알아야 하므로 <b>화면 표시(AS-01 내 처리 건 · 미확인)</b>와 <b>메신저 알림(즉시 발송)</b>을 함께 쓴다. 메일·문자는 쓰지 않는다.</div>
-    <div class="sc-grid">
-      <div class="mock">
-        <div class="dimbg" style="background:#f3f4f6">
-          <div class="mdl hot" data-n="1" style="max-width:420px"><span class="num">1</span>
-            <div class="mh" style="font-size:12.5px">굿팜 A/S 알림<span class="x">슬랙 DM</span></div>
-            <div class="mb">
-              <div class="lbx">새 A/S가 넘어왔습니다</div>
-              <div style="font-size:10.5px;line-height:1.7">
-                <b>솔아약국</b> (경기 성남시 분당구)<br/>
-                카테고리 · 기기<br/>
-                접수내용 · 카드 결제를 누르면 아무 반응이 없어요.<br/>
-                상담사 · 운영팀 홍길동 · 접수 10:02
-              </div>
-              <div class="row" style="margin-top:8px"><span class="bn sm">A/S 열기 →</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <ol class="desc">
-        <div class="dh">AS-06 · 정책</div>
-        <li data-n="1"><span class="di">1</span><span class="dt"><b>메신저 알림</b> — 엔지니어를 넘기는 즉시 <b>새 엔지니어에게 개인 메시지</b>로 보낸다. 내용은 약국명·지역·카테고리·접수내용 한 줄·상담사·접수 시각이며, `A/S 열기`를 누르면 해당 A/S 상세가 바로 열린다.<br/>· 처리완료 → 상담사에게 같은 형식으로 발송<br/>· 보완 요청 → 상담사에게 발송</span></li>
-        <li data-n="2"><span class="di">2</span><span class="dt"><b>화면 표시</b> — AS-01의 `내 처리 건`(기본 켜짐)과 `미확인` 표시로 메신저를 놓쳐도 목록에서 바로 보인다. 엔지니어가 A/S를 열면 `미확인`이 사라진다.</span></li>
-        <li data-n="3"><span class="di">3</span><span class="dt"><b>발송 수단</b> — <b>슬랙 개인 메시지</b>를 기본으로 한다. 슬랙은 즉시 도착하고 별도 비용 없이 붙일 수 있다. <span class="tbu">카카오톡은 사내 인원에게 보내려면 알림톡(건당 비용·템플릿 승인)이 필요하므로, CS팀 전원이 슬랙을 쓰는지 확인 필요</span></span></li>
-        <li data-n="4"><span class="di">4</span><span class="dt"><b>받는 사람 연결</b> — 슈퍼어드민 사용자에 <b>슬랙 계정</b>을 한 번 연결해 둔다(사용자 관리에 슬랙 ID 항목 추가). 연결되지 않은 사용자는 화면 표시만 받는다. <span class="tbu">사용자 관리 화면 추가 범위 확인 필요</span></span></li>
-      </ol>
-    </div>
   </section>
 </div>
 
