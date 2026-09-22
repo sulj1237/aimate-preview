@@ -252,7 +252,7 @@
   <!-- AS-01 -->
   <section class="screen" id="AS-01">
     <div class="sc-head"><span class="sid">AS-01</span><span class="nm">A/S 목록</span><span class="pf">슈퍼어드민 · WEB</span></div>
-    <div class="sc-ov"><b>개요</b> — 현재 목록 구조를 유지하고 <b>전화번호 검색 · 상세▼ 필터 · A/S 등록 · 엔지니어 · 접수 ~ 종료</b>를 더한다. 행을 누르면 <b>AS-03 A/S 상세</b>가 열린다.</div>
+    <div class="sc-ov"><b>개요</b> — 현재 목록 구조를 유지하고 <b>전화번호 검색 · 상세▼ 필터 · 내 처리 건 · 상담사·엔지니어 · 접수 ~ 종료</b>를 더한다. 등록은 약국 관리에서 하므로 이 화면에는 등록 버튼이 없다. 행을 누르면 <b>AS-03 A/S 상세</b>가 열린다.</div>
     <div class="sc-grid">
       <div class="mock">
         <div class="page">
@@ -273,10 +273,10 @@
           <div class="panel">
             <div class="row" style="margin-bottom:8px">
               <span class="tot">전체 <b>13</b> 건</span>
-              <div class="hot" data-n="7" style="margin-left:8px"><span class="num">7</span><span class="qb on">내 처리 건 3</span><span class="qb">미확인 1</span></div>
+              <div class="hot" data-n="5" style="margin-left:8px"><span class="num">5</span><span class="qb on">내 처리 건 3</span><span class="qb">미확인 1</span></div>
               <span style="flex:1"></span>
               <span class="seg"><span class="on">10개</span><span>30개</span><span>50개</span><span>100개</span></span>
-              <div class="hot" data-n="5"><span class="num" style="left:auto;right:-13px">5</span><span class="bn">엑셀 내보내기</span></div>
+              <div class="hot" data-n="4"><span class="num" style="left:auto;right:-13px">4</span><span class="bn">엑셀 내보내기</span></div>
             </div>
             <div class="hot" data-n="6"><span class="num">6</span><div class="tw">
               <table class="m"><thead><tr>
@@ -299,8 +299,8 @@
         <li data-n="1"><span class="di">1</span><span class="dt"><b>적용된 필터</b> — 현재 방식 유지. 기본값 = 기간 6개월.</span></li>
         <li data-n="2"><span class="di">2</span><span class="dt"><b>검색</b> — 검색 조건에 <b>전화번호</b> 추가(약국명 / 전화번호). 하이픈 유무와 관계없이 찾는다. 전화 받은 번호로 약국의 A/S를 바로 찾는다.</span></li>
         <li data-n="3"><span class="di">3</span><span class="dt"><b>상세▼ 필터</b> — 상태(전체/접수/처리중/처리완료/종료) · 엔지니어 · 카테고리(기존 1단) · 기간(접수일 기준).</span></li>
-        <li data-n="5"><span class="di">5</span><span class="dt"><b>엑셀 내보내기</b> — 현재 항목에 엔지니어 · 접수일시 · 처리완료 일시 · 종료 일시 · 처리내용 · 이관 횟수를 더한다.</span></li>
-        <li data-n="7"><span class="di">7</span><span class="dt"><b>내 처리 건 · 미확인</b>(추가) — `내 처리 건`은 내가 엔지니어인 A/S만 모아 본다(기본 켜짐). `미확인`은 넘겨받고 아직 열어보지 않은 건이며, 목록에서 약국명 옆에 `NEW`로 표시된다.</span></li>
+        <li data-n="4"><span class="di">4</span><span class="dt"><b>엑셀 내보내기</b> — 현재 항목에 엔지니어 · 접수일시 · 처리완료 일시 · 종료 일시 · 처리내용 · 이관 횟수를 더한다.</span></li>
+        <li data-n="5"><span class="di">5</span><span class="dt"><b>내 처리 건 · 미확인</b>(추가) — `내 처리 건`은 내가 엔지니어인 A/S만 모아 본다(기본 켜짐). `미확인`은 넘겨받고 아직 열어보지 않은 건이며, 목록에서 약국명 옆에 `NEW`로 표시된다.</span></li>
         <li data-n="6"><span class="di">6</span><span class="dt"><b>목록</b> — 약국명(지역) · 카테고리 · 접수내용 · <b>상담사</b> · <b>엔지니어</b> · 접수일자 · <b>접수 ~ 종료</b> · 상태. 전화를 받은 상담사와 실제로 처리하는 엔지니어를 나눠 보여준다. 기본 정렬 = 접수일자 최신순. 행 클릭 → AS-03.<br/>· 진행내역 컬럼 → 상세의 진행내용 탭으로 이동<br/>· 처리일자(관리자) → 엔지니어 + 접수 ~ 종료<br/>· 접수 ~ 종료 표기: 당일 `09:15 ~ 09:51 (36분)` / 여러 날 `09-16 10:02 ~ 09-17 14:10 (1일 4시간)` / 진행 중 `10:02 ~ 진행중 (2시간 10분 경과)`</span></li>
       </ol>
     </div>
