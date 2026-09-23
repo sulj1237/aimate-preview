@@ -499,24 +499,39 @@ function render(){
 }
 function renderInternal(){
   if(S.screen==='list'){
-    return `<div class="desktop"><div class="hd"><b>고객 목록</b> <span>AI 차트 · 처방전 접수 목록에 해당</span></div>
-     ${DB.patients.slice().sort((a,b)=>lastDate(b.patientId).localeCompare(lastDate(a.patientId)))
-       .map(p=>{const a=analyze(p.patientId);
-         const n=st=>a?a.items.filter(i=>i.state===st).length:0;
-         const out=a?a.items.filter(i=>i.state==='OUT'):[];
-         const parts=[];
-         if(a&&a.noHistory) parts.push('처음 등록한 처방');
-         if(n('NEW')) parts.push('새로 추가 '+n('NEW'));
-         if(n('CHANGED')) parts.push('달라진 약 '+n('CHANGED'));
-         if(n('CONTINUE')) parts.push('그대로 '+n('CONTINUE'));
-         out.forEach(()=>{});
-         const rem=out.filter(i=>i.detail==='투약일수 남음').length, fin=out.length-rem;
-         if(rem) parts.push('빠진 약 '+rem+' (아직 남음)');
-         if(fin) parts.push('빠진 약 '+fin+' (다 먹음)');
-         return `<div class="row" data-p="${p.patientId}"><span><b>${p.name}</b> <span class="det">${p.patientId}</span><br>
-         <span class="det">${p.summary||''}</span><br><span class="det">${parts.join(' · ')}</span></span>
-         <span class="det">최근 처방일 ${lastDate(p.patientId)}<br>이번 ${a?a.curCount:0}개 · 지난 ${a?a.pastGroups:0}묶음</span></div>`}).join('')}</div>`;
+    const stat=pid=>{const a=analyze(pid); if(!a) return '';
+      const n=st=>a.items.filter(i=>i.state===st).length;
+      const out=a.items.filter(i=>i.state==='OUT');
+      const rem=out.filter(i=>i.detail==='투약일수 남음').length, fin=out.length-rem;
+      const parts=[];
+      if(a.noHistory) parts.push('처음 등록한 처방');
+      if(n('NEW')) parts.push('새로 추가 '+n('NEW'));
+      if(n('CHANGED')) parts.push('달라진 약 '+n('CHANGED'));
+      if(n('CONTINUE')) parts.push('그대로 '+n('CONTINUE'));
+      if(rem) parts.push('빠진 약 '+rem+' (아직 남음)');
+      if(fin) parts.push('빠진 약 '+fin+' (다 먹음)');
+      return parts.join(' · ')};
+    const card=(key)=>{const u=USER_TYPES[key];
+      if(!u.pids.length) return `<div class="row" style="opacity:.6"><span><b>④ ${u.label}</b><br>
+        <span class="det">${u.desc}</span><br><span class="det">처방이 없어 이 목록에는 나오지 않습니다. 고객앱 챗봇에서 확인합니다</span></span><span class="det">—</span></div>`;
+      const rep=u.pids[0], q=DB.patients.find(x=>x.patientId===rep), a=analyze(rep);
+      const more=u.pids.length-1;
+      const num={first:'①',changed:'②',same:'③'}[key];
+      return `<div class="row" data-p="${rep}"><span><b>${num} ${u.label}</b> <span class="det">대표 ${q.name} · ${rep}</span><br>
+        <span class="det">${q.summary||''}</span><br><span class="det">${stat(rep)}</span>
+        ${more?`<br><span class="det">같은 유형 ${more}명 더 — ${u.pids.slice(1).map(id=>id).join(' · ')}</span>`:''}</span>
+        <span class="det">최근 처방일 ${lastDate(rep)}<br>이번 ${a?a.curCount:0}개 · 지난 ${a?a.pastGroups:0}묶음</span></div>`};
+    const sub=USER_TYPES[S.utype].pids.slice(1);
+    return `<div class="desktop"><div class="hd"><b>고객 목록</b> <span>AI 차트 · 처방전 접수 목록에 해당 · 고객 유형 4가지</span></div>
+     ${['first','changed','same','none'].map(card).join('')}
+     ${sub.length?`<div class="k" style="margin-top:14px">선택한 유형(${USER_TYPES[S.utype].label})의 다른 고객</div>
+     ${sub.map(id=>{const q=DB.patients.find(x=>x.patientId===id);
+        return `<div class="row" data-p="${id}"><span><b>${q.name}</b> <span class="det">${id}</span><br>
+        <span class="det">${q.summary||''}</span><br><span class="det">${stat(id)}</span></span>
+        <span class="det">최근 처방일 ${lastDate(id)}</span></div>`}).join('')}`:''}
+     <div class="legend" style="margin-top:12px">판정 검증용 가상 환자는 10명 그대로 두고, 목록에서 고르는 단위만 유형으로 묶었습니다 (08 4장).</div></div>`;
   }
+
   const a=analyze(S.pid), p=DB.patients.find(x=>x.patientId===S.pid);
   let h=`<div class="desktop"><div class="hd"><b>${p.name}</b> <span>· 최근 처방일 ${a.today} · 이번 처방 ${a.curCount}개</span>
     <div style="margin-top:8px"><button class="btn ghost" style="width:auto;padding:6px 12px" data-back="1">목록으로</button></div></div>`;
