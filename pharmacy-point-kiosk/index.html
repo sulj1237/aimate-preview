@@ -3,388 +3,483 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>약국 포인트 · 키오스크 회원가입 자판 비교</title>
+<title>약국 포인트 · 키오스크 프로토타입</title>
 <style>
   :root{
     --ink:#1b2422; --soft:#62706d; --faint:#97a3a0; --line:#e2e8e6; --paper:#fff; --field:#f3f7f6; --bg:#eef2f1;
     --teal:#0a9a92; --teal-d:#077a73; --teal-bg:#e6f5f3;
-    --pt:#d8401a; --pt-bg:#fbeae4;
+    --ok:#16a34a; --danger:#d8453a; --amber:#b9770f;
+    --pt:#d8401a; --pt-d:#a52e10; --pt-bg:#fbeae4;
     --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;
     --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--sans);background:var(--bg);color:var(--ink);padding:24px 20px 60px;font-size:14px}
-  .wrap{max-width:880px;margin:0 auto}
+  .wrap{max-width:820px;margin:0 auto}
   h1{font-size:19px;font-weight:800;letter-spacing:-.02em}
-  .sub{font-size:12.5px;color:var(--soft);margin-top:5px;line-height:1.55}
-  .sub b{color:var(--ink)}
+  .sub{font-size:12.5px;color:var(--soft);margin-top:5px;line-height:1.5}
 
-  .tabs{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
-  .tab{cursor:pointer;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 14px;
-    display:flex;flex-direction:column;gap:2px;min-width:180px}
-  .tab:hover{border-color:var(--teal)}
-  .tab.on{border-color:var(--teal);background:var(--teal-bg)}
-  .tab .id{font-family:var(--mono);font-size:10px;color:var(--faint);font-weight:700}
-  .tab.on .id{color:var(--teal-d)}
-  .tab .lab{font-size:13px;font-weight:800}
-  .tab .note{font-size:10.5px;color:var(--soft)}
+  /* 화면 내비 (그룹별 가로 배치) */
+  .nav{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .grp-h{font-size:10.5px;font-weight:800;letter-spacing:.03em;color:var(--teal-d);background:var(--teal-bg);
+    padding:5px 9px;border-radius:6px;flex:none}
+  .sc{display:inline-flex;gap:7px;align-items:center;cursor:pointer;background:var(--paper);
+    border:1px solid var(--line);border-radius:9px;padding:8px 12px;transition:border-color .12s,background .12s}
+  .sc:hover{border-color:var(--teal)}
+  .sc.on{border-color:var(--teal);background:var(--teal-bg)}
+  .sc .id{font-family:var(--mono);font-size:10px;color:var(--faint);font-weight:700}
+  .sc.on .id{color:var(--teal-d)}
+  .sc .lab{font-size:12.5px;font-weight:700}
 
-  .states-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--faint);margin:20px 0 8px}
-  .states{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  /* 상태 칩 + 무대 */
+  .states-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--faint);text-transform:uppercase;margin:22px 0 8px}
+  .states{display:flex;flex-wrap:wrap;gap:7px;min-height:32px}
   .st{font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
     background:var(--paper);color:var(--soft);cursor:pointer}
   .st.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .count{margin-left:auto;font-size:11.5px;color:var(--soft);font-weight:700}
-  .count b{font-family:var(--mono);color:var(--pt);font-size:13px}
 
-  .stage{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
-  .device{background:#12201d;border-radius:16px;padding:8px;box-shadow:0 26px 54px -26px rgba(15,26,24,.5)}
-  .screen{overflow:hidden;position:relative;width:720px;height:460px;border-radius:10px;background:#f6f8f7}
+  .stage{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .device{background:#12201d;border-radius:26px;padding:12px;box-shadow:0 26px 54px -26px rgba(15,26,24,.5)}
+  .device.kiosk{border-radius:16px;padding:8px}
+  .device.pos{border-radius:12px;padding:9px;background:#2a2a26}
+  .screen{overflow:hidden;position:relative;background:var(--paper)}
+  .device.phone .screen{width:300px;height:600px;border-radius:22px}
+  .device.kiosk .screen{width:560px;height:364px;border-radius:10px;background:#f6f8f7}
+  .device.pos .screen{width:520px;height:330px;border-radius:8px;background:#f0f2f1}
   .dev-tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em}
+  @media(max-width:620px){.device.kiosk,.device.pos{transform:scale(.74);transform-origin:top center;margin-bottom:-90px}}
 
-  /* ── 키오스크 화면 ── */
+  .note{margin-top:26px;font-size:12px;color:var(--soft);line-height:1.6;
+    border-top:1px solid var(--line);padding-top:14px}
+  .note b{color:var(--ink)}
+
+  /* ========== 공통 화면 원자 ========== */
+  .abs{position:absolute;inset:0;display:flex;flex-direction:column}
+
+  /* ── 고객앱(phone) ── */
+  .p{position:absolute;inset:0;display:flex;flex-direction:column;font-size:14px}
+  .p-status{height:30px;flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;font-family:var(--mono);font-size:10px;color:var(--faint)}
+  .p-body{flex:1;overflow:hidden;padding:0 16px 16px}
+  .p-h{font-size:19px;font-weight:800;letter-spacing:-.02em;margin:4px 0 12px}
+  .p-sub{font-size:12px;color:var(--soft);line-height:1.5}
+  .pcard{background:var(--field);border-radius:14px;padding:13px 15px;margin-bottom:10px}
+  .pcard .ph{font-size:13px;font-weight:700}
+  .pcard .pts{font-size:23px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+  .pcard .pts b{color:var(--pt)}
+  .pcard .pm{font-size:11px;color:var(--soft);margin-top:3px}
+  .pexp{display:inline-block;margin-top:8px;font-size:10px;font-weight:700;color:var(--pt-d);
+    background:var(--pt-bg);padding:3px 8px;border-radius:999px}
+  .p-cta{margin-top:auto;height:48px;border-radius:12px;background:var(--teal);color:#fff;border:none;
+    font-size:15px;font-weight:800;cursor:pointer}
+  .barc{height:74px;border-radius:8px;margin:14px 0 8px;
+    background:repeating-linear-gradient(90deg,#12201d 0 2px,transparent 2px 4px,#12201d 4px 7px,transparent 7px 9px,#12201d 9px 12px,transparent 12px 16px)}
+  .barno{text-align:center;font-family:var(--mono);font-size:13px;letter-spacing:.16em}
+  .hrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .hi{width:30px;height:30px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+  .hi.earn{background:rgba(22,163,74,.12);color:var(--ok)}
+  .hi.use{background:var(--pt-bg);color:var(--pt-d)}
+  .hi.exp{background:rgba(22,19,13,.06);color:var(--faint)}
+  .ht{flex:1;min-width:0}.ht .t1{font-size:13px;font-weight:600}.ht .t2{font-size:11px;color:var(--soft);margin-top:1px}
+  .hv{font-size:14px;font-weight:800}.hv.plus{color:var(--ok)}.hv.minus{color:var(--soft)}
+
+  /* ── 키오스크(landscape) ── */
   .k{position:absolute;inset:0;display:flex;flex-direction:column;background:#f6f8f7}
-  .k-bar{height:42px;flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;background:#fff;border-bottom:1px solid var(--line)}
-  .k-back{font-size:12.5px;color:var(--soft);font-weight:600;flex:none}
-  .k-chip{margin:0 auto;font-size:11.5px;font-weight:700;color:var(--soft);background:var(--field);padding:5px 12px;border-radius:999px}
-  .k-r{flex:none;min-width:40px}
+  .k-bar{height:38px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#fff;border-bottom:1px solid var(--line)}
+  .k-logo{font-size:13px;font-weight:800;color:var(--teal-d);flex:none}
+  .k-back{font-size:11.5px;color:var(--soft);font-weight:600;flex:none}
+  .k-r{flex:none;min-width:1px;margin-left:auto}
+  .k-member{margin-left:auto;font-size:11px;font-weight:700}
+  .k-tag{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--teal-d)}
+  .k-chip{margin:0 auto;font-size:10.5px;font-weight:700;color:var(--soft);background:var(--field);padding:4px 11px;border-radius:999px}
+  .k-steps{display:flex;align-items:center;gap:9px;margin:0 auto}
+  .k-step{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--faint)}
+  .k-step-n{width:16px;height:16px;border-radius:50%;background:var(--field);color:var(--soft);
+    display:flex;align-items:center;justify-content:center;font-size:9.5px}
+  .k-step.on{color:var(--ink)}.k-step.on .k-step-n{background:var(--teal);color:#fff}
+  .k-step.done .k-step-n{background:var(--teal);color:#fff;opacity:.4}
 
-  .k-body{flex:1;display:flex;min-height:0}
-  .k-body.side{flex-direction:row}
-  .k-body.bottom{flex-direction:column}
+  /* 1 첫 화면 */
+  .k-start{flex:1;display:grid;grid-template-columns:1fr 1.08fr;min-height:0}
+  .k-scan{padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;
+    background:linear-gradient(180deg,#e9f5f3,#d7ece7)}
+  .k-doc{width:64px;height:80px;border-radius:8px;background:#fff;box-shadow:0 6px 14px rgba(15,26,24,.13);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:9.5px;font-weight:700;color:var(--soft)}
+  .k-qrm{width:28px;height:28px;border-radius:3px;background:conic-gradient(#12201d 25%,#fff 0 50%,#12201d 0 75%,#fff 0);background-size:9px 9px}
+  .k-scan-h{font-size:16px;font-weight:800;line-height:1.3;margin-top:4px}
+  .k-scan-s{font-size:11px;color:var(--soft)}
+  .k-arw{font-size:18px;color:var(--teal);font-weight:800;line-height:1}
+  .k-choices{padding:14px;display:flex;flex-direction:column;gap:9px;justify-content:center}
+  .k-lead{font-size:11.5px;color:var(--soft);line-height:1.4}
+  .k-lead b{display:block;font-size:14px;color:var(--ink);font-weight:800;margin-top:2px}
+  .k-ch{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:13px;
+    background:#fff;cursor:pointer;text-align:left;transition:border-color .12s,box-shadow .12s}
+  .k-ch:hover{border-color:var(--teal)}
+  .k-ch.accent{border-color:var(--teal);box-shadow:0 4px 12px rgba(10,154,146,.14)}
+  .k-ch-ic{width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:15px;background:var(--teal-bg);color:var(--teal-d)}
+  .k-ch.gift .k-ch-ic{background:var(--pt-bg);color:var(--pt-d)}
+  .k-ch-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+  .k-ch-tx b{font-size:13.5px;font-weight:800}
+  .k-ch-tx em{font-style:normal;font-size:11px;color:var(--soft);margin-top:1px}
+  .k-ch-go{font-size:18px;color:var(--faint);flex:none}
 
-  .k-form{padding:14px 16px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
-  .k-body.side .k-form{flex:1.25;min-width:0}
-  .k-body.bottom .k-form{flex:none;display:grid;grid-template-columns:1.15fr 1fr;gap:6px 16px;align-items:start;padding:10px 16px 4px}
-  .k-body.bottom .k-form > .k-field,
-  .k-body.bottom .k-form > .k-help{grid-column:1}
-  .k-body.bottom .k-form > .k-terms{grid-column:2;grid-row:2 / span 5;align-self:start;margin-top:0;padding-top:0;border-top:none}
-  .k-body.bottom .k-field{padding:7px 12px}
-  .k-body.bottom .k-field-v{font-size:16px}
-  .k-body.bottom .key{min-height:31px;font-size:13.5px}
-  .k-body.bottom .k-padwrap{padding:6px 14px 4px;gap:4px;justify-content:flex-start}
-  .k-body.bottom .k-padfoot{padding:0 14px 10px}
-  .k-h{font-size:16px;font-weight:700;line-height:1.3;color:var(--soft)}
+  /* 2 약국 회원가입 */
+  .k-signup{flex:1;display:grid;grid-template-columns:1.3fr 1fr;min-height:0}
+  .k-form{padding:12px 14px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+  .k-h{font-size:15px;font-weight:700;line-height:1.3;color:var(--soft)}
   .k-h b{color:var(--ink);font-weight:800}
-  .k-body.bottom .k-h{grid-column:1 / -1;font-size:15px}
-
-  .k-field{border:1.5px solid var(--line);border-radius:11px;padding:9px 13px;background:#fff;display:flex;flex-direction:column;gap:2px;cursor:pointer}
+  .k-field{border:1.5px solid var(--line);border-radius:11px;padding:8px 13px;background:#fff;display:flex;flex-direction:column;gap:2px}
   .k-field.on{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,154,146,.1)}
-  .k-field-l{font-size:10px;color:var(--soft);font-weight:700;display:flex;align-items:center;gap:4px}
-  .k-field-v{font-size:18px;font-weight:800;letter-spacing:.03em;min-height:22px}
-  .k-field-v.dim{font-size:13.5px;color:var(--faint);font-weight:700}
+  .k-field-l{font-size:9.5px;color:var(--soft);font-weight:700}
+  .k-field-v{font-size:17px;font-weight:800;letter-spacing:.03em}
+  .k-field-v.dim{font-size:13px;color:var(--faint);font-weight:700}
   .k-cur{border-bottom:2px solid var(--teal);padding-bottom:1px}
   .k-dm{color:var(--faint)}
-  .k-help{font-size:10.5px;color:var(--teal-d);font-weight:600}
-  .k-req{font-size:9px;font-weight:800;color:#fff;background:var(--pt);padding:1.5px 6px;border-radius:999px}
-  .k-opt{font-size:9px;font-weight:800;color:var(--soft);background:#eef1f4;padding:1.5px 6px;border-radius:999px}
-
-  .k-terms{display:flex;flex-direction:column;gap:5px;margin-top:3px;padding-top:9px;border-top:1px solid var(--line)}
-  .k-body.bottom .k-terms{grid-column:1 / -1;margin-top:0}
-  .k-terms-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800}
+  .k-help{font-size:10px;color:var(--teal-d);font-weight:600}
+  .k-subs{display:flex;gap:8px;margin-top:1px}
+  .k-terms{display:flex;flex-direction:column;gap:5px;margin-top:3px;padding-top:8px;border-top:1px solid var(--line)}
+  .k-terms-h{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800}
+  .k-req{font-size:8.5px;font-weight:800;color:#fff;background:var(--pt);padding:1.5px 6px;border-radius:999px}
+  .k-opt{font-size:8.5px;font-weight:800;color:var(--soft);background:#eef1f4;padding:1.5px 6px;border-radius:999px;margin-left:4px}
+  .k-gender{flex:1;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:11px;padding:6px 9px;background:#fff}
+  .k-gb{flex:1;font-size:11.5px;font-weight:700;padding:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+  .k-gb.on{background:var(--teal-bg);border-color:var(--teal);color:var(--teal-d)}
+  .k-field-v.sm2{font-size:14px;letter-spacing:0}
   .k-term{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .k-term-t{font-size:12px;font-weight:600}
+  .k-term-t{font-size:11.5px;color:var(--ink);font-weight:600}
   .k-term-t b{color:var(--soft);font-weight:700;margin-right:3px}
-  .k-term-view{flex:none;font-size:10.5px;color:var(--soft);background:var(--field);padding:3px 9px;border-radius:7px}
-  .k-term-note{font-size:9.5px;color:var(--soft)}
+  .k-term-view{flex:none;font-size:10px;color:var(--soft);background:var(--field);padding:3px 9px;border-radius:7px}
+  .k-term-note{font-size:9px;color:var(--soft);margin-top:1px}
+  .k-pad-col{display:flex;flex-direction:column;background:#eef2f1;min-height:0}
+  .k-padfoot{padding:0 12px 12px;display:flex;flex-direction:column;gap:7px}
+  .k-consent{font-size:10px;color:var(--soft);line-height:1.4;text-align:center}
+  .k-consent u{color:var(--ink);text-underline-offset:2px}
+  .k-cta{width:100%;height:44px;border-radius:12px;background:var(--teal);color:#fff;border:none;font-size:14.5px;font-weight:800;cursor:pointer}
+  .k-cta:disabled{background:var(--line);color:var(--faint);cursor:not-allowed}
+  .k-keypad{flex:1;padding:12px 12px 8px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;align-content:center}
+  .k-key{border:none;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(15,26,24,.07);font-size:17px;font-weight:700;
+    color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:36px}
+  .k-key.fn{font-size:11.5px;color:var(--soft);background:var(--field);box-shadow:none}
 
-  /* 입력기 패널 */
-  .k-pad{background:#eef2f1;display:flex;flex-direction:column;min-height:0}
-  .k-body.side .k-pad{flex:1;min-width:0}
-  .k-body.bottom .k-pad{flex:1;border-top:1px solid var(--line)}
-  .k-padwrap{flex:1;padding:12px 14px 8px;display:flex;flex-direction:column;justify-content:center;gap:6px;min-height:0}
-  .k-padfoot{padding:0 14px 14px}
-  .k-cta{width:100%;height:46px;border-radius:12px;background:var(--teal);color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer}
-  .k-cta:disabled{background:#d7dedc;color:#9aa6a3;cursor:not-allowed}
+  /* 3 굿팜 앱 바코드 인증 */
+  .k-tabs{flex:none;display:flex;gap:8px;padding:12px 14px 0}
+  .k-tab{flex:1;padding:10px;border-radius:11px 11px 0 0;border:1px solid var(--line);border-bottom:none;
+    background:var(--field);font-size:12px;font-weight:700;color:var(--soft);cursor:pointer}
+  .k-tab.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .k-tab-b{font-size:9px;background:var(--pt);color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px}
+  .k-auth{flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:11px;padding:11px 14px 14px;min-height:0}
+  .k-authm{background:#e9f5f3;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:12px;text-align:center}
+  .k-h.c{text-align:center;font-size:15px}
+  .k-bigbar{background:#fff;border-radius:11px;padding:14px 18px;box-shadow:0 5px 14px rgba(15,26,24,.1);width:84%}
+  .k-bigbar-b{height:46px;border-radius:4px;
+    background:repeating-linear-gradient(90deg,#12201d 0 2px,transparent 2px 4px,#12201d 4px 7px,transparent 7px 9px,#12201d 9px 12px,transparent 12px 16px)}
+  .k-bigbar-n{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;margin-top:7px;color:var(--soft)}
+  .k-arw2{font-size:11px;color:var(--teal-d);font-weight:700}
+  .k-qrcard{background:#fff;border-radius:13px;border:1px solid var(--line);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:7px;padding:12px;text-align:center}
+  .k-qr{width:80px;height:80px;border-radius:6px;border:3px solid #12201d;
+    background:conic-gradient(#12201d 25%,#fff 0 50%,#12201d 0 75%,#fff 0);background-size:13px 13px}
+  .k-qr-t{font-size:10.5px;color:var(--soft)}
+  .k-qr-b{font-size:12px;font-weight:800}
 
-  .k-num{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:center;flex:1;padding:4px 0}
-  .kb-row{display:flex;gap:5px;justify-content:center}
-  .key{border:none;border-radius:9px;background:#fff;box-shadow:0 1px 2px rgba(15,26,24,.07);font-size:15px;font-weight:700;
-    color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:38px;flex:1;user-select:none}
-  .key:active{background:var(--teal-bg)}
-  .key.fn{font-size:11.5px;color:var(--soft);background:var(--field);box-shadow:none}
-  .key.on{background:var(--teal);color:#fff}
-  .key.wide{flex:1.6}
-  .k-num .key{min-height:46px;font-size:18px}
-  .kb-cj .key{min-height:46px;font-size:15px;line-height:1.15}
-  .kb-note{font-size:10px;color:var(--soft);text-align:center}
+  /* 4 상품 목록 */
+  .k-cart{flex:1;display:flex;flex-direction:column;min-height:0}
+  .k-list{flex:1;overflow:hidden;padding:4px 14px}
+  .k-it{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .k-it-tag{font-size:9px;font-weight:700;color:var(--teal-d);background:var(--teal-bg);padding:2px 7px;border-radius:5px;flex:none;align-self:flex-start;margin-top:2px}
+  .k-it-m{flex:1;min-width:0}
+  .k-it-nm{font-size:13.5px;font-weight:800}
+  .k-it-note{font-size:10.5px;color:var(--soft);margin-top:1px}
+  .k-it-pt{font-size:10.5px;color:var(--pt-d);font-weight:700;margin-top:2px}
+  .k-qty{display:flex;align-items:center;gap:8px;flex:none}
+  .k-qty button{width:24px;height:24px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);line-height:1}
+  .k-qty span{font-size:13.5px;font-weight:700;min-width:14px;text-align:center}
+  .k-it-pr{font-size:14.5px;font-weight:800;flex:none;min-width:58px;text-align:right}
+  .k-it-u{font-size:11px;font-weight:600;margin-left:1px}
+  .k-foot{flex:none;border-top:1px solid var(--line);background:#fff;padding:11px 14px;display:flex;align-items:center;gap:11px}
+  .k-count{flex:none;font-size:13.5px;font-weight:700;color:var(--soft);margin-right:16px}
+  .k-count b{color:var(--ink);font-weight:800;font-size:15px}
+  .k-total{flex:1}
+  .k-total-l{font-size:10.5px;color:var(--soft);display:block}
+  .k-total-v{font-size:21px;font-weight:800}
+  .k-pays{display:flex;gap:8px;flex:none}
+  .k-pay{height:42px;padding:0 18px;border-radius:11px;border:none;background:var(--teal);color:#fff;font-size:13.5px;font-weight:800;cursor:pointer}
+  .k-pay.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
 
-  .cmp{margin-top:26px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-  .cmp h2{font-size:14px;font-weight:800;margin-bottom:10px}
-  table{width:100%;border-collapse:collapse;font-size:12.5px}
-  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{font-size:11px;color:var(--soft);font-weight:800;background:var(--field)}
-  td b{color:var(--ink)}
-  .tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--teal-bg);color:var(--teal-d)}
+  /* 5 결제 완료 */
+  .k-done{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:14px;min-height:0}
+  .k-done-l{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px}
+  .k-check{width:42px;height:42px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800}
+  .k-done-h{font-size:18px;font-weight:800}
+  .k-done-g{font-size:11.5px;font-weight:700;color:var(--ink);background:var(--field);padding:7px 11px;border-radius:9px}
+  .k-earn{display:flex;align-items:center;gap:10px;background:var(--pt-bg);border-radius:13px;padding:11px 13px;margin-top:2px}
+  .k-earn-ic{font-size:21px;flex:none}
+  .k-earn-v{font-size:15px;font-weight:800;color:var(--pt-d)}
+  .k-earn-s{font-size:10.5px;color:var(--soft);margin-top:1px}
+  .k-rc{background:#fff;border-radius:13px;border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:7px;justify-content:center}
+  .k-rc-r{display:flex;justify-content:space-between;font-size:11.5px;color:var(--soft)}
+  .k-rc-r b{color:var(--ink);font-weight:700}
+  .k-rc-r.use span{color:var(--pt-d);font-weight:700}
+  .k-rc-d{height:1px;background:var(--line);margin:2px 0}
+  .k-rc-t{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding-top:9px;margin-top:2px}
+  .k-rc-t span{font-size:12.5px;font-weight:700}
+  .k-rc-t b{font-size:19px;font-weight:800}
+  .k-donebadge{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--teal-d)}
+  .k-home{flex:none;height:42px;border:none;background:var(--teal);color:#fff;font-size:14.5px;font-weight:800;cursor:pointer}
+
+  /* ── POS(landscape) ── */
+  .pos{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr 1fr;font-size:13px}
+  .pos-l{padding:16px;border-right:1px solid var(--line);display:flex;flex-direction:column;background:#fff}
+  .pos-r{padding:16px;display:flex;flex-direction:column;gap:11px}
+  .pos-t{font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
+  .pos-li{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .pos-tot{margin-top:auto;display:flex;justify-content:space-between;align-items:baseline;padding-top:11px}
+  .pos-tot .v{font-size:22px;font-weight:800}
+  .pos-cust{background:#fff;border-radius:11px;padding:13px;border:1px solid var(--line)}
+  .pos-cust .nm{font-size:14px;font-weight:800}
+  .pos-vf{display:inline-block;margin-top:6px;font-size:10px;font-weight:700;color:var(--ok);background:rgba(22,163,74,.12);padding:3px 9px;border-radius:999px}
+  .pos-pt{background:#fff;border-radius:11px;padding:13px;border:1px solid var(--line)}
+  .pos-pt .row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0}
+  .pos-pt .row.use{color:var(--pt-d);font-weight:700}
+  .pos-btn{height:46px;border-radius:11px;background:var(--teal);color:#fff;border:none;font-size:14.5px;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>키오스크 약국 회원가입 — 이름 입력 자판 비교</h1>
-  <p class="sub">
-    변경 요청 반영: 약국 회원가입에 <b>이름(필수)</b>을 더한다. 생년월일·성별은 기존 화면에서 기본 필수로 받고, 수집 여부는 <b>키오스크 설정</b>에서 조정한다.<br />
-    자판을 골라 ②단계에서 <b>직접 입력</b>해 보세요. 입력 타수가 우측 상단에 집계됩니다. 화면 비율은 720×460 기준입니다.<br />
-    이 비교는 <b>이름 입력 자판</b>만 다룹니다. 선택한 자판도 키오스크 설정값으로 바꿀 수 있습니다.
-  </p>
+  <h1>약국 포인트 · 프로토타입</h1>
+  <div class="sub">키오스크 5개 화면(첫 화면·약국 회원가입·굿팜 앱 바코드 인증·상품 목록·결제 완료)을 중심으로,
+    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />약국 회원가입은 <b>이름·전화번호·생년월일·성별</b>을 받습니다. 이름 입력 자판(쿼티 두벌식·천지인)과 생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다. 자판 비교: <a href="./kiosk-signup-keyboard.html" style="color:var(--teal-d);font-weight:700">이름 입력 자판 3안 보기 ›</a></div>
 
-  <div class="tabs" id="tabs"></div>
+  <div class="nav" id="nav"></div>
 
-  <div class="states-h">상태</div>
-  <div class="states">
-    <button class="st" data-step="0">① 전화번호 입력</button>
-    <button class="st" data-step="1">② 이름 입력</button>
-    <span class="count">이름 입력 타수 <b id="cnt">0</b> 타</span>
-  </div>
+  <div class="states-h">화면 상태</div>
+  <div class="states" id="states"></div>
 
   <div class="stage">
-    <div class="device"><div class="screen" id="screen"></div></div>
-    <div class="dev-tag" id="devtag"></div>
+    <div class="device kiosk" id="device"><div class="screen" id="vp"></div></div>
+    <div class="dev-tag" id="tag"></div>
   </div>
 
-  <div class="cmp">
-    <h2>세 안 비교</h2>
-    <table>
-      <thead><tr><th style="width:92px">안</th><th style="width:110px">배치</th><th>장점</th><th>단점 · 확인 필요</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><b>A 쿼티 두벌식</b><br /><span class="tag">권장</span></td>
-          <td>자판이 <b>하단 전폭</b>으로 내려오고 폼은 상단 2열</td>
-          <td>PC·휴대폰과 같은 배열이라 설명이 필요 없다. 이름 3글자 기준 <b>7타</b>로 가장 짧다.</td>
-          <td>키 10열이 들어가야 해서 ②단계에서 <b>레이아웃이 바뀐다</b>(우측 패널 → 하단 전폭). 폼이 2열로 재배치된다.</td>
-        </tr>
-        <tr>
-          <td><b>B 천지인</b></td>
-          <td>현재 숫자 키패드 자리 <b>그대로</b>(우측 3×4)</td>
-          <td>레이아웃 변경이 없다. 키가 커서 터치 정확도가 높고 고령 고객에게 익숙하다.</td>
-          <td>이름 3글자 기준 <b>9~11타</b>로 입력이 길다. 같은 키를 반복해 글자를 바꾸는 방식이라 안내 문구가 필요하다.</td>
-        </tr>
-        <tr>
-          <td><b>C 쿼티 + 한/영</b></td>
-          <td>A와 동일 + <b>한/영 전환키</b></td>
-          <td>외국인 이름·영문 표기를 받을 수 있다.</td>
-          <td>전환 상태를 고객이 인지해야 한다. 개발 범위가 가장 크고, 영문 이름 저장 규칙(표기·정렬)이 따로 필요하다.</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="note">
+    <b>UX Writing 원칙</b> — 한 화면 = 한 행동 · 행동을 먼저, 혜택은 보조 · “~해주세요” 톤 통일 ·
+    용어 통일(회원 → <b>약국 회원</b>, 신규 가입 → <b>약국 회원가입</b>, 굿팜 회원 → <b>굿팜 앱 회원</b>,
+    회원 바코드 → <b>굿팜 앱 바코드</b>, 전달해주세요 → <b>보여주세요</b>).
   </div>
 </div>
 
 <script>
-/* ── 상태 ── */
-var VARIANTS = [
-  { id:"A", key:"qwerty",   lab:"쿼티 두벌식",    note:"하단 전폭 자판" },
-  { id:"B", key:"cheonjiin",lab:"천지인 3×4",     note:"현재 키패드 자리 유지" },
-  { id:"C", key:"qwertyEn", lab:"쿼티 + 한/영",   note:"영문 입력 지원" }
-];
-var vIdx = 0, step = 0, focusField = "phone", strokes = 0;
-var phone = "01012345", birth = "", shift = false, eng = false;
-var nameCommitted = "", cho = -1, jung = -1, jong = 0, cjBuf = "", cjKey = null, cjIdx = 0, cjEmitted = false;
+  var $ = function(id){ return document.getElementById(id); };
 
-/* ── 한글 조합 ── */
-var CHO  = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ".split("");
-var JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".split("");
-var JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-var JUNG_COMB = {"ㅗㅏ":"ㅘ","ㅗㅐ":"ㅙ","ㅗㅣ":"ㅚ","ㅜㅓ":"ㅝ","ㅜㅔ":"ㅞ","ㅜㅣ":"ㅟ","ㅡㅣ":"ㅢ"};
-var JONG_COMB = {"ㄱㅅ":"ㄳ","ㄴㅈ":"ㄵ","ㄴㅎ":"ㄶ","ㄹㄱ":"ㄺ","ㄹㅁ":"ㄻ","ㄹㅂ":"ㄼ","ㄹㅅ":"ㄽ","ㄹㅌ":"ㄾ","ㄹㅍ":"ㄿ","ㄹㅎ":"ㅀ","ㅂㅅ":"ㅄ"};
+  // ── 고객앱 화면 ──
+  function appHome(){ return (
+    '<div class="p"><div class="p-status"><span>9:41</span><span>● ● ●</span></div>'+
+    '<div class="p-body"><div class="p-h">내 포인트</div>'+
+    '<div class="pcard"><div class="ph">굿팜온누리약국</div><div class="pts"><b>1,250</b> P</div>'+
+    '<div class="pm">단골약국 · 마지막 적립 06.04</div><span class="pexp">120P · 14일 후 만료</span></div>'+
+    '<div class="pcard"><div class="ph">행복한약국</div><div class="pts"><b>480</b> P</div><div class="pm">단골약국</div></div>'+
+    '<button class="p-cta">바코드로 포인트 사용하기</button></div></div>'); }
+  function appBarcode(){ return (
+    '<div class="p"><div class="p-status"><span>9:41</span><span>● ● ●</span></div>'+
+    '<div class="p-body"><div class="p-h">바코드 제시</div>'+
+    '<div class="p-sub">약국 스캐너에 바코드를 보여주세요.<br>단골약국에서만 사용할 수 있어요.</div>'+
+    '<div class="barc"></div><div class="barno">9 4012 5837 0021</div>'+
+    '<div class="pcard" style="margin-top:16px"><div class="ph">굿팜온누리약국 (단골)</div>'+
+    '<div class="pts"><b>1,250</b> P</div><div class="pm">PIN 없이 바코드로 인증</div></div></div></div>'); }
+  function appHistory(){
+    var rows = [
+      ['earn','결제 적립','굿팜온누리약국 · 06.04','+120','plus'],
+      ['use','포인트 사용','굿팜온누리약국 · 05.28','-500','minus'],
+      ['earn','수동 조정','약국 어드민 · 05.20','+100','plus'],
+      ['exp','소멸','유효기간 만료 · 05.01','-50','minus']
+    ];
+    var body = rows.map(function(r){ return (
+      '<div class="hrow"><span class="hi '+r[0]+'">'+(r[0]==='earn'?'+':r[0]==='use'?'−':'×')+'</span>'+
+      '<div class="ht"><div class="t1">'+r[1]+'</div><div class="t2">'+r[2]+'</div></div>'+
+      '<span class="hv '+r[4]+'">'+r[3]+'P</span></div>'); }).join("");
+    return ('<div class="p"><div class="p-status"><span>9:41</span><span>● ● ●</span></div>'+
+      '<div class="p-body"><div class="p-h">포인트 이력</div><div class="p-sub">굿팜온누리약국</div>'+
+      '<div style="margin-top:10px">'+body+'</div></div></div>'); }
 
-function curSyl(){
-  if(cho<0 && jung<0) return "";
-  if(cho>=0 && jung>=0) return String.fromCharCode(0xAC00 + (cho*21 + jung)*28 + jong);
-  if(cho>=0) return CHO[cho];
-  return JUNG[jung];
-}
-function nameText(){ return nameCommitted + curSyl(); }
-function commit(){ nameCommitted += curSyl(); cho=-1; jung=-1; jong=0; }
-
-function putJamo(ch){
-  var ci = CHO.indexOf(ch), vi = JUNG.indexOf(ch), ji = JONG.indexOf(ch);
-  if(vi >= 0){                                   // 모음
-    if(cho>=0 && jung<0){ jung = vi; return; }
-    if(cho>=0 && jung>=0 && jong===0){           // 겹모음 시도
-      var comb = JUNG_COMB[JUNG[jung]+ch];
-      if(comb){ jung = JUNG.indexOf(comb); return; }
-      commit(); jung = vi; return;
-    }
-    if(cho>=0 && jung>=0 && jong>0){             // 받침을 다음 글자 초성으로 넘김
-      var js = JONG[jong], moveC, keep = 0;
-      var pair = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===js; })[0];
-      if(pair){ keep = JONG.indexOf(pair[0]); moveC = pair[1]; } else { moveC = js; }
-      jong = keep; commit();
-      cho = CHO.indexOf(moveC); jung = vi; return;
-    }
-    commit(); jung = vi; return;
+  // ── 키오스크 스텝퍼 ──
+  function steps(active){
+    var labels = ["시작","목록","결제","완료"];
+    return '<div class="k-steps">'+labels.map(function(l,i){
+      var c = i===active?' on':(i<active?' done':'');
+      return '<div class="k-step'+c+'"><span class="k-step-n">'+(i+1)+'</span>'+l+'</div>';
+    }).join("")+'</div>';
   }
-  if(ci >= 0 || ji >= 0){                        // 자음
-    if(cho<0 && jung<0){ cho = ci; return; }
-    if(cho>=0 && jung<0){ commit(); cho = ci; return; }
-    if(cho>=0 && jung>=0 && jong===0){
-      if(ji>0){ jong = ji; return; }
-      commit(); cho = ci; return;
-    }
-    var c2 = JONG_COMB[JONG[jong]+ch];
-    if(c2){ jong = JONG.indexOf(c2); return; }
-    commit(); cho = ci; return;
-  }
-  commit(); nameCommitted += ch;                 // 영문 등
-}
-function backspace(){
-  if(jong>0){ var p = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===JONG[jong]; })[0];
-    jong = p ? JONG.indexOf(p[0]) : 0; return; }
-  if(jung>=0){ var pv = Object.keys(JUNG_COMB).filter(function(k){ return JUNG_COMB[k]===JUNG[jung]; })[0];
-    jung = pv ? JUNG.indexOf(pv[0]) : -1; return; }
-  if(cho>=0){ cho = -1; return; }
-  nameCommitted = nameCommitted.slice(0,-1);
-}
 
-/* ── 자판 레이아웃 ── */
-var QW = [["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"],
-          ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"],
-          ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ"]];
-var QW_SHIFT = {"ㅂ":"ㅃ","ㅈ":"ㅉ","ㄷ":"ㄸ","ㄱ":"ㄲ","ㅅ":"ㅆ","ㅐ":"ㅒ","ㅔ":"ㅖ"};
-var EN = [["q","w","e","r","t","y","u","i","o","p"],
-          ["a","s","d","f","g","h","j","k","l"],
-          ["z","x","c","v","b","n","m"]];
-var CJ = [["ㅣ","ㆍ","ㅡ"],["ㄱㅋ","ㄴㄹ","ㄷㅌ"],["ㅂㅍ","ㅅㅎ","ㅈㅊ"],["ㅇㅁ","지움","전체삭제"]];
-var CJ_SET = {"ㄱㅋ":["ㄱ","ㅋ","ㄲ"],"ㄴㄹ":["ㄴ","ㄹ"],"ㄷㅌ":["ㄷ","ㅌ","ㄸ"],
-              "ㅂㅍ":["ㅂ","ㅍ","ㅃ"],"ㅅㅎ":["ㅅ","ㅎ","ㅆ"],"ㅈㅊ":["ㅈ","ㅊ","ㅉ"],"ㅇㅁ":["ㅇ","ㅁ"]};
-var CJ_V = {"ㅣ":"ㅣ","ㆍ":"","ㆍㆍ":"","ㅡ":"ㅡ","ㅣㆍ":"ㅏ","ㅣㆍㆍ":"ㅑ","ㆍㅣ":"ㅓ","ㆍㆍㅣ":"ㅕ","ㆍㅡ":"ㅗ","ㆍㆍㅡ":"ㅛ",
-           "ㅡㆍ":"ㅜ","ㅡㆍㆍ":"ㅠ","ㅣㆍㅣ":"ㅐ","ㆍㅣㅣ":"ㅔ","ㆍㅡㅣ":"ㅚ","ㅡㆍㅣ":"ㅟ","ㅡㅣ":"ㅢ"};
+  // 1 첫 화면
+  function kStart(){
+    var ch = [
+      ['약국 회원 결제','포인트를 적립하고 사용해요','❙❙❙','accent'],
+      ['비회원 결제','포인트 없이 바로 결제해요','🛒','plain'],
+      ['약국 회원가입','가입하고 포인트를 적립해요','🎁','gift']
+    ];
+    var cards = ch.map(function(c){ return (
+      '<button class="k-ch '+c[3]+'"><span class="k-ch-ic">'+c[2]+'</span>'+
+      '<span class="k-ch-tx"><b>'+c[0]+'</b><em>'+c[1]+'</em></span><span class="k-ch-go">›</span></button>'); }).join("");
+    return ('<div class="k"><div class="k-bar"><span class="k-logo">◍ 굿팜</span>'+steps(0)+'<span class="k-r"></span></div>'+
+      '<div class="k-start"><div class="k-scan"><div class="k-doc">처방전<span class="k-qrm"></span></div>'+
+      '<div class="k-scan-h">처방전 QR코드를<br>스캐너에 대주세요</div>'+
+      '<div class="k-scan-s">회원 인증과 결제가 한 번에 진행돼요</div><div class="k-arw">⌄</div></div>'+
+      '<div class="k-choices"><div class="k-lead">처방전이 없으신가요?<b>결제 방법을 선택해 주세요</b></div>'+cards+'</div></div></div>'); }
 
-/* ── 입력 처리 ── */
-function pressNum(k){
-  var t = focusField==="birth" ? birth : phone;
-  if(k==="지움") t = t.slice(0,-1);
-  else if(k==="전체삭제") t = "";
-  else if(t.length < (focusField==="birth"?8:11)) t += k;
-  if(focusField==="birth") birth = t; else phone = t;
-  render();
-}
-function pressHan(ch){
-  strokes++;
-  if(ch==="지움"){ backspace(); }
-  else if(ch==="전체삭제"){ nameCommitted=""; cho=-1; jung=-1; jong=0; cjBuf=""; cjKey=null; }
-  else if(ch==="⇧"){ shift = !shift; strokes--; }
-  else if(ch==="한/영"){ eng = !eng; strokes--; }
-  else if(eng){ cjKey=null; cjEmitted=false; putJamo(ch); }
-  else { cjKey=null; cjEmitted=false; putJamo(shift && QW_SHIFT[ch] ? QW_SHIFT[ch] : ch); shift=false; }
-  render();
-}
-function pressCj(label){
-  if(label==="지움"){ strokes++; cjKey=null; cjBuf=""; cjEmitted=false; backspace(); render(); return; }
-  if(label==="전체삭제"){ strokes++; nameCommitted=""; cho=-1; jung=-1; jong=0; cjBuf=""; cjKey=null; cjEmitted=false; render(); return; }
-  strokes++;
-  if(CJ_SET[label]){                                   // 자음 — 같은 키 반복 시 순환
-    var set = CJ_SET[label];
-    if(cjKey===label){ cjIdx = (cjIdx+1) % set.length; backspaceJamoOnly(); }
-    else { cjKey = label; cjIdx = 0; }
-    cjBuf = ""; cjEmitted = false; putJamo(set[cjIdx]); render(); return;
-  }
-  cjKey = null;                                        // 모음 — ㅣ ㆍ ㅡ 조합
-  var next = cjBuf + label, v = CJ_V[next];
-  if(v !== undefined){
-    if(cjEmitted) backspaceJamoOnly();
-    cjBuf = next; cjEmitted = !!v; if(v) putJamo(v);
-  } else {
-    cjBuf = label; var v2 = CJ_V[label]; cjEmitted = !!v2; if(v2) putJamo(v2);
-  }
-  render();
-}
-function backspaceJamoOnly(){ backspace(); }
-
-/* ── 렌더 ── */
-function fieldHtml(id, label, badge, value, placeholder){
-  var on = focusField===id && step===1 || (id==="phone" && step===0);
-  return '<div class="k-field'+(on?' on':'')+'" onclick="setFocus(\''+id+'\')">'+
-    '<span class="k-field-l">'+label+(badge||'')+'</span>'+
-    '<span class="k-field-v'+(value?'':' dim')+'">'+(value||placeholder)+(on?'<span class="k-cur"></span>':'')+'</span></div>';
-}
-function phoneView(){
-  var d = phone.padEnd(11,"_").split("");
-  return d.slice(0,3).join("")+" - "+d.slice(3,7).join("")+" - "+d.slice(7,11).join("");
-}
-function birthView(){ if(!birth) return ""; var d=birth.padEnd(8,"_").split("");
-  return d.slice(0,4).join("")+" - "+d.slice(4,6).join("")+" - "+d.slice(6,8).join(""); }
-
-function numPad(){
-  return '<div class="k-num">'+["1","2","3","4","5","6","7","8","9","지움","0","전체삭제"].map(function(k){
-    var fn=(k==="지움"||k==="전체삭제")?" fn":"";
-    return '<button class="key'+fn+'" onclick="pressNum(\''+k+'\')">'+k+'</button>'; }).join("")+'</div>';
-}
-function qwertyPad(withEn){
-  var rows = (eng ? EN : QW), out = "";
-  rows.forEach(function(r,i){
-    var keys = r.map(function(k){
-      var face = (!eng && shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k;
-      return '<button class="key" onclick="pressHan(\''+k+'\')">'+face+'</button>'; });
-    if(i===2){
-      if(withEn) keys.unshift('<button class="key fn'+(eng?' on':'')+'" onclick="pressHan(\'한/영\')">'+(eng?'한글':'ABC')+'</button>');
-      keys.unshift('<button class="key fn wide'+(shift?' on':'')+'" onclick="pressHan(\'⇧\')">'+(eng?'Shift ⇧':'쌍자음 ⇧')+'</button>');
-      keys.push('<button class="key fn wide" onclick="pressHan(\'지움\')">지움</button>');
-      keys.push('<button class="key fn wide" onclick="pressHan(\'전체삭제\')">전체삭제</button>');
-    }
-    out += '<div class="kb-row">'+keys.join("")+'</div>';
-  });
-  return out;
-}
-function cjPad(){
-  return '<div class="kb-cj">'+CJ.map(function(r){
-    return '<div class="kb-row">'+r.map(function(k){
-      var fn = (k==="지움"||k==="전체삭제")?" fn":"";
-      var face = CJ_SET[k] ? k.split("").join(" ") : k;
-      return '<button class="key'+fn+'" onclick="pressCj(\''+k+'\')">'+face+'</button>'; }).join("")+'</div>';
-  }).join("")+'</div><div class="kb-note">같은 키를 다시 누르면 다음 글자로 바뀝니다 (ㄱ → ㅋ → ㄲ)</div>';
-}
-
-function render(){
-  var v = VARIANTS[vIdx], bottom = (step===1 && v.key!=="cheonjiin");
-  var canSubmit = step===1 && nameText().length>0 && phone.length===11;
-  var head = step===0
-    ? '포인트 적립을 위한<br /><b>전화번호를 입력해 주세요</b>'
-    : '<b>이름을 입력해 주세요</b>';
-
-  var form =
-    '<div class="k-h">'+head+'</div>'+
-    fieldHtml("phone","전화번호",'<span class="k-req">필수</span>', step===0?phoneView():phone.replace(/(\d{3})(\d{4})(\d{4})/,"$1 - $2 - $3"), "010 - ____ - ____")+
-    (step===0 ? '<div class="k-help">이 번호로 적립 포인트를 안내해 드려요</div>' : '')+
-    fieldHtml("name","이름",'<span class="k-req">필수</span>', nameText(), "이름")+
-    (step===1 ? '<div class="k-help">생년월일·성별은 같은 화면에서 이어서 받습니다 (기존 입력 영역)</div>' : '')+
-    '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
-      '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">상세보기 ›</span></div>'+
-      '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용</span><span class="k-term-view">상세보기 ›</span></div>'+
-      '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>';
-
-  var pad;
-  if(step===0) pad = numPad();
-  else if(v.key==="cheonjiin") pad = cjPad();
-  else pad = qwertyPad(v.key==="qwertyEn");
-
-  document.getElementById("screen").innerHTML =
-    '<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+
+  // 2 약국 회원가입 — step 0: 전화번호, 1: 이름·생년월일·성별 (성별·생년월일은 키오스크 설정값)
+  function kSignup(step){
+    var phoneOn = step===0, infoOn = step===1;
+    var g1 = gender==='m'?' on':'', g2 = gender==='f'?' on':'';
+    var canSubmit = step===1 && gender!=='';
+    return ('<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+
       '<span class="k-chip">약국 회원가입 · '+(step+1)+' / 2 정보 입력</span><span class="k-r"></span></div>'+
-    '<div class="k-body '+(bottom?'bottom':'side')+'">'+
-      '<div class="k-form">'+form+'</div>'+
-      '<div class="k-pad"><div class="k-padwrap">'+pad+'</div>'+
-      '<div class="k-padfoot"><button class="k-cta"'+(canSubmit?'':' disabled')+'>약관 동의하고 가입하기</button></div></div>'+
-    '</div></div>';
+      '<div class="k-signup"><div class="k-form">'+
+      '<div class="k-h">'+(phoneOn
+        ? '포인트 적립을 위한<br><b>전화번호를 입력해 주세요</b>'
+        : '<b>이름과 생년월일·성별을 입력해 주세요</b>')+'</div>'+
+      '<div class="k-field'+(phoneOn?' on':'')+'"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
+        '<span class="k-field-v">010 - 1234 - <span class="k-cur">56</span><span class="k-dm">__</span></span></div>'+
+      (phoneOn ? '<div class="k-help">이 번호로 적립 포인트를 안내해 드려요</div>' : '')+
+      '<div class="k-subs">'+
+        '<div class="k-field sm'+(infoOn?' on':'')+'" style="flex:1"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
+        '<span class="k-field-v '+(infoOn?'':'dim')+'">'+(infoOn?'김지<span class="k-cur">수</span>':'이름')+'</span></div></div>'+
+      '<div class="k-subs">'+
+        '<div class="k-field sm" style="flex:1"><span class="k-field-l">생년월일 <span class="k-req">필수</span></span>'+
+        '<span class="k-field-v sm2 '+(infoOn?'':'dim')+'">'+(infoOn?'1990-03-11':'YYYY-MM-DD')+'</span></div>'+
+        '<div class="k-gender"><span class="k-field-l">성별 <span class="k-req">필수</span></span>'+
+        '<button class="k-gb'+g1+'" onclick="setGender(\'m\')">남자</button>'+
+        '<button class="k-gb'+g2+'" onclick="setGender(\'f\')">여자</button></div></div>'+
+      '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
+        '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">상세보기 ›</span></div>'+
+        '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용</span><span class="k-term-view">상세보기 ›</span></div>'+
+        '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>'+
+      '</div>'+
+      '<div class="k-pad-col"><div class="k-keypad">'+["1","2","3","4","5","6","7","8","9","지움","0","전체삭제"].map(function(k){
+        var fn = (k==="지움"||k==="전체삭제")?' fn':''; return '<button class="k-key'+fn+'">'+k+'</button>'; }).join("")+
+      '</div>'+
+      '<div class="k-padfoot">'+
+      '<button class="k-cta"'+(canSubmit?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
+      '</div></div></div>'); }
 
-  document.getElementById("cnt").textContent = strokes;
-  document.getElementById("devtag").textContent =
-    "KIOSK 720×460 · " + v.id + " " + v.lab + " · " + (bottom ? "자판 하단 전폭" : "입력기 우측 패널");
-  document.querySelectorAll(".st").forEach(function(b){ b.classList.toggle("on", +b.dataset.step===step); });
-  document.querySelectorAll(".tab").forEach(function(b,i){ b.classList.toggle("on", i===vIdx); });
-}
-function setFocus(f){ if(step===0 || f==="birth") return; focusField=f; render(); }
-function pickVariant(i){ vIdx=i; resetName(); render(); }
-function resetName(){ nameCommitted=""; cho=-1; jung=-1; jong=0; cjBuf=""; cjKey=null; cjEmitted=false; strokes=0; shift=false; eng=false; }
+  // 3 굿팜 앱 바코드 인증
+  function kAuth(tab){   // tab 0: 굿팜 앱 바코드, 1: 전화번호로 인증
+    var appOn = tab===0;
+    var right = appOn
+      ? '<div class="k-qrcard"><div class="k-qr"></div><div class="k-qr-t">앱 실행이 번거로우신가요?</div><div class="k-qr-b">QR로 굿팜앱 바코드를 바로 확인하세요!</div></div>'
+      : '<div class="k-qrcard"><div class="k-field on" style="width:88%"><span class="k-field-l">전화번호</span><span class="k-field-v">010 - 1234 - <span class="k-cur">5678</span></span></div><div class="k-qr-t" style="margin-top:8px">가입한 전화번호로 포인트를 적립해요</div></div>';
+    var main = appOn
+      ? '<div class="k-h c">굿팜앱을 실행하여<br><b>바코드를 준비해주세요</b></div>'+
+        '<div class="k-bigbar"><div class="k-bigbar-b"></div><div class="k-bigbar-n">GP 8801-2345-9789</div></div>'+
+        '<div class="k-arw2">화면 아래 스캐너에 바코드를 대주세요 ⌄</div>'
+      : '<div class="k-h c">가입한<br><b>전화번호를 입력해 주세요</b></div>'+
+        '<div class="k-bigbar" style="background:#f6f8f7;box-shadow:none"><div style="font-family:monospace;font-size:22px;font-weight:800;text-align:center;letter-spacing:.05em">010-1234-5678</div></div>'+
+        '<div class="k-arw2">키패드로 전화번호를 입력하세요</div>';
+    return ('<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+steps(0)+'<span class="k-tag">회원 인증</span></div>'+
+      '<div class="k-tabs"><button class="k-tab'+(!appOn?' on':'')+'" onclick="pickState(1)">전화번호로 인증</button>'+
+      '<button class="k-tab'+(appOn?' on':'')+'" onclick="pickState(0)">굿팜 앱 바코드 인증<span class="k-tab-b">+혜택</span></button></div>'+
+      '<div class="k-auth"><div class="k-authm">'+main+'</div>'+right+'</div></div>'); }
 
-document.getElementById("tabs").innerHTML = VARIANTS.map(function(v,i){
-  return '<div class="tab" onclick="pickVariant('+i+')"><span class="id">'+v.id+'</span>'+
-    '<span class="lab">'+v.lab+'</span><span class="note">'+v.note+'</span></div>'; }).join("");
-document.querySelectorAll(".st").forEach(function(b){
-  b.onclick = function(){ step = +b.dataset.step; focusField = step===0 ? "phone" : "name"; render(); }; });
-window.pressNum=pressNum; window.pressHan=pressHan; window.pressCj=pressCj;
-window.setFocus=setFocus; window.pickVariant=pickVariant;
-render();
+  // 4 상품 목록
+  function kCart(){
+    var items = [
+      ['타이레놀 500mg','7,000','1,000'],
+      ['비타민C 1000mg','14,000','1,000'],
+      ['마스크 KF94','2,300','300']
+    ];
+    var list = items.map(function(it){ return (
+      '<div class="k-it"><span class="k-it-tag">일반의약품</span>'+
+      '<div class="k-it-m"><div class="k-it-nm">'+it[0]+'</div>'+
+      '<div class="k-it-note">복용 전 약사 상담이 필요해요</div>'+
+      '<div class="k-it-pt">적립 예정 '+it[2]+'P</div></div>'+
+      '<div class="k-qty"><button>−</button><span>1</span><button>+</button></div>'+
+      '<div class="k-it-pr">'+it[1]+'<span class="k-it-u">원</span></div></div>'); }).join("");
+    return ('<div class="k"><div class="k-bar"><span class="k-back">← 처음으로</span>'+steps(1)+'<span class="k-member">👤 유종권 님</span></div>'+
+      '<div class="k-cart"><div class="k-list">'+list+'</div>'+
+      '<div class="k-foot"><div class="k-count">총 <b>'+items.length+'</b>개</div>'+
+      '<div class="k-total"><span class="k-total-l">총 결제 금액</span><span class="k-total-v">23,300원</span></div>'+
+      '<div class="k-pays"><button class="k-pay ghost">현금 결제</button><button class="k-pay">카드 결제 →</button></div></div></div></div>'); }
+
+  // 5 결제 완료
+  function kDone(){
+    return ('<div class="k"><div class="k-bar"><span class="k-logo">◍ 굿팜</span>'+steps(3)+'<span class="k-donebadge">● 결제 완료</span></div>'+
+      '<div class="k-done"><div class="k-done-l"><div class="k-check">✓</div>'+
+      '<div class="k-done-h">결제가 완료되었어요</div>'+
+      '<div class="k-done-g">약사님께 결제 완료 사실을 알려주세요</div>'+
+      '<div class="k-earn"><span class="k-earn-ic">🎁</span><div><div class="k-earn-v">750P 적립 완료</div>'+
+      '</div></div></div>'+
+      '<div class="k-rc"><div class="k-rc-r"><span>구매 상품</span><b>처방전 외 2건</b></div>'+
+      '<div class="k-rc-r"><span>결제 정보</span><b>카드 결제 · 일시불</b></div><div class="k-rc-d"></div>'+
+      '<div class="k-rc-r"><span>상품 합계</span><span>43,700원</span></div>'+
+      '<div class="k-rc-r use"><span>포인트 사용</span><span>− 1,500P</span></div>'+
+      '<div class="k-rc-t"><span>결제 금액</span><b>42,200원</b></div></div></div>'+
+      '<button class="k-home">처음 화면으로 돌아가기</button></div>'); }
+
+  // ── POS ──
+  function posPay(){
+    return ('<div class="pos"><div class="pos-l"><div class="pos-t">결제 항목</div>'+
+      '<div class="pos-li"><span>타이레놀 500mg</span><span>2,100</span></div>'+
+      '<div class="pos-li"><span>비타민C 1000mg</span><span>14,000</span></div>'+
+      '<div class="pos-li"><span>마스크 KF94</span><span>2,300</span></div>'+
+      '<div class="pos-tot"><span class="pos-t" style="margin:0">합계</span><span class="v">18,400원</span></div></div>'+
+      '<div class="pos-r"><div class="pos-cust"><div class="nm">김○○ 고객</div><span class="pos-vf">✓ 굿팜 앱 바코드 인증됨</span></div>'+
+      '<div class="pos-pt"><div class="row"><span>보유 포인트</span><b>1,250 P</b></div>'+
+      '<div class="row use"><span>사용</span><b>− 500 P</b></div>'+
+      '<div class="row"><span>적립 예정</span><b>+ 120 P</b></div></div>'+
+      '<button class="pos-btn">17,900원 결제</button></div></div>'); }
+
+  // ── 화면 레지스트리 ──
+  var gender = "";        // 성별 선택 상태(회원가입)
+  var SCREENS = [
+    { id:"A-1", name:"포인트 홈", group:"고객앱", device:"phone", states:["기본"], render:function(){ return appHome(); } },
+    { id:"A-2", name:"바코드 제시", group:"고객앱", device:"phone", states:["기본"], render:function(){ return appBarcode(); } },
+    { id:"A-3", name:"포인트 이력", group:"고객앱", device:"phone", states:["기본"], render:function(){ return appHistory(); } },
+    { id:"K-1", name:"첫 화면", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kStart(); } },
+    { id:"K-2", name:"약국 회원가입", group:"키오스크", device:"kiosk", states:["① 전화번호 입력","② 이름·생년월일·성별"], render:function(s){ return kSignup(s); } },
+    { id:"K-3", name:"굿팜 앱 바코드 인증", group:"키오스크", device:"kiosk", states:["굿팜 앱 바코드","전화번호로 인증"], render:function(s){ return kAuth(s); } },
+    { id:"K-4", name:"상품 목록", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kCart(); } },
+    { id:"K-5", name:"결제 완료", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kDone(); } },
+    { id:"P-1", name:"포인트 결제", group:"POS", device:"pos", states:["기본"], render:function(){ return posPay(); } }
+  ];
+  var GROUPS = ["고객앱","키오스크","POS"];
+  var si = 3, sti = 0;   // 기본 = 키오스크 첫 화면
+
+  function renderNav(){
+    $("nav").innerHTML = GROUPS.map(function(g){
+      var rows = SCREENS.map(function(s,i){
+        return s.group===g
+          ? '<button class="sc'+(i===si?' on':'')+'" onclick="pickScreen('+i+')"><span class="id">'+s.id+'</span><span class="lab">'+s.name+'</span></button>'
+          : ""; }).join("");
+      return '<div class="grp"><span class="grp-h">'+g+'</span>'+rows+'</div>';
+    }).join("");
+  }
+  function renderStates(){
+    var s = SCREENS[si];
+    var multi = s.states.length>1;
+    $("states").innerHTML = multi
+      ? s.states.map(function(st,i){ return '<button class="st'+(i===sti?' on':'')+'" onclick="pickState('+i+')">'+st+'</button>'; }).join("")
+      : '<span style="font-size:12px;color:var(--faint)">단일 상태</span>';
+  }
+  function renderVp(){
+    var s = SCREENS[si];
+    $("device").className = "device "+s.device;
+    $("vp").innerHTML = s.render(sti);
+    $("tag").textContent = s.group+" · "+s.name+(s.states.length>1? " · "+s.states[sti] : "");
+    requestAnimationFrame(postHeight);
+  }
+  function pickScreen(i){ si=i; sti=0; if(SCREENS[i].id!=="K-2"){ gender=""; } renderNav(); renderStates(); renderVp(); }
+  function pickState(i){ sti=i; if(SCREENS[si].id==="K-2" && i===0){ gender=""; } renderStates(); renderVp(); }
+  function setGender(g){ gender=g; renderVp(); }
+
+  function postHeight(){
+    var h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    if (window.parent !== window) window.parent.postMessage({ type:"embed-height", height:h }, "*");
+  }
+  window.pickScreen = pickScreen; window.pickState = pickState; window.setGender = setGender;
+
+  renderNav(); renderStates(); renderVp();
+  window.addEventListener("load", postHeight);
+  if (window.ResizeObserver){ new ResizeObserver(postHeight).observe(document.body); }
 </script>
 </body>
 </html>
