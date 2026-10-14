@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>약국 포인트 · 키오스크 회원가입 자판 비교</title>
+<style>
+  :root{
+    --ink:#1b2422; --soft:#62706d; --faint:#97a3a0; --line:#e2e8e6; --paper:#fff; --field:#f3f7f6; --bg:#eef2f1;
+    --teal:#0a9a92; --teal-d:#077a73; --teal-bg:#e6f5f3;
+    --pt:#d8401a; --pt-bg:#fbeae4;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);padding:24px 20px 60px;font-size:14px}
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .sub{font-size:12.5px;color:var(--soft);margin-top:5px;line-height:1.55}
+  .sub b{color:var(--ink)}
+
+  .tabs{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
+  .tab{cursor:pointer;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 14px;
+    display:flex;flex-direction:column;gap:2px;min-width:180px}
+  .tab:hover{border-color:var(--teal)}
+  .tab.on{border-color:var(--teal);background:var(--teal-bg)}
+  .tab .id{font-family:var(--mono);font-size:10px;color:var(--faint);font-weight:700}
+  .tab.on .id{color:var(--teal-d)}
+  .tab .lab{font-size:13px;font-weight:800}
+  .tab .note{font-size:10.5px;color:var(--soft)}
+
+  .states-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--faint);margin:20px 0 8px}
+  .states{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .st{font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--paper);color:var(--soft);cursor:pointer}
+  .st.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .count{margin-left:auto;font-size:11.5px;color:var(--soft);font-weight:700}
+  .count b{font-family:var(--mono);color:var(--pt);font-size:13px}
+
+  .stage{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .device{background:#12201d;border-radius:16px;padding:8px;box-shadow:0 26px 54px -26px rgba(15,26,24,.5)}
+  .screen{overflow:hidden;position:relative;width:720px;height:460px;border-radius:10px;background:#f6f8f7}
+  .dev-tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em}
+
+  /* ── 키오스크 화면 ── */
+  .k{position:absolute;inset:0;display:flex;flex-direction:column;background:#f6f8f7}
+  .k-bar{height:42px;flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;background:#fff;border-bottom:1px solid var(--line)}
+  .k-back{font-size:12.5px;color:var(--soft);font-weight:600;flex:none}
+  .k-chip{margin:0 auto;font-size:11.5px;font-weight:700;color:var(--soft);background:var(--field);padding:5px 12px;border-radius:999px}
+  .k-r{flex:none;min-width:40px}
+
+  .k-body{flex:1;display:flex;min-height:0}
+  .k-body.side{flex-direction:row}
+  .k-body.bottom{flex-direction:column}
+
+  .k-form{padding:14px 16px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+  .k-body.side .k-form{flex:1.25;min-width:0}
+  .k-body.bottom .k-form{flex:none;display:grid;grid-template-columns:1.15fr 1fr;gap:6px 16px;align-items:start;padding:10px 16px 4px}
+  .k-body.bottom .k-form > .k-field,
+  .k-body.bottom .k-form > .k-help{grid-column:1}
+  .k-body.bottom .k-form > .k-terms{grid-column:2;grid-row:2 / span 5;align-self:start;margin-top:0;padding-top:0;border-top:none}
+  .k-body.bottom .k-field{padding:7px 12px}
+  .k-body.bottom .k-field-v{font-size:16px}
+  .k-body.bottom .key{min-height:31px;font-size:13.5px}
+  .k-body.bottom .k-padwrap{padding:6px 14px 4px;gap:4px;justify-content:flex-start}
+  .k-body.bottom .k-padfoot{padding:0 14px 10px}
+  .k-h{font-size:16px;font-weight:700;line-height:1.3;color:var(--soft)}
+  .k-h b{color:var(--ink);font-weight:800}
+  .k-body.bottom .k-h{grid-column:1 / -1;font-size:15px}
+
+  .k-field{border:1.5px solid var(--line);border-radius:11px;padding:9px 13px;background:#fff;display:flex;flex-direction:column;gap:2px;cursor:pointer}
+  .k-field.on{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,154,146,.1)}
+  .k-field-l{font-size:10px;color:var(--soft);font-weight:700;display:flex;align-items:center;gap:4px}
+  .k-field-v{font-size:18px;font-weight:800;letter-spacing:.03em;min-height:22px}
+  .k-field-v.dim{font-size:13.5px;color:var(--faint);font-weight:700}
+  .k-cur{border-bottom:2px solid var(--teal);padding-bottom:1px}
+  .k-dm{color:var(--faint)}
+  .k-help{font-size:10.5px;color:var(--teal-d);font-weight:600}
+  .k-req{font-size:9px;font-weight:800;color:#fff;background:var(--pt);padding:1.5px 6px;border-radius:999px}
+  .k-opt{font-size:9px;font-weight:800;color:var(--soft);background:#eef1f4;padding:1.5px 6px;border-radius:999px}
+
+  .k-terms{display:flex;flex-direction:column;gap:5px;margin-top:3px;padding-top:9px;border-top:1px solid var(--line)}
+  .k-body.bottom .k-terms{grid-column:1 / -1;margin-top:0}
+  .k-terms-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800}
+  .k-term{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .k-term-t{font-size:12px;font-weight:600}
+  .k-term-t b{color:var(--soft);font-weight:700;margin-right:3px}
+  .k-term-view{flex:none;font-size:10.5px;color:var(--soft);background:var(--field);padding:3px 9px;border-radius:7px}
+  .k-term-note{font-size:9.5px;color:var(--soft)}
+
+  /* 입력기 패널 */
+  .k-pad{background:#eef2f1;display:flex;flex-direction:column;min-height:0}
+  .k-body.side .k-pad{flex:1;min-width:0}
+  .k-body.bottom .k-pad{flex:1;border-top:1px solid var(--line)}
+  .k-padwrap{flex:1;padding:12px 14px 8px;display:flex;flex-direction:column;justify-content:center;gap:6px;min-height:0}
+  .k-padfoot{padding:0 14px 14px}
+  .k-cta{width:100%;height:46px;border-radius:12px;background:var(--teal);color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer}
+  .k-cta:disabled{background:#d7dedc;color:#9aa6a3;cursor:not-allowed}
+
+  .k-num{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:center;flex:1;padding:4px 0}
+  .kb-row{display:flex;gap:5px;justify-content:center}
+  .key{border:none;border-radius:9px;background:#fff;box-shadow:0 1px 2px rgba(15,26,24,.07);font-size:15px;font-weight:700;
+    color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:38px;flex:1;user-select:none}
+  .key:active{background:var(--teal-bg)}
+  .key.fn{font-size:11.5px;color:var(--soft);background:var(--field);box-shadow:none}
+  .key.on{background:var(--teal);color:#fff}
+  .key.wide{flex:1.6}
+  .k-num .key{min-height:46px;font-size:18px}
+  .kb-cj .key{min-height:46px;font-size:15px;line-height:1.15}
+  .kb-note{font-size:10px;color:var(--soft);text-align:center}
+
+  .cmp{margin-top:26px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .cmp h2{font-size:14px;font-weight:800;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;color:var(--soft);font-weight:800;background:var(--field)}
+  td b{color:var(--ink)}
+  .tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--teal-bg);color:var(--teal-d)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>키오스크 약국 회원가입 — 이름 입력 자판 비교</h1>
+  <p class="sub">
+    변경 요청 반영: <b>이름 필수 · 생년월일 선택 · 성별 제외</b>.<br />
+    자판을 골라 ②단계에서 <b>직접 입력</b>해 보세요. 입력 타수가 우측 상단에 집계됩니다. 화면 비율은 720×460 기준입니다.<br />
+    이 비교는 <b>이름 입력 자판</b>만 다룹니다. 생년월일·성별 입력은 기존 화면을 그대로 씁니다.
+  </p>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="states-h">상태</div>
+  <div class="states">
+    <button class="st" data-step="0">① 전화번호 입력</button>
+    <button class="st" data-step="1">② 이름 입력</button>
+    <span class="count">이름 입력 타수 <b id="cnt">0</b> 타</span>
+  </div>
+
+  <div class="stage">
+    <div class="device"><div class="screen" id="screen"></div></div>
+    <div class="dev-tag" id="devtag"></div>
+  </div>
+
+  <div class="cmp">
+    <h2>세 안 비교</h2>
+    <table>
+      <thead><tr><th style="width:92px">안</th><th style="width:110px">배치</th><th>장점</th><th>단점 · 확인 필요</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>A 쿼티 두벌식</b><br /><span class="tag">권장</span></td>
+          <td>자판이 <b>하단 전폭</b>으로 내려오고 폼은 상단 2열</td>
+          <td>PC·휴대폰과 같은 배열이라 설명이 필요 없다. 이름 3글자 기준 <b>7타</b>로 가장 짧다.</td>
+          <td>키 10열이 들어가야 해서 ②단계에서 <b>레이아웃이 바뀐다</b>(우측 패널 → 하단 전폭). 폼이 2열로 재배치된다.</td>
+        </tr>
+        <tr>
+          <td><b>B 천지인</b></td>
+          <td>현재 숫자 키패드 자리 <b>그대로</b>(우측 3×4)</td>
+          <td>레이아웃 변경이 없다. 키가 커서 터치 정확도가 높고 고령 고객에게 익숙하다.</td>
+          <td>이름 3글자 기준 <b>9~11타</b>로 입력이 길다. 같은 키를 반복해 글자를 바꾸는 방식이라 안내 문구가 필요하다.</td>
+        </tr>
+        <tr>
+          <td><b>C 쿼티 + 한/영</b></td>
+          <td>A와 동일 + <b>한/영 전환키</b></td>
+          <td>외국인 이름·영문 표기를 받을 수 있다.</td>
+          <td>전환 상태를 고객이 인지해야 한다. 개발 범위가 가장 크고, 영문 이름 저장 규칙(표기·정렬)이 따로 필요하다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/* ── 상태 ── */
+var VARIANTS = [
+  { id:"A", key:"qwerty",   lab:"쿼티 두벌식",    note:"하단 전폭 자판" },
+  { id:"B", key:"cheonjiin",lab:"천지인 3×4",     note:"현재 키패드 자리 유지" },
+  { id:"C", key:"qwertyEn", lab:"쿼티 + 한/영",   note:"영문 입력 지원" }
+];
+var vIdx = 0, step = 0, focusField = "phone", strokes = 0;
+var phone = "01012345", birth = "", shift = false, eng = false;
+var nameCommitted = "", cho = -1, jung = -1, jong = 0, cjBuf = "", cjKey = null, cjIdx = 0, cjEmitted = false;
+
+/* ── 한글 조합 ── */
+var CHO  = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ".split("");
+var JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".split("");
+var JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+var JUNG_COMB = {"ㅗㅏ":"ㅘ","ㅗㅐ":"ㅙ","ㅗㅣ":"ㅚ","ㅜㅓ":"ㅝ","ㅜㅔ":"ㅞ","ㅜㅣ":"ㅟ","ㅡㅣ":"ㅢ"};
+var JONG_COMB = {"ㄱㅅ":"ㄳ","ㄴㅈ":"ㄵ","ㄴㅎ":"ㄶ","ㄹㄱ":"ㄺ","ㄹㅁ":"ㄻ","ㄹㅂ":"ㄼ","ㄹㅅ":"ㄽ","ㄹㅌ":"ㄾ","ㄹㅍ":"ㄿ","ㄹㅎ":"ㅀ","ㅂㅅ":"ㅄ"};
+
+function curSyl(){
+  if(cho<0 && jung<0) return "";
+  if(cho>=0 && jung>=0) return String.fromCharCode(0xAC00 + (cho*21 + jung)*28 + jong);
+  if(cho>=0) return CHO[cho];
+  return JUNG[jung];
+}
+function nameText(){ return nameCommitted + curSyl(); }
+function commit(){ nameCommitted += curSyl(); cho=-1; jung=-1; jong=0; }
+
+function putJamo(ch){
+  var ci = CHO.indexOf(ch), vi = JUNG.indexOf(ch), ji = JONG.indexOf(ch);
+  if(vi >= 0){                                   // 모음
+    if(cho>=0 && jung<0){ jung = vi; return; }
+    if(cho>=0 && jung>=0 && jong===0){           // 겹모음 시도
+      var comb = JUNG_COMB[JUNG[jung]+ch];
+      if(comb){ jung = JUNG.indexOf(comb); return; }
+      commit(); jung = vi; return;
+    }
+    if(cho>=0 && jung>=0 && jong>0){             // 받침을 다음 글자 초성으로 넘김
+      var js = JONG[jong], moveC, keep = 0;
+      var pair = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===js; })[0];
+      if(pair){ keep = JONG.indexOf(pair[0]); moveC = pair[1]; } else { moveC = js; }
+      jong = keep; commit();
+      cho = CHO.indexOf(moveC); jung = vi; return;
+    }
+    commit(); jung = vi; return;
+  }
+  if(ci >= 0 || ji >= 0){                        // 자음
+    if(cho<0 && jung<0){ cho = ci; return; }
+    if(cho>=0 && jung<0){ commit(); cho = ci; return; }
+    if(cho>=0 && jung>=0 && jong===0){
+      if(ji>0){ jong = ji; return; }
+      commit(); cho = ci; return;
+    }
+    var c2 = JONG_COMB[JONG[jong]+ch];
+    if(c2){ jong = JONG.indexOf(c2); return; }
+    commit(); cho = ci; return;
+  }
+  commit(); nameCommitted += ch;                 // 영문 등
+}
+function backspace(){
+  if(jong>0){ var p = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===JONG[jong]; })[0];
+    jong = p ? JONG.indexOf(p[0]) : 0; return; }
+  if(jung>=0){ var pv = Object.keys(JUNG_COMB).filter(function(k){ return JUNG_COMB[k]===JUNG[jung]; })[0];
+    jung = pv ? JUNG.indexOf(pv[0]) : -1; return; }
+  if(cho>=0){ cho = -1; return; }
+  nameCommitted = nameCommitted.slice(0,-1);
+}
+
+/* ── 자판 레이아웃 ── */
+var QW = [["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"],
+          ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"],
+          ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ"]];
+var QW_SHIFT = {"ㅂ":"ㅃ","ㅈ":"ㅉ","ㄷ":"ㄸ","ㄱ":"ㄲ","ㅅ":"ㅆ","ㅐ":"ㅒ","ㅔ":"ㅖ"};
+var EN = [["q","w","e","r","t","y","u","i","o","p"],
+          ["a","s","d","f","g","h","j","k","l"],
+          ["z","x","c","v","b","n","m"]];
+var CJ = [["ㅣ","ㆍ","ㅡ"],["ㄱㅋ","ㄴㄹ","ㄷㅌ"],["ㅂㅍ","ㅅㅎ","ㅈㅊ"],["ㅇㅁ","지움","전체삭제"]];
+var CJ_SET = {"ㄱㅋ":["ㄱ","ㅋ","ㄲ"],"ㄴㄹ":["ㄴ","ㄹ"],"ㄷㅌ":["ㄷ","ㅌ","ㄸ"],
+              "ㅂㅍ":["ㅂ","ㅍ","ㅃ"],"ㅅㅎ":["ㅅ","ㅎ","ㅆ"],"ㅈㅊ":["ㅈ","ㅊ","ㅉ"],"ㅇㅁ":["ㅇ","ㅁ"]};
+var CJ_V = {"ㅣ":"ㅣ","ㆍ":"","ㆍㆍ":"","ㅡ":"ㅡ","ㅣㆍ":"ㅏ","ㅣㆍㆍ":"ㅑ","ㆍㅣ":"ㅓ","ㆍㆍㅣ":"ㅕ","ㆍㅡ":"ㅗ","ㆍㆍㅡ":"ㅛ",
+           "ㅡㆍ":"ㅜ","ㅡㆍㆍ":"ㅠ","ㅣㆍㅣ":"ㅐ","ㆍㅣㅣ":"ㅔ","ㆍㅡㅣ":"ㅚ","ㅡㆍㅣ":"ㅟ","ㅡㅣ":"ㅢ"};
+
+/* ── 입력 처리 ── */
+function pressNum(k){
+  var t = focusField==="birth" ? birth : phone;
+  if(k==="지움") t = t.slice(0,-1);
+  else if(k==="전체삭제") t = "";
+  else if(t.length < (focusField==="birth"?8:11)) t += k;
+  if(focusField==="birth") birth = t; else phone = t;
+  render();
+}
+function pressHan(ch){
+  strokes++;
+  if(ch==="지움"){ backspace(); }
+  else if(ch==="전체삭제"){ nameCommitted=""; cho=-1; jung=-1; jong=0; cjBuf=""; cjKey=null; }
+  else if(ch==="⇧"){ shift = !shift; strokes--; }
+  else if(ch==="한/영"){ eng = !eng; strokes--; }
+  else if(eng){ cjKey=null; cjEmitted=false; putJamo(ch); }
+  else { cjKey=null; cjEmitted=false; putJamo(shift && QW_SHIFT[ch] ? QW_SHIFT[ch] : ch); shift=false; }
+  render();
+}
+function pressCj(label){
+  if(label==="지움"){ strokes++; cjKey=null; cjBuf=""; cjEmitted=false; backspace(); render(); return; }
+  if(label==="전체삭제"){ strokes++; nameCommitted=""; cho=-1; jung=-1; jong=0; cjBuf=""; cjKey=null; cjEmitted=false; render(); return; }
+  strokes++;
+  if(CJ_SET[label]){                                   // 자음 — 같은 키 반복 시 순환
+    var set = CJ_SET[label];
+    if(cjKey===label){ cjIdx = (cjIdx+1) % set.length; backspaceJamoOnly(); }
+    else { cjKey = label; cjIdx = 0; }
+    cjBuf = ""; cjEmitted = false; putJamo(set[cjIdx]); render(); return;
+  }
+  cjKey = null;                                        // 모음 — ㅣ ㆍ ㅡ 조합
+  var next = cjBuf + label, v = CJ_V[next];
+  if(v !== undefined){
+    if(cjEmitted) backspaceJamoOnly();
+    cjBuf = next; cjEmitted = !!v; if(v) putJamo(v);
+  } else {
+    cjBuf = label; var v2 = CJ_V[label]; cjEmitted = !!v2; if(v2) putJamo(v2);
+  }
+  render();
+}
+function backspaceJamoOnly(){ backspace(); }
+
+/* ── 렌더 ── */
+function fieldHtml(id, label, badge, value, placeholder){
+  var on = focusField===id && step===1 || (id==="phone" && step===0);
+  return '<div class="k-field'+(on?' on':'')+'" onclick="setFocus(\''+id+'\')">'+
+    '<span class="k-field-l">'+label+(badge||'')+'</span>'+
+    '<span class="k-field-v'+(value?'':' dim')+'">'+(value||placeholder)+(on?'<span class="k-cur"></span>':'')+'</span></div>';
+}
+function phoneView(){
+  var d = phone.padEnd(11,"_").split("");
+  return d.slice(0,3).join("")+" - "+d.slice(3,7).join("")+" - "+d.slice(7,11).join("");
+}
+function birthView(){ if(!birth) return ""; var d=birth.padEnd(8,"_").split("");
+  return d.slice(0,4).join("")+" - "+d.slice(4,6).join("")+" - "+d.slice(6,8).join(""); }
+
+function numPad(){
+  return '<div class="k-num">'+["1","2","3","4","5","6","7","8","9","지움","0","전체삭제"].map(function(k){
+    var fn=(k==="지움"||k==="전체삭제")?" fn":"";
+    return '<button class="key'+fn+'" onclick="pressNum(\''+k+'\')">'+k+'</button>'; }).join("")+'</div>';
+}
+function qwertyPad(withEn){
+  var rows = (eng ? EN : QW), out = "";
+  rows.forEach(function(r,i){
+    var keys = r.map(function(k){
+      var face = (!eng && shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k;
+      return '<button class="key" onclick="pressHan(\''+k+'\')">'+face+'</button>'; });
+    if(i===2){
+      if(withEn) keys.unshift('<button class="key fn'+(eng?' on':'')+'" onclick="pressHan(\'한/영\')">'+(eng?'한글':'ABC')+'</button>');
+      keys.unshift('<button class="key fn wide'+(shift?' on':'')+'" onclick="pressHan(\'⇧\')">'+(eng?'Shift ⇧':'쌍자음 ⇧')+'</button>');
+      keys.push('<button class="key fn wide" onclick="pressHan(\'지움\')">지움</button>');
+      keys.push('<button class="key fn wide" onclick="pressHan(\'전체삭제\')">전체삭제</button>');
+    }
+    out += '<div class="kb-row">'+keys.join("")+'</div>';
+  });
+  return out;
+}
+function cjPad(){
+  return '<div class="kb-cj">'+CJ.map(function(r){
+    return '<div class="kb-row">'+r.map(function(k){
+      var fn = (k==="지움"||k==="전체삭제")?" fn":"";
+      var face = CJ_SET[k] ? k.split("").join(" ") : k;
+      return '<button class="key'+fn+'" onclick="pressCj(\''+k+'\')">'+face+'</button>'; }).join("")+'</div>';
+  }).join("")+'</div><div class="kb-note">같은 키를 다시 누르면 다음 글자로 바뀝니다 (ㄱ → ㅋ → ㄲ)</div>';
+}
+
+function render(){
+  var v = VARIANTS[vIdx], bottom = (step===1 && v.key!=="cheonjiin");
+  var canSubmit = step===1 && nameText().length>0 && phone.length===11;
+  var head = step===0
+    ? '포인트 적립을 위한<br /><b>전화번호를 입력해 주세요</b>'
+    : '<b>이름을 입력해 주세요</b>';
+
+  var form =
+    '<div class="k-h">'+head+'</div>'+
+    fieldHtml("phone","전화번호",'<span class="k-req">필수</span>', step===0?phoneView():phone.replace(/(\d{3})(\d{4})(\d{4})/,"$1 - $2 - $3"), "010 - ____ - ____")+
+    (step===0 ? '<div class="k-help">이 번호로 적립 포인트를 안내해 드려요</div>' : '')+
+    fieldHtml("name","이름",'<span class="k-req">필수</span>', nameText(), "이름")+
+    (step===1 ? '<div class="k-help">생년월일·성별은 다음 화면에서 받습니다 (기존 화면)</div>' : '')+
+    '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
+      '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">상세보기 ›</span></div>'+
+      '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용</span><span class="k-term-view">상세보기 ›</span></div>'+
+      '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>';
+
+  var pad;
+  if(step===0) pad = numPad();
+  else if(v.key==="cheonjiin") pad = cjPad();
+  else pad = qwertyPad(v.key==="qwertyEn");
+
+  document.getElementById("screen").innerHTML =
+    '<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+
+      '<span class="k-chip">약국 회원가입 · '+(step+1)+' / 2 정보 입력</span><span class="k-r"></span></div>'+
+    '<div class="k-body '+(bottom?'bottom':'side')+'">'+
+      '<div class="k-form">'+form+'</div>'+
+      '<div class="k-pad"><div class="k-padwrap">'+pad+'</div>'+
+      '<div class="k-padfoot"><button class="k-cta"'+(canSubmit?'':' disabled')+'>약관 동의하고 가입하기</button></div></div>'+
+    '</div></div>';
+
+  document.getElementById("cnt").textContent = strokes;
+  document.getElementById("devtag").textContent =
+    "KIOSK 720×460 · " + v.id + " " + v.lab + " · " + (bottom ? "자판 하단 전폭" : "입력기 우측 패널");
+  document.querySelectorAll(".st").forEach(function(b){ b.classList.toggle("on", +b.dataset.step===step); });
+  document.querySelectorAll(".tab").forEach(function(b,i){ b.classList.toggle("on", i===vIdx); });
+}
+function setFocus(f){ if(step===0 || f==="birth") return; focusField=f; render(); }
+function pickVariant(i){ vIdx=i; resetName(); render(); }
+function resetName(){ nameCommitted=""; cho=-1; jung=-1; jong=0; cjBuf=""; cjKey=null; cjEmitted=false; strokes=0; shift=false; eng=false; }
+
+document.getElementById("tabs").innerHTML = VARIANTS.map(function(v,i){
+  return '<div class="tab" onclick="pickVariant('+i+')"><span class="id">'+v.id+'</span>'+
+    '<span class="lab">'+v.lab+'</span><span class="note">'+v.note+'</span></div>'; }).join("");
+document.querySelectorAll(".st").forEach(function(b){
+  b.onclick = function(){ step = +b.dataset.step; focusField = step===0 ? "phone" : "name"; render(); }; });
+window.pressNum=pressNum; window.pressHan=pressHan; window.pressCj=pressCj;
+window.setFocus=setFocus; window.pickVariant=pickVariant;
+render();
+</script>
+</body>
+</html>
