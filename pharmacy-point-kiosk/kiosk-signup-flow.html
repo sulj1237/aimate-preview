@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>약국 포인트 · 키오스크 회원가입 입력 방식 2안 비교</title>
+<style>
+  :root{
+    --ink:#1b2422; --soft:#62706d; --faint:#97a3a0; --line:#e2e8e6; --paper:#fff; --field:#f3f7f6; --bg:#eef2f1;
+    --teal:#0a9a92; --teal-d:#077a73; --teal-bg:#e6f5f3;
+    --pt:#d8401a; --pt-bg:#fbeae4;
+    --sans:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);padding:24px 20px 60px;font-size:14px}
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .sub{font-size:12.5px;color:var(--soft);margin-top:5px;line-height:1.55}
+  .sub b{color:var(--ink)}
+  .back{display:inline-block;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--teal-d);text-decoration:none}
+
+  .tabs{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
+  .tab{cursor:pointer;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 14px;
+    display:flex;flex-direction:column;gap:2px;min-width:230px;text-align:left}
+  .tab:hover{border-color:var(--teal)}
+  .tab.on{border-color:var(--teal);background:var(--teal-bg)}
+  .tab .id{font-family:var(--mono);font-size:10px;color:var(--faint);font-weight:700}
+  .tab.on .id{color:var(--teal-d)}
+  .tab .lab{font-size:13px;font-weight:800}
+  .tab .note{font-size:10.5px;color:var(--soft)}
+
+  .states-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--faint);margin:20px 0 8px}
+  .states{display:flex;gap:7px;align-items:center;flex-wrap:wrap;min-height:30px}
+  .st{font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--paper);color:var(--soft);cursor:pointer}
+  .st.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .count{margin-left:auto;font-size:11.5px;color:var(--soft);font-weight:700}
+  .count b{font-family:var(--mono);color:var(--pt);font-size:13px}
+
+  .stage{margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:9px}
+  .device{background:#12201d;border-radius:16px;padding:8px;box-shadow:0 26px 54px -26px rgba(15,26,24,.5)}
+  .screen{overflow:hidden;position:relative;width:720px;height:460px;border-radius:10px;background:#f6f8f7}
+  .dev-tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em}
+
+  /* ── 키오스크 공통 ── */
+  .k{position:absolute;inset:0;display:flex;flex-direction:column;background:#f6f8f7}
+  .k-bar{height:42px;flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;background:#fff;border-bottom:1px solid var(--line)}
+  .k-back{font-size:12.5px;color:var(--soft);font-weight:600;flex:none}
+  .k-chip{margin:0 auto;font-size:11.5px;font-weight:700;color:var(--soft);background:var(--field);padding:5px 12px;border-radius:999px}
+  .k-r{flex:none;min-width:40px}
+  .k-body{flex:1;position:relative;min-height:0;overflow:hidden}
+  .k-scroll{position:absolute;inset:0;padding:13px 16px;display:flex;flex-direction:column;gap:7px}
+
+  .k-h{font-size:15px;font-weight:700;line-height:1.3;color:var(--soft)}
+  .k-h b{color:var(--ink);font-weight:800}
+  .k-field{border:1.5px solid var(--line);border-radius:11px;padding:8px 13px;background:#fff;
+    display:flex;flex-direction:column;gap:2px;cursor:pointer}
+  .k-field.on{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,154,146,.1)}
+  .k-field-l{font-size:9.5px;color:var(--soft);font-weight:700}
+  .k-field-v{font-size:17px;font-weight:800;letter-spacing:.03em}
+  .k-field-v.sm{font-size:14px;letter-spacing:0}
+  .k-field-v.dim{font-size:13px;color:var(--faint);font-weight:700}
+  .k-dm{color:var(--faint)}
+  .k-help{font-size:10.5px;color:var(--teal-d);font-weight:600}
+  .k-req{font-size:8.5px;font-weight:800;color:#fff;background:var(--pt);padding:1.5px 6px;border-radius:999px}
+  .k-row{display:flex;gap:8px}
+  .k-gender{flex:1;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:11px;padding:6px 9px;background:#fff}
+  .k-gb{flex:1;font-size:11.5px;font-weight:700;padding:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+  .k-gb.on{background:var(--teal-bg);border-color:var(--teal);color:var(--teal-d)}
+  .k-terms{display:flex;flex-direction:column;gap:5px;margin-top:3px;padding-top:8px;border-top:1px solid var(--line)}
+  .k-terms-h{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800}
+  .k-term{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .k-term-t{font-size:11.5px;color:var(--ink);font-weight:600}
+  .k-term-t b{color:var(--soft);font-weight:700;margin-right:3px}
+  .k-term-view{flex:none;font-size:10px;color:var(--soft);background:var(--field);padding:3px 9px;border-radius:7px}
+  .k-term-note{font-size:9px;color:var(--soft);margin-top:1px}
+  .k-cta{width:100%;height:44px;border-radius:12px;background:var(--teal);color:#fff;border:none;
+    font-size:14.5px;font-weight:800;cursor:pointer;margin-top:6px}
+  .k-cta:disabled{background:var(--line);color:var(--faint);cursor:not-allowed}
+
+  /* 입력 수단 — 화면 하단에서 올라옴 */
+  .k-ime{position:absolute;left:0;right:0;bottom:0;background:#e4eae8;border-top:1px solid #cfd9d6;
+    padding:8px 9px 10px;display:flex;flex-direction:column;gap:5px;box-shadow:0 -8px 22px -10px rgba(15,26,24,.3)}
+  .k-kbrow{display:flex;gap:4px;justify-content:center}
+  .k-kk{flex:1;max-width:52px;min-height:30px;border:none;border-radius:7px;background:#fff;
+    box-shadow:0 1px 2px rgba(15,26,24,.07);font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer}
+  .k-kk.fn{font-size:9.5px;color:var(--soft);background:var(--field);box-shadow:none;max-width:70px}
+  .k-kk.fn.on{background:var(--teal);color:#fff}
+  .k-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:300px;margin:0 auto;width:100%}
+  .k-nk{min-height:34px;border:none;border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(15,26,24,.07);
+    font-size:16px;font-weight:700;color:var(--ink);cursor:pointer}
+  .k-nk.fn{font-size:11px;color:var(--soft);background:var(--field);box-shadow:none}
+  .k-imetag{font-size:9.5px;color:var(--soft);font-weight:700;text-align:center}
+
+  /* 가림 경고 */
+  .k-warn{position:absolute;left:14px;right:14px;font-size:10.5px;font-weight:800;color:#fff;background:var(--pt);
+    padding:6px 11px;border-radius:9px;display:flex;align-items:center;gap:6px;z-index:5;box-shadow:0 4px 12px -4px rgba(216,64,26,.6)}
+  .k-cut{position:absolute;left:0;right:0;height:46px;z-index:4;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(216,64,26,0),rgba(216,64,26,.14))}
+
+  /* ② 이름 화면 보조 */
+  .k-callrow{display:flex;justify-content:flex-end}
+  .k-call{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--teal);background:var(--teal-bg);
+    color:var(--teal-d);font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:999px;cursor:pointer}
+  .k-called{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal-d);
+    background:var(--teal-bg);border-radius:9px;padding:7px 11px}
+  .k-steps{display:flex;gap:5px;margin:0 auto}
+  .k-sdot{width:22px;height:5px;border-radius:999px;background:var(--line)}
+  .k-sdot.on{background:var(--teal)}
+
+  /* 요약 · 비교표 */
+  .panel{margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .panel h2{font-size:13px;font-weight:800;margin-bottom:8px}
+  .bullets{display:flex;flex-direction:column;gap:5px}
+  .bl{font-size:12px;color:var(--soft);line-height:1.5;padding-left:14px;position:relative}
+  .bl:before{content:"·";position:absolute;left:4px;color:var(--faint);font-weight:800}
+  .bl b{color:var(--ink)}
+  .bl.bad b{color:var(--pt)}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+  th,td{border-bottom:1px solid var(--line);padding:8px 9px;text-align:left;vertical-align:top}
+  th{font-size:10.5px;font-weight:800;color:var(--faint);letter-spacing:.03em}
+  td b{font-weight:800}
+  .good{color:var(--teal-d);font-weight:800}
+  .bad{color:var(--pt);font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./index.html">‹ 키오스크 프로토타입 5화면으로</a>
+  <h1>키오스크 회원가입 · 입력 방식 2안 비교</h1>
+  <div class="sub">
+    가입 정보를 <b>한 화면에 모두 받을지</b>, <b>한 단계씩 나눠 받을지</b> 비교합니다. 탭을 눌러 두 안을 바꿔 보고,
+    <b>입력란을 눌러</b> 자판이 올라올 때 화면이 어떻게 되는지 확인하세요.<br />
+    현행 화면의 문제 — 한 화면에 입력란이 모여 있어 <b>자판이 올라오면 약관과 가입 버튼이 가려집니다</b>.
+    고객은 자판을 닫아야 다음 할 일을 볼 수 있습니다. (실데이터 아님)
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="states-h">화면 상태</div>
+  <div class="states" id="states"></div>
+
+  <div class="stage">
+    <div class="device"><div class="screen" id="vp"></div></div>
+    <div class="dev-tag" id="tag"></div>
+  </div>
+
+  <div class="panel" id="summary"></div>
+
+  <div class="panel">
+    <h2>두 안 비교</h2>
+    <table>
+      <thead><tr><th>항목</th><th>1안 · 한 화면 입력</th><th>2안 · 단계별 입력</th></tr></thead>
+      <tbody>
+        <tr><td>한 화면 입력 항목</td><td>전화번호·이름·생년월일·성별·약관 <b>5종</b></td><td><b>1종</b> (마지막 화면만 2종+약관)</td></tr>
+        <tr><td>자판이 올라왔을 때</td><td class="bad">약관·가입 버튼이 가려짐</td><td class="good">가릴 것이 없음</td></tr>
+        <tr><td>지금 무엇을 하는지</td><td>입력란 5개 중 어디인지 스스로 찾아야 함</td><td class="good">제목 한 줄로 드러남</td></tr>
+        <tr><td>진행 정도</td><td>알기 어려움</td><td class="good">1 / 3 · 2 / 3 으로 표시</td></tr>
+        <tr><td>약사 호출 버튼</td><td>둘 자리가 마땅치 않음</td><td class="good">이름 화면에 둠</td></tr>
+        <tr><td>설정으로 항목을 끌 때</td><td>빈 자리가 남아 어색함</td><td class="good">마지막 화면만 줄어듦</td></tr>
+        <tr><td>화면 전환 횟수</td><td class="good">없음</td><td>2회 (다음 버튼)</td></tr>
+        <tr><td>되돌아가 고치기</td><td class="good">한 화면에서 바로</td><td>이전 버튼으로 이동</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+var $ = function(id){ return document.getElementById(id); };
+
+var VARIANTS = [
+  { id:"1안", lab:"한 화면 입력", note:"현행 방식 · 자판이 가림" },
+  { id:"2안", lab:"단계별 입력",  note:"전화번호 → 이름 → 추가 정보" }
+];
+var vIdx = 1, step = 0;
+
+/* 상태 */
+var phone = "", birth = "", gender = "";
+var nameCommitted = "", cho = -1, jung = -1, jong = 0, shift = false, eng = false;
+var focusField = "phone";   // 1안에서 지금 입력 중인 칸
+var imeOpen = true;         // 1안에서 자판이 올라와 있는지
+var called = false;
+
+/* ── 한글 조합 ── */
+var CHO  = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ".split("");
+var JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".split("");
+var JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+var JUNG_COMB = {"ㅗㅏ":"ㅘ","ㅗㅐ":"ㅙ","ㅗㅣ":"ㅚ","ㅜㅓ":"ㅝ","ㅜㅔ":"ㅞ","ㅜㅣ":"ㅟ","ㅡㅣ":"ㅢ"};
+var JONG_COMB = {"ㄱㅅ":"ㄳ","ㄴㅈ":"ㄵ","ㄴㅎ":"ㄶ","ㄹㄱ":"ㄺ","ㄹㅁ":"ㄻ","ㄹㅂ":"ㄼ","ㄹㅅ":"ㄽ","ㄹㅌ":"ㄾ","ㄹㅍ":"ㄿ","ㄹㅎ":"ㅀ","ㅂㅅ":"ㅄ"};
+var QW = [["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"],
+          ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"],
+          ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ"]];
+var QW_SHIFT = {"ㅂ":"ㅃ","ㅈ":"ㅉ","ㄷ":"ㄸ","ㄱ":"ㄲ","ㅅ":"ㅆ","ㅐ":"ㅒ","ㅔ":"ㅖ"};
+var EN = [["q","w","e","r","t","y","u","i","o","p"],
+          ["a","s","d","f","g","h","j","k","l"],
+          ["z","x","c","v","b","n","m"]];
+
+function curSyl(){
+  if(cho<0 && jung<0) return "";
+  if(cho>=0 && jung>=0) return String.fromCharCode(0xAC00 + (cho*21 + jung)*28 + jong);
+  if(cho>=0) return CHO[cho];
+  return JUNG[jung];
+}
+function nameText(){ return nameCommitted + curSyl(); }
+function commitSyl(){ nameCommitted += curSyl(); cho=-1; jung=-1; jong=0; }
+function putJamo(ch){
+  var ci = CHO.indexOf(ch), vi = JUNG.indexOf(ch), ji = JONG.indexOf(ch);
+  if(vi >= 0){
+    if(cho>=0 && jung<0){ jung = vi; return; }
+    if(cho>=0 && jung>=0 && jong===0){
+      var comb = JUNG_COMB[JUNG[jung]+ch];
+      if(comb){ jung = JUNG.indexOf(comb); return; }
+      commitSyl(); jung = vi; return;
+    }
+    if(cho>=0 && jung>=0 && jong>0){
+      var js = JONG[jong], moveC, keep = 0;
+      var pair = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===js; })[0];
+      if(pair){ keep = JONG.indexOf(pair[0]); moveC = pair[1]; } else { moveC = js; }
+      jong = keep; commitSyl();
+      cho = CHO.indexOf(moveC); jung = vi; return;
+    }
+    commitSyl(); jung = vi; return;
+  }
+  if(ci >= 0 || ji >= 0){
+    if(cho<0 && jung<0){ cho = ci; return; }
+    if(cho>=0 && jung<0){ commitSyl(); cho = ci; return; }
+    if(cho>=0 && jung>=0 && jong===0){
+      if(ji>0){ jong = ji; return; }
+      commitSyl(); cho = ci; return;
+    }
+    var c2 = JONG_COMB[JONG[jong]+ch];
+    if(c2){ jong = JONG.indexOf(c2); return; }
+    commitSyl(); cho = ci; return;
+  }
+  commitSyl(); nameCommitted += ch;
+}
+function nameBack(){
+  if(jong>0){ var pj = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===JONG[jong]; })[0];
+    jong = pj ? JONG.indexOf(pj[0]) : 0; return; }
+  if(jung>=0){ var pv = Object.keys(JUNG_COMB).filter(function(k){ return JUNG_COMB[k]===JUNG[jung]; })[0];
+    jung = pv ? JUNG.indexOf(pv[0]) : -1; return; }
+  if(cho>=0){ cho = -1; return; }
+  nameCommitted = nameCommitted.slice(0,-1);
+}
+function pressHan(ch){
+  if(ch==="⇧"){ shift=!shift; render(); return; }
+  if(ch==="한영"){ eng=!eng; shift=false; render(); return; }
+  if(ch==="지움"){ nameBack(); render(); return; }
+  if(ch==="전체삭제"){ nameCommitted=""; cho=-1; jung=-1; jong=0; render(); return; }
+  var c = (!eng && shift && QW_SHIFT[ch]) ? QW_SHIFT[ch] : ch;
+  putJamo(c); if(shift && !eng) shift=false;
+  render();
+}
+function pressNum(k){
+  var tgt = (vIdx===0) ? focusField : (step===0 ? "phone" : "birth");
+  var t = (tgt==="birth") ? birth : phone, max = (tgt==="birth") ? 8 : 11;
+  if(k==="지움") t = t.slice(0,-1);
+  else if(k==="전체삭제") t = "";
+  else if(t.length < max) t += k;
+  if(tgt==="birth") birth = t; else phone = t;
+  render();
+}
+function setFocus(f){ focusField = f; imeOpen = true; render(); }
+function closeIme(){ imeOpen = false; render(); }
+function setGender(g){ gender = g; render(); }
+function callPharmacist(){ called = true; render(); }
+function goStep(i){ step = i; render(); }
+function pickVariant(i){ vIdx = i; step = 0; reset(); render(); }
+function reset(){ phone=""; birth=""; gender=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
+  shift=false; eng=false; called=false; focusField="phone"; imeOpen=true; }
+
+/* ── 뷰 조각 ── */
+function phoneView(){
+  var d = phone.padEnd(11,"_").split("");
+  var g = [d.slice(0,3).join(""), d.slice(3,7).join(""), d.slice(7,11).join("")];
+  return g.map(function(x){ return x.replace(/_/g,'<span class="k-dm">_</span>'); }).join(" - ");
+}
+function birthView(){
+  if(!birth) return '<span class="k-field-v sm dim">YYYY-MM-DD</span>';
+  var d = birth.padEnd(8,"_").split("");
+  var t = d.slice(0,4).join("")+"-"+d.slice(4,6).join("")+"-"+d.slice(6,8).join("");
+  return '<span class="k-field-v sm">'+t.replace(/_/g,'<span class="k-dm">_</span>')+'</span>';
+}
+function field(id, label, valueHtml, on){
+  return '<div class="k-field'+(on?' on':'')+'" onclick="setFocus(\''+id+'\')">'+
+    '<span class="k-field-l">'+label+' <span class="k-req">필수</span></span>'+valueHtml+'</div>';
+}
+function terms(){
+  return '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
+    '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">상세보기 ›</span></div>'+
+    '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용 <span style="color:var(--soft);font-weight:600">(처방 고객 연결 포함)</span></span><span class="k-term-view">상세보기 ›</span></div>'+
+    '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>';
+}
+function numPad(){
+  return '<div class="k-numpad">'+["1","2","3","4","5","6","7","8","9","지움","0","전체삭제"].map(function(k){
+    var fn = (k==="지움"||k==="전체삭제")?' fn':'';
+    return '<button class="k-nk'+fn+'" onclick="pressNum(\''+k+'\')">'+k+'</button>'; }).join("")+'</div>';
+}
+function qwertyPad(){
+  var rows = (eng ? EN : QW), out = "";
+  rows.forEach(function(r,i){
+    var keys = r.map(function(k){
+      var face = (!eng && shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k;
+      return '<button class="k-kk" onclick="pressHan(\''+k+'\')">'+face+'</button>'; });
+    if(i===2){
+      keys.unshift('<button class="k-kk fn'+(eng?' on':'')+'" onclick="pressHan(\'한영\')">'+(eng?'한글':'ABC')+'</button>');
+      keys.unshift('<button class="k-kk fn'+(shift?' on':'')+'" onclick="pressHan(\'⇧\')">'+(eng?'Shift ⇧':'쌍자음 ⇧')+'</button>');
+      keys.push('<button class="k-kk fn" onclick="pressHan(\'지움\')">지움</button>');
+      keys.push('<button class="k-kk fn" onclick="pressHan(\'전체삭제\')">전체삭제</button>');
+    }
+    out += '<div class="k-kbrow">'+keys.join("")+'</div>';
+  });
+  return out;
+}
+
+/* ── 1안 · 한 화면 입력 ── */
+function viewAllInOne(){
+  var nm = nameText();
+  var isName = focusField==="name";
+  var ime = imeOpen
+    ? '<div class="k-ime" id="ime">'+
+        '<div class="k-imetag">'+(isName ? '이름 입력 · 쿼티 두벌식(한/영)' : (focusField==="birth"?'생년월일 입력':'전화번호 입력'))+
+        ' · <span style="color:var(--pt)">자판을 내려야 아래 내용이 보입니다</span>'+
+        ' <button class="k-kk fn" style="max-width:56px;display:inline-block" onclick="closeIme()">내리기 ▾</button></div>'+
+        (isName ? qwertyPad() : numPad())+
+      '</div>'
+    : '';
+  var warn = imeOpen
+    ? '<div class="k-warn" style="bottom:'+(isName?176:196)+'px">⚠ 약관과 가입 버튼이 자판에 가려졌습니다</div>'+
+      '<div class="k-cut" style="bottom:'+(isName?166:186)+'px"></div>'
+    : '';
+  var canSubmit = phone.length===11 && nm && birth.length===8 && gender!=="";
+  return ('<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+
+    '<span class="k-chip">약국 회원가입 · 정보 입력</span><span class="k-r"></span></div>'+
+    '<div class="k-body"><div class="k-scroll">'+
+      '<div class="k-h"><b>회원 정보를 입력해 주세요</b></div>'+
+      field("phone","전화번호",'<span class="k-field-v">'+phoneView()+'</span>', focusField==="phone")+
+      field("name","이름",'<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||"이름")+'</span>', isName)+
+      '<div class="k-row">'+
+        '<div style="flex:1">'+field("birth","생년월일", birthView(), focusField==="birth")+'</div>'+
+        '<div class="k-gender"><span class="k-field-l">성별 <span class="k-req">필수</span></span>'+
+        '<button class="k-gb'+(gender==="m"?" on":"")+'" onclick="setGender(\'m\')">남자</button>'+
+        '<button class="k-gb'+(gender==="f"?" on":"")+'" onclick="setGender(\'f\')">여자</button></div>'+
+      '</div>'+
+      terms()+
+      '<button class="k-cta"'+(canSubmit?'':' disabled')+'>약관 동의하고 가입하기</button>'+
+    '</div>'+ warn + ime +'</div></div>');
+}
+
+/* ── 2안 · 단계별 입력 ── */
+function dots(i){
+  return '<div class="k-steps">'+[0,1,2].map(function(n){
+    return '<div class="k-sdot'+(n<=i?' on':'')+'"></div>'; }).join("")+'</div>';
+}
+function viewStepped(){
+  var bar = '<div class="k-bar"><span class="k-back">← 이전</span>'+dots(step)+
+    '<span class="k-chip" style="margin:0">'+(step+1)+' / 3</span><span class="k-r"></span></div>';
+  if(step===0){
+    var ok = phone.length===11;
+    return ('<div class="k">'+bar+'<div class="k-body"><div class="k-scroll">'+
+      '<div class="k-h">포인트 적립을 위한<br><b>전화번호를 입력해 주세요</b></div>'+
+      '<div class="k-field on"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
+        '<span class="k-field-v">'+phoneView()+'</span></div>'+
+      '<div class="k-help">이 번호로 적립 포인트를 안내해 드려요</div>'+
+      '<button class="k-cta"'+(ok?'':' disabled')+' onclick="goStep(1)">다음</button>'+
+      '</div><div class="k-ime">'+numPad()+'</div></div></div>');
+  }
+  if(step===1){
+    var nm = nameText();
+    return ('<div class="k">'+bar+'<div class="k-body"><div class="k-scroll">'+
+      '<div class="k-h"><b>이름을 입력해 주세요</b></div>'+
+      '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
+        '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||"이름")+'</span></div>'+
+      '<div class="k-callrow">'+(called
+        ? '<span class="k-called">✓ 약사님께 전달했어요 · 잠시만 기다려 주세요</span>'
+        : '<button class="k-call" onclick="callPharmacist()">🔔 도움이 필요하신가요? 약사님 호출하기</button>')+'</div>'+
+      '<button class="k-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button>'+
+      '</div><div class="k-ime">'+qwertyPad()+'</div></div></div>');
+  }
+  var ok2 = birth.length===8 && gender!=="";
+  return ('<div class="k">'+bar+'<div class="k-body"><div class="k-scroll">'+
+    '<div class="k-h"><b>생년월일과 성별을 입력해 주세요</b></div>'+
+    '<div class="k-row">'+
+      '<div style="flex:1"><div class="k-field on"><span class="k-field-l">생년월일 <span class="k-req">필수</span></span>'+birthView()+'</div></div>'+
+      '<div class="k-gender"><span class="k-field-l">성별 <span class="k-req">필수</span></span>'+
+      '<button class="k-gb'+(gender==="m"?" on":"")+'" onclick="setGender(\'m\')">남자</button>'+
+      '<button class="k-gb'+(gender==="f"?" on":"")+'" onclick="setGender(\'f\')">여자</button></div>'+
+    '</div>'+
+    terms()+
+    '<button class="k-cta"'+(ok2?'':' disabled')+'>약관 동의하고 가입하기</button>'+
+    '</div><div class="k-ime">'+numPad()+'</div></div></div>');
+}
+
+var SUMMARY = [
+  { h:"1안 · 한 화면 입력 (현행 방식)", items:[
+    ['bad', '자판이 올라오면 <b>약관과 가입 버튼이 가려집니다</b> — 고객은 자판을 내려야 다음 할 일을 봅니다'],
+    ['', '입력란이 5개 모여 있어 <b>지금 어디를 채우는지</b> 스스로 찾아야 합니다'],
+    ['', '진행 정도를 알 수 없어, 얼마나 남았는지 가늠이 안 됩니다'],
+    ['', '장점 — <b>화면 전환이 없고</b>, 앞 항목을 고치러 돌아갈 필요가 없습니다']
+  ]},
+  { h:"2안 · 단계별 입력 (확정안)", items:[
+    ['good', '한 화면에 하나만 있어 <b>자판이 가릴 것이 없습니다</b>'],
+    ['good', '제목 한 줄로 <b>지금 할 일</b>이 드러나고, 점 세 개로 진행 정도가 보입니다'],
+    ['good', '이름 화면에 <b>약사님 호출하기</b>를 둘 자리가 생깁니다 — 가장 막히는 단계라 그 자리에 둡니다'],
+    ['good', '설정에서 성별·생년월일을 끄면 <b>마지막 화면만</b> 줄어듭니다'],
+    ['', '비용 — <b>다음</b> 버튼을 두 번 눌러야 하고, 앞 항목 수정은 이전으로 돌아가야 합니다']
+  ]}
+];
+
+function render(){
+  $("tabs").innerHTML = VARIANTS.map(function(v,i){
+    return '<button class="tab'+(i===vIdx?' on':'')+'" onclick="pickVariant('+i+')">'+
+      '<span class="id">'+v.id+'</span><span class="lab">'+v.lab+'</span><span class="note">'+v.note+'</span></button>';
+  }).join("");
+
+  if(vIdx===1){
+    $("states").innerHTML = ["① 전화번호","② 이름","③ 추가 정보"].map(function(s,i){
+      return '<button class="st'+(i===step?' on':'')+'" onclick="goStep('+i+')">'+s+'</button>'; }).join("")+
+      '<span class="count">화면 <b>3</b>개</span>';
+  } else {
+    $("states").innerHTML = '<span style="font-size:12px;color:var(--faint)">단일 화면 — 입력란을 눌러 자판을 올려 보세요</span>'+
+      '<span class="count">화면 <b>1</b>개</span>';
+  }
+
+  $("vp").innerHTML = (vIdx===0) ? viewAllInOne() : viewStepped();
+  $("tag").textContent = "키오스크 · 약국 회원가입 · " + VARIANTS[vIdx].id + " " + VARIANTS[vIdx].lab +
+    (vIdx===1 ? " · " + (step+1) + "/3" : "");
+
+  var s = SUMMARY[vIdx];
+  $("summary").innerHTML = '<h2>'+s.h+'</h2><div class="bullets">'+
+    s.items.map(function(it){ return '<div class="bl '+it[0]+'">'+it[1]+'</div>'; }).join("")+'</div>';
+}
+
+window.pickVariant = pickVariant; window.goStep = goStep; window.setFocus = setFocus;
+window.closeIme = closeIme; window.setGender = setGender; window.pressNum = pressNum;
+window.pressHan = pressHan; window.callPharmacist = callPharmacist;
+
+render();
+</script>
+</body>
+</html>
