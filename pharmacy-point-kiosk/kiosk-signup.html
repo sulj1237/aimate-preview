@@ -333,7 +333,7 @@
 
   /* ===================== 실 키오스크 디자인 템플릿 (1280×800) =====================
      출처: 약국 포인트 > Kiosk-point 시안(1.png·3.png·5-2.png). 색·치수를 시안에서 그대로 가져왔다. */
-  .kk-root{
+  :root, .kk-root{
     --t-ink:#171716; --t-mute:#52524F; --t-dim:#8E8E8B; --t-line:#E6E6E3; --t-dash:#D2D2CE;
     --t-bg:#FAFAF9; --t-card:#F4F4F2; --t-teal:#038A85; --t-teal-br:#04A6A0; --t-teal-d:#026E69;
     --t-tealbg:#E6F7F6; --t-red:#EF4444;
@@ -679,10 +679,11 @@
     var home = step>0
       ? '<button class="kk-home" onclick="askCancel()"><i>←</i>처음으로</button>'
       : '<span class="kk-home"></span>';
-    var names = ["시작","목록","결제","완료"], st = "";
+    // 단계 표시는 가입 단계로 — 결제 단계(시작·목록·결제·완료)와 섞지 않는다
+    var names = collectExtra ? ["전화번호","이름","선택 정보 · 약관"] : ["전화번호","이름 · 약관"], st = "";
     names.forEach(function(n,i){
       if(i) st += '<span class="kk-line"></span>';
-      st += '<span class="kk-step'+(i===0?' on':'')+'"><span>'+(i+1)+'</span><b>'+n+'</b></span>';
+      st += '<span class="kk-step'+(i<=step?' on':'')+'"><span>'+(i+1)+'</span><b>'+n+'</b></span>';
     });
     return '<div class="kk-bar">'+home+'<div class="kk-steps">'+st+'</div>'+
       '<div class="kk-who"><span>👤 비회원</span></div></div>';
@@ -698,7 +699,7 @@
       '<span class="ks-n">가입 '+signupTotal()+'화면</span></div>';
   }
   function eyebrow(step){
-    return '<div class="kk-eyebrow">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</div>';
+    return '<div class="kk-eyebrow">약국 회원가입</div>';
   }
 
   function phoneView(){

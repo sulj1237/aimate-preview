@@ -330,13 +330,225 @@
   .pos-pt .row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0}
   .pos-pt .row.use{color:var(--pt-d);font-weight:700}
   .pos-btn{height:46px;border-radius:11px;background:var(--teal);color:#fff;border:none;font-size:14.5px;font-weight:800;cursor:pointer}
+  /* ===================== 실 키오스크 디자인 템플릿 (1280×800) =====================
+     출처: 약국 포인트 > Kiosk-point 시안(1.png·3.png·5-2.png). 색·치수를 시안에서 그대로 가져왔다. */
+  :root, .kk-root{
+    --t-ink:#171716; --t-mute:#52524F; --t-dim:#8E8E8B; --t-line:#E6E6E3; --t-dash:#D2D2CE;
+    --t-bg:#FAFAF9; --t-card:#F4F4F2; --t-teal:#038A85; --t-teal-br:#04A6A0; --t-teal-d:#026E69;
+    --t-tealbg:#E6F7F6; --t-red:#EF4444;
+  }
+  .device.kiosk{zoom:.6}
+  .device.kiosk .screen{width:1280px;height:800px;border-radius:14px;background:#FAFAF9}
+  .dev-tag{zoom:1}
+
+  .kk{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--t-bg);color:var(--t-ink);
+    font-size:18px;letter-spacing:-.01em}
+  /* 상단 바 */
+  .kk-bar{height:72px;flex:none;display:flex;align-items:center;padding:0 48px;background:#fff;
+    border-bottom:1px solid var(--t-line)}
+  .kk-home{flex:1;display:flex;align-items:center;gap:14px;font-size:22px;font-weight:700;color:var(--t-ink);
+    background:none;border:none;padding:0;cursor:pointer;text-align:left}
+  .kk-home i{font-style:normal;font-size:24px}
+  .kk-steps{flex:none;display:flex;align-items:center;gap:12px}
+  .kk-step{display:flex;align-items:center;gap:9px}
+  .kk-step span{width:28px;height:28px;border-radius:999px;background:#E9EDEC;color:#9AA5A2;
+    font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .kk-step b{font-size:15px;font-weight:600;color:#9AA5A2}
+  .kk-step.on span{background:var(--t-teal);color:#fff}
+  .kk-step.on b{color:var(--t-ink);font-weight:700}
+  .kk-line{width:36px;height:1px;background:#DDE2E0}
+  .kk-who{flex:1;display:flex;justify-content:flex-end}
+  .kk-who span{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 20px;border-radius:999px;
+    border:1px solid var(--t-line);font-size:16px;font-weight:700;color:var(--t-ink);background:#fff}
+
+  /* 본문 2열(좌 입력 · 우 키패드) + 하단 버튼 줄 */
+  .kk-body{flex:1;display:grid;grid-template-columns:1fr 496px;gap:53px;padding:40px 48px 0;min-height:0}
+  .kk-col{display:flex;flex-direction:column;gap:22px;min-height:0}
+  .kk-eyebrow{font-size:17px;font-weight:800;color:var(--t-teal)}
+  .kk-title{font-size:32px;font-weight:700;line-height:1.5;letter-spacing:-.02em}
+  .kk-title b{font-weight:800}
+
+  /* 입력 칸 */
+  .kk-field{background:#fff;border:2px solid var(--t-line);border-radius:18px;padding:20px 26px}
+  .kk-field-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .kk-field-l{font-size:16px;font-weight:800;color:var(--t-dim)}
+  .kk-field.on .kk-field-l{color:var(--t-teal-d)}
+  .kk-cnt{font-size:16px;color:var(--t-dim);font-weight:600}
+  .kk-field-v{margin-top:12px;font-size:46px;font-weight:700;letter-spacing:.01em;line-height:1.1}
+  .kk-field-v .dm{color:#E2E2DF}
+  .kk-field-v.ph{color:#C9C9C5;font-weight:600;font-size:34px}
+  .kk-caret{display:inline-block;width:3px;height:.9em;background:var(--t-teal);vertical-align:-3px;margin-left:4px;
+    animation:kkblink 1.05s steps(1) infinite}
+  @keyframes kkblink{0%,55%{opacity:1}56%,100%{opacity:0}}
+  .kk-dash{border:2px dashed var(--t-dash);border-radius:18px;padding:18px 26px;display:flex;align-items:center;gap:12px;
+    background:transparent;cursor:pointer;width:100%;text-align:left}
+  .kk-dash b{font-size:19px;font-weight:800;color:var(--t-mute)}
+  .kk-dash i{font-style:normal;font-size:17px;color:var(--t-dim)}
+  .kk-row{display:flex;align-items:center;gap:16px}
+  .kk-row>.kk-lab{font-size:19px;font-weight:700;color:var(--t-mute);flex:none}
+  .kk-pill{height:54px;min-width:116px;padding:0 26px;border-radius:999px;border:2px solid var(--t-line);
+    background:#fff;font-size:20px;font-weight:700;color:var(--t-mute);cursor:pointer}
+  .kk-pill.on{border-color:var(--t-teal);background:var(--t-tealbg);color:var(--t-teal-d)}
+  .kk-req{font-size:14px;font-weight:800;color:#fff;background:var(--t-red);padding:3px 11px;border-radius:999px;margin-left:8px}
+  .kk-opt{font-size:14px;font-weight:800;color:var(--t-dim);background:var(--t-card);padding:3px 11px;border-radius:999px;margin-left:8px}
+  .kk-help{font-size:17px;color:var(--t-teal-d);font-weight:700}
+
+  /* 약관 */
+  .kk-terms{background:var(--t-card);border-radius:18px;padding:22px 24px}
+  .kk-terms-h{font-size:20px;font-weight:800;display:flex;align-items:center;margin-bottom:6px}
+  .kk-term{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;
+    border-top:1px solid #E6E6E3}
+  .kk-term-t{font-size:18px;font-weight:700}
+  .kk-term-t i{font-style:normal;color:var(--t-dim);font-weight:700;margin-right:8px}
+  .kk-term-t em{font-style:normal;color:var(--t-mute);font-weight:600}
+  .kk-term-v{flex:none;height:40px;padding:0 16px;border-radius:999px;background:#fff;border:1px solid var(--t-line);
+    font-size:15px;font-weight:700;color:var(--t-mute);display:flex;align-items:center;gap:6px}
+  .kk-term-n{font-size:15px;color:var(--t-dim);margin-top:10px}
+
+  /* 숫자 키패드 */
+  .kk-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-content:start}
+  .kk-key{height:112px;border-radius:18px;background:#fff;border:2px solid var(--t-line);
+    font-size:38px;font-weight:600;color:var(--t-ink);cursor:pointer}
+  .kk-key.fn{background:var(--t-card);border-color:var(--t-card);font-size:21px;font-weight:700;color:var(--t-mute)}
+  .kk-key.sm{font-size:30px;font-weight:700}
+
+  /* 한글 자판 */
+  .kk-kb{flex:1;background:var(--t-card);padding:20px 24px;display:flex;flex-direction:column;gap:10px;
+    justify-content:center}
+  .kk-kbrow{display:flex;gap:10px;justify-content:center}
+  .kk-kk{flex:1;max-width:108px;height:76px;border-radius:14px;background:#fff;border:2px solid var(--t-line);
+    font-size:28px;font-weight:600;color:var(--t-ink);cursor:pointer}
+  .kk-kk.fn{font-size:18px;font-weight:700;color:var(--t-mute);background:#EDEDEA;border-color:#EDEDEA;max-width:140px}
+  .kk-kk.fn.on{background:var(--t-teal);border-color:var(--t-teal);color:#fff}
+
+  /* 하단 버튼 줄 */
+  .kk-foot{flex:none;display:flex;gap:16px;padding:24px 48px 40px}
+  .kk-cta{flex:1;height:100px;border-radius:18px;background:var(--t-teal);color:#fff;border:none;
+    font-size:28px;font-weight:800;cursor:pointer;letter-spacing:-.01em}
+  .kk-cta:disabled{background:var(--t-line);color:#fff;cursor:not-allowed}
+  .kk-ghost{flex:none;min-width:220px;height:100px;border-radius:18px;background:#fff;border:2px solid var(--t-line);
+    font-size:26px;font-weight:700;color:var(--t-mute);cursor:pointer}
+
+  /* 가입 취소 확인 모달 */
+  .kk-dim{position:absolute;inset:0;background:rgba(12,22,20,.5);display:flex;align-items:center;
+    justify-content:center;z-index:30}
+  .kk-modal{background:#fff;border-radius:24px;padding:44px 48px 36px;width:660px;text-align:center;
+    box-shadow:0 30px 70px rgba(10,18,16,.3)}
+  .kk-modal-h{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .kk-modal-t{font-size:20px;color:var(--t-mute);line-height:1.6;margin-top:14px}
+  .kk-modal-b{display:flex;gap:16px;margin-top:32px}
+  .kk-modal-b button{flex:1;height:88px;border-radius:18px;font-size:24px;font-weight:800;cursor:pointer}
+  .kk-modal-b .no{background:#fff;border:2px solid var(--t-line);color:var(--t-mute)}
+  .kk-modal-b .yes{background:var(--t-teal);border:none;color:#fff}
+  .kk-top{flex:none;display:flex;flex-direction:column;gap:22px;padding:40px 48px 20px}
+  .kk-two{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:44px;padding:36px 48px 18px;align-items:start}
+  .kk-two .kk-col{gap:18px}
+  @media(max-width:860px){.device.kiosk{zoom:.5}}
+  /* ── 템플릿 적용 · 첫 화면 / 인증 / 상품 목록 / 결제 완료 ── */
+  .kk-logo{font-size:24px;font-weight:800;color:var(--t-teal-d);letter-spacing:.02em}
+  .kk-who span.ok{color:var(--t-teal-d);border-color:#BFE6E2;background:#EFFAF9}
+
+  .kk-start{flex:1;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;padding:36px 48px 40px;min-height:0}
+  .kk-scan{background:linear-gradient(180deg,#F4FBFB,#DFF4F2);border-radius:24px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;padding:24px}
+  .kk-doc{width:180px;height:226px;background:#fff;border-radius:16px;box-shadow:0 10px 26px rgba(10,40,36,.12);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-size:17px;
+    font-weight:700;color:var(--t-mute)}
+  .kk-qrm{width:84px;height:84px;background:
+    repeating-linear-gradient(90deg,#171716 0 8px,#fff 8px 16px),repeating-linear-gradient(0deg,#171716 0 8px,#fff 8px 16px);
+    background-blend-mode:multiply;border-radius:4px}
+  .kk-scan-h{font-size:30px;font-weight:800;text-align:center;line-height:1.45}
+  .kk-scan-s{font-size:18px;color:var(--t-mute)}
+  .kk-chev{font-size:30px;color:#7BCEC9;line-height:.8}
+  .kk-choices{display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .kk-lead{font-size:18px;color:var(--t-mute);font-weight:700;margin-bottom:4px}
+  .kk-lead b{display:block;font-size:28px;font-weight:800;color:var(--t-ink);margin-top:6px}
+  .kk-ch{display:flex;align-items:center;gap:18px;width:100%;height:112px;padding:0 24px;border-radius:18px;
+    background:#fff;border:2px solid var(--t-line);cursor:pointer;text-align:left}
+  .kk-ch.accent{border-color:var(--t-teal);background:var(--t-tealbg)}
+  .kk-ch-ic{width:56px;height:56px;border-radius:16px;background:var(--t-card);display:flex;align-items:center;
+    justify-content:center;font-size:24px;flex:none}
+  .kk-ch.accent .kk-ch-ic{background:#fff;color:var(--t-teal-d)}
+  .kk-ch-tx{flex:1}
+  .kk-ch-tx b{display:block;font-size:24px;font-weight:800}
+  .kk-ch-tx em{font-style:normal;font-size:17px;color:var(--t-mute)}
+  .kk-ch-go{font-size:28px;color:var(--t-dim);flex:none}
+
+  .kk-tabs{flex:none;display:flex;gap:12px;justify-content:center;padding:26px 48px 0}
+  .kk-tab{height:68px;min-width:290px;border-radius:16px;border:2px solid var(--t-line);background:#fff;
+    font-size:22px;font-weight:700;color:var(--t-dim);cursor:pointer}
+  .kk-tab.on{background:var(--t-teal-d);border-color:var(--t-teal-d);color:#fff}
+  .kk-auth{flex:1;margin:26px 48px 40px;border-radius:24px;background:linear-gradient(180deg,#F4FBFB,#DFF4F2);
+    display:grid;grid-template-columns:1fr 250px;gap:26px;padding:30px;min-height:0}
+  .kk-authm{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+  .kk-auth-h{font-size:34px;font-weight:800;line-height:1.45}
+  .kk-auth-h b{color:var(--t-teal-d)}
+  .kk-phone{width:200px;height:252px;border-radius:22px;background:#52524F;padding:14px;flex:none}
+  .kk-phone-s{background:#fff;border-radius:12px;padding:16px 10px;text-align:center}
+  .kk-bars{height:62px;background:repeating-linear-gradient(90deg,#171716 0 4px,#fff 4px 8px,#171716 8px 12px,#fff 12px 18px)}
+  .kk-barno{font-size:13px;color:var(--t-mute);margin-top:8px}
+  .kk-auth-g{font-size:20px;font-weight:800;color:var(--t-teal-d)}
+  .kk-qrcard{background:#fff;border-radius:18px;padding:20px 16px;text-align:center;align-self:start}
+  .kk-qrcard h4{font-size:16px;font-weight:800;margin-bottom:12px}
+  .kk-qr{width:140px;height:140px;margin:0 auto;background:
+    repeating-linear-gradient(90deg,#171716 0 10px,#fff 10px 20px),repeating-linear-gradient(0deg,#171716 0 10px,#fff 10px 20px);
+    background-blend-mode:multiply}
+  .kk-qrcard p{font-size:14px;color:var(--t-mute);margin-top:12px;line-height:1.5}
+
+  .kk-list{flex:1;overflow:hidden;padding:0 48px}
+  .kk-it{display:flex;align-items:center;gap:20px;padding:24px 0;border-bottom:1px solid var(--t-line)}
+  .kk-it-m{flex:1;min-width:0}
+  .kk-it-nm{font-size:26px;font-weight:800;display:flex;align-items:center;gap:12px}
+  .kk-tag{font-size:15px;font-weight:800;color:#9A6508;background:#FDF3DA;border:1px solid #F2DFA8;
+    padding:4px 12px;border-radius:10px;flex:none}
+  .kk-it-s{font-size:16px;color:var(--t-teal-d);font-weight:700;margin-top:8px}
+  .kk-it-s.warn{color:#9A6508}
+  .kk-qty{display:flex;align-items:center;gap:14px;flex:none}
+  .kk-qb{width:58px;height:58px;border-radius:14px;border:2px solid var(--t-line);background:#fff;font-size:26px;
+    color:var(--t-mute);cursor:pointer}
+  .kk-qb.plus{background:var(--t-tealbg);border-color:#BFE6E2;color:var(--t-teal-d)}
+  .kk-qn{font-size:24px;font-weight:800;min-width:26px;text-align:center}
+  .kk-it-pr{flex:none;text-align:right;min-width:160px}
+  .kk-it-pr s{display:block;font-size:16px;color:var(--t-dim)}
+  .kk-it-pr b{font-size:28px;font-weight:800}
+  .kk-del{flex:none;font-size:24px;color:var(--t-dim);background:none;border:none;cursor:pointer}
+  .kk-paybar{flex:none;display:flex;align-items:center;gap:20px;padding:18px 48px 32px;background:#fff;
+    border-top:1px solid var(--t-line)}
+  .kk-pay-l{font-size:19px;color:var(--t-mute);font-weight:700}
+  .kk-pay-v{flex:1;text-align:right;font-size:46px;font-weight:800}
+  .kk-pay-v em{font-style:normal;font-size:22px;font-weight:700;margin-left:4px}
+  .kk-pay-b{height:104px;min-width:400px;border-radius:14px;background:var(--t-teal);color:#fff;border:none;
+    font-size:28px;font-weight:800;cursor:pointer}
+
+  .kk-done{flex:1;display:grid;grid-template-columns:1fr 1.05fr;gap:40px;padding:36px 48px 20px;min-height:0}
+  .kk-donel{display:flex;flex-direction:column}
+  .kk-check{width:104px;height:104px;border-radius:999px;background:var(--t-teal);color:#fff;font-size:50px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 13px #DCF2F0}
+  .kk-done-h{font-size:40px;font-weight:800;line-height:1.35;margin-top:26px}
+  .kk-note{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:#FDF0DC;color:#9A6508;
+    font-size:21px;font-weight:800;padding:14px 22px;border-radius:14px;align-self:flex-start}
+  .kk-earn{margin-top:auto;border:2px solid #BFE6E2;background:#EFFAF9;border-radius:18px;padding:18px 24px}
+  .kk-earn span{font-size:16px;color:var(--t-mute);font-weight:700}
+  .kk-earn b{display:block;font-size:36px;font-weight:800;color:var(--t-teal-d);margin-top:4px}
+  .kk-rc{background:#fff;border:1px solid var(--t-line);border-radius:20px;padding:26px 30px;display:flex;flex-direction:column}
+  .kk-rc-l{font-size:16px;color:var(--t-dim);font-weight:700}
+  .kk-rc-v{font-size:24px;font-weight:800;margin-top:4px}
+  .kk-rc-d{height:1px;background:var(--t-line);margin:18px 0}
+  .kk-rc-r{display:flex;justify-content:space-between;font-size:17px;color:var(--t-mute);padding:5px 0}
+  .kk-rc-r b{color:var(--t-ink);font-weight:700}
+  .kk-rc-t{display:flex;align-items:baseline;justify-content:space-between;margin-top:auto;padding-top:18px;
+    border-top:1px solid var(--t-line)}
+  .kk-rc-t span{font-size:22px;font-weight:800}
+  .kk-rc-t b{font-size:44px;font-weight:800}
+  .kk-backhome{flex:none;margin:0 48px 32px;height:96px;border-radius:16px;background:var(--t-teal);color:#fff;
+    border:none;font-size:28px;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>약국 포인트 · 프로토타입</h1>
   <div class="sub">키오스크 5개 화면(첫 화면·약국 회원가입·굿팜 앱 바코드 인증·상품 목록·결제 완료)을 중심으로,
-    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>입니다. ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있고, 상단 왼쪽은 <b>← 처음으로</b>입니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다 — 호출 알림을 받는 POS 화면은 <b>P-1 · 약사 호출 알림</b> 상태에 남아 있습니다.  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
+    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />키오스크 5개 화면은 <b>실제 키오스크 디자인(1280×800 시안)</b>의 색·치수·상단 바 구성을 따릅니다 — 보기 편하도록 60%로 줄여 보여 줍니다. 단계 표시는 결제 흐름이 <b>시작 · 목록 · 결제 · 완료</b>, 가입 흐름이 <b>전화번호 · 이름 · 선택 정보 · 약관</b>으로 각각 따로 갑니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>입니다. ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있고, 상단 왼쪽 <b>← 처음으로</b>는 ②부터 나오고, 누르면 <b>가입을 취소할지 묻는 모달</b>이 먼저 뜹니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다 — 호출 알림을 받는 POS 화면은 <b>P-1 · 약사 호출 알림</b> 상태에 남아 있습니다.  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
 
   <div class="nav" id="nav"></div>
 
@@ -399,21 +611,6 @@
   }
 
   // 1 첫 화면
-  function kStart(){
-    var ch = [
-      ['약국 회원 결제','포인트를 적립하고 사용해요','❙❙❙','accent'],
-      ['비회원 결제','포인트 없이 바로 결제해요','🛒','plain'],
-      ['약국 회원가입','가입하고 포인트를 적립해요','🎁','gift']
-    ];
-    var cards = ch.map(function(c){ return (
-      '<button class="k-ch '+c[3]+'"><span class="k-ch-ic">'+c[2]+'</span>'+
-      '<span class="k-ch-tx"><b>'+c[0]+'</b><em>'+c[1]+'</em></span><span class="k-ch-go">›</span></button>'); }).join("");
-    return ('<div class="k"><div class="k-bar"><span class="k-logo">◍ 굿팜</span>'+steps(0)+'<span class="k-r"></span></div>'+
-      '<div class="k-start"><div class="k-scan"><div class="k-doc">처방전<span class="k-qrm"></span></div>'+
-      '<div class="k-scan-h">처방전 QR코드를<br>스캐너에 대주세요</div>'+
-      '<div class="k-scan-s">회원 인증과 결제가 한 번에 진행돼요</div><div class="k-arw">⌄</div></div>'+
-      '<div class="k-choices"><div class="k-lead">처방전이 없으신가요?<b>결제 방법을 선택해 주세요</b></div>'+cards+'</div></div></div>'); }
-
   // ── 한글 조합 (자판 비교 프로토타입 C안 = 쿼티 + 한/영과 같은 로직) ──
   var CHO  = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ".split("");
   var JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".split("");
@@ -550,14 +747,24 @@
     return '<div class="k-kb">'+out+'</div>';
   }
 
-  // 2 약국 회원가입 — 선택 정보를 받으면 3화면, 받지 않으면 2화면
+  // ===== 실 키오스크 디자인 템플릿(1280×800)에 맞춘 약국 회원가입 =====
   //   받음   : ① 전화번호 / ② 이름 / ③ 선택 정보 · 약관
   //   안 받음: ① 전화번호 / ② 이름 · 약관
   function signupTotal(){ return collectExtra ? 3 : 2; }
+
+  // 상단 바 — 왼쪽 처음으로(②부터) · 가운데 결제 단계 · 오른쪽 회원 구분
   function setBar(step){
-    var home = step>0 ? '<button class="k-back" onclick="askCancel()">← 처음으로</button>' : '';
-    return '<div class="k-bar">'+home+
-      '<span class="k-chip">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</span></div>';
+    var home = step>0
+      ? '<button class="kk-home" onclick="askCancel()"><i>←</i>처음으로</button>'
+      : '<span class="kk-home"></span>';
+    // 단계 표시는 가입 단계로 — 결제 단계(시작·목록·결제·완료)와 섞지 않는다
+    var names = collectExtra ? ["전화번호","이름","선택 정보 · 약관"] : ["전화번호","이름 · 약관"], st = "";
+    names.forEach(function(n,i){
+      if(i) st += '<span class="kk-line"></span>';
+      st += '<span class="kk-step'+(i<=step?' on':'')+'"><span>'+(i+1)+'</span><b>'+n+'</b></span>';
+    });
+    return '<div class="kk-bar">'+home+'<div class="kk-steps">'+st+'</div>'+
+      '<div class="kk-who"><span>👤 비회원</span></div></div>';
   }
   function renderKioskSet(){
     var el = $("kioskset");
@@ -569,32 +776,83 @@
       '<button class="ks-b'+(!collectExtra?' on':'')+'" onclick="toggleExtra(false)">사용 안 함</button>'+
       '<span class="ks-n">가입 '+signupTotal()+'화면</span></div>';
   }
-  function termsBlock(){
-    return '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
-      '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">보기 ›</span></div>'+
-      '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용 <span style="color:var(--soft);font-weight:600">(처방 고객 연결 포함)</span></span><span class="k-term-view">보기 ›</span></div>'+
-      '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>';
+  function eyebrow(step){
+    return '<div class="kk-eyebrow">약국 회원가입</div>';
   }
-  function callRow(){
-    if(called) return '<span class="k-barcall"><span class="k-barcall-ok">'+
-      '✓ 약사님께 전달했어요 · 입력은 그대로 이어서 하세요</span></span>';
-    return '<span class="k-barcall"><span class="k-barcall-t">입력이 어려우시면 약사님이 도와드려요</span>'+
-      '<button class="k-call sm" onclick="callPharmacist()">🔔 약사님 호출하기</button></span>';
+
+  function phoneView(){
+    var out = "", sep = [3,7];
+    for(var i=0;i<11;i++){
+      if(sep.indexOf(i) >= 0) out += ' <span class="dm">-</span> ';
+      out += (i < phone.length) ? phone[i] : '<span class="dm">0</span>';
+    }
+    return out;
+  }
+  function birthView(){
+    var out = "", sep = [4,6];
+    for(var i=0;i<8;i++){
+      if(sep.indexOf(i) >= 0) out += '<span class="dm">.</span>';
+      out += (i < birth.length) ? birth[i] : '<span class="dm">0</span>';
+    }
+    return out;
+  }
+  function numPad(forPhone){
+    var last = forPhone ? ["010","0","지움"] : ["전체삭제","0","지움"];
+    return '<div class="kk-pad">'+["1","2","3","4","5","6","7","8","9"].concat(last).map(function(k){
+      var cls = (k==="지움"||k==="전체삭제") ? " fn" : (k==="010" ? " sm" : "");
+      return '<button class="kk-key'+cls+'" onclick="pressNum(\''+k+'\')">'+k+'</button>'; }).join("")+'</div>';
+  }
+  function qwertyPad(){
+    var rows = (eng ? EN : QW), out = "";
+    rows.forEach(function(r,i){
+      var keys = r.map(function(k){
+        var face = (!eng && shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k;
+        return '<button class="kk-kk" onclick="pressHan(\''+k+'\')">'+face+'</button>'; });
+      if(i===2){
+        keys.unshift('<button class="kk-kk fn'+(eng?' on':'')+'" onclick="pressHan(\'한/영\')">'+(eng?'한글':'ABC')+'</button>');
+        keys.unshift('<button class="kk-kk fn'+(shift?' on':'')+'" onclick="pressHan(\'⇧\')">'+(eng?'Shift ⇧':'쌍자음 ⇧')+'</button>');
+        keys.push('<button class="kk-kk fn" onclick="pressHan(\'지움\')">지움</button>');
+        keys.push('<button class="kk-kk fn" onclick="pressHan(\'전체삭제\')">전체삭제</button>');
+      }
+      out += '<div class="kk-kbrow">'+keys.join("")+'</div>';
+    });
+    return '<div class="kk-kb">'+out+'</div>';
+  }
+  function termsBlock(){
+    return '<div class="kk-terms"><div class="kk-terms-h">약관 <span class="kk-req">필수</span></div>'+
+      '<div class="kk-term"><span class="kk-term-t"><i>01.</i>약국 포인트 이용약관</span>'+
+        '<span class="kk-term-v">상세보기 ›</span></div>'+
+      '<div class="kk-term"><span class="kk-term-t"><i>02.</i>개인정보 수집·이용 <em>(처방 고객 연결 포함)</em></span>'+
+        '<span class="kk-term-v">상세보기 ›</span></div>'+
+      '<div class="kk-term-n">ⓘ 아래 버튼을 누르면 위 약관에 동의하는 것이 됩니다</div></div>';
+  }
+  function cancelModal(){
+    return '<div class="kk-dim" onclick="closeCancel()"><div class="kk-modal" onclick="event.stopPropagation()">'+
+      '<div class="kk-modal-h">약국 회원가입을 취소할까요?</div>'+
+      '<div class="kk-modal-t">지금까지 입력한 내용이 모두 지워집니다.</div>'+
+      '<div class="kk-modal-b"><button class="no" onclick="cancelSignup()">가입 취소</button>'+
+      '<button class="yes" onclick="closeCancel()">계속 입력하기</button></div>'+
+      '</div></div>';
+  }
+  function nameField(nm){
+    return '<div class="kk-field on"><div class="kk-field-h"><span class="kk-field-l">이름 <span class="kk-req">필수</span></span></div>'+
+      (nm ? '<div class="kk-field-v">'+nm+'<i class="kk-caret"></i></div>'
+          : '<div class="kk-field-v ph">이름을 입력해 주세요<i class="kk-caret"></i></div>')+'</div>';
   }
 
   function kSignup(step){
+    // ① 전화번호
     if(step===0){
       var ok0 = phone.length===11;
-      return ('<div class="k">'+setBar(0)+
-        '<div class="k-signup"><div class="k-form">'+
-        '<div class="k-h">포인트 적립을 위한<br><b>전화번호를 입력해 주세요</b></div>'+
-        '<div class="k-field on"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
-          '<span class="k-field-v">'+phoneView()+'<i class="k-caret"></i></span></div>'+
-        '</div>'+
-        '<div class="k-pad-col">'+numPad(true)+'</div></div>'+
-        '<div class="k-padfoot" style="padding:8px 14px 11px"><div class="k-footrow">'+
-          '<button class="k-ghost" onclick="askCancel()">취소</button>'+
-          '<button class="k-cta lg"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div></div>'+
+      return ('<div class="kk">'+setBar(0)+
+        '<div class="kk-body"><div class="kk-col">'+ eyebrow(0)+
+          '<div class="kk-title">포인트 적립을 위해<br><b>전화번호를 입력해 주세요</b></div>'+
+          '<div class="kk-field on"><div class="kk-field-h"><span class="kk-field-l">전화번호 <span class="kk-req">필수</span></span>'+
+            '<span class="kk-cnt">'+phone.length+' / 11</span></div>'+
+            '<div class="kk-field-v">'+phoneView()+'<i class="kk-caret"></i></div></div>'+
+        '</div><div class="kk-col">'+numPad(true)+'</div></div>'+
+        '<div class="kk-foot"><button class="kk-ghost" onclick="askCancel()">취소</button>'+
+        '<button class="kk-cta"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div>'+
         '</div>');
     }
 
@@ -603,101 +861,143 @@
     // ② 이름 — 선택 정보를 받으면 이름만, 받지 않으면 약관까지 이 화면에서 끝낸다
     if(step===1){
       if(collectExtra){
-        return ('<div class="k">'+setBar(1)+'<div class="k-name">'+
-          '<div class="k-nametop" style="padding-top:9px">'+
-          '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
-            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
-          '</div>'+ qwertyPad()+
-          '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1">'+
-          '<div class="k-footrow"><button class="k-ghost" onclick="goStep(0)">이전</button>'+
-          '<button class="k-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button></div></div>'+
-          '</div></div>');
+        return ('<div class="kk">'+setBar(1)+
+          '<div class="kk-top">'+ eyebrow(1)+ nameField(nm)+'</div>'+ qwertyPad()+
+          '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(0)">이전</button>'+
+          '<button class="kk-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button></div>'+
+          '</div>');
       }
-      // 선택 정보를 받지 않는 약국 — 이름 + 약관을 2열로 나란히
-      return ('<div class="k">'+setBar(1)+'<div class="k-name">'+
-        '<div class="k-two">'+
-        '<div class="k-col">'+
-          '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
-            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
-          '<div class="k-help">이름과 전화번호로 회원을 찾습니다</div>'+
-        '</div>'+
-        '<div class="k-col">'+ termsBlock()+
-        '</div></div>'+ qwertyPad()+
-        '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1"><div class="k-footrow">'+
-        '<button class="k-ghost" onclick="goStep(0)">이전</button>'+
-        '<button class="k-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button>'+
-        '</div></div></div></div>');
+      return ('<div class="kk">'+setBar(1)+
+        '<div class="kk-two"><div class="kk-col">'+ eyebrow(1)+ nameField(nm)+
+          '<div class="kk-help">이름과 전화번호로 약국 회원을 찾아요</div>'+
+        '</div><div class="kk-col">'+ termsBlock()+'</div></div>'+ qwertyPad()+
+        '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(0)">이전</button>'+
+        '<button class="kk-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
+        '</div>');
     }
 
-    // ③ 선택 정보 · 약관 — 좌측 폼 + 우측 숫자 키패드(①과 같은 배치)
+    // ③ 선택 정보 · 약관
     var g1 = gender==='m'?' on':'', g2 = gender==='f'?' on':'';
-    return ('<div class="k">'+setBar(2)+
-      '<div class="k-signup"><div class="k-form">'+
-        '<div class="k-field on" onclick="setFocus(\'birth\')"><span class="k-field-l">생년월일 <span class="k-opt">선택</span></span>'+
-          birthView()+'</div>'+
-        '<div class="k-gender"><span class="k-field-l">성별 <span class="k-opt">선택</span></span>'+
-        '<button class="k-gb'+g1+'" onclick="setGender(\'m\')">남자</button>'+
-        '<button class="k-gb'+g2+'" onclick="setGender(\'f\')">여자</button></div>'+
+    var birthOn = (focusField==='birth') || birth;
+    var birthBox = birthOn
+      ? '<div class="kk-field on" onclick="setFocus(\'birth\')"><div class="kk-field-h">'+
+        '<span class="kk-field-l">생년월일 <span class="kk-opt">선택</span></span>'+
+        '<span class="kk-cnt">'+birth.length+' / 8</span></div>'+
+        '<div class="kk-field-v">'+birthView()+'<i class="kk-caret"></i></div></div>'
+      : '<button class="kk-dash" onclick="setFocus(\'birth\')"><b>생년월일 <span class="kk-opt">선택</span></b>'+
+        '<i>눌러서 입력해 주세요 ✎</i></button>';
+    return ('<div class="kk">'+setBar(2)+
+      '<div class="kk-body"><div class="kk-col">'+ eyebrow(2)+ birthBox+
+        '<div class="kk-row"><span class="kk-lab">성별 <span class="kk-opt">선택</span></span>'+
+        '<button class="kk-pill'+g1+'" onclick="setGender(\'m\')">남자</button>'+
+        '<button class="kk-pill'+g2+'" onclick="setGender(\'f\')">여자</button></div>'+
         termsBlock()+
-      '</div>'+
-      '<div class="k-pad-col">'+numPad()+'</div></div>'+
-      '<div class="k-padfoot" style="padding:8px 14px 11px"><div class="k-footrow">'+
-      '<button class="k-ghost" onclick="goStep(1)">이전</button>'+
-      '<button class="k-cta">약관 동의하고 가입하기</button></div></div>'+
+      '</div><div class="kk-col">'+numPad()+'</div></div>'+
+      '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(1)">이전</button>'+
+      '<button class="kk-cta">약관 동의하고 가입하기</button></div>'+
       '</div>'); }
+
+  // ===== 실 키오스크 디자인 템플릿(1280×800) · 첫 화면 / 인증 / 상품 목록 / 결제 완료 =====
+  function kkBar(active, left, right){
+    var names = ["시작","목록","결제","완료"], st = "";
+    names.forEach(function(n,i){
+      if(i) st += '<span class="kk-line"></span>';
+      st += '<span class="kk-step'+(i===active?' on':'')+'"><span>'+(i+1)+'</span><b>'+n+'</b></span>';
+    });
+    return '<div class="kk-bar">'+left+'<div class="kk-steps">'+st+'</div>'+
+      '<div class="kk-who">'+(right||'')+'</div></div>';
+  }
+  function kkHome(onclick){ return '<button class="kk-home" onclick="'+onclick+'"><i>←</i>처음으로</button>'; }
+  function kkLogo(){ return '<span class="kk-home kk-logo">GOODPHARM</span>'; }
+  function goScreen(id){
+    for(var i=0;i<SCREENS.length;i++){ if(SCREENS[i].id===id){ pickScreen(i); return; } }
+  }
+
+  // 1 첫 화면 — 처방전 스캔(주 동선) + 결제 방법(보조 동선)
+  function kStart(){
+    var ch = [
+      ['약국 회원 결제','포인트를 적립하고 사용해요','❙❙❙','accent','goScreen(\'K-3\')'],
+      ['비회원 결제','포인트 없이 바로 결제해요','🛒','','goScreen(\'K-4\')'],
+      ['약국 회원가입','가입하고 포인트를 적립해요','🎁','','goScreen(\'K-2\')']
+    ];
+    var cards = ch.map(function(c){ return (
+      '<button class="kk-ch '+c[3]+'" onclick="'+c[4]+'"><span class="kk-ch-ic">'+c[2]+'</span>'+
+      '<span class="kk-ch-tx"><b>'+c[0]+'</b><em>'+c[1]+'</em></span><span class="kk-ch-go">›</span></button>'); }).join("");
+    return ('<div class="kk">'+kkBar(0, kkLogo(), '')+
+      '<div class="kk-start">'+
+        '<div class="kk-scan"><div class="kk-doc">처방전<span class="kk-qrm"></span></div>'+
+          '<div class="kk-scan-h">처방전 QR코드를<br>스캐너에 대주세요</div>'+
+          '<div class="kk-scan-s">회원 인증과 결제가 한 번에 진행돼요</div>'+
+          '<div class="kk-chev">⌄</div></div>'+
+        '<div class="kk-choices"><div class="kk-lead">처방전이 없으신가요?<b>결제 방법을 선택해 주세요</b></div>'+
+          cards+'</div>'+
+      '</div></div>'); }
 
   // 3 굿팜 앱 바코드 인증
   function kAuth(tab){   // tab 0: 굿팜 앱 바코드, 1: 전화번호로 인증
     var appOn = tab===0;
-    var right = appOn
-      ? '<div class="k-qrcard"><div class="k-qr"></div><div class="k-qr-t">앱 실행이 번거로우신가요?</div><div class="k-qr-b">QR로 굿팜앱 바코드를 바로 확인하세요!</div></div>'
-      : '<div class="k-qrcard"><div class="k-field on" style="width:88%"><span class="k-field-l">전화번호</span><span class="k-field-v">010 - 1234 - <span class="k-cur">5678</span></span></div><div class="k-qr-t" style="margin-top:8px">가입한 전화번호로 포인트를 적립해요</div></div>';
     var main = appOn
-      ? '<div class="k-h c">굿팜앱을 실행하여<br><b>바코드를 준비해주세요</b></div>'+
-        '<div class="k-bigbar"><div class="k-bigbar-b"></div><div class="k-bigbar-n">GP 8801-2345-9789</div></div>'+
-        '<div class="k-arw2">화면 아래 스캐너에 바코드를 대주세요 ⌄</div>'
-      : '<div class="k-h c">가입한<br><b>전화번호를 입력해 주세요</b></div>'+
-        '<div class="k-bigbar" style="background:#f6f8f7;box-shadow:none"><div style="font-family:monospace;font-size:22px;font-weight:800;text-align:center;letter-spacing:.05em">010-1234-5678</div></div>'+
-        '<div class="k-arw2">키패드로 전화번호를 입력하세요</div>';
-    return ('<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+steps(0)+'<span class="k-tag">회원 인증</span></div>'+
-      '<div class="k-tabs"><button class="k-tab'+(!appOn?' on':'')+'" onclick="pickState(1)">전화번호로 인증</button>'+
-      '<button class="k-tab'+(appOn?' on':'')+'" onclick="pickState(0)">굿팜 앱 바코드 인증<span class="k-tab-b">+혜택</span></button></div>'+
-      '<div class="k-auth"><div class="k-authm">'+main+'</div>'+right+'</div></div>'); }
+      ? '<div class="kk-auth-h">굿팜 앱의 <b>회원 바코드</b>를<br>준비해 주세요</div>'+
+        '<div class="kk-phone"><div class="kk-phone-s"><div class="kk-bars"></div>'+
+          '<div class="kk-barno">GP 8801-2345-6789</div></div></div>'+
+        '<div class="kk-auth-g">아래 스캐너에 바코드를 인식해 주세요</div><div class="kk-chev">⌄</div>'
+      : '<div class="kk-auth-h">가입한 <b>전화번호</b>를<br>입력해 주세요</div>'+
+        '<div class="kk-field" style="width:460px;background:#fff">'+
+          '<div class="kk-field-h"><span class="kk-field-l">전화번호</span><span class="kk-cnt">11 / 11</span></div>'+
+          '<div class="kk-field-v">010 - 1234 - 5678<i class="kk-caret"></i></div></div>'+
+        '<div class="kk-auth-g">키패드로 전화번호를 눌러 주세요</div>';
+    var side = appOn
+      ? '<div class="kk-qrcard"><h4>휴대폰으로 QR을 스캔하세요</h4><div class="kk-qr"></div>'+
+        '<p>굿팜 앱이 열리고 회원 바코드가<br>바로 표시됩니다</p></div>'
+      : '<div class="kk-qrcard"><h4>포인트는 이렇게 쌓여요</h4><div class="kk-qr"></div>'+
+        '<p>가입한 전화번호로<br>포인트를 적립해 드려요</p></div>';
+    return ('<div class="kk">'+kkBar(0, kkHome("goScreen('K-1')"), '<span>👤 비회원</span>')+
+      '<div class="kk-tabs">'+
+        '<button class="kk-tab'+(!appOn?' on':'')+'" onclick="pickState(1)">전화번호로 인증</button>'+
+        '<button class="kk-tab'+(appOn?' on':'')+'" onclick="pickState(0)">굿팜 앱으로 인증</button></div>'+
+      '<div class="kk-auth"><div class="kk-authm">'+main+'</div>'+side+'</div></div>'); }
 
   // 4 상품 목록
   function kCart(){
     var items = [
-      ['타이레놀 500mg','7,000','1,000'],
-      ['비타민C 1000mg','14,000','1,000'],
-      ['마스크 KF94','2,300','300']
+      ['네오케어밴드(혼합)대용량-80매','3,000','적립 90P',''],
+      ['비맥스메타비정(60/120) (60정)','30,000','약사님 복약 지도 필요','일반의약품']
     ];
     var list = items.map(function(it){ return (
-      '<div class="k-it"><span class="k-it-tag">일반의약품</span>'+
-      '<div class="k-it-m"><div class="k-it-nm">'+it[0]+'</div>'+
-      '<div class="k-it-note">복용 전 약사 상담이 필요해요</div>'+
-      '<div class="k-it-pt">적립 예정 '+it[2]+'P</div></div>'+
-      '<div class="k-qty"><button>−</button><span>1</span><button>+</button></div>'+
-      '<div class="k-it-pr">'+it[1]+'<span class="k-it-u">원</span></div></div>'); }).join("");
-    return ('<div class="k"><div class="k-bar"><span class="k-back">← 처음으로</span>'+steps(1)+'<span class="k-member">👤 유종권 님</span></div>'+
-      '<div class="k-cart"><div class="k-list">'+list+'</div>'+
-      '<div class="k-foot"><div class="k-count">총 <b>'+items.length+'</b>개</div>'+
-      '<div class="k-total"><span class="k-total-l">총 결제 금액</span><span class="k-total-v">23,300원</span></div>'+
-      '<div class="k-pays"><button class="k-pay ghost">현금 결제</button><button class="k-pay">카드 결제 →</button></div></div></div></div>'); }
+      '<div class="kk-it"><div class="kk-it-m">'+
+        '<div class="kk-it-nm">'+(it[3]?'<span class="kk-tag">⊘ '+it[3]+'</span>':'')+it[0]+'</div>'+
+        '<div class="kk-it-s'+(it[3]?' warn':'')+'">'+it[2]+'</div></div>'+
+      '<div class="kk-qty"><button class="kk-qb">−</button><span class="kk-qn">1</span>'+
+        '<button class="kk-qb plus">+</button></div>'+
+      '<div class="kk-it-pr"><b>'+it[1]+'원</b></div>'+
+      '<button class="kk-del">🗑</button></div>'); }).join("");
+    return ('<div class="kk">'+kkBar(1, kkHome("goScreen('K-1')"), '<span>👤 010-****-9866</span>')+
+      '<div class="kk-list">'+list+'</div>'+
+      '<div class="kk-paybar"><span class="kk-pay-l">총 결제 금액</span>'+
+      '<span class="kk-pay-v">33,000<em>원</em></span>'+
+      '<button class="kk-pay-b" onclick="goScreen(\'K-5\')">💳 다음으로 →</button></div></div>'); }
 
   // 5 결제 완료
   function kDone(){
-    return ('<div class="k"><div class="k-bar"><span class="k-logo">◍ 굿팜</span>'+steps(3)+'<span class="k-donebadge">● 결제 완료</span></div>'+
-      '<div class="k-done"><div class="k-done-l"><div class="k-check">✓</div>'+
-      '<div class="k-done-h">결제가 완료되었어요</div>'+
-      '<div class="k-done-g">약사님께 결제 완료 사실을 알려주세요</div>'+
-      '<div class="k-earn"><span class="k-earn-ic">🎁</span><div><div class="k-earn-v">750P 적립 완료</div>'+
-      '</div></div></div>'+
-      '<div class="k-rc"><div class="k-rc-r"><span>구매 상품</span><b>처방전 외 2건</b></div>'+
-      '<div class="k-rc-r"><span>결제 정보</span><b>카드 결제 · 일시불</b></div><div class="k-rc-d"></div>'+
-      '<div class="k-rc-r"><span>상품 합계</span><span>43,700원</span></div>'+
-      '<div class="k-rc-r use"><span>포인트 사용</span><span>− 1,500P</span></div>'+
-      '<div class="k-rc-t"><span>결제 금액</span><b>42,200원</b></div></div></div>'+
-      '<button class="k-home">처음 화면으로 돌아가기</button></div>'); }
+    return ('<div class="kk">'+kkBar(3, kkLogo(), '<span class="ok">● 결제 완료</span>')+
+      '<div class="kk-done"><div class="kk-donel">'+
+        '<div class="kk-check">✓</div>'+
+        '<div class="kk-done-h">결제가<br>완료되었습니다</div>'+
+        '<div class="kk-note">🔔 약사님께 결제 완료 사실을 알려주세요</div>'+
+        '<div class="kk-earn"><span>적립 포인트</span><b>+ 750 P</b></div>'+
+      '</div>'+
+      '<div class="kk-rc"><div class="kk-rc-l">구매 상품</div>'+
+        '<div class="kk-rc-v">네오케어밴드(혼합)대용량-80매 외 2건</div>'+
+        '<div class="kk-rc-d"></div>'+
+        '<div class="kk-rc-l">결제 정보</div><div class="kk-rc-v">카드 결제 · 일시불</div>'+
+        '<div style="margin-top:16px">'+
+          '<div class="kk-rc-r"><span>상품 합계</span><b>43,700원</b></div>'+
+          '<div class="kk-rc-r"><span>포인트 사용</span><b>− 1,500 P</b></div>'+
+          '<div class="kk-rc-r"><span>승인일시</span><b>2026.10.16 13:16:45</b></div>'+
+        '</div>'+
+        '<div class="kk-rc-t"><span>결제 금액</span><b>42,200<em style="font-style:normal;font-size:22px"> 원</em></b></div>'+
+      '</div></div>'+
+      '<button class="kk-backhome" onclick="goScreen(\'K-1\')">처음 화면으로 돌아가기</button></div>'); }
 
   // ── POS ──
   function posPay(alerted){
