@@ -172,6 +172,19 @@
   .k-cta:disabled{background:var(--line);color:var(--faint);cursor:not-allowed}
   .k-footrow{display:flex;align-items:stretch;gap:8px}
   .k-footrow .k-cta{flex:1;width:auto}
+  /* 가입 취소 확인 모달 */
+  .k-dim{position:absolute;inset:0;background:rgba(12,22,20,.52);display:flex;align-items:center;
+    justify-content:center;z-index:30}
+  .k-modal{background:#fff;border-radius:16px;padding:22px 24px 18px;width:330px;text-align:center;
+    box-shadow:0 18px 44px rgba(10,18,16,.3)}
+  .k-modal-h{font-size:16px;font-weight:800;letter-spacing:-.01em}
+  .k-modal-t{font-size:12.5px;color:var(--soft);line-height:1.55;margin-top:8px}
+  .k-modal-b{display:flex;gap:8px;margin-top:18px}
+  .k-modal-b button{flex:1;height:46px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer}
+  .k-modal-b .no{background:#fff;border:1.5px solid var(--line);color:var(--soft)}
+  .k-modal-b .yes{background:var(--teal);border:none;color:#fff}
+  .k-cta.lg{height:54px;font-size:18px;letter-spacing:.02em}
+  .k-footrow:has(.k-cta.lg) .k-ghost{height:54px}
   .k-ghost{flex:none;min-width:92px;height:44px;border-radius:12px;background:#fff;border:1.5px solid var(--line);
     color:var(--soft);font-size:13.5px;font-weight:800;cursor:pointer}
   .k-ghost:hover{background:var(--field)}
@@ -486,8 +499,18 @@
   function toggleExtra(v){ collectExtra = v; if(!v){ birth=""; gender=""; if(sti>1) sti=1; }
     renderStates(); renderVp(); }
   function goStep(i){ pickState(i); }
-  // 취소 — 입력값만 비우고 ①로 (키오스크 설정값은 그대로)
-  function cancelSignup(){ gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
+  // 가입 취소 — 확인 모달을 먼저 띄우고, 확인하면 입력값을 비운다 (키오스크 설정값은 그대로)
+  function askCancel(){ confirmOpen = true; renderVp(); }
+  function closeCancel(){ confirmOpen = false; renderVp(); }
+  function cancelModal(){
+    return '<div class="k-dim" onclick="closeCancel()"><div class="k-modal" onclick="event.stopPropagation()">'+
+      '<div class="k-modal-h">회원가입을 취소할까요?</div>'+
+      '<div class="k-modal-t">지금까지 입력한 내용이 모두 지워집니다.</div>'+
+      '<div class="k-modal-b"><button class="no" onclick="cancelSignup()">가입 취소</button>'+
+      '<button class="yes" onclick="closeCancel()">계속 입력하기</button></div>'+
+      '</div></div>';
+  }
+  function cancelSignup(){ confirmOpen = false; gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
     shift=false; eng=false; strokes=0; called=false; focusField="name";
     var home = 0; for(var i=0;i<SCREENS.length;i++){ if(SCREENS[i].id==="K-1"){ home=i; break; } }
     pickScreen(home); }
@@ -532,7 +555,8 @@
   //   안 받음: ① 전화번호 / ② 이름 · 약관
   function signupTotal(){ return collectExtra ? 3 : 2; }
   function setBar(step){
-    return '<div class="k-bar"><button class="k-back" onclick="cancelSignup()">← 처음으로</button>'+
+    var home = step>0 ? '<button class="k-back" onclick="askCancel()">← 처음으로</button>' : '';
+    return '<div class="k-bar">'+home+
       '<span class="k-chip">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</span></div>';
   }
   function renderKioskSet(){
@@ -567,11 +591,11 @@
         '<div class="k-field on"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
           '<span class="k-field-v">'+phoneView()+'<i class="k-caret"></i></span></div>'+
         '</div>'+
-        '<div class="k-pad-col">'+numPad(true)+
-        '<div class="k-padfoot"><div class="k-footrow">'+
-          '<button class="k-ghost" onclick="cancelSignup()">취소</button>'+
-          '<button class="k-cta"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div></div>'+
-        '</div></div></div>');
+        '<div class="k-pad-col">'+numPad(true)+'</div></div>'+
+        '<div class="k-padfoot" style="padding:8px 14px 11px"><div class="k-footrow">'+
+          '<button class="k-ghost" onclick="askCancel()">취소</button>'+
+          '<button class="k-cta lg"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div></div>'+
+        '</div>');
     }
 
     var nm = nameText();
@@ -701,6 +725,7 @@
   var nameCommitted = "", cho = -1, jung = -1, jong = 0;   // 이름 한글 조합
   var shift = false, eng = false, strokes = 0;
   var called = false;            // 약사 호출 여부
+  var confirmOpen = false;       // 가입 취소 확인 모달
   var focusField = "name";       // ②화면에서 입력 중인 칸 (name · birth)
   var collectExtra = true;       // 키오스크 설정 — 성별·생년월일 수집
   var SCREENS = [
@@ -739,7 +764,7 @@
     renderKioskSet();
     var s = SCREENS[si];
     $("device").className = "device "+s.device;
-    $("vp").innerHTML = s.render(sti);
+    $("vp").innerHTML = s.render(sti) + (confirmOpen ? cancelModal() : "");
     $("tag").textContent = s.group+" · "+s.name+(s.states.length>1? " · "+s.states[sti] : "");
     requestAnimationFrame(postHeight);
   }
@@ -755,7 +780,8 @@
   }
   window.pickScreen = pickScreen; window.pickState = pickState; window.setGender = setGender;
   window.pressNum = pressNum; window.pressHan = pressHan; window.callPharmacist = callPharmacist;
-  window.toggleExtra = toggleExtra; window.goStep = goStep; window.cancelSignup = cancelSignup; window.setFocus = setFocus;
+  window.toggleExtra = toggleExtra; window.goStep = goStep; window.cancelSignup = cancelSignup;
+  window.askCancel = askCancel; window.closeCancel = closeCancel; window.setFocus = setFocus;
   window.renderKioskSet = renderKioskSet;
 
   renderNav(); renderStates(); renderVp();
