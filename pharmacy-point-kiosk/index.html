@@ -130,11 +130,18 @@
   .k-form{padding:12px 14px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
   .k-h{font-size:15px;font-weight:700;line-height:1.3;color:var(--soft)}
   .k-h b{color:var(--ink);font-weight:800}
-  .k-field{border:1.5px solid var(--line);border-radius:11px;padding:8px 13px;background:#fff;display:flex;flex-direction:column;gap:2px}
-  .k-field.on{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,154,146,.1)}
-  .k-field-l{font-size:9.5px;color:var(--soft);font-weight:700}
-  .k-field-v{font-size:17px;font-weight:800;letter-spacing:.03em}
-  .k-field-v.dim{font-size:13px;color:var(--faint);font-weight:700}
+  /* 입력칸 — 테두리 없이, 지금 넣는 값만 크게 */
+  .k-field{padding:3px 2px;background:transparent;display:flex;flex-direction:column;gap:3px;cursor:pointer}
+  .k-field-l{font-size:11px;color:var(--faint);font-weight:700;display:flex;align-items:center;gap:5px}
+  .k-field-v{font-size:17px;font-weight:700;letter-spacing:.02em;color:var(--faint)}
+  .k-field.on .k-field-l{color:var(--soft)}
+  .k-field.on .k-field-v{font-size:30px;font-weight:800;color:var(--ink);letter-spacing:.01em}
+  .k-field.done .k-field-v{font-size:16px;color:var(--ink);font-weight:700}
+  .k-field-v.dim{color:#c3cbc9;font-weight:700}
+  .k-field.on .k-field-v.dim{color:#cdd5d3;font-size:24px}
+  .k-caret{display:inline-block;width:3px;height:0.92em;background:var(--teal);vertical-align:-2px;
+    margin-left:2px;animation:kblink 1.05s steps(1) infinite}
+  @keyframes kblink{0%,55%{opacity:1}56%,100%{opacity:0}}
   .k-cur{border-bottom:2px solid var(--teal);padding-bottom:1px}
   .k-dm{color:var(--faint)}
   .k-help{font-size:10px;color:var(--teal-d);font-weight:600}
@@ -142,9 +149,13 @@
   .k-terms{display:flex;flex-direction:column;gap:5px;margin-top:3px;padding-top:8px;border-top:1px solid var(--line)}
   .k-terms-h{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800}
   .k-req{font-size:8.5px;font-weight:800;color:#fff;background:var(--pt);padding:1.5px 6px;border-radius:999px}
-  .k-opt{font-size:8.5px;font-weight:800;color:var(--soft);background:#eef1f4;padding:1.5px 6px;border-radius:999px;margin-left:4px}
-  .k-gender{flex:1;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:11px;padding:6px 9px;background:#fff}
-  .k-gb{flex:1;font-size:11.5px;font-weight:700;padding:6px 0;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+  .k-opt{font-size:8.5px;font-weight:800;color:var(--soft);background:#eef1f4;padding:1.5px 6px;border-radius:999px}
+  .k-callbox{display:flex;align-items:center;gap:9px;border:1px dashed #c9d3d0;border-radius:11px;
+    padding:8px 11px;background:#fff}
+  .k-callbox-t{flex:1;font-size:10.5px;color:var(--soft);line-height:1.45}
+  .k-callbox-t b{display:block;font-size:12px;color:var(--ink);font-weight:800}
+  .k-gender{flex:1;display:flex;align-items:center;gap:8px;padding:3px 2px;background:transparent}
+  .k-gb{flex:1;font-size:14px;font-weight:700;padding:11px 0;border:1.5px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;color:var(--soft)}
   .k-gb.on{background:var(--teal-bg);border-color:var(--teal);color:var(--teal-d)}
   .k-field-v.sm2{font-size:14px;letter-spacing:0}
   .k-term{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -162,6 +173,62 @@
   .k-key{border:none;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(15,26,24,.07);font-size:17px;font-weight:700;
     color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:36px}
   .k-key.fn{font-size:11.5px;color:var(--soft);background:var(--field);box-shadow:none}
+
+  /* 2-② 이름 입력 — 하단 전폭 자판 */
+  .k-name{flex:1;display:flex;flex-direction:column;min-height:0}
+  .k-nametop{padding:13px 16px 10px;display:flex;flex-direction:column;gap:7px}
+  .k-callrow{display:flex;justify-content:flex-end}
+  .k-call{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--teal);background:var(--teal-bg);
+    color:var(--teal-d);font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:999px;cursor:pointer}
+  .k-call:hover{background:#ddf0ee}
+  .k-barcall{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+  .k-barcall-t{font-size:10px;color:var(--soft);font-weight:700}
+  .k-barcall-ok{font-size:10.5px;font-weight:800;color:var(--teal-d);background:var(--teal-bg);padding:5px 11px;border-radius:999px}
+  .k-call.sm{font-size:11px;padding:5px 11px}
+  .k-called{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal-d);
+    background:var(--teal-bg);border-radius:9px;padding:7px 11px}
+  .k-kb{flex:1;background:#eef2f1;padding:8px 9px 10px;display:flex;flex-direction:column;gap:5px;justify-content:center}
+  .k-kbrow{display:flex;gap:4px;justify-content:center}
+  .k-kk{flex:1;max-width:52px;min-height:30px;border:none;border-radius:7px;background:#fff;
+    box-shadow:0 1px 2px rgba(15,26,24,.07);font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer}
+  .k-kk.fn{font-size:9.5px;color:var(--soft);background:var(--field);box-shadow:none;max-width:70px}
+  .k-kk.fn.on{background:var(--teal);color:#fff}
+  .k-cnt{font-size:9.5px;color:var(--faint);font-weight:700}
+
+  /* ② 이름 + 추가 정보 — 폼 2열 재배치 */
+  .k-two{flex:none;display:grid;grid-template-columns:1.05fr 1fr;gap:6px 14px;padding:10px 14px 6px;align-items:start}
+  .k-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .k-two .k-field{padding:7px 11px}
+  .k-two .k-field-v{font-size:15px}
+  .k-two .k-field.on .k-field-v.dim{font-size:20px;letter-spacing:0}
+  .k-two .k-terms{margin-top:0;padding-top:6px}
+  .k-two .k-term{font-size:11px}
+  .k-two .k-cta{height:40px;font-size:13.5px;margin-top:2px}
+
+  /* 화면 밖 — 키오스크 설정 컨트롤 */
+  .ks{margin-top:10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+    background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:11.5px;color:var(--soft)}
+  .ks-h{font-weight:800;color:var(--ink)}
+  .ks-tag{font-size:9.5px;font-weight:800;color:var(--soft);background:var(--field);padding:2px 7px;border-radius:999px}
+  .ks-b{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 11px;
+    font-size:11.5px;font-weight:700;color:var(--soft);cursor:pointer}
+  .ks-b.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .ks-n{margin-left:auto;font-weight:800;color:var(--teal-d)}
+
+  /* 약사 호출 알림 배너 (POS) */
+  .pos-call{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;gap:10px;
+    background:#fff4ec;border-bottom:1.5px solid #f0b58f;border-left:5px solid var(--pt);padding:9px 12px;
+    box-shadow:0 3px 10px -4px rgba(216,64,26,.45)}
+  .pos.alerted .pos-l,.pos.alerted .pos-r{padding-top:58px}
+  .pos-call-i{flex:none;width:26px;height:26px;border-radius:50%;background:var(--pt);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:13px}
+  .pos-call-t{flex:1;font-size:11.5px;line-height:1.45}
+  .pos-call-t b{display:block;font-size:12.5px;font-weight:800;color:var(--pt)}
+  .pos-call-t span{color:var(--soft)}
+  .pos-call-b{flex:none;font-size:11.5px;font-weight:800;color:#fff;background:var(--pt);
+    border:none;border-radius:8px;padding:7px 14px;cursor:pointer}
+
+  /* 2-③ 추가 정보 — 설정 토글 */
 
   /* 3 굿팜 앱 바코드 인증 */
   .k-tabs{flex:none;display:flex;gap:8px;padding:12px 14px 0}
@@ -250,12 +317,13 @@
 <div class="wrap">
   <h1>약국 포인트 · 프로토타입</h1>
   <div class="sub">키오스크 5개 화면(첫 화면·약국 회원가입·굿팜 앱 바코드 인증·상품 목록·결제 완료)을 중심으로,
-    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />약국 회원가입은 <b>이름·전화번호·생년월일·성별</b>을 받습니다. 이름 입력 자판(쿼티 두벌식·천지인)과 생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다. 자판 비교: <a href="./kiosk-signup-keyboard.html" style="color:var(--teal-d);font-weight:700">이름 입력 자판 3안 보기 ›</a></div>
+    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>이고 <b>약사님 호출하기</b>는 이름 화면에 있습니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>는 버튼만 두지 않고 <b>"입력이 어려우신가요? 누르면 약국 PC로 알림이 가요"</b> 안내와 함께, 접근성 검증기준 [별표5] 7.e에 따라 <b>전 화면 같은 자리</b>에 둡니다. 누르면 POS에 <b>고정 배너</b>로 알림이 가고 약사가 확인할 때까지 남습니다(<b>P-1 · 약사 호출 알림</b> 상태에서 확인).  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
 
   <div class="nav" id="nav"></div>
 
   <div class="states-h">화면 상태</div>
   <div class="states" id="states"></div>
+  <div id="kioskset"></div>
 
   <div class="stage">
     <div class="device kiosk" id="device"><div class="screen" id="vp"></div></div>
@@ -327,39 +395,212 @@
       '<div class="k-scan-s">회원 인증과 결제가 한 번에 진행돼요</div><div class="k-arw">⌄</div></div>'+
       '<div class="k-choices"><div class="k-lead">처방전이 없으신가요?<b>결제 방법을 선택해 주세요</b></div>'+cards+'</div></div></div>'); }
 
-  // 2 약국 회원가입 — step 0: 전화번호, 1: 이름·생년월일·성별 (성별·생년월일은 키오스크 설정값)
+  // ── 한글 조합 (자판 비교 프로토타입 C안 = 쿼티 + 한/영과 같은 로직) ──
+  var CHO  = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ".split("");
+  var JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ".split("");
+  var JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+  var JUNG_COMB = {"ㅗㅏ":"ㅘ","ㅗㅐ":"ㅙ","ㅗㅣ":"ㅚ","ㅜㅓ":"ㅝ","ㅜㅔ":"ㅞ","ㅜㅣ":"ㅟ","ㅡㅣ":"ㅢ"};
+  var JONG_COMB = {"ㄱㅅ":"ㄳ","ㄴㅈ":"ㄵ","ㄴㅎ":"ㄶ","ㄹㄱ":"ㄺ","ㄹㅁ":"ㄻ","ㄹㅂ":"ㄼ","ㄹㅅ":"ㄽ","ㄹㅌ":"ㄾ","ㄹㅍ":"ㄿ","ㄹㅎ":"ㅀ","ㅂㅅ":"ㅄ"};
+  var QW = [["ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ"],
+            ["ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ"],
+            ["ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ"]];
+  var QW_SHIFT = {"ㅂ":"ㅃ","ㅈ":"ㅉ","ㄷ":"ㄸ","ㄱ":"ㄲ","ㅅ":"ㅆ","ㅐ":"ㅒ","ㅔ":"ㅖ"};
+  var EN = [["q","w","e","r","t","y","u","i","o","p"],
+            ["a","s","d","f","g","h","j","k","l"],
+            ["z","x","c","v","b","n","m"]];
+
+  function curSyl(){
+    if(cho<0 && jung<0) return "";
+    if(cho>=0 && jung>=0) return String.fromCharCode(0xAC00 + (cho*21 + jung)*28 + jong);
+    if(cho>=0) return CHO[cho];
+    return JUNG[jung];
+  }
+  function nameText(){ return nameCommitted + curSyl(); }
+  function commitSyl(){ nameCommitted += curSyl(); cho=-1; jung=-1; jong=0; }
+  function putJamo(ch){
+    var ci = CHO.indexOf(ch), vi = JUNG.indexOf(ch), ji = JONG.indexOf(ch);
+    if(vi >= 0){
+      if(cho>=0 && jung<0){ jung = vi; return; }
+      if(cho>=0 && jung>=0 && jong===0){
+        var comb = JUNG_COMB[JUNG[jung]+ch];
+        if(comb){ jung = JUNG.indexOf(comb); return; }
+        commitSyl(); jung = vi; return;
+      }
+      if(cho>=0 && jung>=0 && jong>0){
+        var js = JONG[jong], moveC, keep = 0;
+        var pair = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===js; })[0];
+        if(pair){ keep = JONG.indexOf(pair[0]); moveC = pair[1]; } else { moveC = js; }
+        jong = keep; commitSyl();
+        cho = CHO.indexOf(moveC); jung = vi; return;
+      }
+      commitSyl(); jung = vi; return;
+    }
+    if(ci >= 0 || ji >= 0){
+      if(cho<0 && jung<0){ cho = ci; return; }
+      if(cho>=0 && jung<0){ commitSyl(); cho = ci; return; }
+      if(cho>=0 && jung>=0 && jong===0){
+        if(ji>0){ jong = ji; return; }
+        commitSyl(); cho = ci; return;
+      }
+      var c2 = JONG_COMB[JONG[jong]+ch];
+      if(c2){ jong = JONG.indexOf(c2); return; }
+      commitSyl(); cho = ci; return;
+    }
+    commitSyl(); nameCommitted += ch;
+  }
+  function nameBack(){
+    if(jong>0){ var pj = Object.keys(JONG_COMB).filter(function(k){ return JONG_COMB[k]===JONG[jong]; })[0];
+      jong = pj ? JONG.indexOf(pj[0]) : 0; return; }
+    if(jung>=0){ var pv = Object.keys(JUNG_COMB).filter(function(k){ return JUNG_COMB[k]===JUNG[jung]; })[0];
+      jung = pv ? JUNG.indexOf(pv[0]) : -1; return; }
+    if(cho>=0){ cho = -1; return; }
+    nameCommitted = nameCommitted.slice(0,-1);
+  }
+  function pressHan(ch){
+    if(ch==="⇧"){ shift=!shift; renderVp(); return; }
+    if(ch==="한/영"){ eng=!eng; shift=false; renderVp(); return; }
+    if(ch==="지움"){ nameBack(); renderVp(); return; }
+    if(ch==="전체삭제"){ nameCommitted=""; cho=-1; jung=-1; jong=0; renderVp(); return; }
+    var c = (!eng && shift && QW_SHIFT[ch]) ? QW_SHIFT[ch] : ch;
+    putJamo(c); if(shift && !eng) shift=false;
+    strokes++; renderVp();
+  }
+  function pressNum(k){
+    var toBirth = (sti===2);
+    var t = toBirth ? birth : phone, max = toBirth ? 8 : 11;
+    if(k==="지움") t = t.slice(0,-1);
+    else if(k==="전체삭제") t = "";
+    else if(k==="010"){ if(t.length+3 <= max) t += "010"; }   // 앞 3자리를 한 번에
+    else if(t.length < max) t += k;
+    if(toBirth) birth = t; else phone = t;
+    renderVp();
+  }
+  function callPharmacist(){ called = true; renderVp(); }
+  function setFocus(f){ focusField = f; renderVp(); }
+  function toggleExtra(v){ collectExtra = v; if(!v){ birth=""; gender=""; if(sti>1) sti=1; }
+    renderStates(); renderVp(); }
+  function goStep(i){ pickState(i); }
+
+  function phoneView(){
+    var d = phone.padEnd(11,"_").split("");
+    var g = [d.slice(0,3).join(""), d.slice(3,7).join(""), d.slice(7,11).join("")];
+    return g.map(function(x){ return x.replace(/_/g,'<span class="k-dm">_</span>'); }).join(" - ");
+  }
+  function birthView(){
+    if(!birth) return '<span class="k-field-v dim">YYYY.MM.DD<i class="k-caret"></i></span>';
+    var d = birth.padEnd(8,"_").split("");
+    var t = d.slice(0,4).join("")+"."+d.slice(4,6).join("")+"."+d.slice(6,8).join("");
+    return '<span class="k-field-v">'+t.replace(/_/g,'<span class="k-dm">_</span>')+'<i class="k-caret"></i></span>';
+  }
+  function numPad(forPhone){
+    var last = forPhone ? ["010","0","⌫ 지움"] : ["전체삭제","0","⌫ 지움"];
+    return '<div class="k-keypad">'+["1","2","3","4","5","6","7","8","9"].concat(last).map(function(k){
+      var fn = (k==="⌫ 지움"||k==="전체삭제")?' fn':'';
+      var key = (k==="⌫ 지움") ? "지움" : k;
+      return '<button class="k-key'+fn+'" onclick="pressNum(\''+key+'\')">'+k+'</button>'; }).join("")+'</div>';
+  }
+  function qwertyPad(){
+    var rows = (eng ? EN : QW), out = "";
+    rows.forEach(function(r,i){
+      var keys = r.map(function(k){
+        var face = (!eng && shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k;
+        return '<button class="k-kk" onclick="pressHan(\''+k+'\')">'+face+'</button>'; });
+      if(i===2){
+        keys.unshift('<button class="k-kk fn'+(eng?' on':'')+'" onclick="pressHan(\'한/영\')">'+(eng?'한글':'ABC')+'</button>');
+        keys.unshift('<button class="k-kk fn'+(shift?' on':'')+'" onclick="pressHan(\'⇧\')">'+(eng?'Shift ⇧':'쌍자음 ⇧')+'</button>');
+        keys.push('<button class="k-kk fn" onclick="pressHan(\'지움\')">지움</button>');
+        keys.push('<button class="k-kk fn" onclick="pressHan(\'전체삭제\')">전체삭제</button>');
+      }
+      out += '<div class="k-kbrow">'+keys.join("")+'</div>';
+    });
+    return '<div class="k-kb">'+out+'</div>';
+  }
+
+  // 2 약국 회원가입 — 선택 정보를 받으면 3화면, 받지 않으면 2화면
+  //   받음   : ① 전화번호 / ② 이름 / ③ 선택 정보 · 약관
+  //   안 받음: ① 전화번호 / ② 이름 · 약관
+  function signupTotal(){ return collectExtra ? 3 : 2; }
+  function setBar(step){
+    return '<div class="k-bar"><span class="k-back">← 이전</span>'+
+      '<span class="k-chip">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</span>'+callRow()+'</div>';
+  }
+  function renderKioskSet(){
+    var el = $("kioskset");
+    if(SCREENS[si].id !== "K-2"){ el.innerHTML = ""; return; }
+    el.innerHTML = '<div class="ks"><span class="ks-h">키오스크 설정</span>'+
+      '<span class="ks-tag">화면 밖 · 약국 기기 설정</span>'+
+      '<span>성별·생년월일</span>'+
+      '<button class="ks-b'+(collectExtra?' on':'')+'" onclick="toggleExtra(true)">받음(선택 입력)</button>'+
+      '<button class="ks-b'+(!collectExtra?' on':'')+'" onclick="toggleExtra(false)">사용 안 함</button>'+
+      '<span class="ks-n">가입 '+signupTotal()+'화면</span></div>';
+  }
+  function termsBlock(){
+    return '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
+      '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">보기 ›</span></div>'+
+      '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용 <span style="color:var(--soft);font-weight:600">(처방 고객 연결 포함)</span></span><span class="k-term-view">보기 ›</span></div>'+
+      '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>';
+  }
+  function callRow(){
+    if(called) return '<span class="k-barcall"><span class="k-barcall-ok">'+
+      '✓ 약사님께 전달했어요 · 입력은 그대로 이어서 하세요</span></span>';
+    return '<span class="k-barcall"><span class="k-barcall-t">입력이 어려우시면 약사님이 도와드려요</span>'+
+      '<button class="k-call sm" onclick="callPharmacist()">🔔 약사님 호출하기</button></span>';
+  }
+
   function kSignup(step){
-    var phoneOn = step===0, infoOn = step===1;
+    if(step===0){
+      var ok0 = phone.length===11;
+      return ('<div class="k">'+setBar(0)+
+        '<div class="k-signup"><div class="k-form">'+
+        '<div class="k-h">포인트 적립을 위한<br><b>전화번호를 입력해 주세요</b></div>'+
+        '<div class="k-field on"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
+          '<span class="k-field-v">'+phoneView()+'<i class="k-caret"></i></span></div>'+
+        '</div>'+
+        '<div class="k-pad-col">'+numPad(true)+
+        '<div class="k-padfoot"><button class="k-cta"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div>'+
+        '</div></div></div>');
+    }
+
+    var nm = nameText();
+
+    // ② 이름 — 선택 정보를 받으면 이름만, 받지 않으면 약관까지 이 화면에서 끝낸다
+    if(step===1){
+      if(collectExtra){
+        return ('<div class="k">'+setBar(1)+'<div class="k-name">'+
+          '<div class="k-nametop" style="padding-top:9px">'+
+          '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
+            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
+          '</div>'+ qwertyPad()+
+          '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1">'+
+          '<button class="k-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button></div>'+
+          '</div></div>');
+      }
+      // 선택 정보를 받지 않는 약국 — 이름 + 약관을 2열로 나란히
+      return ('<div class="k">'+setBar(1)+'<div class="k-name">'+
+        '<div class="k-two">'+
+        '<div class="k-col">'+
+          '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
+            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
+          '<div class="k-help">이름과 전화번호로 회원을 찾습니다</div>'+
+        '</div>'+
+        '<div class="k-col">'+ termsBlock()+
+          '<button class="k-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button>'+
+        '</div></div>'+ qwertyPad()+'</div></div>');
+    }
+
+    // ③ 선택 정보 · 약관 — 좌측 폼 + 우측 숫자 키패드(①과 같은 배치)
     var g1 = gender==='m'?' on':'', g2 = gender==='f'?' on':'';
-    var canSubmit = step===1 && gender!=='';
-    return ('<div class="k"><div class="k-bar"><span class="k-back">← 이전</span>'+
-      '<span class="k-chip">약국 회원가입 · '+(step+1)+' / 2 정보 입력</span><span class="k-r"></span></div>'+
+    return ('<div class="k">'+setBar(2)+
       '<div class="k-signup"><div class="k-form">'+
-      '<div class="k-h">'+(phoneOn
-        ? '포인트 적립을 위한<br><b>전화번호를 입력해 주세요</b>'
-        : '<b>이름과 생년월일·성별을 입력해 주세요</b>')+'</div>'+
-      '<div class="k-field'+(phoneOn?' on':'')+'"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
-        '<span class="k-field-v">010 - 1234 - <span class="k-cur">56</span><span class="k-dm">__</span></span></div>'+
-      (phoneOn ? '<div class="k-help">이 번호로 적립 포인트를 안내해 드려요</div>' : '')+
-      '<div class="k-subs">'+
-        '<div class="k-field sm'+(infoOn?' on':'')+'" style="flex:1"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
-        '<span class="k-field-v '+(infoOn?'':'dim')+'">'+(infoOn?'김지<span class="k-cur">수</span>':'이름')+'</span></div></div>'+
-      '<div class="k-subs">'+
-        '<div class="k-field sm" style="flex:1"><span class="k-field-l">생년월일 <span class="k-req">필수</span></span>'+
-        '<span class="k-field-v sm2 '+(infoOn?'':'dim')+'">'+(infoOn?'1990-03-11':'YYYY-MM-DD')+'</span></div>'+
-        '<div class="k-gender"><span class="k-field-l">성별 <span class="k-req">필수</span></span>'+
+        '<div class="k-field on" onclick="setFocus(\'birth\')"><span class="k-field-l">생년월일 <span class="k-opt">선택</span></span>'+
+          birthView()+'</div>'+
+        '<div class="k-gender"><span class="k-field-l">성별 <span class="k-opt">선택</span></span>'+
         '<button class="k-gb'+g1+'" onclick="setGender(\'m\')">남자</button>'+
-        '<button class="k-gb'+g2+'" onclick="setGender(\'f\')">여자</button></div></div>'+
-      '<div class="k-terms"><div class="k-terms-h">약관 <span class="k-req">필수</span></div>'+
-        '<div class="k-term"><span class="k-term-t"><b>01.</b> 약국 포인트 이용약관</span><span class="k-term-view">상세보기 ›</span></div>'+
-        '<div class="k-term"><span class="k-term-t"><b>02.</b> 개인정보 수집·이용</span><span class="k-term-view">상세보기 ›</span></div>'+
-        '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>'+
+        '<button class="k-gb'+g2+'" onclick="setGender(\'f\')">여자</button></div>'+
+        termsBlock()+
       '</div>'+
-      '<div class="k-pad-col"><div class="k-keypad">'+["1","2","3","4","5","6","7","8","9","지움","0","전체삭제"].map(function(k){
-        var fn = (k==="지움"||k==="전체삭제")?' fn':''; return '<button class="k-key'+fn+'">'+k+'</button>'; }).join("")+
-      '</div>'+
-      '<div class="k-padfoot">'+
-      '<button class="k-cta"'+(canSubmit?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
+      '<div class="k-pad-col">'+numPad()+
+      '<div class="k-padfoot"><button class="k-cta">약관 동의하고 가입하기</button></div>'+
       '</div></div></div>'); }
 
   // 3 굿팜 앱 바코드 인증
@@ -416,8 +657,15 @@
       '<button class="k-home">처음 화면으로 돌아가기</button></div>'); }
 
   // ── POS ──
-  function posPay(){
-    return ('<div class="pos"><div class="pos-l"><div class="pos-t">결제 항목</div>'+
+  function posPay(alerted){
+    return ('<div class="pos'+(alerted?' alerted':'')+'">'+
+      (alerted
+        ? '<div class="pos-call"><span class="pos-call-i">🔔</span>'+
+          '<span class="pos-call-t"><b>1번 키오스크에서 약사님을 찾습니다</b>'+
+          '<span>회원가입 ② 이름 입력 단계 · 경과 00:42</span></span>'+
+          '<button class="pos-call-b">확인</button></div>'
+        : '')+
+      '<div class="pos-l"><div class="pos-t">결제 항목</div>'+
       '<div class="pos-li"><span>타이레놀 500mg</span><span>2,100</span></div>'+
       '<div class="pos-li"><span>비타민C 1000mg</span><span>14,000</span></div>'+
       '<div class="pos-li"><span>마스크 KF94</span><span>2,300</span></div>'+
@@ -429,17 +677,23 @@
       '<button class="pos-btn">17,900원 결제</button></div></div>'); }
 
   // ── 화면 레지스트리 ──
-  var gender = "";        // 성별 선택 상태(회원가입)
+  var gender = "";               // 성별 선택 상태(회원가입)
+  var phone = "", birth = "";    // 입력값
+  var nameCommitted = "", cho = -1, jung = -1, jong = 0;   // 이름 한글 조합
+  var shift = false, eng = false, strokes = 0;
+  var called = false;            // 약사 호출 여부
+  var focusField = "name";       // ②화면에서 입력 중인 칸 (name · birth)
+  var collectExtra = true;       // 키오스크 설정 — 성별·생년월일 수집
   var SCREENS = [
     { id:"A-1", name:"포인트 홈", group:"고객앱", device:"phone", states:["기본"], render:function(){ return appHome(); } },
     { id:"A-2", name:"바코드 제시", group:"고객앱", device:"phone", states:["기본"], render:function(){ return appBarcode(); } },
     { id:"A-3", name:"포인트 이력", group:"고객앱", device:"phone", states:["기본"], render:function(){ return appHistory(); } },
     { id:"K-1", name:"첫 화면", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kStart(); } },
-    { id:"K-2", name:"약국 회원가입", group:"키오스크", device:"kiosk", states:["① 전화번호 입력","② 이름·생년월일·성별"], render:function(s){ return kSignup(s); } },
+    { id:"K-2", name:"약국 회원가입", group:"키오스크", device:"kiosk", states:["① 전화번호","② 이름","③ 선택 정보 · 약관"], render:function(s){ return kSignup(s); } },
     { id:"K-3", name:"굿팜 앱 바코드 인증", group:"키오스크", device:"kiosk", states:["굿팜 앱 바코드","전화번호로 인증"], render:function(s){ return kAuth(s); } },
     { id:"K-4", name:"상품 목록", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kCart(); } },
     { id:"K-5", name:"결제 완료", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kDone(); } },
-    { id:"P-1", name:"포인트 결제", group:"POS", device:"pos", states:["기본"], render:function(){ return posPay(); } }
+    { id:"P-1", name:"포인트 결제", group:"POS", device:"pos", states:["기본","약사 호출 알림"], render:function(s){ return posPay(s===1); } }
   ];
   var GROUPS = ["고객앱","키오스크","POS"];
   var si = 3, sti = 0;   // 기본 = 키오스크 첫 화면
@@ -455,20 +709,25 @@
   }
   function renderStates(){
     var s = SCREENS[si];
-    var multi = s.states.length>1;
+    var labels = s.states;
+    if(s.id==="K-2") labels = collectExtra ? ["① 전화번호","② 이름","③ 선택 정보 · 약관"] : ["① 전화번호","② 이름 · 약관"];
+    var multi = labels.length>1;
     $("states").innerHTML = multi
-      ? s.states.map(function(st,i){ return '<button class="st'+(i===sti?' on':'')+'" onclick="pickState('+i+')">'+st+'</button>'; }).join("")
+      ? labels.map(function(st,i){ return '<button class="st'+(i===sti?' on':'')+'" onclick="pickState('+i+')">'+st+'</button>'; }).join("")
       : '<span style="font-size:12px;color:var(--faint)">단일 상태</span>';
   }
   function renderVp(){
+    renderKioskSet();
     var s = SCREENS[si];
     $("device").className = "device "+s.device;
     $("vp").innerHTML = s.render(sti);
     $("tag").textContent = s.group+" · "+s.name+(s.states.length>1? " · "+s.states[sti] : "");
     requestAnimationFrame(postHeight);
   }
-  function pickScreen(i){ si=i; sti=0; if(SCREENS[i].id!=="K-2"){ gender=""; } renderNav(); renderStates(); renderVp(); }
-  function pickState(i){ sti=i; if(SCREENS[si].id==="K-2" && i===0){ gender=""; } renderStates(); renderVp(); }
+  function resetSignup(){ gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
+    shift=false; eng=false; strokes=0; called=false; collectExtra=true; focusField="name"; }
+  function pickScreen(i){ si=i; sti=0; if(SCREENS[i].id!=="K-2"){ resetSignup(); } renderNav(); renderStates(); renderVp(); }
+  function pickState(i){ sti=i; renderStates(); renderVp(); }
   function setGender(g){ gender=g; renderVp(); }
 
   function postHeight(){
@@ -476,6 +735,9 @@
     if (window.parent !== window) window.parent.postMessage({ type:"embed-height", height:h }, "*");
   }
   window.pickScreen = pickScreen; window.pickState = pickState; window.setGender = setGender;
+  window.pressNum = pressNum; window.pressHan = pressHan; window.callPharmacist = callPharmacist;
+  window.toggleExtra = toggleExtra; window.goStep = goStep; window.setFocus = setFocus;
+  window.renderKioskSet = renderKioskSet;
 
   renderNav(); renderStates(); renderVp();
   window.addEventListener("load", postHeight);
