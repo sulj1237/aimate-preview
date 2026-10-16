@@ -88,10 +88,8 @@
   .k{position:absolute;inset:0;display:flex;flex-direction:column;background:#f6f8f7}
   .k-bar{height:38px;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;background:#fff;border-bottom:1px solid var(--line)}
   .k-logo{font-size:13px;font-weight:800;color:var(--teal-d);flex:none}
-  .k-back{font-size:11.5px;color:var(--soft);font-weight:600;flex:none}
-  .k-home{flex:none;font-size:11.5px;color:var(--soft);font-weight:700;background:#fff;
-    border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer}
-  .k-home:hover{background:var(--field)}
+  .k-back{font-size:11.5px;color:var(--soft);font-weight:600;flex:none;
+    background:none;border:none;padding:0;cursor:pointer}
   .k-r{flex:none;min-width:1px;margin-left:auto}
   .k-member{margin-left:auto;font-size:11px;font-weight:700}
   .k-tag{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--teal-d)}
@@ -328,7 +326,7 @@
     키오스크 <b>약국 회원가입</b> 화면입니다. 위쪽 <b>화면 상태</b>로 단계를 옮기고, 키패드·자판을 눌러 직접 입력해 보세요. <b>실데이터 아님</b><br />
     <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙고, 폼을 <b>2열로 눕혀</b> 자판이 올라와도 가려지지 않습니다.<br />
     성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. 이름 자판은 <b>쿼티 두벌식(한/영 전환)</b> 한 가지입니다.<br />
-    ①에서는 <b>취소</b>로 가입을 접고, ②·③에서는 <b>← 이전</b>으로 앞 화면으로 돌아갑니다. 두 버튼 모두 <b>키패드 아래 주 버튼 왼편</b>에 있습니다.<br />
+    ①에서는 <b>취소</b>로 가입을 접고, ②·③에서는 <b>이전</b>으로 앞 화면으로 돌아갑니다. 두 버튼 모두 <b>키패드 아래 주 버튼 왼편</b>에 있습니다.<br />
     <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다.<br />
     <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(아래 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.
     입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a>
@@ -537,7 +535,7 @@
   //   안 받음: ① 전화번호 / ② 이름 · 약관
   function signupTotal(){ return collectExtra ? 3 : 2; }
   function setBar(step){
-    return '<div class="k-bar"><button class="k-home" onclick="cancelSignup()">← 처음으로</button>'+
+    return '<div class="k-bar"><button class="k-back" onclick="cancelSignup()">← 처음으로</button>'+
       '<span class="k-chip">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</span></div>';
   }
   function renderKioskSet(){
@@ -590,7 +588,7 @@
             '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
           '</div>'+ qwertyPad()+
           '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1">'+
-          '<div class="k-footrow"><button class="k-ghost" onclick="goStep(0)">← 이전</button>'+
+          '<div class="k-footrow"><button class="k-ghost" onclick="goStep(0)">이전</button>'+
           '<button class="k-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button></div></div>'+
           '</div></div>');
       }
@@ -605,7 +603,7 @@
         '<div class="k-col">'+ termsBlock()+
         '</div></div>'+ qwertyPad()+
         '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1"><div class="k-footrow">'+
-        '<button class="k-ghost" onclick="goStep(0)">← 이전</button>'+
+        '<button class="k-ghost" onclick="goStep(0)">이전</button>'+
         '<button class="k-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button>'+
         '</div></div></div></div>');
     }
@@ -623,7 +621,7 @@
       '</div>'+
       '<div class="k-pad-col">'+numPad()+'</div></div>'+
       '<div class="k-padfoot" style="padding:8px 14px 11px"><div class="k-footrow">'+
-      '<button class="k-ghost" onclick="goStep(1)">← 이전</button>'+
+      '<button class="k-ghost" onclick="goStep(1)">이전</button>'+
       '<button class="k-cta">약관 동의하고 가입하기</button></div></div>'+
       '</div>'); }
 
