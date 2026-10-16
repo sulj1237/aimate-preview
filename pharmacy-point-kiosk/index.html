@@ -542,13 +542,109 @@
   .kk-rc-t b{font-size:44px;font-weight:800}
   .kk-backhome{flex:none;margin:0 48px 32px;height:96px;border-radius:16px;background:var(--t-teal);color:#fff;
     border:none;font-size:28px;font-weight:800;cursor:pointer}
+  /* ===================== 클라이언트 3.0(POS) — 실제 화면 구성 ===================== */
+  .device.pos{zoom:.58;position:relative;inset:auto;display:block}
+  .device.pos .screen{width:1340px;height:860px;border-radius:10px;background:#EFF1F2}
+  .pp{position:absolute;inset:0;display:flex;flex-direction:column;background:#EFF1F2;color:#171716;
+    font-size:14px;letter-spacing:-.01em}
+  .pp-tb{height:40px;flex:none;display:flex;align-items:center;gap:10px;padding:0 14px;background:#232A2E;color:#fff}
+  .pp-tb b{font-size:15px;font-weight:700}
+  .pp-tb .sq{width:18px;height:18px;border-radius:4px;background:#0FA69C;display:inline-block}
+  .pp-tb .rt{margin-left:auto;display:flex;gap:16px;color:#C7CDD1;font-size:15px}
+  .pp-body{flex:1;display:grid;grid-template-columns:1fr 520px;gap:14px;padding:14px;min-height:0}
+  .pp-col{display:flex;flex-direction:column;gap:12px;min-height:0}
+  .pp-card{background:#fff;border:1px solid #DFE3E6;border-radius:8px;padding:12px 14px}
+  .pp-h{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;margin-bottom:10px}
+  .pp-h .sp{margin-left:auto;display:flex;gap:8px}
+  .pp-sb{height:30px;padding:0 12px;border-radius:6px;border:1px solid #CFD5DA;background:#fff;
+    font-size:13px;font-weight:700;color:#3F4A50;cursor:pointer}
+  .pp-sb.teal{background:#0FA69C;border-color:#0FA69C;color:#fff}
+
+  /* 고객정보 */
+  .pp-cust{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 18px;border:1px dashed #E06A5F;
+    border-radius:6px;padding:10px 12px}
+  .pp-cust.on{border-style:solid;border-color:#DFE3E6;background:#F7FAFA}
+  .pp-f{display:flex;align-items:center;gap:8px;font-size:14px}
+  .pp-f span{color:#78838A;font-weight:700;min-width:92px}
+  .pp-f b{font-weight:800}
+  .pp-f .pt{color:#0A7D75}
+  .pp-f .dim{color:#AEB6BB;font-weight:600}
+
+  /* 표 */
+  .pp-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .pp-tbl th{background:#F2F5F6;color:#5A656B;font-weight:700;padding:8px 6px;border-bottom:1px solid #DFE3E6;
+    text-align:center;white-space:nowrap}
+  .pp-tbl td{padding:9px 6px;border-bottom:1px solid #EEF1F2;text-align:center;white-space:nowrap}
+  .pp-tbl td.l{text-align:left}
+  .pp-tbl td.r{text-align:right}
+  .pp-tbl td b{font-weight:800}
+  .pp-tbl .pt{color:#0A7D75;font-weight:800}
+  .pp-sell{flex:1;display:flex;flex-direction:column;min-height:0}
+  .pp-sell .wrap{flex:1;overflow:hidden}
+  .pp-inp{flex:1;height:30px;border:1px solid #CFD5DA;border-radius:6px;padding:0 10px;font-size:13px;color:#8C959A;
+    display:flex;align-items:center}
+
+  /* 하단 합계 */
+  .pp-sum{display:grid;grid-template-columns:150px 1fr 320px;gap:14px;align-items:center}
+  .pp-qty{font-size:14px;color:#5A656B;font-weight:700}
+  .pp-qty b{display:block;font-size:22px;color:#171716;margin-top:4px}
+  .pp-rows{display:flex;flex-direction:column;gap:3px}
+  .pp-row{display:flex;justify-content:space-between;font-size:13px;color:#5A656B}
+  .pp-row b{color:#171716;font-weight:700}
+  .pp-row.pt b{color:#0A7D75}
+  .pp-own{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;padding-top:8px;
+    border-top:1px dashed #E7B4AE;color:#D14A3C;font-weight:800}
+  .pp-own b{font-size:24px}
+  .pp-pays{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pp-pb{height:44px;border-radius:7px;border:none;background:#0FA69C;color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+  .pp-pb.dark{background:#1E9C93}
+  .pp-pb.ghost{background:#fff;border:1px solid #CFD5DA;color:#3F4A50}
+  .pp-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .pp-tab{height:38px;border-radius:7px;border:1px solid #CFD5DA;background:#fff;font-size:13px;font-weight:700;
+    color:#3F4A50;cursor:pointer}
+
+  /* 호출 배너 */
+  .pp-call{flex:none;display:flex;align-items:center;gap:12px;margin:0 14px;margin-top:12px;background:#1F2A36;
+    color:#fff;border-radius:8px;padding:12px 16px}
+  .pp-call b{font-size:15px}
+  .pp-call span.s{display:block;font-size:12.5px;color:#9FD9D1;margin-top:2px}
+  .pp-call button{margin-left:auto;height:34px;padding:0 16px;border-radius:7px;border:none;background:#0FA69C;
+    color:#fff;font-size:13.5px;font-weight:800;cursor:pointer}
+
+  /* 모달 */
+  .pp-dim{position:absolute;inset:0;background:rgba(18,26,30,.45);display:flex;align-items:center;
+    justify-content:center;z-index:40}
+  .pp-modal{background:#fff;border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,.3);width:520px;overflow:hidden}
+  .pp-modal.wide{width:680px}
+  .pp-mh{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid #E7EBED;font-size:16px;font-weight:800}
+  .pp-mh .x{margin-left:auto;color:#8C959A;cursor:pointer}
+  .pp-mb{padding:18px;font-size:14px;line-height:1.6;color:#3F4A50}
+  .pp-mb b{color:#171716}
+  .pp-mb .big{font-size:17px;font-weight:800;color:#171716;margin-bottom:8px}
+  .pp-kv{display:flex;justify-content:space-between;padding:7px 0;font-size:14px}
+  .pp-kv b{font-weight:800}
+  .pp-in{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .pp-in input{flex:1;height:40px;border:1px solid #CFD5DA;border-radius:6px;padding:0 12px;font-size:16px;
+    font-weight:800;text-align:right}
+  .pp-warn{color:#D14A3C;font-size:13px;margin-top:8px}
+  .pp-mf{display:flex;gap:8px;justify-content:flex-end;padding:14px 18px;border-top:1px solid #E7EBED;background:#FAFBFB}
+  .pp-mb-list{border:1px solid #E7EBED;border-radius:6px;margin-top:10px}
+  .pp-mb-list .r{display:grid;grid-template-columns:90px 1fr 70px;gap:10px;padding:10px 12px;font-size:13.5px;
+    border-top:1px solid #F0F3F4;cursor:pointer}
+  .pp-mb-list .r:first-child{border-top:none}
+  .pp-mb-list .r:hover{background:#F4FAF9}
+  .pp-mb-list .r em{font-style:normal;color:#78838A}
+  .pp-wait{text-align:center;padding:34px 18px}
+  .pp-spin{width:54px;height:54px;margin:0 auto 18px;border-radius:999px;border:5px solid #E2E8EA;
+    border-top-color:#0FA69C;animation:ppspin 1s linear infinite}
+  @keyframes ppspin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>약국 포인트 · 프로토타입</h1>
   <div class="sub">키오스크 5개 화면(첫 화면·약국 회원가입·굿팜 앱 바코드 인증·상품 목록·결제 완료)을 중심으로,
-    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />키오스크 5개 화면은 <b>실제 키오스크 디자인(1280×800 시안)</b>의 색·치수·상단 바 구성을 따릅니다 — 보기 편하도록 60%로 줄여 보여 줍니다. 단계 표시는 결제 흐름이 <b>시작 · 목록 · 결제 · 완료</b>, 가입 흐름이 <b>전화번호 · 이름 · 선택 정보 · 약관</b>으로 각각 따로 갑니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>입니다. ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있고, 상단 왼쪽 <b>← 처음으로</b>는 ②부터 나오고, 누르면 <b>가입을 취소할지 묻는 모달</b>이 먼저 뜹니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다 — 호출 알림을 받는 POS 화면은 <b>P-1 · 약사 호출 알림</b> 상태에 남아 있습니다.  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
+    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />키오스크 5개 화면은 <b>실제 키오스크 디자인(1280×800 시안)</b>의 색·치수·상단 바 구성을 따릅니다 — 보기 편하도록 60%로 줄여 보여 줍니다. 단계 표시는 결제 흐름이 <b>시작 · 목록 · 결제 · 완료</b>, 가입 흐름이 <b>전화번호 · 이름 · 선택 정보 · 약관</b>으로 각각 따로 갑니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>입니다. ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있고, 상단 왼쪽 <b>← 처음으로</b>는 ②부터 나오고, 누르면 <b>가입을 취소할지 묻는 모달</b>이 먼저 뜹니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다 — 호출 알림을 받는 POS 화면은 <b>P-1 · 약사 호출 알림</b> 상태에 남아 있습니다.<br /><b>POS(클라이언트 3.0)</b>는 실제 클라이언트 화면 구성(고객정보 · 판매 목록 · 결제 목록 · 하단 합계)을 따릅니다. 상태 칩으로 <b>고객 찾기 → 회원 없음 → 적립 여부 → 키오스크 가입 대기 → 가입 완료</b> 흐름과 <b>포인트 사용 · 사용 불가 · 굿팜 바코드 스캔</b> 모달을 확인하세요. 키오스크에서 인증을 마치면 상단에 <b>이름</b>으로 표기합니다(앱 회원이 아니어도 동일).  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
 
   <div class="nav" id="nav"></div>
 
@@ -971,7 +1067,7 @@
         '<button class="kk-qb plus">+</button></div>'+
       '<div class="kk-it-pr"><b>'+it[1]+'원</b></div>'+
       '<button class="kk-del">🗑</button></div>'); }).join("");
-    return ('<div class="kk">'+kkBar(1, kkHome("goScreen('K-1')"), '<span>👤 010-****-9866</span>')+
+    return ('<div class="kk">'+kkBar(1, kkHome("goScreen('K-1')"), '<span>👤 김지수 님</span>')+
       '<div class="kk-list">'+list+'</div>'+
       '<div class="kk-paybar"><span class="kk-pay-l">총 결제 금액</span>'+
       '<span class="kk-pay-v">33,000<em>원</em></span>'+
@@ -1000,24 +1096,154 @@
       '<button class="kk-backhome" onclick="goScreen(\'K-1\')">처음 화면으로 돌아가기</button></div>'); }
 
   // ── POS ──
-  function posPay(alerted){
-    return ('<div class="pos'+(alerted?' alerted':'')+'">'+
-      (alerted
-        ? '<div class="pos-call"><span class="pos-call-i">🔔</span>'+
-          '<span class="pos-call-t"><b>1번 키오스크에서 약사님을 찾습니다</b>'+
-          '<span>회원가입 ② 이름 입력 단계 · 경과 00:42</span></span>'+
-          '<button class="pos-call-b">확인</button></div>'
-        : '')+
-      '<div class="pos-l"><div class="pos-t">결제 항목</div>'+
-      '<div class="pos-li"><span>타이레놀 500mg</span><span>2,100</span></div>'+
-      '<div class="pos-li"><span>비타민C 1000mg</span><span>14,000</span></div>'+
-      '<div class="pos-li"><span>마스크 KF94</span><span>2,300</span></div>'+
-      '<div class="pos-tot"><span class="pos-t" style="margin:0">합계</span><span class="v">18,400원</span></div></div>'+
-      '<div class="pos-r"><div class="pos-cust"><div class="nm">김○○ 고객</div><span class="pos-vf">✓ 굿팜 앱 바코드 인증됨</span></div>'+
-      '<div class="pos-pt"><div class="row"><span>보유 포인트</span><b>1,250 P</b></div>'+
-      '<div class="row use"><span>사용</span><b>− 500 P</b></div>'+
-      '<div class="row"><span>적립 예정</span><b>+ 120 P</b></div></div>'+
-      '<button class="pos-btn">17,900원 결제</button></div></div>'); }
+  // ===== 클라이언트 3.0(POS) — 약국 회원 조회·가입 유도 + 약국 포인트 사용 =====
+  //  상태: 0 고객 미지정 / 1 고객 찾기 / 2 회원 없음 / 3 적립 여부 / 4 키오스크 가입 대기
+  //        5 가입 완료 / 6 포인트 사용 / 7 포인트 사용 불가 / 8 굿팜 바코드 스캔 / 9 약사 호출 알림
+  function ppCust(on){
+    if(!on) return ('<div class="pp-cust">'+
+      '<div class="pp-f"><span>고객명</span><b class="dim">미지정</b></div>'+
+      '<div class="pp-f"><span>보유 포인트</span><b class="dim">-</b></div>'+
+      '<div class="pp-f"><span>연령(성별)</span><b class="dim">-</b></div>'+
+      '<div class="pp-f"><span>전화번호</span><b class="dim">-</b></div>'+
+      '<div class="pp-f" style="grid-column:span 2"><span>주민번호(생년월일)</span><b class="dim">-</b></div>'+
+      '</div>');
+    return ('<div class="pp-cust on">'+
+      '<div class="pp-f"><span>고객명</span><b>김지수</b></div>'+
+      '<div class="pp-f"><span>보유 포인트</span><b class="pt">500 P</b></div>'+
+      '<div class="pp-f"><span>연령(성별)</span><b>33세(여)</b></div>'+
+      '<div class="pp-f"><span>전화번호</span><b>010-1234-2345</b></div>'+
+      '<div class="pp-f" style="grid-column:span 2"><span>주민번호(생년월일)</span><b>901230-2******</b></div>'+
+      '</div>');
+  }
+  function ppRow(no,nm,price,qty,amt,pt,stock){
+    return '<tr><td>'+no+'</td><td class="l">'+nm+'</td><td class="r">'+price+'</td><td>'+qty+'</td>'+
+      '<td class="r">'+amt+'</td><td class="pt">'+pt+'</td><td>'+stock+'</td></tr>';
+  }
+  function ppModal(inner){ return '<div class="pp-dim">'+inner+'</div>'; }
+
+  function posPay(s){
+    var member = (s>=5);
+    var usePt  = (s===6);
+    var base = ('<div class="pp">'+
+      '<div class="pp-tb"><span class="sq"></span><b>POS</b><span class="rt">⚙ &nbsp; — &nbsp; □ &nbsp; ✕</span></div>'+
+      (s===9 ? '<div class="pp-call"><span>🔔</span><span><b>1번 키오스크에서 약사님을 찾습니다</b>'+
+        '<span class="s">약국 회원가입 · 이름 입력 단계 · 경과 00:42</span></span><button>확인</button></div>' : '')+
+      '<div class="pp-body">'+
+        '<div class="pp-col">'+
+          '<div class="pp-card"><div class="pp-h">고객정보<span class="sp">'+
+            '<button class="pp-sb">⌗ 바코드 조회</button><button class="pp-sb">⌕ 찾기</button>'+
+            '<button class="pp-sb">＋ 신규</button></span></div>'+ ppCust(member)+'</div>'+
+          '<div class="pp-card pp-sell"><div class="pp-h">판매 목록<span class="sp">'+
+            '<span class="pp-inp" style="width:280px">상품명·바코드를 입력해 주세요</span>'+
+            '<button class="pp-sb teal">검색</button><button class="pp-sb">비우기</button>'+
+            '<button class="pp-sb">대기목록</button><button class="pp-sb">임시저장</button></span></div>'+
+            '<div class="wrap"><table class="pp-tbl"><thead><tr><th>NO</th><th>상품명</th><th>판매가</th>'+
+            '<th>수량</th><th>금액</th><th>포인트</th><th>재고</th></tr></thead><tbody>'+
+            ppRow(3,"피로회복세트3","4,000",2,"8,000","+80P","-")+
+            ppRow(4,"데일밴드","2,000",1,"2,000","+20P","52")+
+            '</tbody></table></div></div>'+
+          '<div class="pp-card"><div class="pp-sum">'+
+            '<div class="pp-qty">총 수량<b>3개</b></div>'+
+            '<div class="pp-rows">'+
+              '<div class="pp-row"><span>조제금액</span><b>0 원</b></div>'+
+              '<div class="pp-row"><span>일반금액</span><b>18,000 원</b></div>'+
+              '<div class="pp-row pt"><span>적립 포인트</span><b>'+(member?'+100 P':'0 P')+'</b></div>'+
+              '<div class="pp-row pt"><span>사용 포인트</span><b>'+(member&&s>=6?'− 400 P':'0 P')+'</b></div>'+
+              '<div class="pp-own"><span>본인부담금</span><b>'+(member&&s>=6?'17,600':'18,000')+' 원</b></div>'+
+            '</div>'+
+            '<div><div class="pp-pays">'+
+              '<button class="pp-pb dark">상세 결제</button><button class="pp-pb">카드(일시불)</button>'+
+              '<button class="pp-pb ghost">현금영수증</button><button class="pp-pb">카드(할부)</button>'+
+            '</div></div>'+
+          '</div></div>'+
+        '</div>'+
+        '<div class="pp-col">'+
+          '<div class="pp-card"><div class="pp-h">결제 목록<span class="sp">'+
+            '<button class="pp-sb">2026-10-16</button><button class="pp-sb teal">당일</button>'+
+            '<button class="pp-sb">검색</button></span></div>'+
+            '<table class="pp-tbl"><thead><tr><th>고객명</th><th>금액</th><th>매출</th><th>구분</th>'+
+            '<th>상태</th><th>시간</th></tr></thead><tbody>'+
+            '<tr><td class="l">김지수</td><td class="r">10,000</td><td>판매</td><td>접수</td><td>대기</td><td>10:00</td></tr>'+
+            '<tr><td class="l">홍은주</td><td class="r">16,500</td><td>판매</td><td>접수</td><td>완료</td><td>9:00</td></tr>'+
+            '</tbody></table></div>'+
+          '<div class="pp-card pp-sell"><div class="pp-h">판매 상품</div>'+
+            '<div class="wrap"><table class="pp-tbl"><thead><tr><th>NO</th><th>상품명</th><th>판매가</th>'+
+            '<th>수량</th><th>금액</th><th>포인트</th><th>재고</th></tr></thead><tbody>'+
+            ppRow(1,"피로회복세트3","4,000",2,"8,000","+80P","-")+
+            ppRow(2,"데일밴드","2,000",1,"2,000","+20P","52")+
+            '</tbody></table></div></div>'+
+          '<div class="pp-tabs"><button class="pp-tab">다빈도/세트</button><button class="pp-tab">자주쓰는 라벨</button>'+
+            '<button class="pp-tab">약품 상세내역</button><button class="pp-tab">상세 고객정보</button></div>'+
+        '</div>'+
+      '</div>');
+
+    var ov = "";
+    if(s===1){   // 고객 찾기
+      ov = ppModal('<div class="pp-modal wide"><div class="pp-mh">고객 찾기<span class="x">✕</span></div>'+
+        '<div class="pp-mb"><div class="pp-h" style="margin:0">'+
+          '<span class="pp-inp" style="flex:1">고객명 또는 전화번호</span>'+
+          '<button class="pp-sb teal">검색</button><button class="pp-sb">약국 회원만</button></div>'+
+        '<div class="pp-mb-list">'+
+          '<div class="r"><b>이○하</b><em>010-0000-0000</em><em>비회원</em></div>'+
+          '<div class="r"><b>김민지</b><em>010-0000-0000</em><em>비회원</em></div>'+
+          '<div class="r"><b>박홍련</b><em>010-0000-0000</em><em>비회원</em></div>'+
+        '</div>'+
+        '<p style="margin-top:12px;font-size:13px;color:#78838A">약국 회원가입은 키오스크에서 받습니다. '+
+        '여기서 찾은 고객은 결제 고객으로만 지정됩니다.</p></div>'+
+        '<div class="pp-mf"><button class="pp-sb">신규 등록</button>'+
+        '<button class="pp-sb teal" onclick="pickState(5)">이 고객으로 지정</button></div></div>');
+    }
+    if(s===2){   // 회원 없음
+      ov = ppModal('<div class="pp-modal"><div class="pp-mh">회원 정보를 찾을 수 없습니다<span class="x">✕</span></div>'+
+        '<div class="pp-mb">조회한 전화번호로 등록된 약국 회원이 없습니다.<br>'+
+        '<b>키오스크에서 약국 회원가입</b>을 하면 이 결제부터 포인트를 적립할 수 있습니다.</div>'+
+        '<div class="pp-mf"><button class="pp-sb">다시 조회</button>'+
+        '<button class="pp-sb teal" onclick="pickState(3)">약국 회원가입 안내</button></div></div>');
+    }
+    if(s===3){   // 적립 여부
+      ov = ppModal('<div class="pp-modal"><div class="pp-mh">약국 포인트를 적립할까요?<span class="x">✕</span></div>'+
+        '<div class="pp-mb"><div class="big">가입하면 이 결제부터 적립됩니다</div>'+
+        '키오스크에서 약국 회원가입을 마치면 포인트가 적립됩니다. 가입은 고객이 키오스크에서 직접 진행합니다.'+
+        '<div class="pp-kv" style="margin-top:12px;border-top:1px solid #EEF1F2;padding-top:12px">'+
+        '<span>가입 시 적립 예정</span><b class="pt" style="color:#0A7D75">100 P</b></div></div>'+
+        '<div class="pp-mf"><button class="pp-sb">적립 안 함</button>'+
+        '<button class="pp-sb teal" onclick="pickState(4)">키오스크로 안내</button></div></div>');
+    }
+    if(s===4){   // 가입 대기
+      ov = ppModal('<div class="pp-modal"><div class="pp-wait"><div class="pp-spin"></div>'+
+        '<div class="big" style="font-size:17px;font-weight:800;color:#171716">키오스크에서 가입하는 중입니다</div>'+
+        '<p style="margin-top:8px;color:#5A656B">고객이 키오스크에서 약국 회원가입을 마치면 고객정보가 자동으로 채워집니다.<br>'+
+        '잠시만 기다려 주세요.</p></div>'+
+        '<div class="pp-mf"><button class="pp-sb">가입 없이 결제</button>'+
+        '<button class="pp-sb teal" onclick="pickState(5)">가입 완료(시연)</button></div></div>');
+    }
+    if(s===6){   // 포인트 사용
+      ov = ppModal('<div class="pp-modal"><div class="pp-mh">약국 포인트 사용<span class="x">✕</span></div>'+
+        '<div class="pp-mb">'+
+        '<div class="pp-kv"><span>보유 포인트</span><b>500 P <em style="font-style:normal;color:#78838A">(적립 대기 100P)</em></b></div>'+
+        '<div class="pp-kv"><span>사용 가능 포인트</span><b>400 P</b></div>'+
+        '<div class="pp-kv"><span>사용 가능 카테고리 금액</span><b>18,000 원</b></div>'+
+        '<div class="pp-in"><input value="400" readonly /><button class="pp-sb">전액</button></div>'+
+        '<p style="margin-top:8px;font-size:13px;color:#78838A">적립 대기 포인트는 사용 가능 금액 계산에 넣지 않습니다.</p>'+
+        '</div><div class="pp-mf"><button class="pp-sb" onclick="pickState(5)">취소</button>'+
+        '<button class="pp-sb teal" onclick="pickState(5)">확인</button></div></div>');
+    }
+    if(s===7){   // 사용 불가
+      ov = ppModal('<div class="pp-modal"><div class="pp-mh">포인트를 사용할 수 없습니다<span class="x">✕</span></div>'+
+        '<div class="pp-mb">사용 가능 포인트가 최소 사용 금액보다 적습니다.'+
+        '<div class="pp-kv" style="margin-top:10px"><span>최소 사용 기준</span><b>1,000 P</b></div>'+
+        '<div class="pp-kv"><span>보유 포인트</span><b>500 P</b></div>'+
+        '<div class="pp-kv"><span>사용 가능 포인트</span><b>500 P</b></div></div>'+
+        '<div class="pp-mf"><button class="pp-sb teal" onclick="pickState(5)">확인</button></div></div>');
+    }
+    if(s===8){   // 굿팜 바코드 스캔
+      ov = ppModal('<div class="pp-modal"><div class="pp-mh">굿팜 바코드 스캔<span class="x">✕</span></div>'+
+        '<div class="pp-mb">굿팜 앱을 실행해 <b>메인 &gt; 단골약국 바코드</b>를 스캐너에 대주세요.<br>'+
+        '포인트 사용은 단골약국 등록 후 회원 바코드 스캔으로 가능합니다.</div>'+
+        '<div class="pp-mf"><button class="pp-sb" onclick="pickState(5)">취소</button></div></div>');
+    }
+    return base + ov + '</div>';
+  }
 
   // ── 화면 레지스트리 ──
   var gender = "";               // 성별 선택 상태(회원가입)
@@ -1037,7 +1263,9 @@
     { id:"K-3", name:"굿팜 앱 바코드 인증", group:"키오스크", device:"kiosk", states:["굿팜 앱 바코드","전화번호로 인증"], render:function(s){ return kAuth(s); } },
     { id:"K-4", name:"상품 목록", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kCart(); } },
     { id:"K-5", name:"결제 완료", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kDone(); } },
-    { id:"P-1", name:"포인트 결제", group:"POS", device:"pos", states:["기본","약사 호출 알림"], render:function(s){ return posPay(s===1); } }
+    { id:"P-1", name:"약국 포인트 · 회원", group:"POS", device:"pos",
+      states:["고객 미지정","고객 찾기","회원 없음","적립 여부","키오스크 가입 대기","가입 완료","포인트 사용","포인트 사용 불가","굿팜 바코드 스캔","약사 호출 알림"],
+      render:function(s){ return posPay(s); } }
   ];
   var GROUPS = ["고객앱","키오스크","POS"];
   var si = 3, sti = 0;   // 기본 = 키오스크 첫 화면
