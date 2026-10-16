@@ -196,6 +196,7 @@
   .k-col{display:flex;flex-direction:column;gap:6px;min-width:0}
   .k-two .k-field{padding:7px 11px}
   .k-two .k-field-v{font-size:15px}
+  .k-two .k-field.on .k-field-v.dim{font-size:20px;letter-spacing:0}
   .k-two .k-terms{margin-top:0;padding-top:6px}
   .k-two .k-term{font-size:11px}
   .k-two .k-cta{height:40px;font-size:13.5px;margin-top:2px}
@@ -567,9 +568,8 @@
       if(collectExtra){
         return ('<div class="k">'+setBar(1)+'<div class="k-name">'+
           '<div class="k-nametop" style="padding-top:9px">'+
-          '<div class="k-h"><b>이름을 입력해 주세요</b></div>'+
           '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
-            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름')+'<i class="k-caret"></i></span></div>'+
+            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
           callRow()+
           '</div>'+ qwertyPad()+
           '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1">'+
@@ -581,7 +581,7 @@
         '<div class="k-two">'+
         '<div class="k-col">'+
           '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
-            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름')+'<i class="k-caret"></i></span></div>'+
+            '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
           '<div class="k-help">이름과 전화번호로 회원을 찾습니다</div>'+ callRow()+
         '</div>'+
         '<div class="k-col">'+ termsBlock()+
