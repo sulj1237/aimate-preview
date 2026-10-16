@@ -634,6 +634,22 @@
   .pp-mb-list .r:first-child{border-top:none}
   .pp-mb-list .r:hover{background:#F4FAF9}
   .pp-mb-list .r em{font-style:normal;color:#78838A}
+  .pp-modal.find{width:760px}
+  .pp-mh.center{justify-content:center;position:relative}
+  .pp-mh.center .x{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:30px;height:30px;
+    border:1px solid #CFD5DA;border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .find-top{display:flex;gap:8px;align-items:center}
+  .find-top .pp-inp{flex:1;height:38px}
+  .find-top .pp-sb{height:38px}
+  .pp-sb.pbtn{color:#0A7D75;border-color:#9FD9D1;background:#fff}
+  .find-wrap{border:1px solid #DFE3E6;border-radius:6px;margin-top:12px;height:230px;overflow:hidden}
+  .find-tbl td{text-align:left;padding:11px 12px}
+  .find-tbl th{text-align:left;padding:10px 12px}
+  .find-tbl tr.on td{background:#EFFAF9}
+  .pt-ico{color:#0FA69C;font-weight:800;margin-right:6px}
+  .find-note{margin-top:14px;font-size:13px;color:#5A656B;line-height:1.75}
+  .find-link{display:block;text-align:right;margin-top:6px;font-size:13.5px;color:#0A7D75;text-decoration:underline}
+  .pp-mf .left{margin-right:auto}
   .pp-wait{text-align:center;padding:34px 18px}
   .pp-spin{width:54px;height:54px;margin:0 auto 18px;border-radius:999px;border:5px solid #E2E8EA;
     border-top-color:#0FA69C;animation:ppspin 1s linear infinite}
@@ -644,7 +660,7 @@
 <div class="wrap">
   <h1>약국 포인트 · 프로토타입</h1>
   <div class="sub">키오스크 5개 화면(첫 화면·약국 회원가입·굿팜 앱 바코드 인증·상품 목록·결제 완료)을 중심으로,
-    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />키오스크 5개 화면은 <b>실제 키오스크 디자인(1280×800 시안)</b>의 색·치수·상단 바 구성을 따릅니다 — 보기 편하도록 60%로 줄여 보여 줍니다. 단계 표시는 결제 흐름이 <b>시작 · 목록 · 결제 · 완료</b>, 가입 흐름이 <b>전화번호 · 이름 · 선택 정보 · 약관</b>으로 각각 따로 갑니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>입니다. ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있고, 상단 왼쪽 <b>← 처음으로</b>는 ②부터 나오고, 누르면 <b>가입을 취소할지 묻는 모달</b>이 먼저 뜹니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다 — 호출 알림을 받는 POS 화면은 <b>P-1 · 약사 호출 알림</b> 상태에 남아 있습니다.<br /><b>POS(클라이언트 3.0)</b>는 실제 클라이언트 화면 구성(고객정보 · 판매 목록 · 결제 목록 · 하단 합계)을 따릅니다. 상태 칩으로 <b>고객 찾기 → 회원 없음 → 적립 여부 → 키오스크 가입 대기 → 가입 완료</b> 흐름과 <b>포인트 사용 · 사용 불가 · 굿팜 바코드 스캔</b> 모달을 확인하세요. 키오스크에서 인증을 마치면 상단에 <b>가운데를 가린 이름</b>(김*수 님)으로 표기합니다 — 앱 회원이 아니어도 같습니다.  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
+    고객앱·POS 시안을 함께 검토합니다. 화면을 눌러 이동하세요. <b>실데이터 아님</b> · 적립·사용 규칙은 <b>02 정책</b>이 기준입니다.<br />키오스크 5개 화면은 <b>실제 키오스크 디자인(1280×800 시안)</b>의 색·치수·상단 바 구성을 따릅니다 — 보기 편하도록 60%로 줄여 보여 줍니다. 단계 표시는 결제 흐름이 <b>시작 · 목록 · 결제 · 완료</b>, 가입 흐름이 <b>전화번호 · 이름 · 선택 정보 · 약관</b>으로 각각 따로 갑니다.<br />약국 회원가입은 <b>선택 정보(성별·생년월일)를 받으면 3화면</b>(① 전화번호 → ② 이름 → ③ 선택 정보 · 약관), <b>받지 않으면 2화면</b>(① 전화번호 → ② 이름 · 약관)입니다. 약관은 <b>마지막 화면</b>에 붙습니다. 폼을 <b>2열로 눕혀</b> 자판이 올라와도 약관과 가입 버튼이 가려지지 않습니다. 자판은 <b>쿼티 두벌식(한/영 전환)</b>입니다. ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있고, 상단 왼쪽 <b>← 처음으로</b>는 ②부터 나오고, 누르면 <b>가입을 취소할지 묻는 모달</b>이 먼저 뜹니다. <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(위쪽 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.<br />성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. <b>약사님 호출하기</b>(키오스크 버튼 · POS 알림)와 <b>전화번호 조회·본인 확인</b>은 <b>다음 배포</b>에서 진행합니다.<br /><b>POS(클라이언트 3.0)</b>는 실제 클라이언트 화면 구성(고객정보 · 판매 목록 · 결제 목록 · 하단 합계)을 따릅니다. 상태 칩으로 <b>고객 찾기 → 회원 없음 → 적립 여부 → 키오스크 가입 대기 → 가입 완료</b> 흐름과 <b>포인트 사용 · 사용 불가</b> 모달을 확인하세요. 키오스크에서 인증을 마치면 상단에 <b>가운데를 가린 이름</b>(김*수 님)으로 표기합니다 — 앱 회원이 아니어도 같습니다.  생년월일·성별 수집 여부는 <b>키오스크 설정</b>에서 조정합니다(③ 화면의 설정 버튼으로 확인). 입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a></div>
 
   <div class="nav" id="nav"></div>
 
@@ -1098,7 +1114,7 @@
   // ── POS ──
   // ===== 클라이언트 3.0(POS) — 약국 회원 조회·가입 유도 + 약국 포인트 사용 =====
   //  상태: 0 고객 미지정 / 1 고객 찾기 / 2 회원 없음 / 3 적립 여부 / 4 키오스크 가입 대기
-  //        5 가입 완료 / 6 포인트 사용 / 7 포인트 사용 불가 / 8 굿팜 바코드 스캔 / 9 약사 호출 알림
+  //        5 가입 완료 / 6 포인트 사용 / 7 포인트 사용 불가
   function ppCust(on){
     if(!on) return ('<div class="pp-cust">'+
       '<div class="pp-f"><span>고객명</span><b class="dim">미지정</b></div>'+
@@ -1126,8 +1142,6 @@
     var usePt  = (s===6);
     var base = ('<div class="pp">'+
       '<div class="pp-tb"><span class="sq"></span><b>POS</b><span class="rt">⚙ &nbsp; — &nbsp; □ &nbsp; ✕</span></div>'+
-      (s===9 ? '<div class="pp-call"><span>🔔</span><span><b>1번 키오스크에서 약사님을 찾습니다</b>'+
-        '<span class="s">약국 회원가입 · 이름 입력 단계 · 경과 00:42</span></span><button>확인</button></div>' : '')+
       '<div class="pp-body">'+
         '<div class="pp-col">'+
           '<div class="pp-card"><div class="pp-h">고객정보<span class="sp">'+
@@ -1179,19 +1193,30 @@
 
     var ov = "";
     if(s===1){   // 고객 찾기
-      ov = ppModal('<div class="pp-modal wide"><div class="pp-mh">고객 찾기<span class="x">✕</span></div>'+
-        '<div class="pp-mb"><div class="pp-h" style="margin:0">'+
-          '<span class="pp-inp" style="flex:1">고객명 또는 전화번호</span>'+
-          '<button class="pp-sb teal">검색</button><button class="pp-sb">약국 회원만</button></div>'+
-        '<div class="pp-mb-list">'+
-          '<div class="r"><b>이○하</b><em>010-0000-0000</em><em>비회원</em></div>'+
-          '<div class="r"><b>김민지</b><em>010-0000-0000</em><em>비회원</em></div>'+
-          '<div class="r"><b>박홍련</b><em>010-0000-0000</em><em>비회원</em></div>'+
+      var rows = [
+        ["이마눌", true, "010-0000-0000", "비급", "-", true],
+        ["김민지", true, "010-0000-0000", "비급", "-", false],
+        ["박종민", false, "010-0000-0000", "비급", "-", false],
+        ["-", true, "010-****-0000", "-", "-", false]
+      ].map(function(r){
+        return '<tr class="'+(r[5]?'on':'')+'"><td>'+(r[1]?'<span class="pt-ico">Ⓟ</span>':'')+r[0]+'</td>'+
+          '<td>******-*</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td></tr>';
+      }).join("");
+      ov = ppModal('<div class="pp-modal find"><div class="pp-mh center">고객 찾기<span class="x">✕</span></div>'+
+        '<div class="pp-mb">'+
+        '<div class="find-top"><span class="pp-inp">고객명 혹은 연락처로 검색</span>'+
+          '<button class="pp-sb teal">검색</button>'+
+          '<button class="pp-sb pbtn" onclick="pickState(4)">Ⓟ 약국 회원가입</button></div>'+
+        '<div class="find-wrap"><table class="pp-tbl find-tbl"><thead><tr><th>고객명</th><th>주민번호</th>'+
+          '<th>연락처</th><th>종별</th><th>특이사항</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+        '<div class="find-note">* 고객명 <b>Ⓟ</b> 아이콘은 포인트 적립이 가능한 고객입니다.<br>'+
+          '* <b>약국 회원가입</b> 버튼을 누르면 키오스크로 회원가입을 요청합니다.<br>'+
+          '* 기존 회원은 바코드건 또는 키오스크에 회원 바코드를 스캔해 주세요.</div>'+
+        '<a class="find-link">약국 포인트는 무엇인가요?</a>'+
         '</div>'+
-        '<p style="margin-top:12px;font-size:13px;color:#78838A">약국 회원가입은 키오스크에서 받습니다. '+
-        '여기서 찾은 고객은 결제 고객으로만 지정됩니다.</p></div>'+
-        '<div class="pp-mf"><button class="pp-sb">신규 등록</button>'+
-        '<button class="pp-sb teal" onclick="pickState(5)">이 고객으로 지정</button></div></div>');
+        '<div class="pp-mf"><button class="pp-sb left">＋ 신규</button>'+
+        '<button class="pp-sb">취소</button>'+
+        '<button class="pp-sb teal" onclick="pickState(5)">등록</button></div></div>');
     }
     if(s===2){   // 회원 없음
       ov = ppModal('<div class="pp-modal"><div class="pp-mh">회원 정보를 찾을 수 없습니다<span class="x">✕</span></div>'+
@@ -1236,12 +1261,6 @@
         '<div class="pp-kv"><span>사용 가능 포인트</span><b>500 P</b></div></div>'+
         '<div class="pp-mf"><button class="pp-sb teal" onclick="pickState(5)">확인</button></div></div>');
     }
-    if(s===8){   // 굿팜 바코드 스캔
-      ov = ppModal('<div class="pp-modal"><div class="pp-mh">굿팜 바코드 스캔<span class="x">✕</span></div>'+
-        '<div class="pp-mb">굿팜 앱을 실행해 <b>메인 &gt; 단골약국 바코드</b>를 스캐너에 대주세요.<br>'+
-        '포인트 사용은 단골약국 등록 후 회원 바코드 스캔으로 가능합니다.</div>'+
-        '<div class="pp-mf"><button class="pp-sb" onclick="pickState(5)">취소</button></div></div>');
-    }
     return base + ov + '</div>';
   }
 
@@ -1264,7 +1283,7 @@
     { id:"K-4", name:"상품 목록", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kCart(); } },
     { id:"K-5", name:"결제 완료", group:"키오스크", device:"kiosk", states:["기본"], render:function(){ return kDone(); } },
     { id:"P-1", name:"약국 포인트 · 회원", group:"POS", device:"pos",
-      states:["고객 미지정","고객 찾기","회원 없음","적립 여부","키오스크 가입 대기","가입 완료","포인트 사용","포인트 사용 불가","굿팜 바코드 스캔","약사 호출 알림"],
+      states:["고객 미지정","고객 찾기","회원 없음","적립 여부","키오스크 가입 대기","가입 완료","포인트 사용","포인트 사용 불가"],
       render:function(s){ return posPay(s); } }
   ];
   var GROUPS = ["고객앱","키오스크","POS"];
