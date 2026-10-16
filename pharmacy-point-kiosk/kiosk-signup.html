@@ -138,7 +138,7 @@
   .k-field.on .k-field-v{font-size:30px;font-weight:800;color:var(--ink);letter-spacing:.01em}
   .k-field.done .k-field-v{font-size:16px;color:var(--ink);font-weight:700}
   .k-field-v.dim{color:#c3cbc9;font-weight:700}
-  .k-field.on .k-field-v.dim{color:#cdd5d3}
+  .k-field.on .k-field-v.dim{color:#cdd5d3;font-size:24px}
   .k-caret{display:inline-block;width:3px;height:0.92em;background:var(--teal);vertical-align:-2px;
     margin-left:2px;animation:kblink 1.05s steps(1) infinite}
   @keyframes kblink{0%,55%{opacity:1}56%,100%{opacity:0}}
@@ -181,6 +181,10 @@
   .k-call{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--teal);background:var(--teal-bg);
     color:var(--teal-d);font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:999px;cursor:pointer}
   .k-call:hover{background:#ddf0ee}
+  .k-barcall{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+  .k-barcall-t{font-size:10px;color:var(--soft);font-weight:700}
+  .k-barcall-ok{font-size:10.5px;font-weight:800;color:var(--teal-d);background:var(--teal-bg);padding:5px 11px;border-radius:999px}
+  .k-call.sm{font-size:11px;padding:5px 11px}
   .k-called{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--teal-d);
     background:var(--teal-bg);border-radius:9px;padding:7px 11px}
   .k-kb{flex:1;background:#eef2f1;padding:8px 9px 10px;display:flex;flex-direction:column;gap:5px;justify-content:center}
@@ -470,6 +474,7 @@
     var t = toBirth ? birth : phone, max = toBirth ? 8 : 11;
     if(k==="지움") t = t.slice(0,-1);
     else if(k==="전체삭제") t = "";
+    else if(k==="010"){ if(t.length+3 <= max) t += "010"; }   // 앞 3자리를 한 번에
     else if(t.length < max) t += k;
     if(toBirth) birth = t; else phone = t;
     renderVp();
@@ -486,15 +491,17 @@
     return g.map(function(x){ return x.replace(/_/g,'<span class="k-dm">_</span>'); }).join(" - ");
   }
   function birthView(){
-    if(!birth) return '<span class="k-field-v dim">YYYY.MM.DD</span>';
+    if(!birth) return '<span class="k-field-v dim">YYYY.MM.DD<i class="k-caret"></i></span>';
     var d = birth.padEnd(8,"_").split("");
     var t = d.slice(0,4).join("")+"."+d.slice(4,6).join("")+"."+d.slice(6,8).join("");
-    return '<span class="k-field-v">'+t.replace(/_/g,'<span class="k-dm">_</span>')+'</span>';
+    return '<span class="k-field-v">'+t.replace(/_/g,'<span class="k-dm">_</span>')+'<i class="k-caret"></i></span>';
   }
-  function numPad(){
-    return '<div class="k-keypad">'+["1","2","3","4","5","6","7","8","9","지움","0","전체삭제"].map(function(k){
-      var fn = (k==="지움"||k==="전체삭제")?' fn':'';
-      return '<button class="k-key'+fn+'" onclick="pressNum(\''+k+'\')">'+k+'</button>'; }).join("")+'</div>';
+  function numPad(forPhone){
+    var last = forPhone ? ["010","0","⌫ 지움"] : ["전체삭제","0","⌫ 지움"];
+    return '<div class="k-keypad">'+["1","2","3","4","5","6","7","8","9"].concat(last).map(function(k){
+      var fn = (k==="⌫ 지움"||k==="전체삭제")?' fn':'';
+      var key = (k==="⌫ 지움") ? "지움" : k;
+      return '<button class="k-key'+fn+'" onclick="pressNum(\''+key+'\')">'+k+'</button>'; }).join("")+'</div>';
   }
   function qwertyPad(){
     var rows = (eng ? EN : QW), out = "";
@@ -519,7 +526,7 @@
   function signupTotal(){ return collectExtra ? 3 : 2; }
   function setBar(step){
     return '<div class="k-bar"><span class="k-back">← 이전</span>'+
-      '<span class="k-chip">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</span><span class="k-r"></span></div>';
+      '<span class="k-chip">약국 회원가입 · '+(step+1)+' / '+signupTotal()+'</span>'+callRow()+'</div>';
   }
   function renderKioskSet(){
     var el = $("kioskset");
@@ -538,11 +545,10 @@
       '<div class="k-term-note">ⓘ 버튼을 누르면 위 약관에 동의한 것으로 간주됩니다</div></div>';
   }
   function callRow(){
-    if(called) return '<div class="k-callbox"><span class="k-callbox-t">'+
-      '<b>✓ 약사님께 전달했어요</b>잠시만 기다려 주세요 · 입력은 그대로 이어서 하실 수 있어요</span></div>';
-    return '<div class="k-callbox"><span class="k-callbox-t">'+
-      '<b>입력이 어려우신가요?</b>누르면 약국 PC로 알림이 가고 약사님이 도와드려요</span>'+
-      '<button class="k-call" onclick="callPharmacist()">🔔 약사님 호출하기</button></div>';
+    if(called) return '<span class="k-barcall"><span class="k-barcall-ok">'+
+      '✓ 약사님께 전달했어요 · 입력은 그대로 이어서 하세요</span></span>';
+    return '<span class="k-barcall"><span class="k-barcall-t">입력이 어려우시면 약사님이 도와드려요</span>'+
+      '<button class="k-call sm" onclick="callPharmacist()">🔔 약사님 호출하기</button></span>';
   }
 
   function kSignup(step){
@@ -554,9 +560,8 @@
         '<div class="k-field on"><span class="k-field-l">전화번호 <span class="k-req">필수</span></span>'+
           '<span class="k-field-v">'+phoneView()+'<i class="k-caret"></i></span></div>'+
         '<div class="k-help">이 번호로 적립 포인트를 안내해 드려요</div>'+
-        callRow()+
         '</div>'+
-        '<div class="k-pad-col">'+numPad()+
+        '<div class="k-pad-col">'+numPad(true)+
         '<div class="k-padfoot"><button class="k-cta"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div>'+
         '</div></div></div>');
     }
@@ -570,7 +575,6 @@
           '<div class="k-nametop" style="padding-top:9px">'+
           '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
             '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
-          callRow()+
           '</div>'+ qwertyPad()+
           '<div class="k-padfoot" style="padding:8px 14px 11px;background:#eef2f1">'+
           '<button class="k-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button></div>'+
@@ -582,7 +586,7 @@
         '<div class="k-col">'+
           '<div class="k-field on"><span class="k-field-l">이름 <span class="k-req">필수</span></span>'+
             '<span class="k-field-v '+(nm?'':'dim')+'">'+(nm||'이름을 입력해 주세요')+'<i class="k-caret"></i></span></div>'+
-          '<div class="k-help">이름과 전화번호로 회원을 찾습니다</div>'+ callRow()+
+          '<div class="k-help">이름과 전화번호로 회원을 찾습니다</div>'+
         '</div>'+
         '<div class="k-col">'+ termsBlock()+
           '<button class="k-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button>'+
@@ -595,11 +599,11 @@
       '<div class="k-signup"><div class="k-form">'+
         '<div class="k-h">생년월일과 성별은 <b>선택</b>이에요<br><span style="font-size:12.5px">넣지 않아도 가입됩니다</span></div>'+
         '<div class="k-field on" onclick="setFocus(\'birth\')"><span class="k-field-l">생년월일 <span class="k-opt">선택</span></span>'+
-          birthView()+'<i class="k-caret" style="margin-left:-1px"></i></div>'+
+          birthView()+'</div>'+
         '<div class="k-gender"><span class="k-field-l">성별 <span class="k-opt">선택</span></span>'+
         '<button class="k-gb'+g1+'" onclick="setGender(\'m\')">남자</button>'+
         '<button class="k-gb'+g2+'" onclick="setGender(\'f\')">여자</button></div>'+
-        termsBlock()+ callRow()+
+        termsBlock()+
       '</div>'+
       '<div class="k-pad-col">'+numPad()+
       '<div class="k-padfoot"><button class="k-cta">약관 동의하고 가입하기</button></div>'+
