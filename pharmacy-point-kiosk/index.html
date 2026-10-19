@@ -694,7 +694,7 @@
   function appBarcode(){ return (
     '<div class="p"><div class="p-status"><span>9:41</span><span>● ● ●</span></div>'+
     '<div class="p-body"><div class="p-h">바코드 제시</div>'+
-    '<div class="p-sub">약국 스캐너에 바코드를 보여주세요.<br>단골약국에서만 사용할 수 있어요.</div>'+
+    '<div class="p-sub">약국 스캐너에 바코드를 보여 주세요.<br>단골약국에서만 사용할 수 있어요.</div>'+
     '<div class="barc"></div><div class="barno">9 4012 5837 0021</div>'+
     '<div class="pcard" style="margin-top:16px"><div class="ph">굿팜온누리약국 (단골)</div>'+
     '<div class="pts"><b>1,250</b> P</div><div class="pm">PIN 없이 바코드로 인증</div></div></div></div>'); }
@@ -889,7 +889,8 @@
       '<span class="ks-n">가입 '+signupTotal()+'화면</span></div>';
   }
   function eyebrow(step){
-    return '<div class="kk-eyebrow">약국 회원가입</div>';
+    if(step===0) return '';   // ① 제목이 같은 말을 한다
+    return '<div class="kk-eyebrow">약국 포인트 회원가입</div>';
   }
 
   function phoneView(){
@@ -940,7 +941,7 @@
   }
   function cancelModal(){
     return '<div class="kk-dim" onclick="closeCancel()"><div class="kk-modal" onclick="event.stopPropagation()">'+
-      '<div class="kk-modal-h">약국 회원가입을 취소할까요?</div>'+
+      '<div class="kk-modal-h">약국 포인트 회원가입을 취소할까요?</div>'+
       '<div class="kk-modal-t">지금까지 입력한 내용이 모두 지워집니다.</div>'+
       '<div class="kk-modal-b"><button class="no" onclick="cancelSignup()">가입 취소</button>'+
       '<button class="yes" onclick="closeCancel()">계속 입력하기</button></div>'+
@@ -949,7 +950,7 @@
   function nameField(nm){
     return '<div class="kk-field on"><div class="kk-field-h"><span class="kk-field-l">이름 <span class="kk-req">필수</span></span></div>'+
       (nm ? '<div class="kk-field-v">'+nm+'<i class="kk-caret"></i></div>'
-          : '<div class="kk-field-v ph">이름을 입력해 주세요<i class="kk-caret"></i></div>')+'</div>';
+          : '<div class="kk-field-v ph">예) 김지수<i class="kk-caret"></i></div>')+'</div>';
   }
 
   function kSignup(step){
@@ -958,7 +959,7 @@
       var ok0 = phone.length===11;
       return ('<div class="kk">'+setBar(0)+
         '<div class="kk-body"><div class="kk-col">'+ eyebrow(0)+
-          '<div class="kk-title">포인트 적립을 위해<br><b>전화번호를 입력해 주세요</b></div>'+
+          '<div class="kk-title">약국 포인트 회원가입을 위해<br><b>고객님의 정보를 입력해 주세요</b></div>'+
           '<div class="kk-field on"><div class="kk-field-h"><span class="kk-field-l">전화번호 <span class="kk-req">필수</span></span>'+
             '<span class="kk-cnt">'+phone.length+' / 11</span></div>'+
             '<div class="kk-field-v">'+phoneView()+'<i class="kk-caret"></i></div></div>'+
@@ -981,7 +982,7 @@
       }
       return ('<div class="kk">'+setBar(1)+
         '<div class="kk-two"><div class="kk-col">'+ eyebrow(1)+ nameField(nm)+
-          '<div class="kk-help">이름과 전화번호로 약국 회원을 찾아요</div>'+
+          '<div class="kk-help">이름과 전화번호로 약국 포인트 회원을 찾아요</div>'+
         '</div><div class="kk-col">'+ termsBlock()+'</div></div>'+ qwertyPad()+
         '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(0)">이전</button>'+
         '<button class="kk-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
@@ -1028,9 +1029,9 @@
   // 1 첫 화면 — 처방전 스캔(주 동선) + 결제 방법(보조 동선)
   function kStart(){
     var ch = [
-      ['약국 회원 결제','포인트를 적립하고 사용해요','❙❙❙','accent','goScreen(\'K-3\')'],
+      ['약국 포인트 회원 결제','포인트를 적립하고 사용해요','❙❙❙','accent','goScreen(\'K-3\')'],
       ['비회원 결제','포인트 없이 바로 결제해요','🛒','','goScreen(\'K-4\')'],
-      ['약국 회원가입','가입하고 포인트를 적립해요','🎁','','goScreen(\'K-2\')']
+      ['약국 포인트 회원가입','가입하면 포인트를 적립해요','🎁','','goScreen(\'K-2\')']
     ];
     var cards = ch.map(function(c){ return (
       '<button class="kk-ch '+c[3]+'" onclick="'+c[4]+'"><span class="kk-ch-ic">'+c[2]+'</span>'+
@@ -1038,7 +1039,7 @@
     return ('<div class="kk">'+kkBar(0, kkLogo(), '')+
       '<div class="kk-start">'+
         '<div class="kk-scan"><div class="kk-doc">처방전<span class="kk-qrm"></span></div>'+
-          '<div class="kk-scan-h">처방전 QR코드를<br>스캐너에 대주세요</div>'+
+          '<div class="kk-scan-h">처방전 QR코드를<br>스캐너에 대 주세요</div>'+
           '<div class="kk-scan-s">회원 인증과 결제가 한 번에 진행돼요</div>'+
           '<div class="kk-chev">⌄</div></div>'+
         '<div class="kk-choices"><div class="kk-lead">처방전이 없으신가요?<b>결제 방법을 선택해 주세요</b></div>'+
@@ -1052,7 +1053,7 @@
       ? '<div class="kk-auth-h">굿팜 앱의 <b>회원 바코드</b>를<br>준비해 주세요</div>'+
         '<div class="kk-phone"><div class="kk-phone-s"><div class="kk-bars"></div>'+
           '<div class="kk-barno">GP 8801-2345-6789</div></div></div>'+
-        '<div class="kk-auth-g">아래 스캐너에 바코드를 인식해 주세요</div><div class="kk-chev">⌄</div>'
+        '<div class="kk-auth-g">아래 스캐너에 바코드를 대 주세요</div><div class="kk-chev">⌄</div>'
       : '<div class="kk-auth-h">가입한 <b>전화번호</b>를<br>입력해 주세요</div>'+
         '<div class="kk-field" style="width:460px;background:#fff">'+
           '<div class="kk-field-h"><span class="kk-field-l">전화번호</span><span class="kk-cnt">11 / 11</span></div>'+
@@ -1073,7 +1074,7 @@
   function kCart(){
     var items = [
       ['네오케어밴드(혼합)대용량-80매','3,000','적립 90P',''],
-      ['비맥스메타비정(60/120) (60정)','30,000','약사님 복약 지도 필요','일반의약품']
+      ['비맥스메타비정(60/120) (60정)','30,000','복용 전 약사님 복약 지도가 필요해요','일반의약품']
     ];
     var list = items.map(function(it){ return (
       '<div class="kk-it"><div class="kk-it-m">'+
@@ -1095,7 +1096,7 @@
       '<div class="kk-done"><div class="kk-donel">'+
         '<div class="kk-check">✓</div>'+
         '<div class="kk-done-h">결제가<br>완료되었습니다</div>'+
-        '<div class="kk-note">🔔 약사님께 결제 완료 사실을 알려주세요</div>'+
+        '<div class="kk-note">🔔 약사님께 결제가 끝났다고 알려 주세요</div>'+
         '<div class="kk-earn"><span>적립 포인트</span><b>+ 750 P</b></div>'+
       '</div>'+
       '<div class="kk-rc"><div class="kk-rc-l">구매 상품</div>'+
@@ -1255,7 +1256,7 @@
     }
     if(s===7){   // 사용 불가
       ov = ppModal('<div class="pp-modal"><div class="pp-mh">포인트를 사용할 수 없습니다<span class="x">✕</span></div>'+
-        '<div class="pp-mb">사용 가능 포인트가 최소 사용 금액보다 적습니다.'+
+        '<div class="pp-mb">사용 가능 포인트가 최소 사용 기준보다 적습니다.'+
         '<div class="pp-kv" style="margin-top:10px"><span>최소 사용 기준</span><b>1,000 P</b></div>'+
         '<div class="pp-kv"><span>보유 포인트</span><b>500 P</b></div>'+
         '<div class="pp-kv"><span>사용 가능 포인트</span><b>500 P</b></div></div>'+

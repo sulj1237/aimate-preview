@@ -699,7 +699,8 @@
       '<span class="ks-n">가입 '+signupTotal()+'화면</span></div>';
   }
   function eyebrow(step){
-    return '<div class="kk-eyebrow">약국 회원가입</div>';
+    if(step===0) return '';   // ① 제목이 같은 말을 한다
+    return '<div class="kk-eyebrow">약국 포인트 회원가입</div>';
   }
 
   function phoneView(){
@@ -750,7 +751,7 @@
   }
   function cancelModal(){
     return '<div class="kk-dim" onclick="closeCancel()"><div class="kk-modal" onclick="event.stopPropagation()">'+
-      '<div class="kk-modal-h">약국 회원가입을 취소할까요?</div>'+
+      '<div class="kk-modal-h">약국 포인트 회원가입을 취소할까요?</div>'+
       '<div class="kk-modal-t">지금까지 입력한 내용이 모두 지워집니다.</div>'+
       '<div class="kk-modal-b"><button class="no" onclick="cancelSignup()">가입 취소</button>'+
       '<button class="yes" onclick="closeCancel()">계속 입력하기</button></div>'+
@@ -759,7 +760,7 @@
   function nameField(nm){
     return '<div class="kk-field on"><div class="kk-field-h"><span class="kk-field-l">이름 <span class="kk-req">필수</span></span></div>'+
       (nm ? '<div class="kk-field-v">'+nm+'<i class="kk-caret"></i></div>'
-          : '<div class="kk-field-v ph">이름을 입력해 주세요<i class="kk-caret"></i></div>')+'</div>';
+          : '<div class="kk-field-v ph">예) 김지수<i class="kk-caret"></i></div>')+'</div>';
   }
 
   function kSignup(step){
@@ -768,7 +769,7 @@
       var ok0 = phone.length===11;
       return ('<div class="kk">'+setBar(0)+
         '<div class="kk-body"><div class="kk-col">'+ eyebrow(0)+
-          '<div class="kk-title">포인트 적립을 위해<br><b>전화번호를 입력해 주세요</b></div>'+
+          '<div class="kk-title">약국 포인트 회원가입을 위해<br><b>고객님의 정보를 입력해 주세요</b></div>'+
           '<div class="kk-field on"><div class="kk-field-h"><span class="kk-field-l">전화번호 <span class="kk-req">필수</span></span>'+
             '<span class="kk-cnt">'+phone.length+' / 11</span></div>'+
             '<div class="kk-field-v">'+phoneView()+'<i class="kk-caret"></i></div></div>'+
@@ -791,7 +792,7 @@
       }
       return ('<div class="kk">'+setBar(1)+
         '<div class="kk-two"><div class="kk-col">'+ eyebrow(1)+ nameField(nm)+
-          '<div class="kk-help">이름과 전화번호로 약국 회원을 찾아요</div>'+
+          '<div class="kk-help">이름과 전화번호로 약국 포인트 회원을 찾아요</div>'+
         '</div><div class="kk-col">'+ termsBlock()+'</div></div>'+ qwertyPad()+
         '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(0)">이전</button>'+
         '<button class="kk-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
