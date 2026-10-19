@@ -727,10 +727,10 @@
     var el = $("kioskset");
     if(SCREENS[si].id !== "K-2"){ el.innerHTML = ""; return; }
     el.innerHTML = '<div class="ks"><span class="ks-h">키오스크 설정</span>'+
-      '<span class="ks-tag">화면 밖 · 약국 기기 설정</span>'+
-      '<span>성별·생년월일</span>'+
-      '<button class="ks-b'+(collectExtra?' on':'')+'" onclick="toggleExtra(true)">받음(선택 입력)</button>'+
-      '<button class="ks-b'+(!collectExtra?' on':'')+'" onclick="toggleExtra(false)">사용 안 함</button>'+
+      '<span class="ks-tag">화면 밖 · 설정 &gt; 결제 및 정책 &gt; 고객 정보</span>'+
+      '<span>생년월일 및 성별 수집 설정</span>'+
+      '<button class="ks-b'+(collectExtra?' on':'')+'" onclick="toggleExtra(true)">켬</button>'+
+      '<button class="ks-b'+(!collectExtra?' on':'')+'" onclick="toggleExtra(false)">끔</button>'+
       '<span class="ks-n">가입 '+signupTotal()+'화면</span></div>';
   }
   function eyebrow(step){
