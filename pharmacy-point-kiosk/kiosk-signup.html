@@ -456,7 +456,8 @@
     성별·생년월일은 <b>선택값</b>이라 넣지 않아도 가입됩니다. 이름 자판은 <b>쿼티 두벌식(한/영 전환)</b> 한 가지입니다.<br />
     화면은 <b>실제 키오스크 디자인(1280×760 시안)</b>의 색·치수·상단 바 구성을 그대로 따릅니다 — 보기 편하도록 60%로 줄여 보여 줍니다.<br />
     ①에서는 <b>취소</b>, ②·③에서는 <b>이전</b>이 키패드 아래 주 버튼 왼편에 있습니다. <b>← 처음으로</b>는 <b>②부터</b> 상단 왼쪽에 나오고, 누르면 <b>가입을 취소할지 묻는 모달</b>이 먼저 뜹니다.<br />
-    <b>약사님 호출하기</b>와 <b>전화번호 조회·본인 확인</b>은 <b>2차 작업</b>으로 진행합니다.<br />
+    ①에서 <b>다음</b>을 누르면 그 번호로 가입한 회원이 있는지 먼저 조회합니다 — 시연용으로 <b>010-1234-5678</b>을 넣으면 <b>이미 가입하신 회원이에요</b> 모달이 뜹니다.<br />
+    <b>약사님 호출하기</b>와 <b>본인 확인 목록</b>(같은 번호의 저장된 고객 정보)은 <b>다음 배포</b>에서 진행합니다.<br />
     <b>키오스크 설정</b>은 약국 기기 설정이라 화면 밖(아래 버튼)에 뒀습니다 — 눌러서 화면 수가 바뀌는 걸 확인하세요.
     입력 방식 비교: <a href="./kiosk-signup-flow.html" style="color:var(--teal-d);font-weight:700">한 화면 입력 vs 단계별 입력 보기 ›</a>
   </div>
@@ -621,6 +622,23 @@
     renderStates(); renderVp(); }
   function goStep(i){ pickState(i); }
   // 가입 취소 — 확인 모달을 먼저 띄우고, 확인하면 입력값을 비운다 (키오스크 설정값은 그대로)
+  // ① 다음 — 입력한 번호로 가입한 포인트 회원이 있는지 먼저 조회한다
+  //    시연용: 010-1234-5678은 이미 가입한 회원으로 응답한다
+  function lookupPhone(p){ return p === "01012345678" ? "member" : "none"; }
+  function submitPhone(){
+    if(lookupPhone(phone) === "member"){ lookupOpen = true; renderVp(); return; }
+    goStep(1);
+  }
+  function closeLookup(){ lookupOpen = false; cancelSignup(); }
+  function lookupModal(){
+    return '<div class="kk-dim"><div class="kk-modal">'+
+      '<div class="kk-modal-h">이미 가입하신 회원이에요</div>'+
+      '<div class="kk-modal-t">'+phoneDash()+'로 가입한 <b>약국 포인트 회원</b>이 있습니다.<br>'+
+      '결제하실 때 포인트가 그대로 적립됩니다.</div>'+
+      '<div class="kk-modal-b"><button class="yes" onclick="closeLookup()">확인</button></div>'+
+      '</div></div>';
+  }
+  function phoneDash(){ return phone.slice(0,3)+'-'+phone.slice(3,7)+'-'+phone.slice(7); }
   function askCancel(){ confirmOpen = true; renderVp(); }
   function closeCancel(){ confirmOpen = false; renderVp(); }
   function cancelModal(){
@@ -631,7 +649,7 @@
       '<button class="yes" onclick="closeCancel()">계속 입력하기</button></div>'+
       '</div></div>';
   }
-  function cancelSignup(){ confirmOpen = false; gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
+  function cancelSignup(){ confirmOpen = false; lookupOpen = false; gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
     shift=false; eng=false; strokes=0; called=false; focusField="name"; goStep(0); }
 
   function phoneView(){
@@ -775,7 +793,7 @@
             '<div class="kk-field-v">'+phoneView()+'<i class="kk-caret"></i></div></div>'+
         '</div><div class="kk-col">'+numPad(true)+'</div></div>'+
         '<div class="kk-foot"><button class="kk-ghost" onclick="askCancel()">취소</button>'+
-        '<button class="kk-cta"'+(ok0?'':' disabled')+' onclick="goStep(1)">다음</button></div>'+
+        '<button class="kk-cta"'+(ok0?'':' disabled')+' onclick="submitPhone()">다음</button></div>'+
         '</div>');
     }
 
@@ -900,6 +918,7 @@
   var shift = false, eng = false, strokes = 0;
   var called = false;            // 약사 호출 여부
   var confirmOpen = false;       // 가입 취소 확인 모달
+  var lookupOpen = false;        // 이미 가입한 회원 안내 모달
   var focusField = "name";       // ②화면에서 입력 중인 칸 (name · birth)
   var collectExtra = true;       // 키오스크 설정 — 성별·생년월일 수집
   var SCREENS = [
@@ -921,7 +940,7 @@
     renderKioskSet();
     var s = SCREENS[si];
     $("device").className = "device "+s.device;
-    $("vp").innerHTML = s.render(sti) + (confirmOpen ? cancelModal() : "");
+    $("vp").innerHTML = s.render(sti) + (confirmOpen ? cancelModal() : "") + (lookupOpen ? lookupModal() : "");
     $("tag").textContent = s.group+" · "+s.name+(s.states.length>1? " · "+s.states[sti] : "");
     requestAnimationFrame(postHeight);
   }
@@ -937,7 +956,8 @@
   window.pickState = pickState; window.setGender = setGender;
   window.pressNum = pressNum; window.pressHan = pressHan; window.callPharmacist = callPharmacist;
   window.toggleExtra = toggleExtra; window.goStep = goStep; window.cancelSignup = cancelSignup;
-  window.askCancel = askCancel; window.closeCancel = closeCancel; window.setFocus = setFocus;
+  window.askCancel = askCancel; window.closeCancel = closeCancel;
+  window.submitPhone = submitPhone; window.closeLookup = closeLookup; window.setFocus = setFocus;
   window.renderKioskSet = renderKioskSet;
 
   renderNav(); renderStates(); renderVp();
