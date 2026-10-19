@@ -597,21 +597,38 @@
     if(cho>=0){ cho = -1; return; }
     nameCommitted = nameCommitted.slice(0,-1);
   }
+  // ── 입력값 검증 ──
+  function cleanName(s){ return s.replace(/\s+/g," ").trim(); }
+  function validName(s){ var t = cleanName(s); return t.replace(/\s/g,"").length >= 2 && t.length <= 20; }
+  function validPhone(p){ return p.length === 11 && p.slice(0,3) === "010"; }
+  function validBirth(){
+    if(!birth) return true;                       // 선택값 — 비워도 가입된다
+    if(birth.length !== 8) return false;
+    var y = +birth.slice(0,4), m = +birth.slice(4,6), d = +birth.slice(6,8);
+    if(y < 1900 || m < 1 || m > 12 || d < 1) return false;
+    if(d > new Date(y, m, 0).getDate()) return false;
+    return new Date(y, m-1, d) <= new Date();
+  }
+
   function pressHan(ch){
     if(ch==="⇧"){ shift=!shift; renderVp(); return; }
     if(ch==="한/영"){ eng=!eng; shift=false; renderVp(); return; }
     if(ch==="지움"){ nameBack(); renderVp(); return; }
     if(ch==="전체삭제"){ nameCommitted=""; cho=-1; jung=-1; jong=0; renderVp(); return; }
-    var c = (!eng && shift && QW_SHIFT[ch]) ? QW_SHIFT[ch] : ch;
-    putJamo(c); if(shift && !eng) shift=false;
+    if(ch==="띄어쓰기"){ var t0 = nameText();
+      if(t0 && t0.slice(-1)!==" "){ commitSyl(); nameCommitted += " "; strokes++; }
+      renderVp(); return; }
+    var c = eng ? (shift ? ch.toUpperCase() : ch)
+                : ((shift && QW_SHIFT[ch]) ? QW_SHIFT[ch] : ch);
+    putJamo(c); if(shift) shift=false;
     strokes++; renderVp();
   }
   function pressNum(k){
     var toBirth = (sti===2);
     var t = toBirth ? birth : phone, max = toBirth ? 8 : 11;
-    if(k==="지움") t = t.slice(0,-1);
-    else if(k==="전체삭제") t = "";
-    else if(k==="010"){ if(t.length+3 <= max) t += "010"; }   // 앞 3자리를 한 번에
+    var min = toBirth ? 0 : 3;                    // 전화번호 앞 010은 고정
+    if(k==="지움"){ if(t.length > min) t = t.slice(0,-1); }
+    else if(k==="전체삭제") t = toBirth ? "" : "010";
     else if(t.length < max) t += k;
     if(toBirth) birth = t; else phone = t;
     renderVp();
@@ -649,7 +666,7 @@
       '<button class="yes" onclick="closeCancel()">계속 입력하기</button></div>'+
       '</div></div>';
   }
-  function cancelSignup(){ confirmOpen = false; lookupOpen = false; gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
+  function cancelSignup(){ confirmOpen = false; lookupOpen = false; gender=""; phone="010"; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
     shift=false; eng=false; strokes=0; called=false; focusField="name"; goStep(0); }
 
   function phoneView(){
@@ -738,17 +755,21 @@
     return out;
   }
   function numPad(forPhone){
-    var last = forPhone ? ["010","0","지움"] : ["전체삭제","0","지움"];
+    var last = ["전체삭제","0","지움"];
     return '<div class="kk-pad">'+["1","2","3","4","5","6","7","8","9"].concat(last).map(function(k){
-      var cls = (k==="지움"||k==="전체삭제") ? " fn" : (k==="010" ? " sm" : "");
+      var cls = (k==="지움"||k==="전체삭제") ? " fn" : "";
       return '<button class="kk-key'+cls+'" onclick="pressNum(\''+k+'\')">'+k+'</button>'; }).join("")+'</div>';
   }
   function qwertyPad(){
     var rows = (eng ? EN : QW), out = "";
     rows.forEach(function(r,i){
       var keys = r.map(function(k){
-        var face = (!eng && shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k;
+        var face = eng ? (shift ? k.toUpperCase() : k)
+                       : ((shift && QW_SHIFT[k]) ? QW_SHIFT[k] : k);
         return '<button class="kk-kk" onclick="pressHan(\''+k+'\')">'+face+'</button>'; });
+      if(i===1 && eng){
+        keys.push('<button class="kk-kk fn" onclick="pressHan(\'띄어쓰기\')">띄어쓰기</button>');
+      }
       if(i===2){
         keys.unshift('<button class="kk-kk fn'+(eng?' on':'')+'" onclick="pressHan(\'한/영\')">'+(eng?'한글':'ABC')+'</button>');
         keys.unshift('<button class="kk-kk fn'+(shift?' on':'')+'" onclick="pressHan(\'⇧\')">'+(eng?'Shift ⇧':'쌍자음 ⇧')+'</button>');
@@ -784,7 +805,7 @@
   function kSignup(step){
     // ① 전화번호
     if(step===0){
-      var ok0 = phone.length===11;
+      var ok0 = validPhone(phone);
       return ('<div class="kk">'+setBar(0)+
         '<div class="kk-body"><div class="kk-col">'+ eyebrow(0)+
           '<div class="kk-title">약국 포인트 회원가입을 위해<br><b>고객님의 정보를 입력해 주세요</b></div>'+
@@ -805,7 +826,7 @@
         return ('<div class="kk">'+setBar(1)+
           '<div class="kk-top">'+ eyebrow(1)+ nameField(nm)+'</div>'+ qwertyPad()+
           '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(0)">이전</button>'+
-          '<button class="kk-cta"'+(nm?'':' disabled')+' onclick="goStep(2)">다음</button></div>'+
+          '<button class="kk-cta"'+(validName(nm)?'':' disabled')+' onclick="goStep(2)">다음</button></div>'+
           '</div>');
       }
       return ('<div class="kk">'+setBar(1)+
@@ -813,7 +834,7 @@
           '<div class="kk-help">이름과 전화번호로 약국 포인트 회원을 찾아요</div>'+
         '</div><div class="kk-col">'+ termsBlock()+'</div></div>'+ qwertyPad()+
         '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(0)">이전</button>'+
-        '<button class="kk-cta"'+(nm?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
+        '<button class="kk-cta"'+(validName(nm)?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
         '</div>');
     }
 
@@ -835,7 +856,7 @@
         termsBlock()+
       '</div><div class="kk-col">'+numPad()+'</div></div>'+
       '<div class="kk-foot"><button class="kk-ghost" onclick="goStep(1)">이전</button>'+
-      '<button class="kk-cta">약관 동의하고 가입하기</button></div>'+
+      '<button class="kk-cta"'+(validBirth()?'':' disabled')+'>약관 동의하고 가입하기</button></div>'+
       '</div>'); }
 
   // 3 굿팜 앱 바코드 인증
@@ -913,7 +934,7 @@
 
   // ── 화면 레지스트리 ──
   var gender = "";               // 성별 선택 상태(회원가입)
-  var phone = "", birth = "";    // 입력값
+  var phone = "010", birth = "";    // 입력값
   var nameCommitted = "", cho = -1, jung = -1, jong = 0;   // 이름 한글 조합
   var shift = false, eng = false, strokes = 0;
   var called = false;            // 약사 호출 여부
@@ -944,7 +965,7 @@
     $("tag").textContent = s.group+" · "+s.name+(s.states.length>1? " · "+s.states[sti] : "");
     requestAnimationFrame(postHeight);
   }
-  function resetSignup(){ gender=""; phone=""; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
+  function resetSignup(){ gender=""; phone="010"; birth=""; nameCommitted=""; cho=-1; jung=-1; jong=0;
     shift=false; eng=false; strokes=0; called=false; collectExtra=true; focusField="name"; }
   function pickState(i){ sti=i; renderStates(); renderVp(); }
   function setGender(g){ gender=g; renderVp(); }
