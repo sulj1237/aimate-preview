@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>슈퍼어드민 · 서비스 청구 통계</title>
+<style>
+  :root{
+    --teal:#1fb6a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e3e6ea; --bg:#f4f5f7;
+    --side:#33383d; --side-line:#454b52;
+    --up:#d6453d; --down:#2f6fd6; --warn:#e8a317; --warn-soft:#fff6e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  button{font-family:inherit}
+  .wrap{display:flex;min-height:100vh}
+
+  /* 사이드바 (맥락용) */
+  .side{width:188px;flex:none;background:var(--side);color:#cdd2d7}
+  .side-logo{display:flex;align-items:center;gap:7px;padding:16px;border-bottom:1px solid var(--side-line)}
+  .side-mark{width:18px;height:18px;border-radius:7px 7px 7px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .side-mark::after{content:"";position:absolute;left:-4px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:#f4de3f}
+  .side-word{font-size:16px;font-weight:800;color:#fff}
+  .side-grp{font-size:10.5px;color:#8e959c;padding:14px 16px 6px;letter-spacing:.02em}
+  .side-item{padding:8px 16px 8px 26px;font-size:12px;color:#aeb4ba}
+  .side-item.on{background:var(--teal);color:#fff;font-weight:700}
+  .side-item .new{font-size:9.5px;background:#f4de3f;color:#33383d;border-radius:3px;padding:0 4px;margin-left:4px;font-weight:800}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{height:46px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px}
+  .crumb{font-size:12px;color:var(--muted)}
+  .crumb b{color:var(--ink)}
+  .crumb a{color:var(--muted);cursor:pointer;text-decoration:none}
+  .crumb a:hover{color:var(--teal-d)}
+  .demo{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
+  .demo button{height:24px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:11.5px;padding:0 8px;cursor:pointer;color:#4b5158}
+  .demo button.on{background:#4b5158;border-color:#4b5158;color:#fff}
+  .content{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:1240px}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+  .ph{display:flex;align-items:center;gap:10px;padding:14px 18px 0}
+  .ph h3{margin:0;font-size:14px}
+  .ph .sub{font-size:11.5px;color:var(--muted)}
+  .ph .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+
+  /* 조회 조건 */
+  .filter{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+  .frow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .fitem{display:flex;align-items:center;gap:8px}
+  .flabel{font-weight:700;color:#4b5158;font-size:12.5px}
+  .sel{height:32px;border:1px solid var(--line);border-radius:6px;padding:0 26px 0 10px;font-size:12.5px;color:var(--ink);background:#fff;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,#9aa0a6 50%),linear-gradient(135deg,#9aa0a6 50%,transparent 50%);
+    background-position:calc(100% - 14px) 14px,calc(100% - 9px) 14px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  .sel:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,182,166,.15)}
+  .btn{height:32px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;color:#4b5158;cursor:pointer}
+  .btn:hover{border-color:#c9cdd2}
+  .btn.pri{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  .btn.sm{height:26px;padding:0 10px;font-size:11.5px}
+  .info{font-size:11.5px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .info .i{display:inline-flex;width:14px;height:14px;border-radius:50%;border:1px solid #b9bec4;font-size:9px;align-items:center;justify-content:center;color:#8a9099;font-weight:700}
+  .badge{font-size:10.5px;border-radius:4px;padding:0 6px;font-weight:700}
+  .badge.tmp{background:#eef0f3;color:#6b7178}
+
+  /* 요약 대시보드 */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .dhd{font-size:14px;font-weight:800;margin:0 0 -4px 2px}
+  .kunp{position:relative;cursor:pointer}.kunp:hover{border-color:#0AB4AD}
+  .kunp .go{color:var(--teal-d);font-weight:700;margin-left:6px}
+
+  /* 약국 결제 관리 (이동 화면 — 실제 슈퍼어드민 화면 구성) */
+  .pay-h{margin:4px 0 0;font-size:19px}
+  .pay-f{padding:18px 18px 14px;display:flex;flex-direction:column;gap:12px}
+  .pay-f .frow{gap:8px;flex-wrap:nowrap;white-space:nowrap}
+  .pay-f .flabel{width:56px;font-weight:600}
+  .pay-f .gap{width:12px}
+  .din{height:32px;border:1px solid var(--line);border-radius:4px;padding:0 10px;font-size:12px;display:inline-flex;align-items:center;min-width:96px;background:#fff}
+  .qbtn{height:32px;min-width:42px;padding:0 8px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:12px;color:#4b5158;cursor:pointer}
+  .qbtn.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  .rad{display:inline-flex;align-items:center;gap:4px;font-size:12px;margin-right:8px}
+  .rad i{width:13px;height:13px;border:1px solid #c3c8cd;border-radius:50%;display:inline-block;position:relative}
+  .rad.on i{border-color:var(--teal)} .rad.on i::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--teal)}
+  .chk{width:13px;height:13px;border:1px solid #c3c8cd;border-radius:2px;display:inline-block}
+  .pay-f .acts{display:flex;justify-content:center;gap:16px;border-top:1px solid var(--line);padding-top:14px}
+  .pay-f .acts .btn{width:112px}
+  .pay-top{display:flex;align-items:center;gap:8px}
+  .pay-top .cnt{color:var(--teal-d)}
+  .pay-top .r{margin-left:auto;display:flex;gap:6px}
+  .tbl.pay th,.tbl.pay td{text-align:center}
+  .tbl.pay .fail{color:var(--up);font-weight:700}
+  .apv{height:26px;padding:0 12px;border:0;border-radius:4px;background:#eef0f2;color:#b5bbc1;font-size:11.5px}
+  .back{color:var(--teal-d);cursor:pointer;font-weight:700;margin-left:10px}
+  .kpi{padding:16px 18px}
+  .kpi .k{font-size:12px;color:var(--muted);font-weight:700}
+  .kpi .v{font-size:24px;font-weight:800;margin:4px 0 2px;letter-spacing:-.01em}
+  .kpi .v small{font-size:13px;font-weight:700;margin-left:2px}
+  .kpi .d{font-size:12px}
+  .kpi .def{font-size:11px;color:var(--muted);margin-top:6px}
+  .tagf,.tagp{display:inline-block;font-size:10px;font-weight:700;border-radius:3px;padding:0 4px;margin-left:4px;line-height:16px;vertical-align:1px}
+  .tagf{background:#eef0f2;color:#5b6168} .tagp{background:var(--warn-soft);color:#a86f00}
+  .pend{font-size:11.5px;color:#a86f00}
+  .mnote{background:var(--warn-soft);border:1px solid #f1dca6;border-radius:8px;padding:10px 14px;font-size:12px;color:#6b5414;display:flex;flex-direction:column;gap:4px}
+  .mnote .per{color:#8a7432;font-size:11.5px}
+  .tbl td.memo{font-size:10.5px;font-weight:600;line-height:1.5;color:#c2570c;white-space:normal;min-width:190px;max-width:250px;letter-spacing:-.2px;vertical-align:top}
+  .tbl td.memo .dx{color:#5b4bb7}.tbl td.memo .mt{color:#1f2328}.tbl td.memo .pmb{display:inline-block;padding:0 4px;margin:2px 4px 1px 0;border-radius:3px;background:#eef0f3;color:#6b7178}.tbl td.memo .pmb.pmc{background:#e6f6f3;color:#0f8a74}
+  .tbl tr.ph-row td.memo{font-weight:600}
+  .pnote{font-size:11.5px;color:var(--muted);margin:-4px 0 6px;padding-left:2px}
+  .kpinote{font-size:11.5px;color:var(--muted);margin-top:-6px;padding-left:2px}
+  .upc{color:var(--up)} .downc{color:var(--down)} .flat{color:var(--muted)}
+
+  /* 표 */
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:9px 12px;border-bottom:1px solid #eff1f3;white-space:nowrap}
+  .tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tbl tbody tr.click{cursor:pointer}
+  .tbl tbody tr.click:hover{background:#f6fbfa}
+  .tbl tr.total td{background:#f8f9fa;font-weight:800;border-top:1px solid var(--line)}
+  .tbl .svc{font-weight:700}
+  .tbl .svc .go{color:#b9bec4;margin-left:4px;font-weight:400}
+  .share{display:flex;align-items:center;gap:8px}
+  .share .bar{height:8px;background:var(--teal);border-radius:2px}
+  .share .pct{min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+  .tbl.svct td,.tbl.svct th{padding-left:10px;padding-right:10px}.tbl.svct .share{width:120px}
+  .dc .db{display:inline-block;padding:0 5px;margin-bottom:1px;border-radius:3px;background:#fdeee3;color:#b4480a;font-weight:700}
+  .dq{font-size:10.5px;font-weight:600;color:#c2570c;white-space:nowrap;margin-top:3px}
+  .dc.dx{color:#5b4bb7}.dc .xb{display:inline-block;padding:0 4px;margin-right:4px;border-radius:3px;background:#ece9fb;color:#4c3aa8;font-weight:700}
+  .dc{font-size:10.5px;letter-spacing:-.2px;font-weight:600;color:#c2570c;margin:3px 0 0 auto;white-space:nowrap;line-height:1.45;text-align:right}
+  .why{font-size:11px;color:var(--muted);margin-top:1px}
+  .tbl tr.ph-row td{background:#fafbfc;font-weight:700;border-top:1px solid var(--line)}
+  .tbl tr.sv-row td:first-child{padding-left:26px;color:var(--muted)}
+  .tbl tr.ph-row{cursor:pointer}.tbl tr.ph-row:hover td{background:#F1F3F5}
+  .tbl tr.ph-row.one{cursor:default}.tbl tr.ph-row.one:hover td{background:#fafbfc}
+  .tbl tr.ph-row .tg{display:inline-block;width:14px;color:var(--muted);font-size:10px}
+  .tbl tr.ph-row td.svcn{font-weight:500;color:var(--muted);max-width:280px;overflow:hidden;text-overflow:ellipsis}
+  .pctl{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .sel.sm{height:28px;font-size:12px}
+  .sel.sm.on{border-color:var(--teal);color:var(--teal-d);font-weight:700}
+  .qty{color:var(--muted);font-weight:600;font-size:11.5px;margin-left:4px}
+  .foot{font-size:11.5px;color:var(--muted);padding:10px 18px 14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .tblwrap{padding:10px 0 0;overflow-x:auto}
+
+  .tip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;margin-left:4px;border-radius:50%;border:1px solid #b9bec4;color:#7b8188;font-size:9.5px;font-weight:700;cursor:help;vertical-align:1px}
+  .tip:hover::after{content:attr(data-tip);position:absolute;right:0;bottom:20px;z-index:30;width:250px;white-space:normal;text-align:left;background:#2b2f33;color:#fff;font-size:11.5px;font-weight:400;line-height:1.5;padding:8px 10px;border-radius:6px}
+  /* 표 머리글 도움말 — 표 영역(가로 스크롤) 위로 나가면 잘려서 아래로 표시 */
+  .tbl th .tip:hover::after{bottom:auto;top:20px;font-weight:400;color:#fff}
+  .empty{padding:36px 18px;text-align:center;color:var(--muted);font-size:12.5px}
+
+  /* 상세 */
+  .tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:12px 18px 0}
+  .psum{display:flex;gap:18px;align-items:center;padding:12px 18px 2px;font-size:12.5px;color:#5E646C}
+  .pcf{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 4px 0 10px;border-radius:12px;background:#E7FBFA;color:#08837E;font-weight:700}
+  .pcf button{border:0;background:none;color:#08837E;font-size:14px;cursor:pointer;padding:0 4px}
+  .brow{display:flex;align-items:stretch;gap:8px;padding:14px 18px 16px}
+  .bcell{flex:1;min-width:0;text-align:left;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px 12px;font:inherit}
+  button.bcell{cursor:pointer}button.bcell:hover{border-color:#0AB4AD}
+  .bcell.on{border:2px solid #0AB4AD;padding:9px 11px;background:#F2FBFA}
+  .bcell.end{background:#F7F9FA}
+  .bk{font-size:11.5px;color:var(--muted);font-weight:600}
+  .bv{font-size:16px;font-weight:800;color:#212529;margin-top:4px}
+  .bs{font-size:11.5px;color:#5E646C;margin-top:2px}
+  .bar2{align-self:center;color:var(--muted);font-weight:700}
+  .psum b{font-size:14px;font-weight:800;color:#212529;margin:0 2px 0 4px}
+  .schip{height:28px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:0 12px;font-size:12px;color:#4b5158;cursor:pointer}
+  .schip b{margin-left:3px}
+  .schip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .link{color:var(--ink);cursor:pointer;text-decoration:underline;text-decoration-color:#c9cdd2;text-underline-offset:2px}
+  .link:hover{color:var(--teal-d)}
+  .msel{position:relative}
+  .tright{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .srch{height:28px;width:170px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12px;outline:none}
+  .srch:focus{border-color:var(--teal)}
+  .tbl th.sort{cursor:pointer;user-select:none}
+  .tbl th.sort .ar{margin-left:3px;font-size:10px;color:#b9bec4}
+  .tbl th.sort.on,.tbl th.sort.on .ar{color:var(--teal-d)}
+  .msel .btn.on{border-color:var(--teal);color:var(--teal-d);font-weight:700}
+  .mpanel{position:absolute;right:0;top:36px;z-index:20;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:8px 0;width:240px;max-height:340px;overflow:auto}
+  .mpanel label{display:flex;align-items:center;gap:8px;padding:5px 14px;font-size:12.5px;cursor:pointer}
+  .mpanel label:hover{background:#f6f7f8}
+  .mpanel .mfoot{border-top:1px solid var(--line);margin-top:6px;padding:8px 14px 2px;display:flex;justify-content:flex-end}
+  .pager{display:flex;gap:4px;justify-content:center;padding:12px}
+  .pager button{min-width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:5px;font-size:12px;cursor:pointer}
+  .pager button.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+
+  /* 청구 확인 — 원인 분류 · 메모 (서비스 · 결제 수정은 원래 화면) */
+  .chk-ln{margin-top:5px;padding-top:5px;border-top:1px dashed #e3e6ea;color:#1f2328;font-weight:500;white-space:normal}
+  .ckb{display:inline-block;padding:0 5px;margin-right:4px;border-radius:3px;background:#fff1d6;color:#a86f00;font-weight:700}
+  .ckb.ok{background:#e6f6f3;color:#0f8a74}
+  .ckm{color:#4b5158}.ckw{color:var(--muted);font-weight:500}
+  .lnk{display:inline-block;margin:3px 8px 0 0;border:0;background:none;padding:0;color:var(--teal-d);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .mdl-bg{position:fixed;inset:0;background:rgba(33,37,41,.45);z-index:50;display:flex;align-items:center;justify-content:center}
+  .mdl{width:460px;max-width:calc(100vw - 32px);max-height:calc(100vh - 48px);overflow:auto;background:#fff;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .mdl h4{margin:0;font-size:15px}.mdl .sub{font-size:12px;color:var(--muted)}
+  .mdl label.fl{font-size:12px;font-weight:700;color:#4b5158;display:block;margin-bottom:4px}
+  .mdl select,.mdl textarea{width:100%;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:12.5px;padding:7px 9px;outline:none}
+  .mdl textarea{height:72px;resize:vertical}
+  .mdl .auto{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:12px;line-height:1.6}
+  .mdl .auto .xb{display:inline-block;padding:0 4px;margin-right:4px;border-radius:3px;background:#ece9fb;color:#4c3aa8;font-weight:700;font-size:11px}
+  .mdl .go{display:flex;gap:14px;font-size:12px}
+  .mdl .log{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;line-height:1.6}
+  .mdl .acts{display:flex;justify-content:flex-end;gap:8px}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  /* 케이스별 표기 안내 */
+  .gd h2{font-size:17px;margin:4px 0 4px}.gd .lead{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+  .gd .panel{margin-bottom:14px}.gd .ph{padding:12px 14px 4px}.gd .ph p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+  .gd .tbl td{white-space:normal;vertical-align:top;line-height:1.5}.gd .tbl td.k{font-weight:700;white-space:nowrap}
+  .gd .ex{font-size:10.5px;font-weight:600;line-height:1.5;color:#c2570c;letter-spacing:-.2px;min-width:220px;max-width:300px}
+  .gd .ex .mt{color:#1f2328}.gd .ex .dx{color:#5b4bb7}.gd .ex .amt{font-size:12.5px;color:#1f2328;font-weight:500}
+  .gd .ex .db{display:inline-block;padding:0 5px;margin-bottom:1px;border-radius:3px;background:#fdeee3;color:#b4480a;font-weight:700}
+  .gd .ex .xb{display:inline-block;padding:0 4px;margin-right:4px;border-radius:3px;background:#ece9fb;color:#4c3aa8;font-weight:700}
+  .gd .ex .pmb{display:inline-block;padding:0 4px;margin:2px 4px 1px 0;border-radius:3px;background:#eef0f3;color:#6b7178}.gd .ex .pmb.pmc{background:#e6f6f3;color:#0f8a74}
+  .gd .ex .ckb{display:inline-block;padding:0 5px;margin-right:4px;border-radius:3px;background:#fff1d6;color:#a86f00;font-weight:700}
+  .gd .ex .lnk{color:var(--teal-d);font-weight:700;text-decoration:underline;margin-right:8px}
+  .gd .na{color:var(--muted);font-weight:500}
+  .gd .tbl{table-layout:fixed}.gd .tbl td.k{width:150px;white-space:normal}.gd .tbl td.ex,.gd .tbl th:last-child{width:290px}.gd .tbl .num{width:70px}.gd .ex br+*{}
+  .gd .tbl thead th:first-child{width:150px}.gd .ex .dc,.gd .ex{white-space:normal;word-break:keep-all}.gd .ex .dc{text-align:left;margin:2px 0 0;white-space:normal}
+  .demo button.gdb{margin-left:8px;border-color:var(--teal);color:var(--teal-d);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side" id="side"></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb" id="crumb"></div>
+      <div class="demo">데모 시나리오
+        <button data-sc="cmp" class="on">전월 비교</button>
+        <button data-sc="first">첫 달 (전월 없음)</button>
+        <button class="gdb" id="gdBtn">케이스별 표기 안내</button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───────── 데이터 ─────────
+   실데이터 구조 그대로: 굿팜 서비스 요금표(결합 할인) · 약국 관리 옵션명 · 약국 결제 관리 결제 행
+   (약국 × 청구월 1건 = 그 약국 서비스 합계, 매월 5일 정기 결제, 실패 · 재시도 · 밀린 결제 일괄, 중간 가입분 결제)
+   약국명 · 대표자명 · 사업자 번호만 가상 값 */
+const fmt = n => (n<0?'−':'')+Math.abs(Math.round(n)).toLocaleString('ko-KR');
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const VAT = v => Math.round(v*1.1);
+
+// 서비스(통합 서비스명) — 약국 관리 기준
+const SERVICES = [
+  {code:'KIOSK', name:'키오스크'}, {code:'SMART_OCR', name:'스마트 OCR'}, {code:'PHARMACY_FIRST', name:'파머시 퍼스트'},
+  {code:'SMART2D', name:'스마트2D'}, {code:'MOBILE_OCR', name:'모바일 OCR'}, {code:'FULL_PACKAGE', name:'풀패키지'},
+  {code:'ESL', name:'ESL'}, {code:'EDB', name:'EDB 연동'},
+  {code:'POS', name:'굿팜 POS'}, {code:'MBF', name:'모바일 바코드프리'},
+  {code:'OFF', name:'서비스에 없는 청구'}, {code:'DISC', name:'청구 할인'}, {code:'UNALLOC', name:'서비스 미지정'} ];   // 실제 청구액이 계약 합계보다 많은 금액 (계약 확인 필요)
+const SVC_NAME = Object.fromEntries(SERVICES.map(s=>[s.code,s.name]));
+
+// 요금표 (VAT 별도) — 서비스 비용 · 장비임대료. 결합 할인은 서비스 비용에만, 가장 높은 가격(임대료 포함) 1개 정상가 · 나머지 50%
+const FEE = {KIOSK:[30000,15000], SMART_OCR:[30000,15000], PHARMACY_FIRST:[40000,0], SMART2D:[30000,0], MOBILE_OCR:[15000,0]};
+const FEE_ORDER = ['KIOSK','SMART_OCR','PHARMACY_FIRST','SMART2D','MOBILE_OCR'];
+const FIXED = {FULL_PACKAGE:100000, ESL:180000, EDB:20000, SMART2D_KD:45000};   // 정액 · 할인 불가 · 제휴가
+
+// 약국 × 월 이용 서비스 → 서비스별 청구 금액(VAT 포함) · 요금 기준 · 옵션명
+function bill(sub){
+  const out = {};
+  const comb = sub.filter(i=>i.c in FEE && !i.kd && !(i.c==='MOBILE_OCR' && sub.some(j=>j.c==='SMART_OCR')));
+  const top = comb.slice().sort((a,b)=>(FEE[b.c][0]+FEE[b.c][1])-(FEE[a.c][0]+FEE[a.c][1]) || FEE_ORDER.indexOf(a.c)-FEE_ORDER.indexOf(b.c))[0];
+  sub.forEach(i=>{ const q=i.q||1; let amt, t='정상가', opt, why='';
+    if(i.c==='POS'){ amt=0; t='무료'; opt='굿팜 POS'; why='<b class="db">굿팜 POS 무료</b><br>결제 없음 · 함께 쓰는 서비스에만 청구'; }
+    else if(i.c==='FULL_PACKAGE'){ amt=FIXED.FULL_PACKAGE; t='정액'; opt='풀패키지 ('+(i.v||'키오스크')+')'; }
+    else if(i.c==='ESL' || i.c==='EDB'){ amt=FIXED[i.c]; t='할인 불가'; opt=i.c==='EDB'?'EDB 연동비':'ESL'; }
+    else if(i.kd){ amt=FIXED.SMART2D_KD; t='제휴가'; opt='스마트2D (광동)'; }
+    else if(i.c==='MOBILE_OCR' && sub.some(j=>j.c==='SMART_OCR')){ amt=0; t='스마트 OCR 기본 제공'; opt='모바일 OCR'; why='<b class="db">스마트 OCR 기본 제공</b><br>모바일 OCR 15,000 → 0원'; }
+    else { const [svc,eq]=FEE[i.c], solo=comb.length<=1, isTop=i===top;
+      amt = (solo||isTop ? svc : svc/2) + eq + (q-1)*(svc/2+eq);
+      t = solo||isTop ? (q>1?'정상가 + 결합할인 50%':'정상가') : '결합할인 50%';
+      opt = SVC_NAME[i.c];
+      // 할인 표기 — 배지(무엇과 결합해 몇 % 할인) + 요금표 계산식(VAT 별도) + VAT 금액을 더한 포함가
+      const w = n => n.toLocaleString('ko-KR'), L = [], badge = t => '<b class="db">'+t+'</b>';
+      if(!(solo||isTop)){
+        L.push(badge(SVC_NAME[top.c]+' 결합할인 50%'));
+        L.push('서비스 비용 '+w(svc)+' × 50% = '+w(svc/2)+(q>1?' × '+q+'대':''));
+      } else if(q>1){
+        L.push(badge((q>2?'2대째부터':'2대째')+' 결합할인 50%'));
+        L.push('1대째 정상가 '+w(svc)+' · '+(q>2?'2 ~ '+q+'대째':'2대째')+' '+w(svc)+' × 50% = '+w(svc/2)+(q>2?' × '+(q-1)+'대':''));
+      }
+      if(L.length){ if(eq) L.push('+ 장비임대료 '+w(eq)+(q>1?' × '+q+'대':'')+' (할인 없음) = '+w(amt));
+        L.push('+ VAT '+w(VAT(amt)-amt)+' = '+w(VAT(amt))+'원 (VAT 포함가)'); }
+      why = L.join('<br>'); }
+    out[i.c] = {amt:VAT(amt), t, opt, q, why}; });
+  return out;
+}
+const billTotal = b => Object.values(b).reduce((a,x)=>a+x.amt,0);
+// 요금표와 다르게 청구되는 약국 — 실제 청구액을 옵션에 나누고, 금액 아래에 왜 다른지 노트
+// 원인 분류 — 결제 금액과 계약이 다르거나 기타 할인이 있는 약국 (실데이터 52곳 정리 기준). 비고 배지 = [대분류] 소분류
+const CAUSE = {'1-1':['서비스 누락','EDB 연동비'], '1-2':['서비스 누락','이용 서비스'], '1-3':['서비스 누락','해지 후 결제'], '1-4':['서비스 누락','솔루션 외 서비스'],
+  '2':['할인 오입력','할인 0원 · 정가 결제'], '3':['서비스 미갱신','서비스 · 금액 변경'],
+  '4-1':['기타 할인','POS 무상'], '4-2':['기타 할인','중복 가입 · 제휴처'], '4-3':['기타 할인','오류 보상 · 테스트'], '5':['기타 할인','사유 없음'],
+  '6':['과다 청구 의심','회수 · 무료 서비스 청구']};
+const CAUSE_KEYS = ['1-1','1-2','1-3','1-4','2','3','4-1','4-2','4-3','5','6'];   // 표시 순서 (숫자 키는 객체 순서가 바뀌어 별도 지정)
+const CAUSE_GRP = [...new Set(CAUSE_KEYS.map(k=>CAUSE[k][0]))];
+const CB = k => '<b class="xb">'+CAUSE[k][0]+'</b>'+CAUSE[k][1]+'<br>';
+// 기타 할인 사유 → 원인 분류
+const discCause = (c, why) => c==='POS' ? '4-1' : /온비타|drs|중복|파머시/i.test(why) ? '4-2' : /pos/i.test(why) ? '4-1' : /오류|테스트/.test(why) ? '4-3' : '5';
+const LIST = i => i.c==='POS' ? 0 : i.c==='FULL_PACKAGE' ? FIXED.FULL_PACKAGE : i.c==='ESL'||i.c==='EDB' ? FIXED[i.c] : i.kd ? FIXED.SMART2D_KD : (FEE[i.c][0]+FEE[i.c][1])*(i.q||1);
+function billX(p, bm){
+  const x=p.x, sub=p.sub[bm], canon=bill(sub), out={}, w=fmt, B=t=>'<b class="xb">'+t+'</b>';
+  const ct = x.ct.slice(), note = sub.map(()=>[]), cat = sub.map(()=>[]);
+  // 계약 기타 할인 — 사유에 적힌 옵션에만 (옵션을 특정하지 않으면 청구 할인 행)
+  let discEtc=0, discWhy='';
+  (x.disc||[]).forEach(([c,d,why])=>{ const n=sub.findIndex(i=>i.c===c); if(n<0){ discEtc+=d; discWhy=why; return; }
+    const take=Math.min(d,ct[n]); ct[n]-=take; discEtc+=d-take; const k=discCause(c,why); cat[n].push(k); note[n].push(CB(k)+'기타 할인 사유 `'+why+'` −'+w(VAT(take))+'원'); });
+  const noCt = x.k==='list', base = sub.map((i,n)=>VAT(noCt ? LIST(i) : ct[n]));
+  // 굿팜 POS — 계약 당시 유료 약국만 결제
+  const pi = sub.findIndex(i=>i.c==='POS'), posPaid = pi>=0 && base[pi]>0 && x.billed>=base.reduce((a,v)=>a+v,0)-VAT(discEtc);
+  if(pi>=0 && !posPaid) base[pi]=0;
+  const amt = base.slice(); let diff = x.billed-base.reduce((a,v)=>a+v,0);
+  const sumCt = x.billed-diff, rs = x.reason||'';
+  // 계약보다 많이 결제 — 결제 이유 · 할인 0원 계약으로 어느 서비스인지 확인
+  if(diff>0){
+    const edb = /EDB/.test(rs) && !sub.some(i=>i.c==='EDB') ? 22000 : 0;
+    const free = sub.map((i,n)=>n).filter(n=>x.ct[n]===0 && LIST(sub[n])>0);
+    let hit = free.find(n=>VAT(LIST(sub[n]))+edb===diff);
+    if(hit===undefined && edb===diff) hit=-1;
+    if(hit!==undefined){
+      if(hit>=0){ amt[hit]=VAT(LIST(sub[hit])); cat[hit].push('2'); note[hit].push(CB('2')+'등록 금액은 할인으로 0원 · 실제 결제 정가 '+w(amt[hit])+'원'); }
+      if(edb) out.EDB={amt:edb, t:'edb', opt:'EDB 연동비', q:1, x:1, cat:['1-1'], why:CB('1-1')+'EDB 연동비가 약국 서비스에 없음 · 결제 이유 `'+rs+'`'};
+      diff=0; }
+    else if(diff===16500 && /바코드프리/.test(rs)){ out.MBF={amt:diff, t:'mbf', opt:'모바일 바코드프리', q:1, x:1, cat:['1-4'], why:CB('1-4')+'모바일 바코드프리 · 결제 이유 `'+rs+'`'}; diff=0; }
+  }
+  // 실제 결제 = 계약 옵션 일부의 요금표 금액 → 나머지 옵션은 청구 안 됨
+  if(diff<0 && !x.disc){
+    const cand = sub.map((_,n)=>n).filter(n=>canon[sub[n].c].amt>0 && base[n]>0); const hits=[];
+    for(let m=1;m<(1<<cand.length)-1;m++){ const on=new Set(cand.filter((_,k)=>m>>k&1)), pick=sub.filter((_,n)=>on.has(n)||!cand.includes(n)), bb=bill(pick);
+      if(billTotal(bb)===x.billed) hits.push({on, bb}); }
+    if(hits.length===1){ const {on,bb}=hits[0], names=sub.filter((i,n)=>on.has(n)).map(i=>SVC_NAME[i.c]).join(' + ');
+      sub.forEach((i,n)=>{ out[i.c] = on.has(n)||!cand.includes(n) ? {...bb[i.c], x:0}
+        : {amt:0, t:'miss', opt:canon[i.c].opt, q:canon[i.c].q, x:1, cat:['3'], why:CB('3')+'약국 서비스에 있지만 청구되지 않음<br>실제 결제 '+w(x.billed)+'원 = '+names+' 요금표 금액'+(rs?'<br>결제 이유 `'+rs+'`':'')}; });
+      return out; } }
+  sub.forEach((i,n)=>{ const c=canon[i.c], L=note[n];
+    if(x.k==='term') { cat[n].push('1-3'); L.push(CB('1-3')+'서비스 해지 상태인데 결제 중'); }
+    else if(noCt){ cat[n].push('2'); L.push(CB('2')+'등록 금액 없음 (0원) · 요금표 정가 '+w(base[n])+'원으로 표시'); }
+    else if(i.c==='POS' && posPaid){ L.push(B('굿팜 POS 유료 이용')+'가입 당시 유료 약국'); L.push('POS '+w(ct[n])+' + VAT '+w(amt[n]-ct[n])+' = '+w(amt[n])+'원'); }
+    else if(i.c==='POS'){ if(!L.length) L.push(...c.why.split('<br>')); }
+    else if(!L.length && amt[n]!==c.amt){ L.push(B('등록 금액')+'요금표와 다른 등록 금액'); L.push('요금표 '+w(c.amt)+'원 → 등록 '+w(amt[n])+'원'); }
+    out[i.c] = {amt:amt[n], t:x.k, opt:c.opt, q:c.q, why:L.length?L.join('<br>'):c.why, x:L.length?1:0, cat:cat[n]}; });
+  const memo = x.memo ? '<br>'+x.memo : '';
+  // 계약보다 많이 결제 — 비고에 무료 · 회수 = 과다 청구 의심, 0원 계약 옵션이 있으면 할인 오입력, 그 외 계약 미갱신
+  const offK = /무료|회수/.test(x.memo||'') ? '6' : x.ct.some(v=>v===0) ? '2' : '3';
+  if(diff>0) out.OFF = {amt:diff, t:'off', opt:'서비스에 없는 청구', q:1, x:1, cat:[offK],
+    why:CB(offK)+'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>서비스에 없는 금액 +'+w(diff)+'원'+(x.memo?'':' (쓰는 서비스가 약국 서비스에 빠졌을 수 있음)')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
+  const discK = discWhy ? discCause('',discWhy) : '3';
+  if(diff<0) out.DISC = {amt:diff, t:'disc', opt:'청구 할인', q:1, x:1, cat:[discK],
+    why:CB(discK)+(discWhy?'기타 할인 사유 `'+discWhy+'` −'+w(-diff)+'원':'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>할인 −'+w(-diff)+'원 (구독료 · 등록 할인)')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
+  return out;
+}
+// 서비스 미지정 — 계약 · 옵션 정보 없이 결제되는 약국 (청구 설정 '미배분' 5곳 · 각 49,500원, Q14)
+const UN_FEE = {amt:49500, t:'un', opt:'서비스 미지정', q:'', x:1, cat:['1-2'], why:CB('1-2')+'서비스 · 옵션 정보 없이 결제 · 결제 이유 `굿팜결제`'};
+const billP = (p, bm) => p.un ? {UNALLOC:UN_FEE} : p.x ? billX(p, bm) : bill(p.sub[bm]);
+
+// ───────── 가상 약국명 · 대표자명 · 사업자 번호 ─────────
+const NM_A = ['메디팜','온누리','늘푸른','새봄','참','바른','행복','건강','하나','미소','다온','소망','희망','열린','해맑은','튼튼','365','가온','나래','누리','단골','도담','라온','모아','세움','아름','이음','자연','한결','함께','하늘','별빛','봄날','정성','태평','성심','동행','은혜','새길','푸른숲','온새미','한빛','늘봄','다솜','예림','지음','청솔','백세','고운','참좋은'];
+const NM_B = ['','새봄','사랑','중앙','프라자','온누리','메디','늘봄','행복','건강'];
+const NM_P = ['동탄','일산','분당','송파','부평','해운대','수원','청주','전주','광교','김포','세종','판교','목동','노원','강서','서면','평촌','산본','구월','상동','중동','화정','범계','안산','시흥','오산','이천','원주','춘천'];
+// 실제 약국명(결제 관리 · 청구 설정 데이터)과 겹치는 이름 제외 — 이름 대신 해시만 보관
+const hz = t => { let h=5381; for(const ch of t) h=(Math.imul(h,33)+ch.charCodeAt(0))|0; return h>>>0; };
+const NM_REAL = new Set([1285224,19777391,30166021,69540980,150919871,153535879,177740767,181107955,186152991,194682039,205920418,243063492,243606903,243667887,244045320,246760647,247527303,247554528,247784307,248925579,248929935,248934291,248948448,249056259,249070416,249200007,249204363,249430875,250271583,250328211,250332567,250606995,250611351,250869444,250968543,251125359,251338803,251353457,252022695,254753907,254810535,254833404,254967351,256618211,263484285,275119087,307537287,330694571,341032080,345330244,365877195,379071820,383676444,415026179,426844860,428340057,438538843,451939776,452324320,462021244,465694935,468282908,468778021,474050531,480821531,503767163,521557067,524382535,527989303,549843054,567565440,568818176,576664336,581604040,584920147,588537767,603773728,612546616,632069643,664750279,668929259,691630486,732190044,733128664,737776140,739301832,742030075,751301219,756815915,764551383,786110617,796920031,812442336,813170877,815832092,829283664,841744211,841858845,846129979,861809439,872197643,879119628,906289730,918218296,939597531,1025062862,1049211627,1074352281,1103576685,1123654277,1124084676,1147261064,1161038563,1167611860,1174316593,1182968729,1188368403,1189024640,1198234872,1239211118,1244499293,1252127821,1252467760,1259066929,1272802457,1283108079,1289046055,1315123903,1319250272,1325717121,1341496461,1344608823,1423388260,1440919135,1523439648,1526827124,1544760688,1583116980,1634603100,1652105015,1654087397,1655519907,1658899100,1666876035,1680775787,1689066233,1696638696,1715034591,1799388879,1806739629,1840743115,1865776695,1895486538,1910432031,1922527131,1941011727,1974246344,1981262712,1981892871,2036724712,2038987225,2063129305,2063494662,2082283668,2084550063,2085595503,2094020007,2100079203,2103736797,2121258075,2122286827,2137807307,2142722414,2157653243,2158767591,2169696189,2177256689,2188844540,2220793820,2223744954,2251076375,2251085087,2251855873,2296160975,2310092552,2330117187,2343321463,2366022503,2368752139,2370210199,2411462051,2412069779,2449378919,2453091621,2457711159,2466844903,2473635119,2491654988,2494369679,2504755547,2515135784,2525531894,2531357889,2533734249,2558682827,2562873850,2589192176,2590616287,2592826404,2593303939,2597621111,2601202456,2608330072,2610938306,2618905616,2625148667,2629460540,2663550145,2675357739,2712498128,2729934235,2755062910,2764855700,2789443461,2814341675,2848062120,2950625728,2961985850,2982399315,2983380104,3015279403,3032504133,3036016499,3039423679,3051332466,3080099219,3088027927,3092056635,3098565253,3108244123,3123444385,3137424967,3144594351,3152038559,3154951193,3161265355,3174940756,3234240936,3251519411,3264605599,3267213391,3269278121,3278469843,3296596239,3303102160,3341956189,3346129639,3354745215,3355848924,3371562145,3398044692,3417044443,3431934717,3432895215,3438116324,3452946382,3455708887,3462971716,3491336859,3508935241,3510240062,3548538303,3555324951,3555770352,3561891031,3583409303,3585058651,3604804743,3645580380,3669726331,3685072478,3707286387,3722706776,3724387103,3725679344,3725807159,3726605396,3728671971,3728691920,3729949715,3734161967,3736088408,3736162460,3736406396,3736928027,3737225324,3740443319,3742995935,3743737544,3744328871,3749141162,3751408883,3765015515,3765594863,3768378347,3774037880,3783120140,3783188747,3783215972,3783920555,3786364271,3786560291,3786962132,3787397732,3787932431,3788822144,3789114848,3789200027,3789204383,3790354367,3790389215,3791009945,3791896391,3792145772,3793407923,3794444651,3794684231,3796597604,3796620473,3798187544,3798343271,3799803620,3800962316,3802638287,3803849255,3830004708,3831827843,3833291459,3837982871,3839525281,3841027368,3842659987,3846785258,3849025331,3850332131,3851878511,3855264212,3856095119,3856335788,3856775744,3858000869,3858099968,3862368848,3869176187,3869877503,3870186779,3871432595,3872935415,3873287162,3873649799,3874504664,3874608119,3874918484,3875310524,3876853488,3877700879,3877874030,3878072228,3880285076,3880389620,3881731268,3883911655,3883969163,3884391695,3886762448,3894366935,3905819799,3911316131,3911918348,3912924584,3913720643,3914022296,3914374043,3914443739,3914522147,3914817266,3915130648,3915176636,3917174951,3917462447,3917559368,3917566991,3917772812,3919632824,3919850624,3919863692,3920102183,3920520359,3920608568,3921069215,3921230387,3921540752,3924432047,3924662915,3925273844,3925496940,3925525403,3929603708,3933274727,3936089792,3936293435,3936525392,3936624491,3937051379,3937256111,3938884924,3939673691,3940460088,3940492619,3954157391,3954174815,3954723671,3957403700,3958143131,3958609223,3959397659,3959454287,3959937803,3960212231,3960547643,3960761087,3960843851,3961153127,3961218467,3962016704,3962204012,3963296279,3965596247,3966978188,3967800383,3967848299,3967865723,3968919875,3970816379,3971873243,3971890667,3972117179,3972896747,3973860668,3974434571,3974526047,3974695931,3974797274,3976359923,3979031240,3979592075,3980951147,3981109052,3981574055,3982774133,3982880855,3984336848,3984341204,3984771359,3984780071,3985198247,3987180227,3987611471,3987733439,3987798779,3988703738,3992435741,3992988953,3993196570,3993397328,3996806987,3999259415,3999345147,3999604628,3999686303,4000435535,4013971271,4019524616,4024432739,4025143856,4025158013,4025845172,4025957339,4026568268,4026572624,4029873383,4031306507,4037313937,4038010543,4040737803,4051809817,4057822568,4059674511,4060329899,4061024228,4064744252,4068708212,4069417151,4080947483,4085665031,4093161707,4093449656,4093765013,4094577407,4096333964,4097927107,4099039040,4100153087,4100710655,4101176747,4101181103,4101817079,4102469390,4104923996,4104931619,4104995870,4105031807,4105360685,4106333162,4106464931,4106469287,4106525915,4107005075,4107241388,4107478717,4107928547,4108077740,4114054172,4115403443,4116855080,4118692223,4118783699,4121855768,4128107521,4128224159,4128541139,4138798963,4152314848,4216048316,4229616376,4230891788,4247396030,4267383647,4281203907]);
+function makeNames(n){ const r=rng(7), all=[];
+  NM_A.forEach(a=>NM_B.forEach(b=>{ if(!b || !a.includes(b)) all.push(a+b+'약국'); })); NM_P.forEach(p=>['','중앙','시장','온누리','새봄','메디','프라자','사랑','행복'].forEach(b=>all.push(p+b+'약국')));
+  const u=[...new Set(all)].filter(x=>!NM_REAL.has(hz(x))); if(u.length<n) throw new Error('약국명 부족 '+u.length+' < '+n);
+  for(let i=u.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [u[i],u[j]]=[u[j],u[i]]; } return u.slice(0,n); }
+const SURN='김김김김이이이박박최최정강조윤장임한오서신권황안송류전홍고문양손배백허유남심노하';
+const GIVN=['민준','서연','지훈','수진','영희','정호','현우','은정','미경','성민','지영','동현','혜진','상훈','윤정','재원','소영','준혁','경숙','태희','하늘','민정','주원','선영','종석','유진','승철','다은','진우','명숙','기현','수빈','혜원','정민','영수','지은','도윤','서진','인숙','용준'];
+function person(seed){ const r=rng(seed), g=()=>GIVN[Math.floor(r()*GIVN.length)];
+  const d=k=>Array.from({length:k},()=>Math.floor(r()*10)).join('');
+  return {rep:SURN[Math.floor(r()*SURN.length)]+g(), biz:(100+Math.floor(r()*800))+'-'+d(2)+'-'+d(5)}; }
+
+// ───────── 약국 · 이용 서비스 (2026-10 기준 구성) ─────────
+// 구성 = 청구 설정 실데이터(옵션별 납부액 2026-10-16) 중 요금표대로 청구되는 약국의 서비스 조합 · 약국 수
+const K={c:'KIOSK'}, O={c:'SMART_OCR'}, PF={c:'PHARMACY_FIRST'}, D2={c:'SMART2D'}, D2K={c:'SMART2D',kd:1}, MO={c:'MOBILE_OCR'}, EDB={c:'EDB'}, ESL={c:'ESL'};
+const POS={c:'POS'}, FPK={c:'FULL_PACKAGE',v:'키오스크'}, FPO={c:'FULL_PACKAGE',v:'스마트 OCR'}, K2={c:'KIOSK',q:2}, O2={c:'SMART_OCR',q:2};
+const MIX = [
+  [68,[K]], [231,[O]], [43,[K,PF]], [41,[O,PF]], [14,[K,EDB]], [2,[O,EDB]], [19,[PF]], [38,[MO]], [17,[O,MO]], [15,[D2]],
+  [14,[D2,EDB]], [10,[D2,PF,EDB]], [7,[D2,PF]], [6,[FPK]], [1,[FPO]], [6,[K,O]], [5,[K,PF,MO]], [4,[K,PF,EDB]], [3,[K,MO]],
+  [3,[O,PF,MO]], [3,[K,D2]], [3,[K,D2,PF]], [3,[PF,MO]], [2,[O2]], [1,[K2,PF]], [1,[EDB]], [1,[K,D2,EDB]],
+  [1,[O,PF,EDB]], [1,[D2,MO]], [1,[O,D2,MO]], [1,[K,MO,EDB]], [1,[K,D2,PF,EDB]], [1,[D2,PF,MO,EDB]], [1,[K,PF,MO,EDB]],
+  [1,[D2,PF,MO]], [1,[K,O,PF]], [1,[{c:'KIOSK',q:3}]] ];   // 마지막 = 키오스크 3대 (요금표 정석 케이스)
+// 요금표와 다르게 청구되는 약국 — 청구 설정 실데이터의 근거 구분 그대로 [약국 수, 구분, [[서비스, 계약 금액(VAT 별도)]], 실제 청구액(VAT 포함)]
+//   over · under = 추정 · 청구액≠계약합 (실제 청구액이 계약 합계보다 많음 · 적음 → 계약 금액 비율로 나눔)
+//   list = 추정 · 정가 비율 (계약 금액 0원 → 요금표 정가 비율로 나눔)
+//   contract = 확정이지만 계약 금액이 요금표와 다름 (계약 금액 그대로)
+const EDBR='굿팜결제(굿팜사용료+EDB연동비)', ONV='온비타 파머시퍼스트 중복';
+const XMIX = [
+  // 계약보다 많이 결제 — 결제 이유로 서비스 확인(EDB 연동비 계약 누락) · 할인 0원 계약을 정가로 결제 · 비고와 다른 결제
+  [13,'over',[[K,45000]],71500,{reason:EDBR}], [1,'over',[[K,0]],71500,{reason:EDBR}],
+  [1,'over',[[K,0],[PF,20000]],71500], [1,'over',[[O,0],[PF,20000]],71500],
+  [1,'over',[[PF,40000]],71500,{memo:'키오스크 무료 사용 / 파머시 퍼스트 금액만 결제'}],
+  [1,'over',[[K,0],[O,22500]],49500,{memo:'메모: 스캐너 설치 · A/S 키오스크'}],
+  [2,'over',[[K,0]],49500], [3,'over',[[O,0]],49500], [1,'over',[[D2K,0]],49500],
+  [1,'over',[[D2K,0]],16500,{reason:'굿팜결제(M바코드프리)'}],
+  [1,'term',[[O,45000]],49500],
+  // 계약보다 적게 결제
+  [1,'under',[[D2,15000],[PF,40000]],49500], [1,'under',[[PF,40000],[MO,7500]],44000], [1,'under',[[D2,30000],[EDB,20000],[MO,7500]],55000],
+  [1,'under',[[D2,15000],[PF,40000],[EDB,20000]],71500,{reason:EDBR,memo:'메모: 키오스크 1대, 스캐너 2대 사용중'}], [1,'under',[[O,45000],[MO,7500]],55000,{reason:'굿팜결제(스캐너+M바코드프리)'}],
+  [1,'under',[[K,45000],[O,30000],[EDB,20000]],99000,{reason:'굿팜결제(키오스크+스캐너+EDB연동비)',memo:'비고: 키오스크+스캐너 사용중 / 99,000원 / EDB연동비 O'}],
+  // 계약 금액이 요금표와 다름 (계약 그대로 결제)
+  [4,'contract',[[K,0],[PF,20000]],22000], [2,'contract',[[O,0],[PF,20000]],22000], [1,'contract',[[D2K,0],[PF,20000]],22000], [1,'contract',[[K,0],[EDB,20000]],22000],
+  [1,'contract',[[K,0],[O,22500]],24750], [1,'contract',[[K,0],[O,30000],[PF,20000]],55000], [4,'contract',[[K,45000],[MO,0]],49500],
+  [1,'contract',[[K,45000],[O,22500],[MO,0]],74250], [1,'contract',[[K,45000],[PF,20000],[MO,0]],71500],
+  // 계약 기타 할인 — 사유의 옵션에만
+  [2,'contract',[[K,45000],[PF,20000],[EDB,20000]],71500,{disc:[['PHARMACY_FIRST',20000,ONV]]}],
+  [1,'contract',[[K,45000],[D2,15000],[PF,20000]],66000,{disc:[['PHARMACY_FIRST',20000,ONV]]}],
+  [1,'contract',[[O,45000],[PF,20000]],49500,{disc:[['PHARMACY_FIRST',20000,'온비타']]}], [1,'contract',[[O,45000],[PF,20000]],49500,{disc:[['PHARMACY_FIRST',20000,'drs 가입처']]}],
+  [1,'contract',[[O,45000]],44000,{disc:[['SMART_OCR',5000,'스캐너 인식 오류']]}], [1,'contract',[[O,45000]],33000,{disc:[['SMART_OCR',15000,'사유 없음']]}],
+  [1,'contract',[[K,45000],[PF,20000]],60500,{disc:[['',10000,'사유 없음']]}],
+  [1,'contract',[[PF,20000],[EDB,20000],[D2K,0]],44000], [1,'contract',[[D2,15000],[PF,40000],[EDB,20000],[MO,0]],82500],
+  // 굿팜 POS 계약 약국 — 계약 당시 유료 약국만 POS 결제, 나머지는 기타 할인으로 POS 0원
+  [1,'contract',[[K2,75000],[PF,20000],[EDB,20000],[POS,10000]],126500,{disc:[['POS',10000,'풀패키지 포스 비용 할인']]}], [1,'contract',[[ESL,180000],[POS,20000]],198000,{disc:[['POS',20000,'pos 무료']]}],
+  [1,'contract',[[MO,15000],[POS,20000]],16500,{disc:[['POS',20000,'pos 무상']]}],
+  [1,'contract',[[K,45000],[O,22500],[D2,15000],[MO,0],[POS,10000]],82500,{disc:[['SMART_OCR',17500,'OCR 테스트']]}],
+  [1,'contract',[[POS,10000],[PF,40000],[ESL,180000]],198000,{disc:[['PHARMACY_FIRST',40000,'파머시퍼스트, 굿팜pos 무상제공'],['POS',10000,'파머시퍼스트, 굿팜pos 무상제공']]}],
+  [1,'contract',[[PF,40000],[POS,10000]],55000], [1,'contract',[[D2,15000],[POS,10000],[PF,40000]],71500] ];
+const N_BASE = MIX.reduce((a,m)=>a+m[0],0), N_X = XMIX.reduce((a,m)=>a+m[0],0), UN_N = 5, N_EXTRA = 9;
+const NAMES = makeNames(N_BASE+N_X+UN_N+N_EXTRA);
+const PH = [];   // {name, sub:{'2026-09':[...], '2026-10':[...], '2026-11':[...]}}
+{ let k=0; MIX.forEach(([n,items])=>{ for(let i=0;i<n;i++){ const it=items.map(x=>({...x})); PH.push({name:NAMES[k++], sub:{'2026-09':it, '2026-10':it, '2026-11':it}}); } }); }
+{ let k=N_BASE; XMIX.forEach(([n,k2,lines,billed,ex])=>{ for(let i=0;i<n;i++){ const it=lines.map(([x])=>({...x})); PH.push({name:NAMES[k++], sub:{'2026-09':it, '2026-10':it, '2026-11':it}, x:{k:k2, ct:lines.map(([,c])=>c), billed, ...(ex||{})}}); } }); }
+const UN_PH = NAMES.slice(N_BASE+N_X, N_BASE+N_X+UN_N);   // 서비스 미지정 — 계약 · 옵션 정보 없이 결제되는 약국 (청구 설정 '미배분' 5곳, Q14)
+const EXTRA = NAMES.slice(N_BASE+N_X+UN_N);
+const byIdx = (mixIdx, nth) => { let k=0; for(let i=0;i<mixIdx;i++) k+=MIX[i][0]; return PH[k+nth]; };
+const setSub = (p, months, items) => months.forEach(m=>p.sub[m]=items.map(x=>({...x})));
+
+// ───────── 서비스 이용 변화 ─────────
+// 10월 (9월 → 10월)
+EXTRA.slice(0,3).forEach(n=>PH.push({name:n, sub:{'2026-09':[], '2026-10':[{...K}], '2026-11':[{...K}]}}));   // 신규 가입 3곳
+[0,1].forEach(i=>setSub(byIdx(0,10+i), ['2026-09'], [K]));                       // 키오스크 → 키오스크 + 파머시 퍼스트 2곳 (파머시 퍼스트 신규)
+setSub(byIdx(2,0), ['2026-09'], [K]);  setSub(byIdx(2,0), ['2026-10','2026-11'], [K,PF]);
+setSub(byIdx(6,0), ['2026-09'], [PF]); setSub(byIdx(6,0), ['2026-10','2026-11'], [K,PF]);   // 파머시 퍼스트 → + 키오스크 (파머시 퍼스트 40,000 → 결합할인 20,000)
+EXTRA.slice(3,7).forEach((n,i)=>PH.push({name:n, sub:{'2026-09':[i%2?{...O}:{...K}], '2026-10':[], '2026-11':[]}}));   // 해지 4곳
+setSub(byIdx(0,20), ['2026-09'], [K,PF]);                                          // 파머시 퍼스트만 해지
+// 11월 (10월 → 11월)
+PH.push({name:EXTRA[7], sub:{'2026-09':[], '2026-10':[], '2026-11':[{...O}]}});     // 신규 가입
+[0,1].forEach(i=>setSub(byIdx(0,30+i), ['2026-11'], [K,PF]));                      // 11월 중간 파머시 퍼스트 가입 2곳 (미결제분 결제)
+setSub(byIdx(0,40), ['2026-11'], [K,EDB]);                                         // EDB 연동 추가
+setSub(byIdx(1,10), ['2026-11'], [{c:'FULL_PACKAGE',v:'스마트 OCR'}]);              // 스마트 OCR → 풀패키지 전환
+setSub(byIdx(0,50), ['2026-11'], [{c:'KIOSK',q:2}]);                               // 키오스크 1대 → 2대
+setSub(byIdx(7,0), ['2026-11'], [O,MO]);                                           // 모바일 OCR → 스마트 OCR 가입 (모바일 OCR 기본 제공 0원)
+[[0,60],[1,60],[7,5]].forEach(([m,i])=>setSub(byIdx(m,i), ['2026-11'], []));       // 해지 3곳
+setSub(byIdx(2,10), ['2026-11'], [K]);                                             // 파머시 퍼스트만 해지
+
+// ───────── 결제 (약국 결제 관리 결제 행) ─────────
+// 결제 1건 = 약국 × 청구월, 금액 = 그 달 이용 서비스 합계. 정기 결제 = 매월 5일
+const FAIL_RS = ['기타오류(8326 : 사용 한도 초과)','기타오류(8324 : 거래 정지 카드)','기타오류(8326 : 사용 한도 초과)','기타오류(7004 : 도난 / 분실)'];
+const PAYS = [];   // {name, bm(청구월), amt, reason, ok, date, fail}
+const MON = {'2026-09':9, '2026-10':10, '2026-11':11};
+const d2 = (m,d) => '2026-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+const reasonOf = (p,bm) => p.x && p.x.reason ? p.x.reason : p.sub[bm].some(i=>i.c==='EDB') ? '굿팜결제(굿팜사용료+EDB연동비)' : '굿팜결제';
+const amtOf = (p,bm) => billTotal(p.x ? billP(p,bm) : bill(p.sub[bm]));
+// 정기 결제 실패 · 처리 (약국 인덱스 고정)
+const r9 = rng(909), pickPH = (cond, n, seed) => { const r=rng(seed), c=PH.filter(cond); const o=[];
+  while(o.length<n){ const p=c[Math.floor(r()*c.length)]; if(!o.includes(p)) o.push(p); } return o; };
+const live = bm => p => p.sub[bm].length>0 && amtOf(p,bm)>0;
+const OCT_RETRY = pickPH(live('2026-10'), 5, 31);                                   // 10월 실패 → 10월 안에 재시도 성공
+const OCT_LATE  = pickPH(p=>live('2026-10')(p) && !OCT_RETRY.includes(p), 4, 32);  // 10월 실패 → 11-09 10월분 · 11월분 함께 결제
+const OCT_OPEN  = pickPH(p=>live('2026-10')(p) && live('2026-11')(p) && ![...OCT_RETRY,...OCT_LATE].includes(p), 2, 33);   // 10월 실패 · 재시도 실패 → 미결제
+const SEP_LATE3 = pickPH(p=>live('2026-09')(p) && live('2026-11')(p) && ![...OCT_RETRY,...OCT_LATE,...OCT_OPEN].includes(p), 1, 34);  // 9 · 10 · 11월분 11-09 일괄
+const SEP_LATE1 = pickPH(p=>live('2026-09')(p) && live('2026-10')(p) && ![...OCT_RETRY,...OCT_LATE,...OCT_OPEN,...SEP_LATE3].includes(p), 1, 35); // 9월분 10-05 함께 결제
+const busy = [...OCT_RETRY,...OCT_LATE,...OCT_OPEN,...SEP_LATE3,...SEP_LATE1];
+const NOV_RETRY = pickPH(p=>live('2026-11')(p) && !busy.includes(p), 4, 41);       // 11-05 실패 → 11-06 ~ 11-08 재시도 성공
+const NOV_OPEN  = pickPH(p=>live('2026-11')(p) && !busy.includes(p) && !NOV_RETRY.includes(p), 10, 42);  // 11-05 실패 → 미결제
+let fi=0; const nextFail = () => FAIL_RS[fi++ % FAIL_RS.length];
+const pay = (p,bm,amt,reason,ok,date,fail) => PAYS.push({name:p.name,bm,amt,reason,ok,date,fail:fail||''});
+PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
+  if(!live(bm)(p)) return;
+  const m=MON[bm], a=amtOf(p,bm), late=(t)=>MON[bm]+'월 굿팜결제';
+  // 11월 중간 파머시 퍼스트 가입 — 정기 결제는 기존 구성, 가입분은 따로 결제
+  const pfJoin = bm==='2026-11' && p.sub['2026-10'].length && !p.sub['2026-10'].some(i=>i.c==='PHARMACY_FIRST') && p.sub[bm].some(i=>i.c==='PHARMACY_FIRST') && p.sub[bm].length===2 && p.sub[bm][0].c==='KIOSK';
+  const base = pfJoin ? amtOf({sub:{x:p.sub['2026-10']}},'x') : a;
+  const newJoin = bm!=='2026-09' && !p.sub[bm==='2026-10'?'2026-09':'2026-10'].length;
+  if(bm==='2026-10' && OCT_RETRY.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),true,d2(10,7+OCT_RETRY.indexOf(p)*5)); return; }
+  if(bm==='2026-10' && OCT_LATE.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),true,d2(11,9)); return; }
+  if(bm==='2026-10' && OCT_OPEN.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),false,d2(10,20+OCT_OPEN.indexOf(p)*3),nextFail()); return; }
+  if(SEP_LATE3.includes(p) && bm!=='2026-11'){ pay(p,bm,base,reasonOf(p,bm),false,d2(m,5),nextFail()); pay(p,bm,base,late(),true,d2(11,9)); return; }
+  if(SEP_LATE3.includes(p) && bm==='2026-11'){ pay(p,bm,base,late(),true,d2(11,9)); return; }
+  if(SEP_LATE1.includes(p) && bm==='2026-09'){ pay(p,bm,base,reasonOf(p,bm),false,d2(9,5),nextFail()); pay(p,bm,base,late(),true,d2(10,5)); return; }
+  if(bm==='2026-11' && NOV_RETRY.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(11,5),nextFail()); pay(p,bm,base,late(),true,d2(11,6+NOV_RETRY.indexOf(p)%3)); return; }
+  if(bm==='2026-11' && NOV_OPEN.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(11,5),nextFail()); return; }
+  if(bm==='2026-11' && OCT_LATE.includes(p)){ pay(p,bm,base,late(),true,d2(11,9)); return; }
+  if(newJoin && bm==='2026-11'){ pay(p,bm,base,late(),true,d2(11,7)); return; }
+  pay(p,bm,base,reasonOf(p,bm),true,d2(m,5));
+  if(pfJoin) pay(p,bm,a-base,'11월 파머시퍼스트 가입 (미결제분 결제)',true,d2(11,6+PH.indexOf(p)%2));
+}));
+UN_PH.forEach(n=>['2026-09','2026-10','2026-11'].forEach(bm=>PAYS.push({name:n,bm,amt:49500,reason:'굿팜결제',ok:true,date:d2(MON[bm],5),fail:''})));
+// 결제 예시를 만든 뒤 목록에 추가 (다른 약국의 결제 실패 · 재시도 예시는 그대로)
+const UNA=[{c:'UNALLOC'}]; UN_PH.forEach(n=>PH.push({name:n, un:1, sub:{'2026-09':UNA, '2026-10':UNA, '2026-11':UNA}}));
+// 청구 전 — 11-08 키오스크 설치 · 이용 시작, 첫 청구는 12월분
+PH.push({name:EXTRA[8], pre:{bm:'2026-11', d:'11-08', first:'12월'}, sub:{'2026-09':[], '2026-10':[], '2026-11':[{...K}]}});
+
+/* ───────── 기준월 ─────────
+   2026-10 = 마감된 달, 2026-11 = 월중(조회일 11-09, 상단 안내 문구)
+   월 귀속 = 청구월 — 재시도 · 밀린 대금으로 늦게 결제해도 그 청구월 금액. 결제 완료 · 미결제는 조회일 기준 */
+const TODAY = {m:11, d:9};
+const TODAY_S = d2(TODAY.m, TODAY.d);
+const MONTHS = {'2026-11':{mid:true, prev:'2026-10'}, '2026-10':{mid:false, prev:'2026-09'}};
+const PREV_OF = {'2026-10':'2026-09', '2026-11':'2026-10'};
+const PH_BY = Object.fromEntries(PH.map(p=>[p.name,p]));
+const isPre = (p,ym) => !!(p.pre && p.pre.bm===ym);
+const hasSub = (p,ym) => !!(p.sub[ym] && p.sub[ym].length);
+// 결제 → 서비스별 금액: 그 청구월의 이용 서비스 금액으로 나눔 (중간 가입분은 그 서비스로)
+function splitPay(x){
+  const p=PH_BY[x.name]; if(!p) return null;
+  if(x.reason.includes('파머시퍼스트 가입')) return {PHARMACY_FIRST:x.amt};
+  const b=billP(p,x.bm), tot=billTotal(b), o={};
+  if(tot===x.amt){ Object.entries(b).forEach(([c,v])=>o[c]=v.amt); return o; }
+  // 정기 결제가 기존 구성(중간 가입 전)일 때
+  const b0=bill(p.sub[x.bm].filter(i=>i.c!=='PHARMACY_FIRST')); Object.entries(b0).forEach(([c,v])=>o[c]=v.amt); return o;
+}
+// 청구월 기준 금액 — 총 청구(그 달 이용 서비스 금액, 청구 전 제외) · 결제 완료(그 청구월 결제, 조회일까지) · 미결제(총 청구 − 결제 완료)
+const MS = ['bill','paid','unpaid'];
+function measure(ym){ const bl={}, pd={}, up={};
+  PH.forEach(p=>{ if(!hasSub(p,ym) || isPre(p,ym)) return;
+    Object.entries(billP(p,ym)).forEach(([c,v])=>{ if(v.amt) bl[p.name+'|'+c]=v.amt; }); });
+  PAYS.filter(x=>x.ok && x.bm===ym && x.date<=TODAY_S).forEach(x=>{ const s=splitPay(x); if(!s) return;
+    Object.entries(s).forEach(([c,v])=>{ const k=x.name+'|'+c; pd[k]=(pd[k]||0)+v; }); });
+  Object.keys(bl).forEach(k=>{ const d=bl[k]-(pd[k]||0); if(d) up[k]=d; });
+  return {bill:bl, paid:pd, unpaid:up}; }
+const AMT = {'2026-09':measure('2026-09'), '2026-10':measure('2026-10'), '2026-11':measure('2026-11')};
+// 약국 × 서비스 행 — 금액 3가지(총 청구 · 결제 완료 · 미결제)의 전월 · 당월, 상태 = 서비스 이용 변화
+function buildRows(ym){
+  const pm=MONTHS[ym].prev, out={}; SERVICES.forEach(s=>out[s.code]=[]);
+  PH.forEach(p=>{ const bp=hasSub(p,pm)?billP(p,pm):{}, bc=hasSub(p,ym)?billP(p,ym):{};
+    new Set([...Object.keys(bp),...Object.keys(bc)]).forEach(c=>{
+      const k=p.name+'|'+c, fp=bp[c]||null, fc=bc[c]||null;
+      const r={svc:c, name:p.name, option:(fc||fp).opt, fp, fc, status:!fp?'new':!fc?'stop':'keep', qtyPrev:fp?fp.q:0, qty:fc?fc.q:0};
+      MS.forEach(m=>r[m]={prev:AMT[pm][m][k]||0, cur:AMT[ym][m][k]||0});
+      // 0원 옵션 · 청구 전 · 계약 확인이 필요한 옵션은 금액이 없어도 이용 중으로 표시
+      r.use = !!((fc && (!fc.amt || isPre(p,ym))) || (fp && !fp.amt) || (p.x && (fp||fc)));
+      if(!MS.some(m=>r[m].prev||r[m].cur) && !r.use) return;
+      out[c].push(r); }); });
+  return out;
+}
+const ROWS = {'2026-10':buildRows('2026-10'), '2026-11':buildRows('2026-11')};
+const qnum = (a,b) => a&&b&&a!==b ? a+' → '+b : (b||a);
+// 수량 — 계약 해지(이용 서비스에서 빠짐, 청구 중단)면 `2 → 0`, 해지 없이 결제만 없으면(미결제) 계약 수량 그대로
+const qcell = r => r.status==='stop' && r.qtyPrev ? r.qtyPrev+' → 0' : qnum(r.qtyPrev,r.qty);
+const failTxt = f => f.replace(/^기타오류\((\d+) : (.*)\)$/,'$2 ($1)');
+// 금액 칸 = 금액 + 결합할인 계산식 / 비고 칸 = 계약 · 청구 근거(계약 확인 필요 · 기타 할인 등)
+function notesOf(v, f){
+  if(!f || !f.why || (!v && f.amt)) return {calc:'', memo:''};
+  return f.x ? {calc:'', memo:'<span class="dx">'+f.why+'</span>'} : {calc:v===f.amt?f.why:'', memo:''}; }
+function amtCell(v, f){ const c=notesOf(v,f).calc; return fmt(v)+(c?'<div class="dc">'+c+'</div>':''); }
+// 비고(약국) — 그 청구월의 결제 상태: 청구 전 · 미결제 · 재시도 결제 · 늦은 결제 · 밀린 대금 함께 결제 · 가입 후 결제 · 중간 가입 결제
+const mlab = ym => +ym.slice(5)+'월분';
+function payNote(name, ym){
+  const p=PH_BY[name], L=[];
+  if(p && isPre(p,ym)) return '<b class="db">청구 전</b><br><span class="mt">'+p.pre.d+' 이용 시작 · '+p.pre.first+'분부터 청구</span>';
+  const ps=PAYS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S).sort((a,b)=>a.date.localeCompare(b.date));
+  const fl=ps.filter(x=>!x.ok), ok=ps.filter(x=>x.ok && !x.reason.includes('가입')), join=ps.filter(x=>x.ok && x.reason.includes('가입'));
+  if(!ok.length && fl.length){ const f=fl[fl.length-1];
+    return '<b class="db">미결제</b><br><span class="mt">'+f.date.slice(5)+' 결제 실패 · '+failTxt(f.fail)+(fl.length>1?' · 실패 '+fl.length+'회':'')+'</span>'; }
+  const m=ok[0];
+  if(m){
+    const bms=[...new Set(PAYS.filter(x=>x.ok && x.name===name && x.date===m.date).map(x=>x.bm))].sort();
+    const late=m.date.slice(0,7)!==ym, newbie=PREV_OF[ym] && p && !hasSub(p,PREV_OF[ym]);
+    const lab = late ? '늦은 결제' : fl.length ? '재시도 결제' : bms.length>1 ? '밀린 대금 함께 결제' : m.date!==d2(MON[ym],5) ? (newbie?'가입 후 결제':'수기 결제') : '';
+    if(lab){ const t=fl.map(f=>f.date.slice(5)+' 결제 실패');
+      t.push(m.date.slice(5)+' 결제 `'+m.reason+'` '+fmt(m.amt)+'원');
+      if(bms.length>1) t.push(bms.map(mlab).join(' · ')+' 함께 결제');
+      L.push('<b class="db">'+lab+'</b><br><span class="mt">'+t.join('<br>')+'</span>'); } }
+  join.forEach(x=>L.push('<b class="db">중간 가입 결제</b><br><span class="mt">'+x.date.slice(5)+' `'+x.reason+'` '+fmt(x.amt)+'원</span>'));
+  return L.join('<br>');
+}
+// 비고의 결제 상태 — 결제 완료 목록에서는 `미결제` 배지를 빼고 결제 내역만
+const payNoteT = (name, ym) => { const h=payNote(name,ym); return S.tab==='paid' && h.startsWith('<b class="db">미결제</b>') ? '' : h; };
+// 같은 내용은 한 번만 `전월 · 당월`, 다르면 `당월` / `전월` 배지로 나눔
+const memoJoin = (cur, prev) => !cur && !prev ? '' : cur===prev ? '<b class="pmb">전월 · 당월</b><br>'+cur
+  : (cur?'<b class="pmb pmc">당월</b><br>'+cur:'')+(cur&&prev?'<br>':'')+(prev?'<b class="pmb">전월</b><br>'+prev:'');
+// 비고 칸(서비스 행) — 계약 · 청구 근거. 항목이 1개인 약국은 결제 상태도 같은 칸에
+function memoCell(r, single){ const pm=MONTHS[S.month].prev, T=S.tab, first=S.sc==='first';
+  let cur=notesOf(r[T].cur,r.fc).memo, prev=first?'':notesOf(r[T].prev,r.fp).memo;
+  if(single){ cur=[payNoteT(r.name,S.month),cur].filter(Boolean).join('<br>'); if(!first) prev=[payNoteT(r.name,pm),prev].filter(Boolean).join('<br>'); }
+  return '<td class="memo">'+memoJoin(cur,prev)+(single?chkLine(r.name):'')+'</td>'; }
+function phMemoCell(g){ const first=S.sc==='first';
+  return '<td class="memo">'+memoJoin(payNoteT(g.name,S.month), first?'':payNoteT(g.name,MONTHS[S.month].prev))+chkLine(g.name)+'</td>'; }
+
+/* ───────── 청구 확인 ─────────
+   통계 페이지 = 원인 분류 · 메모와 이력만. 서비스 · 결제 수정은 약국 서비스 수정 · 약국 결제 관리에서
+   원인 분류는 약국 단위로 저장 → 바꾼 달부터 적용(이전 달은 기존 분류 유지), 다시 바꾸기 전까지 다음 달에도 그대로, 바꾼 내용은 이력에 남음
+   원인 분류는 약국 서비스 데이터에 한 곳으로 저장 → 서비스 등록 화면과 같은 값 */
+const CHK = {};   // 약국명 → {cz:[{from, k}], memo, log:[{at, who, what}]} — cz = 적용 시작 월별 원인 분류
+// 기준월에 적용되는 저장 분류 — 그 달 이전에 시작한 것 중 가장 최근
+const causeEntry = (name, ym) => { const c=CHK[name]; if(!c||!c.cz) return null; const z=c.cz.filter(x=>x.from<=ym).sort((a,b)=>a.from.localeCompare(b.from)); return z[z.length-1]||null; };
+const causeAt = (name, ym) => (causeEntry(name,ym)||{}).k||'';
+const autoCauses = name => { const o=new Set(); ['2026-10','2026-11'].forEach(m=>SERVICES.forEach(s=>ROWS[m][s.code].forEach(r=>{ if(r.name===name) [r.fc,r.fp].forEach(f=>(f&&f.cat||[]).forEach(k=>o.add(k))); }))); return [...o]; };
+const causeTxt = k => '['+CAUSE[k][0]+'] '+CAUSE[k][1];
+const ME = '운영팀 관리자', NOW = TODAY.m+'-'+String(TODAY.d).padStart(2,'0');
+// 예시 기록 2건 — EDB 연동비 누락 · 중복 가입 할인 유지
+{ const pick=k=>PH.find(p=>autoCauses(p.name).includes(k)); const a=pick('1-1'), b=pick('4-2');
+  if(a) CHK[a.name]={cz:[], memo:'EDB 연동비 서비스 추가 요청 — 영업팀 전달', log:[{at:'11-08 10:12', who:'운영팀 관리자', what:'메모 작성'}]};
+  if(b) CHK[b.name]={cz:[], memo:'온비타 파머시 퍼스트 중복 할인 유지', log:[{at:'11-07 16:40', who:'운영팀 관리자', what:'메모 작성'}]}; }
+// 비고 칸(약국) — 메모 · 마지막 수정 + 원인 분류 · 메모 / 서비스 수정 (결제 관리 이동은 미결제 탭 버튼 하나)
+function chkLine(name){
+  const auto=autoCauses(name), c=CHK[name]; if(!auto.length && !c) return '';
+  let h='<div class="chk-ln">';
+  if(c){ const z=causeEntry(name,S.month), k=z&&z.k;
+    h+=(k && !auto.includes(k)?'<b class="ckb">원인 분류 변경</b>'+causeTxt(k)+'<span class="ckw"> · '+z.from+'부터</span><br>':'');
+    if(c.memo) h+='<span class="ckm">'+c.memo+'</span><br>';
+    const l=c.log[c.log.length-1]; if(l) h+='<span class="ckw">'+l.at+' · '+l.who+'</span><br>'; }
+  h+='<button class="lnk" data-chk="'+name+'">원인 분류 · 메모</button><span class="lnk" data-toast="약국 상세 > 약국 서비스 수정을 새 탭으로 엽니다 (데모)">서비스 수정 ›</span>';
+  return h+'</div>'; }
+function openChk(name){
+  const auto=autoCauses(name), c=CHK[name]||{cz:[], memo:'', log:[]}, cur=causeAt(name,S.month)||auto[0]||'';
+  const bg=document.createElement('div'); bg.className='mdl-bg';
+  bg.innerHTML=`<div class="mdl" role="dialog" aria-label="원인 분류 · 메모">
+    <div><h4>${name} · 원인 분류 · 메모</h4><div class="sub">원인 분류를 바꾸면 ${S.month}부터 적용되고, 다시 바꾸기 전까지 다음 달에도 그대로 적용됩니다. 이전 달은 기존 분류를 유지합니다. 서비스 · 결제는 각 화면에서 수정합니다.</div></div>
+    <div><label class="fl">자동 분류 (약국 서비스 · 결제 비교)</label><div class="auto">${auto.length?auto.map(k=>'<b class="xb">'+CAUSE[k][0]+'</b>'+CAUSE[k][1]).join('<br>'):'없음'}</div></div>
+    <div><label class="fl" for="ckC">원인 분류</label><select id="ckC">${CAUSE_KEYS.map(k=>`<option value="${k}" ${cur===k?'selected':''}>${causeTxt(k)}</option>`).join('')}</select></div>
+    <div><label class="fl" for="ckM">메모</label><textarea id="ckM" placeholder="확인 내용 · 요청 사항">${c.memo}</textarea></div>
+    <div class="go"><span class="lnk" data-toast="약국 상세 > 약국 서비스 수정을 새 탭으로 엽니다 (데모)">서비스 수정 ›</span></div>
+    ${c.log.length?'<div class="log"><b>이력</b><br>'+c.log.slice().reverse().map(l=>l.at+' · '+l.who+' · '+l.what).join('<br>')+'</div>':''}
+    <div class="acts"><button class="btn" id="ckX">취소</button><button class="btn pri" id="ckS">저장</button></div></div>`;
+  document.body.appendChild(bg);
+  const close=()=>bg.remove();
+  bg.onclick=e=>{ if(e.target===bg) close(); };
+  bg.querySelector('#ckX').onclick=close;
+  bg.querySelector('#ckS').onclick=()=>{ const cause=bg.querySelector('#ckC').value, memo=bg.querySelector('#ckM').value.trim();
+    const what=[cause!==cur?'원인 분류 '+causeTxt(cause)+' ('+S.month+'부터)':'', memo!==c.memo?'메모 수정':''].filter(Boolean).join(' · ');
+    const cz=cause!==cur?[...c.cz.filter(x=>x.from!==S.month), {from:S.month, k:cause}]:c.cz;
+    CHK[name]={cz, memo, log:[...c.log, ...(what?[{at:NOW+' '+new Date().toTimeString().slice(0,5), who:ME, what}]:[])]};
+    close(); render(); toast('저장했습니다'); };
+  bg.querySelector('#ckM').focus(); }
+
+/* ───────── 상태 ───────── */
+const S = { sc:'cmp', month:'2026-11', tab:'paid', cause:'all', cf:'all', cpage:1, opts:new Set(), optOpen:false, pp:10, expAll:null, tog:new Set(), q:'', sort:null, dir:'desc', page:'stats' };
+// 약국 결제 관리 이동 화면 — 조회일 기준 최근 1개월 결제 실패 중 아직 결제되지 않은 청구 (재시도 성공 · 이후 결제분 제외, 마지막 실패 시도 1건)
+const PAY_FROM='2026-10-09', PAY_TO=TODAY_S;
+const PAY_FAILS = (()=>{ const last={};
+  PAYS.forEach(x=>{ const k=x.name+'|'+x.bm; if(!last[k] || x.date>=last[k].date) last[k]=x; });
+  return Object.values(last).filter(x=>!x.ok && x.date>=PAY_FROM && x.date<=PAY_TO).sort((a,b)=>b.date.localeCompare(a.date)||a.name.localeCompare(b.name))
+    .map(x=>{ const pr=person(NAMES.indexOf(x.name)+1000); return [x.name, pr.rep, pr.biz, x.amt, x.reason, x.fail, x.date]; }); })();
+// 서비스명 필터 목록 = 옵션명 (서비스 순서대로)
+const ALL_OPTS = [...new Set(SERVICES.flatMap(s=>['2026-10','2026-11'].flatMap(m=>ROWS[m][s.code].map(x=>x.option))))];
+// 총 청구 = 합계만(목록 없음), 목록은 결제 완료 · 미결제로 나눠 봄
+const TABS = [{k:'bill', t:'총 청구', fix:1}, {k:'paid', t:'결제 완료'}, {k:'unpaid', t:'미결제'}];
+const CFLAB = {all:'전체', new:'신규', stop:'중단', chg:'금액 변동'};
+function momCell(c,p){
+  if(S.sc==='first') return '<span class="flat">−</span>';
+  if(p===0 && c===0) return '<span class="flat">−</span>';
+  if(p===0) return '<span class="upc">▲ '+fmt(c)+'</span>';
+  const d=c-p, r=d/p*100, cls=d>0?'upc':d<0?'downc':'flat', ar=d>0?'▲':d<0?'▼':'';
+  if(d===0) return '<span class="flat">0 0.0%</span>';
+  return '<span class="'+cls+'">'+ar+' '+fmt(Math.abs(d))+' '+(d>=0?'+':'−')+Math.abs(r).toFixed(1)+'%</span>';
+}
+function kpiDelta(c,p,unit){
+  if(S.sc==='first') return '<span class="flat">전월 데이터 집계 전</span>';
+  const d=c-p, cls=d>0?'upc':d<0?'downc':'flat', ar=d>0?'▲':d<0?'▼':'';
+  let t=ar+' '+fmt(Math.abs(d))+unit;
+  if(unit==='원' && p) t+=' '+(d>=0?'+':'−')+Math.abs(d/p*100).toFixed(1)+'%';
+  return '<span class="'+cls+'">'+t+'</span>';
+}
+
+// 페이지 이동 — 처음 · 이전 · 앞뒤 2쪽 · 다음 · 끝
+function pager(n){
+  const c=S.cpage, from=Math.max(1,Math.min(c-2,n-4)), to=Math.min(n,from+4), b=(p,t,on)=>`<button class="${on?'on':''}" data-cpg="${p}">${t}</button>`;
+  let h=c>1?b(1,'«')+b(c-1,'‹'):'';
+  for(let i=from;i<=to;i++) h+=b(i,i,i===c);
+  return h+(c<n?b(c+1,'›')+b(n,'»'):'');
+}
+
+/* ───────── 메인 ───────── */
+// 약국별 청구 정렬 키 — 기본(null) = 증감 크기 큰 순
+const SORTKEY = {prev:g=>g.prev, cur:g=>g.cur, diff:g=>g.cur-g.prev};
+function renderMain(){
+  const M=MONTHS[S.month], mid=M.mid, first=S.sc==='first', T=S.tab;
+  const R=ROWS[S.month], allRows=SERVICES.flatMap(s=>R[s.code]);
+  const pv=(r,m)=>first?0:r[m].prev;
+  // 탭 합계 — 기준월 전체 (목록 필터 · 검색과 무관). 총 청구 = 결제 완료 + 미결제
+  const TT=Object.fromEntries(MS.map(m=>[m,{cur:allRows.reduce((a,r)=>a+r[m].cur,0), prev:allRows.reduce((a,r)=>a+pv(r,m),0),
+    ph:new Set(allRows.filter(r=>r[m].cur>0).map(r=>r.name)).size}]));
+
+  // 서비스별 청구 현황 — 이용 약국(0원 · 청구 전 포함) · 총 청구 · 결제 완료 · 미결제, 전월 대비 = 총 청구 기준
+  // 계약에 없는 청구 · 청구 할인 · 서비스 미지정 = 서비스로 나누지 않은 금액 → 표 아래 안내 한 줄
+  const NOSVC=['OFF','DISC','UNALLOC'], noRows=NOSVC.flatMap(c=>R[c]);
+  const noAmt=noRows.reduce((a,r)=>a+r.bill.cur,0), noPh=new Set(noRows.filter(r=>r.bill.cur).map(r=>r.name)).size;
+  const stats=SERVICES.filter(s=>!NOSVC.includes(s.code)).map(s=>{ const rs=R[s.code], sum=m=>rs.reduce((a,r)=>a+r[m].cur,0);
+    const ph=st=>new Set(rs.filter(r=>r.status===st).map(r=>r.name)).size;
+    return {s, use:new Set(rs.filter(r=>r.fc).map(r=>r.name)).size, nw:ph('new'), stop:ph('stop'), bill:sum('bill')}; })
+    .filter(x=>x.use||x.bill||x.stop).sort((a,b)=>b.bill-a.bill || b.use-a.use);
+  stats.forEach(x=>x.share=TT.bill.cur?Math.round(x.bill/TT.bill.cur*1000)/10:0);
+  const maxShare=Math.max(...stats.map(x=>x.share));
+  // 신규 · 해지 = 전월 대비 서비스 이용 변화(약국 수)
+  const cnt=(n,cls)=>first?'<span class="flat">−</span>':n?'<span class="'+cls+'">'+fmt(n)+'</span>':'<span class="flat">0</span>';
+  const rowHtml=x=>`<tr><td class="svc">${x.s.name}</td><td class="num">${fmt(x.use)}</td><td class="num">${cnt(x.nw,'upc')}</td><td class="num">${cnt(x.stop,'downc')}</td><td class="num">${fmt(x.bill)}</td>
+      <td><div class="share"><div class="bar" style="width:${maxShare?Math.max(0,x.share)/maxShare*64:0}px"></div><span class="pct">${x.share.toFixed(1)}%</span></div></td></tr>`;
+
+  // 약국별 청구 — 탭(금액 기준) → 서비스명 · 약국명 검색 → 전월 대비 순으로 거름
+  const q=S.q.trim();
+  // 결제 완료 목록 = 기준월에 결제한 약국 + 서비스를 해지해 결제가 끝난 약국(전월 대비 `중단`) / 미결제 목록 = 기준월 미결제 금액이 있는 약국
+  //   같은 약국의 전월 금액 · 0원 이용 옵션 행은 함께 보여 줌 (전월 대비 비교)
+  const curPh=new Set(allRows.filter(r=>r[T].cur>0).map(r=>r.name)), unpaidPh=new Set(allRows.filter(r=>r.unpaid.cur>0).map(r=>r.name));
+  const stopPh=T==='paid' ? new Set(allRows.filter(r=>r.status==='stop' && pv(r,'paid') && !unpaidPh.has(r.name)).map(r=>r.name)) : new Set();
+  const inTab=r=> (curPh.has(r.name)||stopPh.has(r.name)) && (r[T].cur||pv(r,T)||(T==='paid' && r.use));
+  // 원인 분류 — 서비스 행의 비고 배지(당월 · 전월) 대분류
+  const causeOf=r=>causeAt(r.name,S.month) ? [CAUSE[causeAt(r.name,S.month)][0]] : [...((r.fc&&r.fc.cat)||[]),...((!first&&r.fp&&r.fp.cat)||[])].map(k=>CAUSE[k][0]);
+  const base=allRows.filter(r=>inTab(r) && (!S.opts.size||S.opts.has(r.option)) && (!q||r.name.includes(q)) && (S.cause==='all'||causeOf(r).includes(S.cause)));
+  const cfOf=r=> r.status==='new'?'new' : r.status==='stop'?'stop' : r[T].cur!==pv(r,T)?'chg':'';
+  const cfCnt=k=>new Set((k==='all'?base:base.filter(r=>cfOf(r)===k)).map(r=>r.name)).size;
+  // 전월 대비 필터 — 결제 완료 목록에서만 (미결제는 대부분 전월 0원이라 구분 의미 없음)
+  const cfOn=!first && T==='paid'; if(!cfOn) S.cf='all';
+  const list=S.cf==='all'?base:base.filter(r=>cfOf(r)===S.cf);
+  // 약국별로 묶기 — 약국 행 금액은 표에 남은 서비스 행의 합
+  const byPh={}; list.forEach(r=>{ (byPh[r.name]=byPh[r.name]||{name:r.name,rows:[]}).rows.push(r); });
+  const absd=g=>Math.abs(g.cur-g.prev);
+  const phList=Object.values(byPh).map(g=>{ g.prev=g.rows.reduce((a,r)=>a+pv(r,T),0); g.cur=g.rows.reduce((a,r)=>a+r[T].cur,0);
+    g.rows.sort((a,b)=>Math.abs(b[T].cur-pv(b,T))-Math.abs(a[T].cur-pv(a,T))); return g; })
+    .sort(S.sort ? (a,b)=>(S.dir==='desc'?1:-1)*(SORTKEY[S.sort](b)-SORTKEY[S.sort](a)) || b.cur-a.cur
+                 : (a,b)=>absd(b)-absd(a) || b.rows.length-a.rows.length || b.cur-a.cur);
+  // 기본 목록(원인 분류 전체 · 정렬 없음) — 케이스마다 대표 약국 1곳을 맨 앞에 → 30건씩 보기 첫 페이지에서 모든 케이스 확인
+  if(!S.sort && S.cause==='all'){
+    const casesOf=g=>{ const o=new Set(), sv=causeAt(g.name,S.month);
+      g.rows.forEach(r=>{ if(!sv) [...((r.fc&&r.fc.cat)||[]),...((!first&&r.fp&&r.fp.cat)||[])].forEach(k=>o.add('c:'+k)); if(r.status!=='keep') o.add('s:'+r.status);
+        (notesOf(r[T].cur,r.fc).calc.match(/<b class="db">[^<]+/g)||[]).forEach(t=>o.add('d:'+t.slice(14))); });
+      if(sv) o.add('c:'+sv);
+      (payNoteT(g.name,S.month).match(/<b class="db">[^<]+/g)||[]).forEach(t=>o.add('p:'+t.slice(14)));
+      o.add('n:'+Math.min(g.rows.length,3)); return o; };
+    const cs=new Map(phList.map(g=>[g,casesOf(g)])), done=new Set(), lead=[];
+    phList.forEach(g=>{ if([...cs.get(g)].some(k=>!done.has(k))){ lead.push(g); cs.get(g).forEach(k=>done.add(k)); } });
+    const rest=phList.filter(g=>!lead.includes(g)); phList.length=0; phList.push(...lead,...rest);
+  }
+  const cper=S.pp, cpages=Math.max(1,Math.ceil(phList.length/cper)); if(S.cpage>cpages) S.cpage=cpages;
+  const phPage=phList.slice((S.cpage-1)*cper, S.cpage*cper);
+  // 접기 · 펼치기 — 기본 접힘, 필터 · 검색을 쓰면 모두 펼침. 약국 행 클릭으로 개별 전환
+  const autoOpen=S.cf!=='all'||S.opts.size>0||S.cause!=='all'||!!q, baseOpen=S.expAll===null?autoOpen:S.expAll;
+  const isOpen=g=>baseOpen!==S.tog.has(g.name), multi=phPage.filter(g=>g.rows.length>1), pageAllOpen=multi.length>0&&multi.every(isOpen);
+  const NA='<span class="flat">−</span>';
+  const dl=d=>first?NA:(d===0?'<span class="flat">0</span>':`<span class="${d>0?'upc':'downc'}">${d>0?'+':'−'}${fmt(Math.abs(d))}</span>`);
+  const sh=(k,t)=>`<th class="num sort ${S.sort===k?'on':''}" data-sort="${k}">${t}<span class="ar">${S.sort===k?(S.dir==='desc'?'▼':'▲'):'↕'}</span></th>`;
+  const prevCell=r=>first?NA:amtCell(pv(r,T),r.fp), curCell=r=>amtCell(r[T].cur,r.fc);
+  const tabHtml=TABS.map((x,i)=>{ const v=TT[x.k];
+    return (i===1?'<span class="bar2">=</span>':i===2?'<span class="bar2">+</span>':'')+
+      `<${x.fix?'div':'button'} class="bcell ${x.fix?'end':''} ${T===x.k?'on':''}" ${x.fix?'':'data-tab="'+x.k+'"'}><div class="bk">${x.t}${x.fix?' <span class="flat">(결제 완료 + 미결제)</span>':''}</div><div class="bv">${fmt(v.cur)}<small> 원</small></div>
+      <div class="bs">${fmt(v.ph)}곳 · ${first?'<span class="flat">전월 데이터 집계 전</span>':'전월 대비 '+kpiDelta(v.cur,v.prev,'원')}</div></${x.fix?'div':'button'}>`; }).join('');
+
+  document.getElementById('content').innerHTML=`
+    <div class="panel filter">
+      <div class="frow">
+        <div class="fitem"><span class="flabel">기준월</span><select class="sel" id="fMonth">${first?'<option value="2026-10">2026-10</option>':Object.keys(MONTHS).map(m=>`<option value="${m}" ${S.month===m?'selected':''}>${m}</option>`).join('')}</select></div>
+      </div>
+    </div>
+    ${mid?`<div class="mnote" id="midNote"><div><b>당월 데이터는 결제 마감 전 잠정 집계이며, 이후 결제 내역에 따라 변경될 수 있습니다.</b></div><div class="per">금액은 청구월 기준입니다. 재시도 · 밀린 대금으로 늦게 결제되면 그 청구월의 결제 완료 금액이 바뀝니다.</div></div>`:''}
+
+    <div class="panel">
+      <div class="ph"><h3>서비스별 청구 현황</h3></div>
+      <div class="tblwrap"><table class="tbl svct">
+        <thead><tr>
+          <th>서비스</th>
+          <th class="num">이용 약국</th>
+          <th class="num">신규</th>
+          <th class="num">해지</th>
+          <th class="num">총 청구</th>
+          <th>비중</th></tr></thead>
+        <tbody>${stats.map(rowHtml).join('')}</tbody></table></div>
+      ${noPh?`<div class="foot">ⓘ 서비스로 나누지 않은 금액 ${fmt(noAmt)}원 · 약국 ${fmt(noPh)}곳 (약국 서비스 확인 필요) — 약국별 청구의 원인 분류로 확인</div>`:''}
+    </div>
+
+    <div class="panel" id="phPanel">
+      <div class="ph"><h3>약국별 청구</h3></div>
+      <div class="brow">${tabHtml}</div>
+      <div class="tools">${!cfOn?'':`<span class="flabel">전월 대비</span>${Object.keys(CFLAB).map(k=>`<button class="schip ${S.cf===k?'on':''}" data-cf="${k}">${CFLAB[k]}<b>${fmt(cfCnt(k))}</b></button>`).join('')}`}
+        <div class="tright">
+          ${T==='unpaid'?'<button class="btn sm" id="payGo">약국 결제 관리 ›</button>':''}
+          <select class="sel sm ${S.cause!=='all'?'on':''}" id="cause"><option value="all">원인 분류 · 전체</option>${CAUSE_GRP.map(g=>`<option value="${g}" ${S.cause===g?'selected':''}>${g}</option>`).join('')}</select>
+          <input class="srch" id="q" type="search" placeholder="약국명 검색" value="${S.q.replace(/"/g,'&quot;')}">
+          <div class="msel"><button class="btn sm ${S.opts.size?'on':''}" id="optBtn">서비스명 · ${S.opts.size? (S.opts.size===1?[...S.opts][0]:[...S.opts][0]+' 외 '+(S.opts.size-1)) : '전체'} ▾</button>
+          ${S.optOpen?`<div class="mpanel">${ALL_OPTS.map(o=>`<label><input type="checkbox" data-opt="${o}" ${S.opts.has(o)?'checked':''}>${o}</label>`).join('')}
+            <div class="mfoot"><button class="btn sm" id="optClear">선택 해제</button></div></div>`:''}</div></div></div>
+      <div class="psum"><span>약국 <b>${fmt(phList.length)}</b>곳</span>
+        <span class="pctl"><button class="btn sm" id="expAll">${pageAllOpen?'모두 접기':'모두 펼치기'}</button><select class="sel sm" id="pp">${[10,30,50].map(n=>`<option value="${n}" ${S.pp===n?'selected':''}>${n}건씩 보기</option>`).join('')}</select></span></div>
+      <div class="pnote" id="splitNote">ⓘ 금액은 청구월 기준입니다. 서비스 금액은 약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값입니다.</div>
+      <div class="tblwrap"><table class="tbl">
+        <thead><tr><th>약국명</th><th>서비스 옵션</th><th class="num">수량</th>${sh('prev','전월')}${sh('cur','당월')}${sh('diff','증감')}<th>비고</th></tr></thead>
+        <tbody>${phPage.length?'':'<tr><td colspan="7" class="empty">조건에 맞는 약국이 없습니다.</td></tr>'}${phPage.map(g=>{
+          const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>`;
+          // 항목 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
+          if(g.rows.length===1){ const r=g.rows[0]; return `<tr class="ph-row one"><td><span class="tg"></span>${nm}</td><td>${r.option}</td><td class="num">${qcell(r)}</td>
+          <td class="num">${prevCell(r)}</td><td class="num">${curCell(r)}</td><td class="num">${dl(r[T].cur-pv(r,T))}</td>${memoCell(r,1)}</tr>`; }
+          // 항목 여러 개 = 약국 행(합계) + 접기 · 펼치기
+          return `<tr class="ph-row" data-ph="${g.name}"><td><span class="tg">${isOpen(g)?'▾':'▸'}</span>${nm}</td>
+          <td class="svcn" title="${g.rows.map(r=>r.option).join(' · ')}">${g.rows.length}개 항목</td><td></td>
+          <td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${fmt(g.cur)}</td><td class="num">${dl(g.cur-g.prev)}</td>${phMemoCell(g)}</tr>`+
+          (isOpen(g)?g.rows:[]).map(r=>`<tr class="sv-row"><td>└</td><td>${r.option}</td><td class="num">${qcell(r)}</td>
+          <td class="num">${prevCell(r)}</td><td class="num">${curCell(r)}</td><td class="num">${dl(r[T].cur-pv(r,T))}</td>${memoCell(r)}</tr>`).join(''); }).join('')}</tbody></table></div>
+      <div class="pager">${pager(cpages)}</div>
+    </div>`;
+  bindMain();
+}
+
+// 목록 조건이 바뀌면 1페이지 · 접기 상태 처음으로
+function resetList(){ S.cpage=1; S.expAll=null; S.tog=new Set(); }
+function bindMain(){
+  const $=id=>document.getElementById(id);
+  const fm=$('fMonth'); if(fm) fm.onchange=e=>{ S.month=e.target.value; S.cf='all'; S.q=''; S.opts=new Set(); S.cause='all'; S.sort=null; resetList(); render(); };
+  const ob=$('optBtn'); if(ob) ob.onclick=e=>{ e.stopPropagation(); S.optOpen=!S.optOpen; render(); };
+  document.querySelectorAll('[data-opt]').forEach(c=>c.onchange=()=>{ c.checked?S.opts.add(c.dataset.opt):S.opts.delete(c.dataset.opt); resetList(); render(); });
+  const oc=$('optClear'); if(oc) oc.onclick=()=>{ S.opts=new Set(); resetList(); render(); };
+  document.querySelectorAll('[data-cf]').forEach(b=>b.onclick=()=>{ const k=b.dataset.cf; S.cf=S.cf===k?'all':k; resetList(); render(); });
+  document.querySelectorAll('[data-cpg]').forEach(b=>b.onclick=()=>{ S.cpage=+b.dataset.cpg; S.expAll=null; S.tog=new Set(); render(); });
+  document.querySelectorAll('tr[data-ph]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('.link,.lnk')) return; const n=tr.dataset.ph; S.tog.has(n)?S.tog.delete(n):S.tog.add(n); render(); });
+  const ea=$('expAll'); if(ea) ea.onclick=()=>{ S.expAll=ea.textContent==='모두 펼치기'; S.tog=new Set(); render(); };
+  const cs=$('cause'); if(cs) cs.onchange=e=>{ S.cause=e.target.value; resetList(); render(); };
+  const pp=$('pp'); if(pp) pp.onchange=e=>{ S.pp=+e.target.value; resetList(); render(); };
+  // 정렬 — 같은 열을 누를 때마다 내림차순 → 오름차순 → 기본(증감 크기 큰 순)
+  document.querySelectorAll('th[data-sort]').forEach(th=>th.onclick=()=>{ const k=th.dataset.sort;
+    if(S.sort!==k){ S.sort=k; S.dir='desc'; } else if(S.dir==='desc') S.dir='asc'; else S.sort=null;
+    S.cpage=1; render(); });
+  // 약국명 검색 — 입력하는 즉시 반영(한글 조합 중에는 조합이 끝난 뒤)
+  const qi=$('q'); if(qi){ const apply=()=>{ S.q=qi.value; resetList(); render(); const n=$('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
+    qi.addEventListener('input',e=>{ if(!e.isComposing) apply(); }); qi.addEventListener('compositionend',apply); }
+  // 미결제 탭 — 약국 결제 관리로 이동(기간 1개월 · 결제 여부 조회 실패)
+  const pg=$('payGo'); if(pg) pg.onclick=goPay;
+  // 총 청구 · 결제 완료 · 미결제 탭
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ S.tab=b.dataset.tab; S.cf='all'; S.sort=null; resetList(); render(); });
+}
+
+/* ───────── 약국 결제 관리 (이동 화면) ───────── */
+function renderPay(){
+  const q=['당일','1주일','1개월','3개월','6개월'];
+  document.getElementById('content').innerHTML=`
+    <h2 class="pay-h">약국 결제 관리</h2>
+    <div class="panel pay-f">
+      <div class="frow">
+        <span class="flabel">기간</span><span class="din" id="pFrom">${PAY_FROM}</span>~<span class="din">${PAY_TO}</span>
+        ${q.map(x=>`<button class="qbtn ${x==='1개월'?'on':''}" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">${x}</button>`).join('')}
+        <span class="gap"></span><span class="flabel" style="width:auto">수동 승인 여부</span><span class="chk"></span>
+        <span class="gap"></span><span class="flabel" style="width:auto">결제 여부 조회</span>
+        <span id="pRes"><span class="rad"><i></i>전체</span><span class="rad"><i></i>성공</span><span class="rad on"><i></i>실패</span></span>
+      </div>
+      <div class="frow">
+        <span class="flabel">검색</span><select class="sel"><option>약국명</option></select><input class="din" style="width:140px">
+        <span class="gap"></span><span class="flabel">업체명</span><select class="sel"><option>전체</option></select>
+      </div>
+      <div class="acts"><button class="btn" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">초기화</button><button class="btn pri" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">검색</button></div>
+    </div>
+    <div class="pay-top"><span>전체 <span class="cnt">${PAY_FAILS.length}개</span></span>
+      <span class="r"><button class="btn pri" data-toast="데모 — 약국 결제 관리 기존 기능">엑셀 내보내기</button><select class="sel"><option>10개 씩</option></select></span></div>
+    <div class="panel"><table class="tbl pay" id="pTbl">
+      <thead><tr><th>약국명</th><th>대표자명</th><th>사업자 번호</th><th>결제요청금액</th><th>결제 이유</th><th>결제 성공 여부</th><th>수동 승인 여부</th><th>결제 실패 사유</th><th>결제 일자</th><th>승인</th></tr></thead>
+      <tbody>${PAY_FAILS.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${fmt(r[3])}</td><td>${r[4]}</td><td class="fail">실패</td><td>미승인</td><td>${r[5]}</td><td>${r[6]}</td><td><button class="apv">승인</button></td></tr>`).join('')}</tbody>
+    </table>
+    <div class="pager"><button class="on">1</button></div></div>`;
+}
+
+/* ───────── 화면 이동 ─────────
+   약국 결제 관리로 이동할 때 브라우저 기록을 남김 → 뒤로 가기(브라우저 · `‹ 서비스 청구 통계`)로 보던 약국별 청구 위치 · 탭 · 필터 그대로 복귀 */
+function goPay(){ S.backY=window.scrollY; S.page='pay'; history.pushState({page:'pay'},'','#pay'); render(); window.scrollTo(0,0); }
+history.replaceState({page:'stats'},'',location.pathname+location.search);
+window.addEventListener('popstate',e=>{ S.page=(e.state&&e.state.page)||'stats'; render();
+  if(S.page==='stats') requestAnimationFrame(()=>window.scrollTo(0, S.backY!=null ? S.backY : document.getElementById('phPanel').getBoundingClientRect().top+window.scrollY-10)); });
+
+
+/* ───────── 케이스별 표기 안내 (이해관계자 설명용) ─────────
+   예시는 통계 화면과 같은 함수(배지 · 금액 칸 · 비고 칸)로 프로토타입 데이터에서 그대로 그림 → 표기를 바꾸면 안내도 같이 바뀜. 약국명은 표시하지 않음 */
+function renderGuide(){
+  const MM=['2026-11','2026-10'], all=MM.flatMap(m=>SERVICES.flatMap(s=>ROWS[m][s.code].map(r=>({m,r}))));
+  const NA='<span class="na">프로토타입 데이터에 예시 없음</span>';
+  const ex=h=>'<td class="ex">'+(h||NA)+'</td>';
+  const amtEx=(m,r)=>'<span class="amt">'+fmt(AMT[m].bill[r.name+'|'+r.svc]||0)+'원</span>'+(()=>{ const c=notesOf(AMT[m].bill[r.name+'|'+r.svc]||0,r.fc).calc; return c?'<br>'+c:''; })();
+  const find=f=>all.find(({m,r})=>f(r,m));
+  // 1. 결제 상태 (비고 칸 · 약국 단위)
+  const PAYC=[
+    ['청구 전','이번 달에 서비스를 시작해 다음 달부터 청구','이용 약국 수에는 포함, 금액은 0원'],
+    ['미결제','청구월분 결제가 모두 실패','결제 실패일 · 실패 사유 · 실패 횟수. 미결제 목록에만 나옴'],
+    ['재시도 결제','실패한 뒤 다시 결제해 성공','실패일과 성공일 · 결제 이유 · 금액'],
+    ['늦은 결제','청구월이 지난 뒤 결제','결제한 날이 다음 달이어도 청구월 금액으로 계산'],
+    ['밀린 대금 함께 결제','한 번에 여러 달 치를 결제','함께 결제한 달(예: 10월분 · 11월분)'],
+    ['가입 후 결제','처음 가입한 달, 정기 결제일(5일)이 아닌 날 결제','결제일 · 결제 이유 · 금액'],
+    ['수기 결제','기존 약국이 정기 결제일이 아닌 날 결제','결제일 · 결제 이유 · 금액'],
+    ['중간 가입 결제','달 중간에 서비스를 추가해 따로 결제','추가 결제일 · 결제 이유 · 금액'] ];
+  const payEx=lab=>{ for(const m of MM) for(const p of PH){ const h=payNote(p.name,m); if(h.includes('<b class="db">'+lab+'</b>')) return h.split('<br><b class="db">').map((x,i)=>i?'<b class="db">'+x:x).find(x=>x.includes('>'+lab+'<')); } return ''; };
+  // 2. 서비스 구성 (금액 칸)
+  const SVCC=[
+    ['단건 (정상가)','서비스 1개만 이용','금액만 표시', r=>r.fc&&r.fc.t==='정상가'&&r.qty===1, 'amt'],
+    ['결합할인','2개 이상 함께 이용 → 가장 비싼 서비스 외 50%','금액 아래에 무엇과 결합해 할인했는지 + 계산식 + VAT', r=>r.fc&&r.fc.t==='결합할인 50%', 'amt'],
+    ['같은 서비스 2대 이상','장비가 있는 서비스를 2대 이상 이용 → 2대째부터 50%','`2대째` / `2대째부터` 결합할인 + 장비임대료(할인 없음)', r=>r.fc&&r.qty>1&&/결합할인/.test(r.fc.t), 'amt'],
+    ['풀패키지','정액 상품','`풀패키지 (키오스크)` 옵션명 + 정액 금액', r=>r.fc&&r.fc.t==='정액', 'amt'],
+    ['굿팜 POS 무료','POS는 함께 쓰는 서비스에만 청구','0원 + `굿팜 POS 무료`', r=>r.fc&&r.fc.t==='무료', 'amt'],
+    ['스마트 OCR 기본 제공','스마트 OCR을 쓰면 모바일 OCR 0원','0원 + `스마트 OCR 기본 제공`', r=>r.fc&&r.fc.t==='스마트 OCR 기본 제공', 'amt'],
+    ['신규','전월에 없던 서비스를 이번 달 시작','전월 0 · 증감 +. 전월 대비 필터 `신규`', r=>r.status==='new', 'q'],
+    ['중단','전월에 쓰던 서비스를 이번 달 해지','당월 0 · 수량 `2 → 0`. 전월 대비 필터 `중단`', r=>r.status==='stop'&&r.qtyPrev, 'q'],
+    ['여러 항목 약국','한 약국이 서비스 2개 이상','약국 행 = 합계 + `N개 항목`, 눌러서 펼치면 서비스별 행', null, 'multi'] ];
+  const svcEx=([, , , f, k])=>{ if(k==='multi') return '<span class="mt">▸ 약국명 · 3개 항목 · 합계 금액</span>';
+    const x=find(f); if(!x) return ''; const {m,r}=x;
+    return '<span class="mt">'+r.option+' · 수량 '+qcell(r)+'</span><br>'+(k==='q'?(()=>{ const key=r.name+'|'+r.svc, pm=MONTHS[m].prev; return '<span class="amt">전월 '+fmt(AMT[pm].bill[key]||0)+'원 → 당월 '+fmt(AMT[m].bill[key]||0)+'원</span>'; })():amtEx(m,r)); };
+  // 3. 원인 분류 (비고 칸 · 서비스 행)
+  const causeN=k=>new Set(all.filter(({m,r})=>m==='2026-11'&&[r.fc,r.fp].some(f=>f&&(f.cat||[]).includes(k))).map(({r})=>r.name)).size;
+  const causeEx=k=>{ const x=all.find(({r})=>[r.fc,r.fp].some(f=>f&&(f.cat||[]).includes(k)&&f.why&&f.why.includes(CAUSE[k][1]))) ; if(!x) return ''; const f=[x.r.fc,x.r.fp].find(f=>f&&(f.cat||[]).includes(k)&&f.why); return '<span class="dx">'+f.why.replace(/`/g,'')+'</span>'; };
+  const CAUSE_WHEN={'1-1':'결제 이유에 EDB 연동비가 있는데 약국 서비스에 없음','1-2':'결제는 되는데 이용 서비스 · 옵션 정보가 없음 (서비스 미지정)','1-3':'서비스 해지 상태인데 계속 결제','1-4':'굿팜 솔루션 외 서비스(모바일 바코드프리 등) 결제',
+    '2':'등록 금액은 할인으로 0원인데 정가로 결제','3':'서비스 · 금액이 바뀌었는데 약국 서비스에 반영 안 됨 (결제 금액이 실제)','4-1':'기타 할인 사유: POS 무상','4-2':'기타 할인 사유: 중복 가입 · 제휴처(온비타 · drs 등)','4-3':'기타 할인 사유: 서비스 오류 보상 · 테스트','5':'기타 할인 사유가 비어 있음','6':'비고에 회수 · 무료인데 금액 청구'};
+  // 4. 원인 분류 · 메모 기록 예시
+  const ckName=Object.keys(CHK)[0];
+  document.getElementById('content').innerHTML=`<div class="gd">
+    <h2>케이스별 표기 안내</h2>
+    <p class="lead">약국별 청구 목록에서 상태에 따라 금액 · 비고 칸에 무엇이 어떻게 보이는지 정리했습니다. 예시는 이 프로토타입 데이터에서 통계 화면과 같은 방식으로 그린 표기입니다 (기준월 2026-11 · 조회일 11-09).</p>
+
+    <div class="panel"><div class="ph"><h3>1. 기본 규칙</h3></div><div class="tblwrap"><table class="tbl"><tbody>
+      <tr><td class="k">월 귀속</td><td>청구월 기준. 11월분을 12월에 늦게 결제해도 11월 결제 완료 금액</td></tr>
+      <tr><td class="k">총 청구</td><td>결제 완료 + 미결제. 합계 카드로 보여 줌 (11월 ${fmt(Object.values(AMT['2026-11'].bill).reduce((a,b)=>a+b,0))} = ${fmt(Object.values(AMT['2026-11'].paid).reduce((a,b)=>a+b,0))} + ${fmt(Object.values(AMT['2026-11'].unpaid).reduce((a,b)=>a+b,0))})</td></tr>
+      <tr><td class="k">결제 완료 목록</td><td>그 청구월분을 조회일까지 결제한 약국 + 서비스를 해지해 결제가 끝난 약국(전월 대비 중단). 미결제 배지는 보이지 않음. 전월 대비 필터(전체 · 신규 · 중단 · 금액 변동) 사용</td></tr>
+      <tr><td class="k">미결제 목록</td><td>그 청구월에 미결제 금액이 있는 약국. <b>약국 결제 관리 ›</b> 버튼으로 이동, 뒤로 가기로 보던 위치에 복귀</td></tr>
+      <tr><td class="k">당월</td><td>결제 마감 전 잠정 집계. 화면 위에 안내 문구 표시</td></tr>
+      <tr><td class="k">서비스 금액</td><td>약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값</td></tr>
+      <tr><td class="k">비고 · 전월/당월</td><td>전월과 당월 내용이 같으면 <b>전월 · 당월</b> 한 번, 다르면 <b>당월</b> / <b>전월</b>로 나눠 표기</td></tr>
+      <tr><td class="k">증감</td><td>늘면 빨간 +, 줄면 파란 −, 같으면 0. 전월 데이터가 없는 첫 달은 −</td></tr>
+      <tr><td class="k">비고 위치</td><td>결제 상태 = 약국 행 · 원인 분류 = 서비스 행. 항목이 1개인 약국은 한 칸에 함께</td></tr>
+    </tbody></table></div></div>
+
+    <div class="panel"><div class="ph"><h3>2. 결제 상태 — 비고 칸 (약국 행)</h3><p>정기 결제일(5일)에 한 번에 결제되면 배지 없이 금액만 보입니다.</p></div><div class="tblwrap"><table class="tbl">
+      <thead><tr><th>배지</th><th>언제</th><th>함께 보이는 내용</th><th>화면 예시</th></tr></thead><tbody>
+      ${PAYC.map(c=>`<tr><td class="k">${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td>${ex(payEx(c[0]).replace(/`/g,''))}</tr>`).join('')}
+    </tbody></table></div></div>
+
+    <div class="panel"><div class="ph"><h3>3. 서비스 구성 — 금액 · 수량 칸 (서비스 행)</h3></div><div class="tblwrap"><table class="tbl">
+      <thead><tr><th>케이스</th><th>언제</th><th>표기</th><th>화면 예시</th></tr></thead><tbody>
+      ${SVCC.map(c=>`<tr><td class="k">${c[0]}</td><td>${c[1]}</td><td>${c[2].replace(/`([^`]+)`/g,'<b>$1</b>')}</td>${ex(svcEx(c))}</tr>`).join('')}
+    </tbody></table></div></div>
+
+    <div class="panel"><div class="ph"><h3>4. 원인 분류 — 결제 금액과 약국 서비스가 다를 때 (비고 칸)</h3><p>배지 = [대분류] 소분류. 원인 분류 필터로 대분류별로 모아 볼 수 있습니다. 약국 수는 2026-11 기준.</p></div><div class="tblwrap"><table class="tbl">
+      <thead><tr><th>배지</th><th>언제</th><th class="num">약국 수</th><th>화면 예시</th></tr></thead><tbody>
+      ${CAUSE_KEYS.map(k=>`<tr><td class="k ex"><b class="xb">${CAUSE[k][0]}</b>${CAUSE[k][1]}</td><td>${CAUSE_WHEN[k]}</td><td class="num">${fmt(causeN(k))}</td>${ex(causeEx(k))}</tr>`).join('')}
+      <tr><td class="k">서비스로 나누지 않은 금액</td><td>서비스에 없는 청구 · 청구 할인 · 서비스 미지정 금액</td><td></td>${ex('<span class="mt">서비스별 청구 현황 표 아래 한 줄로 합계 · 약국 수 표시</span>')}</tr>
+    </tbody></table></div></div>
+
+    <div class="panel"><div class="ph"><h3>5. 원인 분류 · 메모 기록</h3></div><div class="tblwrap"><table class="tbl"><tbody>
+      <tr><td class="k">기록하는 곳</td><td>원인 분류가 있는 약국의 비고 칸 <b>원인 분류 · 메모</b>. 원인 분류와 메모만 기록하고, 서비스 · 결제는 <b>서비스 수정 ›</b>(약국 상세) · 약국 결제 관리에서 수정</td>${ex('<span class="lnk">원인 분류 · 메모</span><span class="lnk">서비스 수정 ›</span>')}</tr>
+      <tr><td class="k">적용 시점</td><td>바꾼 달부터 적용, 다시 바꾸기 전까지 다음 달에도 그대로. 이전 달은 기존 분류 유지</td>${ex('<b class="ckb">원인 분류 변경</b>'+causeTxt('6')+'<span class="mt"> · 2026-11부터</span>')}</tr>
+      <tr><td class="k">메모 · 이력</td><td>비고 칸에 메모와 마지막 수정(일시 · 작성자). 창에서 전체 이력 확인</td>${ex(ckName?chkLine(ckName).replace(/<div class="chk-ln">|<\/div>/g,''):'')}</tr>
+    </tbody></table></div></div>
+
+    <div class="panel"><div class="ph"><h3>6. 목록 · 필터</h3></div><div class="tblwrap"><table class="tbl"><tbody>
+      <tr><td class="k">기본 정렬</td><td>원인 분류 전체 · 정렬 없음이면 케이스마다 대표 약국 1곳을 맨 앞에. 30건씩 보기 첫 페이지에서 모든 케이스 확인, 나머지는 증감이 큰 순</td></tr>
+      <tr><td class="k">전월 대비 필터</td><td>결제 완료 목록에만. 전체 · 신규 · 중단 · 금액 변동</td></tr>
+      <tr><td class="k">원인 분류 필터</td><td>대분류별(서비스 누락 · 할인 오입력 · 서비스 미갱신 · 기타 할인 · 과다 청구 의심). 기준월에 적용되는 분류로 거름</td></tr>
+      <tr><td class="k">검색 · 서비스명</td><td>약국명 검색, 서비스명 여러 개 선택. 필터 · 검색을 쓰면 여러 항목 약국을 모두 펼침</td></tr>
+    </tbody></table></div></div>
+  </div>`;
+}
+function goGuide(){ if(S.page==='guide') return; S.backY=window.scrollY; S.page='guide'; history.pushState({page:'guide'},'','#guide'); render(); window.scrollTo(0,0); }
+document.getElementById('gdBtn').onclick=goGuide;
+
+/* ───────── 공통 ───────── */
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>el.classList.remove('show'),1800); }
+document.addEventListener('click',e=>{ const t=e.target.closest('[data-toast]'); if(t){ e.stopPropagation(); toast(t.dataset.toast); }
+  const ck=e.target.closest('[data-chk]'); if(ck){ e.stopPropagation(); openChk(ck.dataset.chk); }
+  const pg=e.target.closest('[data-paygo]'); if(pg){ e.stopPropagation(); document.querySelectorAll('.mdl-bg').forEach(x=>x.remove()); goPay(); } }, true);
+document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{ S.sc=b.dataset.sc; if(S.sc==='first') S.month='2026-10'; document.querySelectorAll('[data-sc]').forEach(x=>x.classList.toggle('on',x===b)); S.cf='all'; render(); });
+// 옵션 목록 밖을 누르면 닫기
+document.addEventListener('click',e=>{
+  if(S.optOpen && !e.target.closest('.msel')){ S.optOpen=false; render(); }});
+const SIDE = {
+  stats:['통계',['서비스 청구 통계<span class="new">NEW</span>','굿팜플러스','굿팜솔루션NEW','모바일약국','모바일약국 월별 결제','모바일 바코드프리','AI MATE','업무 이용 통계','광고 성과 집계 통계']],
+  pay:['약국관리',['약국 관리','신규 약국 관리','약국 A/S','약국 결제 관리','태블릿 관리'],3] };
+function render(){
+  const pay=S.page==='pay', gd=S.page==='guide', sd=SIDE[gd?'stats':S.page];
+  document.getElementById('side').innerHTML='<div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">'+sd[0]+'</div>'+
+    sd[1].map((x,i)=>'<div class="side-item'+(i===(sd[2]||0)?' on':'')+'">'+x+'</div>').join('');
+  document.querySelector('.demo').style.display=pay||gd?'none':'';
+  document.getElementById('crumb').innerHTML=pay?'약국관리 &gt; <b>약국 결제 관리</b><a class="back" id="back">‹ 서비스 청구 통계</a>'
+    : gd?'통계 &gt; 서비스 청구 통계 &gt; <b>케이스별 표기 안내</b><a class="back" id="back">‹ 서비스 청구 통계</a>':'통계 &gt; <b>서비스 청구 통계</b>';
+  if(pay||gd){ (pay?renderPay:renderGuide)(); document.getElementById('back').onclick=()=>history.back(); } else renderMain();
+}
+render();
+</script>
+</body>
+</html>
