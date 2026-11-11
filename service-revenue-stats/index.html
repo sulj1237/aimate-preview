@@ -34,7 +34,8 @@
   .crumb b{color:var(--ink)}
   .crumb a{color:var(--muted);cursor:pointer;text-decoration:none}
   .crumb a:hover{color:var(--teal-d)}
-  .demo{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
+  .tbr{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .demo{display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
   .demo button{height:24px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:11.5px;padding:0 8px;cursor:pointer;color:#4b5158}
   .demo button.on{background:#4b5158;border-color:#4b5158;color:#fff}
   .content{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:1240px}
@@ -217,6 +218,43 @@
   .gd .tbl{table-layout:fixed}.gd .tbl td.k{width:150px;white-space:normal}.gd .tbl td.ex,.gd .tbl th:last-child{width:290px}.gd .tbl .num{width:70px}.gd .ex br+*{}
   .gd .tbl thead th:first-child{width:150px}.gd .ex .dc,.gd .ex{white-space:normal;word-break:keep-all}.gd .ex .dc{text-align:left;margin:2px 0 0;white-space:normal}
   .demo button.gdb{margin-left:8px;border-color:var(--teal);color:var(--teal-d);font-weight:700}
+
+  /* 설명 · 확인 사항 패널 (프로토타입 옆) — 답변은 구글 시트에 저장 */
+  .rvBtn{height:30px;border:1px solid var(--teal);background:var(--teal);color:#fff;border-radius:6px;font-size:12px;font-weight:700;padding:0 12px;cursor:pointer}
+  @media (min-width:1500px){ body.rv-open .wrap{margin-right:440px} }
+  .topbar .crumb,.topbar button,.demo{white-space:nowrap}
+  .rv{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);box-shadow:-6px 0 18px rgba(0,0,0,.08);background:#fbfbfc;border-left:1px solid var(--line);overflow:auto;z-index:50;display:none;font-size:12.5px;color:var(--ink)}
+  body.rv-open .rv{display:block}
+  .rv .rvh{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:8px;z-index:2}
+  .rv .rvh h2{margin:0;font-size:14px;flex:1}
+  .rv .rvh button{border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
+  .rv .sec{padding:14px 16px;border-bottom:1px solid #eceef0}
+  .rv .sec h3{margin:0 0 8px;font-size:13px}
+  .rv p{margin:0 0 6px;line-height:1.55}
+  .rv ul,.rv ol{margin:0 0 6px;padding-left:18px;line-height:1.6}
+  .rv .mut{color:var(--muted);font-size:11.5px}
+  .rv table{width:100%;border-collapse:collapse;font-size:11.5px;margin:4px 0}
+  .rv th,.rv td{border-bottom:1px solid #eceef0;padding:5px 6px;text-align:left;vertical-align:top}
+  .rv th{background:#f3f4f6;font-weight:700}
+  .rv td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .rv .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+  .rv .card.done{border-color:#9fd9cd}
+  .rv .ch{display:flex;gap:6px;align-items:baseline;margin-bottom:4px}
+  .rv .no{font-weight:800;color:var(--teal-d)}
+  .rv .own{margin-left:auto;font-size:11px;color:#6b7178;background:#eef0f3;border-radius:3px;padding:0 5px;white-space:nowrap}
+  .rv .q{font-weight:700;line-height:1.5}
+  .rv .bg{color:#4b5158;margin:4px 0 6px;line-height:1.5}
+  .rv .cur{background:#f2faf8;border-radius:5px;padding:6px 8px;margin:6px 0;font-size:11.5px;line-height:1.5}
+  .rv .cur b{color:var(--teal-d)}
+  .rv .frm{display:grid;grid-template-columns:110px 1fr;gap:6px;margin-top:6px}
+  .rv .frm textarea{grid-column:1/3;min-height:52px;resize:vertical;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:6px}
+  .rv .frm select,.rv .frm input{height:28px;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:0 6px}
+  .rv .frm button{grid-column:1/3;height:30px;border:0;border-radius:5px;background:var(--teal);color:#fff;font-weight:700;cursor:pointer}
+  .rv .frm button:disabled{background:#c5cacf;cursor:default}
+  .rv details{margin-top:6px}.rv summary{cursor:pointer;color:var(--teal-d);font-weight:700;font-size:11.5px}
+  .rv pre{background:#f3f4f6;border-radius:5px;padding:8px;font-size:10.5px;line-height:1.45;overflow:auto;margin:6px 0}
+  .rv .warn{background:#fff6dd;border:1px solid #f0dc9c;border-radius:6px;padding:8px 10px;font-size:11.5px;margin:10px 16px 0}
+  .rv .lnk{color:var(--teal-d);font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:0;padding:0;font:inherit}
 </style>
 </head>
 <body>
@@ -225,15 +263,16 @@
   <div class="main">
     <div class="topbar">
       <div class="crumb" id="crumb"></div>
-      <div class="demo">데모 시나리오
+      <div class="tbr"><div class="demo">데모 시나리오
         <button data-sc="cmp" class="on">전월 비교</button>
         <button data-sc="first">첫 달 (전월 없음)</button>
         <button class="gdb" id="gdBtn">케이스별 표기 안내</button>
-      </div>
+      </div><button class="rvBtn" id="rvBtn">설명 · 확인 사항</button></div>
     </div>
     <div class="content" id="content"></div>
   </div>
 </div>
+<aside class="rv" id="rv" aria-label="설명 · 확인 사항"></aside>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -945,6 +984,116 @@ function renderGuide(){
 }
 function goGuide(){ if(S.page==='guide') return; S.backY=window.scrollY; S.page='guide'; history.pushState({page:'guide'},'','#guide'); render(); window.scrollTo(0,0); }
 document.getElementById('gdBtn').onclick=goGuide;
+
+
+/* ───────── 설명 · 확인 사항 패널 ─────────
+   영업팀 · 재경팀 확인용. 답변은 구글 시트 '확인 요청 · 답변' 탭에 저장(Apps Script 웹 앱 RV_API).
+   공개 페이지라 실제 약국명은 넣지 않고 원인 분류 시트로 연결 */
+const RV_API = '';
+const RV_SHEET = 'https://docs.google.com/spreadsheets/d/10HAOHUz9KitW_oMLdEpeTrCVD4p6-DeIhdKhz7keOkU/edit#gid=900300';
+const RV_CAT = 'https://docs.google.com/spreadsheets/d/10HAOHUz9KitW_oMLdEpeTrCVD4p6-DeIhdKhz7keOkU/edit#gid=900100';
+const RV_ITEMS = [
+  {id:'C1', own:'재경팀', q:'월 실적 기준', bg:'청구월 기준. 늦게 결제해도 청구한 달 실적'},
+  {id:'C2', own:'재경팀', q:'총 청구 정의', bg:'총 청구 = 결제 완료 + 미결제, VAT 포함 금액'},
+  {id:'C3', own:'영업팀 · 재경팀', q:'원인 분류 체계', bg:'대분류 5개 · 소분류 11개 (아래 실데이터 점검 결과 표)'},
+  {id:'C4', own:'영업팀 · 재경팀', q:'원인 분류 변경 적용 시점', bg:'바꾼 달부터 적용, 다시 바꾸기 전까지 유지. 이전 달은 기존 분류'},
+  {id:'C5', own:'영업팀 · 재경팀', q:'통계 화면의 수정 범위', bg:'원인 분류 · 메모만 기록. 서비스 · 결제는 약국 상세 · 약국 결제 관리에서 수정'},
+  {id:'C6', own:'영업팀', q:'용어', bg:'\'계약\'은 계약서에만, 약국에 등록된 내용은 \'서비스\''},
+  {id:'Q1', own:'영업팀', q:'서비스 누락 약국 19곳(EDB 연동비 13곳 등)의 서비스 등록을 언제까지 보완할 수 있나요?', bg:'영업팀이 맡고 있는 등록 작업 중 아직 처리되지 않은 건. 결제는 되는데 등록에 없어 서비스별 통계에서 빠짐. 약국 목록: 원인 분류 시트 분류 코드 1-1 ~ 1-4'},
+  {id:'Q2', own:'영업팀 · 재경팀', q:'할인 오입력 10곳(월 +492,250원)은 등록 금액을 정가로 고치는 것이 맞나요? 계약서에 할인을 약속한 약국이 있는지도 확인해 주세요', bg:'10곳 모두 굿팜 플러스 때부터 정가로 결제해 왔고, 굿팜 솔루션(NEW)으로 옮기면서 할인 −45,000이 등록됨(정기 결제는 기존 금액 그대로). 솔루션 계약서: 없음 6곳 · 기한 만료 1곳 · 서명 완료 3곳 — 서명 완료 3곳은 계약서 할인 여부 확인. 약국 목록: 원인 분류 시트 분류 코드 2'},
+  {id:'Q3', own:'재경팀', q:'과다 청구 의심 1곳(월 +27,500원)은 환불 · 청구 중지 대상인가요?', bg:'비고에 키오스크 무료 · 회수인데 매월 71,500원 결제(등록 44,000). 약국: 원인 분류 시트 분류 코드 6'},
+  {id:'Q4', own:'영업팀', q:'이용 서비스 정보 없이 결제되는 약국 4곳(각 49,500원)은 어떤 서비스인가요?', bg:'통계에서는 \'서비스로 나누지 않은 금액\'으로 따로 표시. 약국 목록: 원인 분류 시트 분류 코드 1-2'},
+  {id:'Q5', own:'영업팀', q:'기타 할인을 입력할 때 사유(원인 분류)를 필수로 고르게 할까요?', bg:'사유 없는 기타 할인 2곳(10,000 · 15,000). 약국 목록: 원인 분류 시트 분류 코드 5'},
+  {id:'Q6', own:'영업팀 · 재경팀', q:'약국 52곳의 원인 분류가 맞나요?', bg:'비고 · 메모 · 결제 이유를 보고 분류한 결과. 틀린 곳은 원인 분류 시트 \'운영 확인 결과\' 열에 적어 주세요. 분류가 확정되면 화면에서 원인 분류를 고르는 기능을 정함'},
+  {id:'Q7', own:'재경팀', q:'서비스별 금액을 등록 금액 비율로 나눈 값으로 보여 줘도 되나요?', bg:'결제 1건은 약국 × 청구월 합계라 서비스별 실제 금액이 없음'},
+  {id:'Q8', own:'재경팀', q:'월 마감일을 언제로 하나요?', bg:'마감 전에는 재시도 · 늦은 결제로 금액이 바뀜'},
+  {id:'Q9', own:'재경팀', q:'수기 결제 때 몇 월분인지(청구월)를 고르게 할까요?', bg:'지금은 결제 사유를 자유 입력(10월 굿팜결제)해서 어느 달분인지 분리가 어려움. 약국 상세 > 정기 결제 > 수기 결제 창(지금: 결제 사유 · 금액)에 결제 구분과 청구월을 추가하는 안', more:'manual'},
+  {id:'Q10', own:'재경팀', q:'약국별 청구 목록을 엑셀로 내려받을 수 있어야 하나요?', bg:'지금 화면은 조회만 가능. 내려받게 한다면 아래 열 구성안 참고', more:'excel'} ];
+const RV_REPLY = {C:['확정','수정 필요','논의 필요'], Q:['답변 완료','확인 중','논의 필요']};
+const RV = {open:false, data:null, err:'', who:''};
+try { RV.who = localStorage.getItem('rvWho')||''; } catch(e){}
+const esc = t => String(t==null?'':t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RV_MORE = {
+  manual:`<details><summary>수기 결제 청구월 선택 안 보기</summary>
+<p class="mut">청구월은 1월~12월 목록이 아니라 같은 화면 정기 결제 내역에서 실패 후 성공이 없는 달만 보여 줍니다. 월만 고르면 연도가 구분되지 않고, 이미 결제한 달을 다시 고를 수 있기 때문입니다.</p>
+<pre>수기 결제                                   ✕
+결제 구분*  (●) 서비스 이용료  ( ) 그 외(장비 · A/S)
+청구월*     [✓] 2026-10 · 49,500원 · 10-05 결제 실패
+            [✓] 2026-11 · 49,500원 · 11-05 결제 실패
+결제 사유*  [ 10월분 · 11월분 굿팜결제        ]
+금액*       [                         99,000 ]
+                 [ 취소 ]  [ 결제 ]</pre>
+<table><tr><th>항목</th><th>입력 방식 · 규칙</th></tr>
+<tr><td>결제 구분 (추가)</td><td>서비스 이용료 · 그 외. 미결제 청구월이 있으면 서비스 이용료가 기본</td></tr>
+<tr><td>청구월 (추가)</td><td>체크박스 여러 개. 연월 · 정기 결제 금액 · 실패일, 오래된 달부터, 처음엔 모두 체크</td></tr>
+<tr><td>결제 사유</td><td>고른 달로 자동 입력 + 수정 가능</td></tr>
+<tr><td>금액</td><td>고른 달 금액 합 자동 계산 + 수정 가능. 다르면 차액 표시</td></tr></table>
+<p class="mut">여러 달을 고르면 통계 비고에 '밀린 대금 함께 결제'로 표시됩니다. 다음 달 선결제를 넣을지는 함께 확인이 필요합니다.</p></details>`,
+  excel:`<details><summary>엑셀 열 구성안 보기</summary>
+<p class="mut">약국 × 청구월 1행(결제 1건과 같은 단위). 서비스별 금액은 같은 행에 열로 붙임.</p>
+<table><tr><th>열</th><th>포함</th><th>이유</th></tr>
+<tr><td>약국명</td><td>포함</td><td>기본 식별</td></tr>
+<tr><td>사업자 번호</td><td>포함</td><td>세금계산서 · 회계 자료와 맞추는 키</td></tr>
+<tr><td>결제요청금액</td><td>포함</td><td>그 청구월 청구 금액</td></tr>
+<tr><td>결제 성공 여부</td><td>포함</td><td>결제 완료 / 미결제</td></tr>
+<tr><td>결제 일자</td><td>포함</td><td>늦은 결제 · 재시도 확인</td></tr>
+<tr><td>결제 실패 사유</td><td>포함</td><td>미결제 건만</td></tr>
+<tr><td>결제 이유</td><td>포함</td><td>몇 월분인지 확인하는 단서</td></tr>
+<tr><td>대표자명</td><td>제외</td><td>개인정보</td></tr>
+<tr><td>수동 승인 여부</td><td>제외</td><td>운영 표시</td></tr>
+<tr><td>청구월 · store_id · 서비스 구성 · 서비스별 금액(배분) · 원인 분류 · 메모</td><td>추가</td><td>통계 기준 확인</td></tr></table>
+<p class="mut">사업자 번호가 들어가므로 내려받은 사람 · 일시를 기록합니다.</p></details>` };
+const RV_STAT = [['서비스 누락','EDB 연동비',13,'+286,000',''],['서비스 누락','이용 서비스',4,'+198,000',''],['서비스 누락','해지 후 결제',1,'0',''],['서비스 누락','솔루션 외 서비스',1,'+16,500',''],
+  ['할인 오입력','할인 0원 · 정가 결제',10,'+492,250',''],['서비스 미갱신','서비스 · 금액 변경',6,'−46,750',''],['기타 할인','POS 무상',3,'','50,000'],['기타 할인','중복 가입 · 제휴처',6,'','150,000'],
+  ['기타 할인','오류 보상 · 테스트',2,'','22,500'],['기타 할인','사유 없음',2,'','25,000'],['과다 청구 의심','회수 · 무료 서비스 청구',1,'+27,500',''],['차이 없음','등록 서비스 그대로 결제',3,'0','']];
+function rvCard(it){
+  const cur=RV.data&&RV.data.items[it.id]||{}, kind=it.id[0], has=cur.reply||cur.answer;
+  return `<div class="card ${cur.reply==='확정'||cur.reply==='답변 완료'?'done':''}" id="rv-${it.id}">
+    <div class="ch"><span class="no">${kind==='C'?'확정 '+it.id.slice(1):'질문 '+it.id.slice(1)}</span><span class="own">${it.own}</span></div>
+    <div class="q">${esc(it.q)}</div><div class="bg">${esc(it.bg)}</div>${it.more?RV_MORE[it.more]:''}
+    ${has?`<div class="cur"><b>${esc(cur.reply||'의견')}</b>${cur.answer?' · '+esc(cur.answer).replace(/\n/g,'<br>'):''}<br><span class="mut">${esc(cur.who)}</span></div>`:''}
+    <div class="frm" data-id="${it.id}">
+      <select><option value="">회신 선택</option>${RV_REPLY[kind].map(o=>`<option ${cur.reply===o?'selected':''}>${o}</option>`).join('')}</select>
+      <input placeholder="답변자 (이름 · 팀)" value="${esc(RV.who)}">
+      <textarea placeholder="답변 · 의견">${esc(cur.answer||'')}</textarea>
+      <button ${RV_API?'':'disabled'}>저장</button></div></div>`; }
+function renderRv(){
+  const el=document.getElementById('rv'); if(!el) return;
+  const log=(RV.data&&RV.data.log||[]).slice(-10).reverse();
+  el.innerHTML=`<div class="rvh"><h2>설명 · 확인 사항</h2><button id="rvX" aria-label="닫기">✕</button></div>
+  ${RV_API?'':'<div class="warn">답변 저장 주소를 연결하기 전입니다. 지금은 읽기만 할 수 있습니다.</div>'}${RV.err?'<div class="warn">'+esc(RV.err)+'</div>':''}
+  <div class="sec"><h3>무엇이 바뀌었나</h3>
+    <ol><li><b>약국별 청구를 총 청구 / 결제 완료 / 미결제로 나눠 봅니다.</b> 총 청구 = 결제 완료 + 미결제(청구월 기준). 결제 완료 목록은 전월 대비(신규 · 중단 · 금액 변동)로, 미결제 목록은 약국 결제 관리로 바로 이동합니다.</li>
+    <li><b>기타 할인 · 금액이 다른 약국을 원인별로 분류합니다.</b> 비고에 [대분류] 소분류 배지와 원인 분류 필터. 원인 분류 · 메모는 화면에서 고쳐 바꾼 달부터 적용하는 안입니다.</li></ol>
+    <p class="mut">그 밖에: 요약 대시보드 삭제 · 서비스별 청구 현황 열 정리 · 화면 용어 '계약' → '서비스'</p></div>
+  <div class="sec"><h3>확인 방법</h3>
+    <ol><li>왼쪽 약국별 청구에서 결제 완료 · 미결제 목록과 <b>원인 분류</b> 필터를 눌러 봅니다. 30건씩 보기 첫 페이지에 케이스마다 대표 약국이 모두 나옵니다.</li>
+    <li>상단 <button class="lnk" id="rvGuide">케이스별 표기 안내</button>에서 상태별로 화면에 어떻게 보이는지 확인합니다.</li>
+    <li>실제 약국별 분류는 <a class="lnk" href="${RV_CAT}" target="_blank" rel="noopener">원인 분류 시트</a>에서 확인합니다. 화면의 약국명은 예시입니다.</li></ol></div>
+  <div class="sec"><h3>실데이터 점검 결과 (2026-10-16 청구 설정)</h3>
+    <p>결제 금액이 등록 서비스와 다르거나 기타 할인이 있는 약국 <b>52곳</b> · 등록보다 매월 <b>973,500원</b> 더 결제 · 기타 할인 매월 247,500원</p>
+    <table><tr><th>대분류</th><th>소분류</th><th>곳</th><th>차이(월)</th><th>기타 할인</th></tr>
+    ${RV_STAT.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td><td class="n">${r[4]}</td></tr>`).join('')}</table></div>
+  <div class="sec"><h3>확정 요청</h3><p class="mut">프로토타입에 반영한 안입니다. 회신을 고르고 저장해 주세요.</p>${RV_ITEMS.filter(i=>i.id[0]==='C').map(rvCard).join('')}</div>
+  <div class="sec"><h3>질문</h3>${RV_ITEMS.filter(i=>i.id[0]==='Q').map(rvCard).join('')}</div>
+  <div class="sec"><h3>최근 답변</h3>${log.length?'<ul>'+log.map(l=>`<li>${esc(l.at)} · ${esc(l.id)} · ${esc(l.who)} · ${esc(l.reply)} ${esc(l.answer).slice(0,60)}</li>`).join('')+'</ul>':'<p class="mut">아직 저장된 답변이 없습니다.</p>'}
+    <p class="mut">모든 답변은 <a class="lnk" href="${RV_SHEET}" target="_blank" rel="noopener">구글 시트</a>에도 쌓입니다.</p></div>`;
+  el.querySelector('#rvX').onclick=()=>toggleRv(false);
+  el.querySelector('#rvGuide').onclick=()=>goGuide();
+  el.querySelectorAll('.frm').forEach(f=>{ const [sel,inp,ta,btn]=[f.querySelector('select'),f.querySelector('input'),f.querySelector('textarea'),f.querySelector('button')];
+    inp.oninput=()=>{ RV.who=inp.value; try{localStorage.setItem('rvWho',RV.who);}catch(e){} };
+    btn.onclick=async()=>{ const who=inp.value.trim(); if(!who){ toast('답변자 이름을 적어 주세요'); inp.focus(); return; }
+      if(!sel.value && !ta.value.trim()){ toast('회신이나 답변을 적어 주세요'); return; }
+      btn.disabled=true; btn.textContent='저장 중…';
+      try{ const r=await fetch(RV_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({id:f.dataset.id,reply:sel.value,answer:ta.value.trim(),who})});
+        const j=await r.json(); if(!j.ok) throw new Error(j.error||'저장 실패'); RV.data=j; RV.err=''; renderRv(); toast('저장했습니다'); }
+      catch(e){ btn.disabled=false; btn.textContent='저장'; toast('저장하지 못했습니다 — '+e.message); } }; }); }
+async function loadRv(){ if(!RV_API) return renderRv();
+  try{ const j=await (await fetch(RV_API)).json(); if(j.ok){ RV.data=j; RV.err=''; } }catch(e){ RV.err='답변을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.'; }
+  renderRv(); }
+function toggleRv(on){ RV.open=on==null?!RV.open:on; document.body.classList.toggle('rv-open',RV.open); if(RV.open) loadRv(); }
+document.getElementById('rvBtn').onclick=()=>toggleRv();
+if(/[?&]review=1/.test(location.search)) toggleRv(true);
 
 /* ───────── 공통 ───────── */
 function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>el.classList.remove('show'),1800); }
