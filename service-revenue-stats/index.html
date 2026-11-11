@@ -225,35 +225,47 @@
   .topbar .crumb,.topbar button,.demo{white-space:nowrap}
   .rv{position:fixed;top:0;right:0;bottom:0;width:min(540px,100vw);box-shadow:-6px 0 18px rgba(0,0,0,.08);background:#fbfbfc;border-left:1px solid var(--line);overflow:auto;z-index:50;display:none;font-size:12.5px;color:var(--ink)}
   body.rv-open .rv{display:block}
-  .rv .rvh{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:8px;z-index:2}
-  .rv .rvh h2{margin:0;font-size:14px;flex:1}
-  .rv .rvh button{border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
-  .rv .sec{padding:14px 16px;border-bottom:1px solid #eceef0}
-  .rv .sec h3{margin:0 0 8px;font-size:13px}
-  .rv p{margin:0 0 6px;line-height:1.55}
-  .rv ul,.rv ol{margin:0 0 6px;padding-left:18px;line-height:1.6}
-  .rv .mut{color:var(--muted);font-size:11.5px}
-  .rv table{width:100%;border-collapse:collapse;font-size:11.5px;margin:4px 0}
-  .rv th,.rv td{border-bottom:1px solid #eceef0;padding:5px 6px;text-align:left;vertical-align:top}
-  .rv th{background:#f3f4f6;font-weight:700}
+  .rv{font-size:13px;line-height:1.65}
+  .rv .rvh{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 20px 0;z-index:2}
+  .rv .rvt{display:flex;align-items:center;gap:8px}
+  .rv .rvh h2{margin:0;font-size:15px;flex:1}
+  .rv .rvh .prog{font-size:12px;color:var(--teal-d);font-weight:700}
+  .rv .rvh button.x{border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
+  .rv .nav{display:flex;gap:4px;margin:10px -4px 0;overflow-x:auto}
+  .rv .nav a{flex:none;font-size:12px;color:#4b5158;text-decoration:none;padding:6px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+  .rv .nav a:hover{color:var(--teal-d);border-color:var(--teal)}
+  .rv .sec{padding:20px;border-bottom:8px solid #f1f2f4;background:#fff;scroll-margin-top:96px}
+  .rv .sec h3{margin:0 0 12px;font-size:14.5px;display:flex;align-items:baseline;gap:8px}
+  .rv .sec h3 small{font-size:12px;color:var(--muted);font-weight:500}
+  .rv p{margin:0 0 8px}
+  .rv ul,.rv ol{margin:0 0 8px;padding-left:20px}
+  .rv li{margin-bottom:6px}
+  .rv .mut{color:var(--muted);font-size:12px}
+  .rv table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .rv th,.rv td{border-bottom:1px solid #eceef0;padding:7px 8px;text-align:left;vertical-align:top}
+  .rv th{background:#f5f6f7;font-weight:700;color:#4b5158}
   .rv td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .rv .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px}
-  .rv .card.done{border-color:#9fd9cd}
-  .rv .ch{display:flex;gap:6px;align-items:baseline;margin-bottom:4px}
-  .rv .no{font-weight:800;color:var(--teal-d)}
-  .rv .own{margin-left:auto;font-size:11px;color:#6b7178;background:#eef0f3;border-radius:3px;padding:0 5px;white-space:nowrap}
-  .rv .q{font-weight:700;line-height:1.5}
-  .rv .bg{color:#4b5158;margin:4px 0 6px;line-height:1.5}
-  .rv .cur{background:#f2faf8;border-radius:5px;padding:6px 8px;margin:6px 0;font-size:11.5px;line-height:1.5}
+  .rv .key{background:#f2faf8;border-radius:8px;padding:12px 14px;margin-bottom:10px}
+  .rv .key b{display:block;font-size:13.5px;margin-bottom:2px}
+  .rv .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+  .rv .card.done{border-color:#9fd9cd;background:#fbfefd}
+  .rv .ch{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .rv .no{font-weight:800;color:var(--teal-d);font-size:12px;background:#e6f6f3;border-radius:4px;padding:1px 7px}
+  .rv .st{font-size:11.5px;font-weight:700;border-radius:4px;padding:1px 7px;background:#fff1d6;color:#a86f00}
+  .rv .st.ok{background:#e6f6f3;color:#0f8a74}
+  .rv .own{margin-left:auto;font-size:12px;color:#4b5158;font-weight:700;white-space:nowrap}
+  .rv .q{font-weight:700;font-size:13.5px;line-height:1.55}
+  .rv .bg{color:#5b6168;margin:6px 0 4px;font-size:12.5px;background:#f7f8f9;border-radius:6px;padding:8px 10px}
+  .rv .cur{background:#f2faf8;border-left:3px solid var(--teal);border-radius:4px;padding:8px 10px;margin:10px 0 0;font-size:12.5px}
   .rv .cur b{color:var(--teal-d)}
-  .rv .frm{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
-  .rv .frm textarea{min-height:52px;resize:vertical;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:6px}
-  .rv .frm select,.rv .frm input{height:28px;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:0 6px}
-  .rv .frm button{height:30px;border:0;border-radius:5px;background:var(--teal);color:#fff;font-weight:700;cursor:pointer}
+  .rv .frm{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+  .rv .frm textarea{min-height:64px;resize:vertical;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:8px}
+  .rv .frm select{height:32px;font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:0 8px;width:180px}
+  .rv .frm button{height:34px;border:0;border-radius:6px;background:var(--teal);color:#fff;font-weight:700;cursor:pointer;font-size:13px}
   .rv .frm button:disabled{background:#c5cacf;cursor:default}
-  .rv details{margin-top:6px}.rv summary{cursor:pointer;color:var(--teal-d);font-weight:700;font-size:11.5px}
-  .rv pre{background:#f3f4f6;border-radius:5px;padding:8px;font-size:10.5px;line-height:1.45;overflow:auto;margin:6px 0}
-  .rv .warn{background:#fff6dd;border:1px solid #f0dc9c;border-radius:6px;padding:8px 10px;font-size:11.5px;margin:10px 16px 0}
+  .rv details{margin-top:8px}.rv summary{cursor:pointer;color:var(--teal-d);font-weight:700;font-size:12.5px}
+  .rv pre{background:#f3f4f6;border-radius:6px;padding:10px;font-size:11.5px;line-height:1.5;overflow:auto;margin:8px 0}
+  .rv .warn{background:#fff6dd;border:1px solid #f0dc9c;border-radius:6px;padding:10px 12px;font-size:12.5px;margin:12px 20px}
   .rv .lnk{color:var(--teal-d);font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:0;padding:0;font:inherit}
 </style>
 </head>
@@ -1048,7 +1060,7 @@ const RV_STAT = [['서비스 누락','EDB 연동비',13,'+286,000',''],['서비�
 function rvCard(it){
   const cur=RV.data&&RV.data.items[it.id]||{}, kind=it.id[0], has=cur.reply||cur.answer;
   return `<div class="card ${cur.reply==='확정'||cur.reply==='답변 완료'?'done':''}" id="rv-${it.id}">
-    <div class="ch"><span class="no">${kind==='C'?'확정 '+it.id.slice(1):'질문 '+it.id.slice(1)}</span><span class="own">${it.own}</span></div>
+    <div class="ch"><span class="no">${kind==='C'?'확정 '+it.id.slice(1):'질문 '+it.id.slice(1)}</span><span class="st ${has?'ok':''}">${has?esc(cur.reply||'의견 있음'):'답변 전'}</span><span class="own">담당 · ${it.own}</span></div>
     <div class="q">${esc(it.q)}</div><div class="bg">${esc(it.bg)}</div>${it.more?RV_MORE[it.more]:''}
     ${has?`<div class="cur"><b>${esc(cur.reply||'의견')}</b>${cur.answer?' · '+esc(cur.answer).replace(/\n/g,'<br>'):''}${cur.at?'<br><span class="mut">'+esc(cur.at)+' 저장</span>':''}</div>`:''}
     <div class="frm" data-id="${it.id}">
@@ -1058,25 +1070,28 @@ function rvCard(it){
 function renderRv(){
   const el=document.getElementById('rv'); if(!el) return;
   const log=(RV.data&&RV.data.log||[]).slice(-10).reverse();
-  el.innerHTML=`<div class="rvh"><h2>설명 · 확인 사항</h2><button id="rvX" aria-label="닫기">✕</button></div>
+  const done=RV_ITEMS.filter(i=>{ const c=RV.data&&RV.data.items[i.id]; return c&&(c.reply||c.answer); }).length;
+  el.innerHTML=`<div class="rvh"><div class="rvt"><h2>설명 · 확인 사항</h2><span class="prog">답변 ${done} / ${RV_ITEMS.length}</span><button class="x" id="rvX" aria-label="닫기">✕</button></div>
+    <div class="nav">${[['rvs1','바뀐 내용'],['rvs2','확인 방법'],['rvs3','실데이터'],['rvs4','확정 요청 6'],['rvs5','질문 10']].map(([k,t])=>`<a data-go="${k}">${t}</a>`).join('')}</div></div>
   ${RV_API?'':'<div class="warn">답변 저장 주소를 연결하기 전입니다. 지금은 읽기만 할 수 있습니다.</div>'}${RV.err?'<div class="warn">'+esc(RV.err)+'</div>':''}
-  <div class="sec"><h3>무엇이 바뀌었나</h3>
-    <ol><li><b>약국별 청구를 총 청구 / 결제 완료 / 미결제로 나눠 봅니다.</b> 총 청구 = 결제 완료 + 미결제(청구월 기준). 결제 완료 목록은 전월 대비(신규 · 중단 · 금액 변동)로, 미결제 목록은 약국 결제 관리로 바로 이동합니다.</li>
-    <li><b>기타 할인 · 금액이 다른 약국을 원인별로 분류합니다.</b> 비고에 [대분류] 소분류 배지와 원인 분류 필터. 원인 분류 · 메모는 화면에서 고쳐 바꾼 달부터 적용하는 안입니다.</li></ol>
+  <div class="sec" id="rvs1"><h3>바뀐 내용</h3>
+    <div class="key"><b>① 약국별 청구를 총 청구 / 결제 완료 / 미결제로 나눠 봅니다</b>총 청구 = 결제 완료 + 미결제(청구월 기준). 결제 완료 목록은 전월 대비(신규 · 중단 · 금액 변동)로 걸러 보고, 미결제 목록에서는 약국 결제 관리로 바로 이동합니다.</div>
+    <div class="key"><b>② 기타 할인 · 금액이 다른 약국을 원인별로 분류합니다</b>비고에 [대분류] 소분류 배지와 원인 분류 필터를 붙였습니다. 원인 분류 · 메모는 화면에서 고칠 수 있고, 바꾼 달부터 적용하는 안입니다.</div>
     <p class="mut">그 밖에: 요약 대시보드 삭제 · 서비스별 청구 현황 열 정리 · 화면 용어 '계약' → '서비스'</p></div>
-  <div class="sec"><h3>확인 방법</h3>
+  <div class="sec" id="rvs2"><h3>확인 방법</h3>
     <ol><li>왼쪽 약국별 청구에서 결제 완료 · 미결제 목록과 <b>원인 분류</b> 필터를 눌러 봅니다. 30건씩 보기 첫 페이지에 케이스마다 대표 약국이 모두 나옵니다.</li>
     <li>상단 <button class="lnk" id="rvGuide">케이스별 표기 안내</button>에서 상태별로 화면에 어떻게 보이는지 확인합니다.</li>
     <li>실제 약국별 분류는 <a class="lnk" href="${RV_CAT}" target="_blank" rel="noopener">원인 분류 시트</a>에서 확인합니다. 화면의 약국명은 예시입니다.</li></ol></div>
-  <div class="sec"><h3>실데이터 점검 결과 (2026-10-16 청구 설정)</h3>
+  <div class="sec" id="rvs3"><h3>실데이터 점검 결과 <small>2026-10-16 청구 설정</small></h3>
     <p>결제 금액이 등록 서비스와 다르거나 기타 할인이 있는 약국 <b>52곳</b> · 등록보다 매월 <b>973,500원</b> 더 결제 · 기타 할인 매월 247,500원</p>
     <table><tr><th>대분류</th><th>소분류</th><th>곳</th><th>차이(월)</th><th>기타 할인</th></tr>
     ${RV_STAT.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td><td class="n">${r[4]}</td></tr>`).join('')}</table></div>
-  <div class="sec"><h3>확정 요청</h3><p class="mut">프로토타입에 반영한 안입니다. 회신을 고르고 저장해 주세요.</p>${RV_ITEMS.filter(i=>i.id[0]==='C').map(rvCard).join('')}</div>
-  <div class="sec"><h3>질문</h3>${RV_ITEMS.filter(i=>i.id[0]==='Q').map(rvCard).join('')}</div>
+  <div class="sec" id="rvs4"><h3>확정 요청 <small>프로토타입에 반영한 안 · 회신을 고르고 저장</small></h3>${RV_ITEMS.filter(i=>i.id[0]==='C').map(rvCard).join('')}</div>
+  <div class="sec" id="rvs5"><h3>질문 <small>답변을 적고 저장</small></h3>${RV_ITEMS.filter(i=>i.id[0]==='Q').map(rvCard).join('')}</div>
   <div class="sec"><h3>최근 답변</h3>${log.length?'<ul>'+log.map(l=>`<li>${esc(l.at)} · ${esc(l.id)} · ${esc(l.reply)} ${esc(l.answer).slice(0,60)}</li>`).join('')+'</ul>':'<p class="mut">아직 저장된 답변이 없습니다.</p>'}
     <p class="mut">모든 답변은 <a class="lnk" href="${RV_SHEET}" target="_blank" rel="noopener">구글 시트</a>에도 쌓입니다.</p></div>`;
   el.querySelector('#rvX').onclick=()=>toggleRv(false);
+  el.querySelectorAll('[data-go]').forEach(a=>a.onclick=()=>el.querySelector('#'+a.dataset.go).scrollIntoView({behavior:'smooth'}));
   el.querySelector('#rvGuide').onclick=()=>goGuide();
   el.querySelectorAll('.frm').forEach(f=>{ const [sel,ta,btn]=[f.querySelector('select'),f.querySelector('textarea'),f.querySelector('button')];
     btn.onclick=async()=>{
