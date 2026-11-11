@@ -246,10 +246,10 @@
   .rv .bg{color:#4b5158;margin:4px 0 6px;line-height:1.5}
   .rv .cur{background:#f2faf8;border-radius:5px;padding:6px 8px;margin:6px 0;font-size:11.5px;line-height:1.5}
   .rv .cur b{color:var(--teal-d)}
-  .rv .frm{display:grid;grid-template-columns:110px 1fr;gap:6px;margin-top:6px}
-  .rv .frm textarea{grid-column:1/3;min-height:52px;resize:vertical;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:6px}
+  .rv .frm{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+  .rv .frm textarea{min-height:52px;resize:vertical;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:6px}
   .rv .frm select,.rv .frm input{height:28px;font:inherit;font-size:12px;border:1px solid var(--line);border-radius:5px;padding:0 6px}
-  .rv .frm button{grid-column:1/3;height:30px;border:0;border-radius:5px;background:var(--teal);color:#fff;font-weight:700;cursor:pointer}
+  .rv .frm button{height:30px;border:0;border-radius:5px;background:var(--teal);color:#fff;font-weight:700;cursor:pointer}
   .rv .frm button:disabled{background:#c5cacf;cursor:default}
   .rv details{margin-top:6px}.rv summary{cursor:pointer;color:var(--teal-d);font-weight:700;font-size:11.5px}
   .rv pre{background:#f3f4f6;border-radius:5px;padding:8px;font-size:10.5px;line-height:1.45;overflow:auto;margin:6px 0}
@@ -987,31 +987,30 @@ document.getElementById('gdBtn').onclick=goGuide;
 
 
 /* ───────── 설명 · 확인 사항 패널 ─────────
-   영업팀 · 재경팀 확인용. 답변은 구글 시트 '확인 요청 · 답변' 탭에 저장(Apps Script 웹 앱 RV_API).
+   영업팀 · 박단님 확인용. 답변은 구글 시트 '확인 요청 · 답변' 탭에 저장(Apps Script 웹 앱 RV_API).
    공개 페이지라 실제 약국명은 넣지 않고 원인 분류 시트로 연결 */
 const RV_API = '';
 const RV_SHEET = 'https://docs.google.com/spreadsheets/d/10HAOHUz9KitW_oMLdEpeTrCVD4p6-DeIhdKhz7keOkU/edit#gid=900300';
 const RV_CAT = 'https://docs.google.com/spreadsheets/d/10HAOHUz9KitW_oMLdEpeTrCVD4p6-DeIhdKhz7keOkU/edit#gid=900100';
 const RV_ITEMS = [
-  {id:'C1', own:'재경팀', q:'월 실적 기준', bg:'청구월 기준. 늦게 결제해도 청구한 달 실적'},
-  {id:'C2', own:'재경팀', q:'총 청구 정의', bg:'총 청구 = 결제 완료 + 미결제, VAT 포함 금액'},
-  {id:'C3', own:'영업팀 · 재경팀', q:'원인 분류 체계', bg:'대분류 5개 · 소분류 11개 (아래 실데이터 점검 결과 표)'},
-  {id:'C4', own:'영업팀 · 재경팀', q:'원인 분류 변경 적용 시점', bg:'바꾼 달부터 적용, 다시 바꾸기 전까지 유지. 이전 달은 기존 분류'},
-  {id:'C5', own:'영업팀 · 재경팀', q:'통계 화면의 수정 범위', bg:'원인 분류 · 메모만 기록. 서비스 · 결제는 약국 상세 · 약국 결제 관리에서 수정'},
+  {id:'C1', own:'박단님', q:'월 실적 기준', bg:'청구월 기준. 늦게 결제해도 청구한 달 실적'},
+  {id:'C2', own:'박단님', q:'총 청구 정의', bg:'총 청구 = 결제 완료 + 미결제, VAT 포함 금액'},
+  {id:'C3', own:'영업팀 · 박단님', q:'원인 분류 체계', bg:'대분류 5개 · 소분류 11개 (아래 실데이터 점검 결과 표)'},
+  {id:'C4', own:'영업팀 · 박단님', q:'원인 분류 변경 적용 시점', bg:'바꾼 달부터 적용, 다시 바꾸기 전까지 유지. 이전 달은 기존 분류'},
+  {id:'C5', own:'영업팀 · 박단님', q:'통계 화면의 수정 범위', bg:'원인 분류 · 메모만 기록. 서비스 · 결제는 약국 상세 · 약국 결제 관리에서 수정'},
   {id:'C6', own:'영업팀', q:'용어', bg:'\'계약\'은 계약서에만, 약국에 등록된 내용은 \'서비스\''},
   {id:'Q1', own:'영업팀', q:'서비스 누락 약국 19곳(EDB 연동비 13곳 등)의 서비스 등록을 언제까지 보완할 수 있나요?', bg:'영업팀이 맡고 있는 등록 작업 중 아직 처리되지 않은 건. 결제는 되는데 등록에 없어 서비스별 통계에서 빠짐. 약국 목록: 원인 분류 시트 분류 코드 1-1 ~ 1-4'},
-  {id:'Q2', own:'영업팀 · 재경팀', q:'할인 오입력 10곳(월 +492,250원)은 등록 금액을 정가로 고치는 것이 맞나요? 계약서에 할인을 약속한 약국이 있는지도 확인해 주세요', bg:'10곳 모두 굿팜 플러스 때부터 정가로 결제해 왔고, 굿팜 솔루션(NEW)으로 옮기면서 할인 −45,000이 등록됨(정기 결제는 기존 금액 그대로). 솔루션 계약서: 없음 6곳 · 기한 만료 1곳 · 서명 완료 3곳 — 서명 완료 3곳은 계약서 할인 여부 확인. 약국 목록: 원인 분류 시트 분류 코드 2'},
-  {id:'Q3', own:'재경팀', q:'과다 청구 의심 1곳(월 +27,500원)은 환불 · 청구 중지 대상인가요?', bg:'비고에 키오스크 무료 · 회수인데 매월 71,500원 결제(등록 44,000). 약국: 원인 분류 시트 분류 코드 6'},
+  {id:'Q2', own:'영업팀 · 박단님', q:'할인 오입력 10곳(월 +492,250원)은 등록 금액을 정가로 고치는 것이 맞나요? 계약서에 할인을 약속한 약국이 있는지도 확인해 주세요', bg:'10곳 모두 굿팜 플러스 때부터 정가로 결제해 왔고, 굿팜 솔루션(NEW)으로 옮기면서 할인 −45,000이 등록됨(정기 결제는 기존 금액 그대로). 솔루션 계약서: 없음 6곳 · 기한 만료 1곳 · 서명 완료 3곳 — 서명 완료 3곳은 계약서 할인 여부 확인. 약국 목록: 원인 분류 시트 분류 코드 2'},
+  {id:'Q3', own:'박단님', q:'과다 청구 의심 1곳(월 +27,500원)은 환불 · 청구 중지 대상인가요?', bg:'비고에 키오스크 무료 · 회수인데 매월 71,500원 결제(등록 44,000). 약국: 원인 분류 시트 분류 코드 6'},
   {id:'Q4', own:'영업팀', q:'이용 서비스 정보 없이 결제되는 약국 4곳(각 49,500원)은 어떤 서비스인가요?', bg:'통계에서는 \'서비스로 나누지 않은 금액\'으로 따로 표시. 약국 목록: 원인 분류 시트 분류 코드 1-2'},
   {id:'Q5', own:'영업팀', q:'기타 할인을 입력할 때 사유(원인 분류)를 필수로 고르게 할까요?', bg:'사유 없는 기타 할인 2곳(10,000 · 15,000). 약국 목록: 원인 분류 시트 분류 코드 5'},
-  {id:'Q6', own:'영업팀 · 재경팀', q:'약국 52곳의 원인 분류가 맞나요?', bg:'비고 · 메모 · 결제 이유를 보고 분류한 결과. 틀린 곳은 원인 분류 시트 \'운영 확인 결과\' 열에 적어 주세요. 분류가 확정되면 화면에서 원인 분류를 고르는 기능을 정함'},
-  {id:'Q7', own:'재경팀', q:'서비스별 금액을 등록 금액 비율로 나눈 값으로 보여 줘도 되나요?', bg:'결제 1건은 약국 × 청구월 합계라 서비스별 실제 금액이 없음'},
-  {id:'Q8', own:'재경팀', q:'월 마감일을 언제로 하나요?', bg:'마감 전에는 재시도 · 늦은 결제로 금액이 바뀜'},
-  {id:'Q9', own:'재경팀', q:'수기 결제 때 몇 월분인지(청구월)를 고르게 할까요?', bg:'지금은 결제 사유를 자유 입력(10월 굿팜결제)해서 어느 달분인지 분리가 어려움. 약국 상세 > 정기 결제 > 수기 결제 창(지금: 결제 사유 · 금액)에 결제 구분과 청구월을 추가하는 안', more:'manual'},
-  {id:'Q10', own:'재경팀', q:'약국별 청구 목록을 엑셀로 내려받을 수 있어야 하나요?', bg:'지금 화면은 조회만 가능. 내려받게 한다면 아래 열 구성안 참고', more:'excel'} ];
+  {id:'Q6', own:'영업팀 · 박단님', q:'약국 52곳의 원인 분류가 맞나요?', bg:'비고 · 메모 · 결제 이유를 보고 분류한 결과. 틀린 곳은 원인 분류 시트 \'운영 확인 결과\' 열에 적어 주세요. 분류가 확정되면 화면에서 원인 분류를 고르는 기능을 정함'},
+  {id:'Q7', own:'박단님', q:'서비스별 금액을 등록 금액 비율로 나눈 값으로 보여 줘도 되나요?', bg:'결제 1건은 약국 × 청구월 합계라 서비스별 실제 금액이 없음'},
+  {id:'Q8', own:'박단님', q:'월 마감일을 언제로 하나요?', bg:'마감 전에는 재시도 · 늦은 결제로 금액이 바뀜'},
+  {id:'Q9', own:'박단님', q:'수기 결제 때 몇 월분인지(청구월)를 고르게 할까요?', bg:'지금은 결제 사유를 자유 입력(10월 굿팜결제)해서 어느 달분인지 분리가 어려움. 약국 상세 > 정기 결제 > 수기 결제 창(지금: 결제 사유 · 금액)에 결제 구분과 청구월을 추가하는 안', more:'manual'},
+  {id:'Q10', own:'박단님', q:'약국별 청구 목록을 엑셀로 내려받을 수 있어야 하나요?', bg:'지금 화면은 조회만 가능. 내려받게 한다면 아래 열 구성안 참고', more:'excel'} ];
 const RV_REPLY = {C:['확정','수정 필요','논의 필요'], Q:['답변 완료','확인 중','논의 필요']};
-const RV = {open:false, data:null, err:'', who:''};
-try { RV.who = localStorage.getItem('rvWho')||''; } catch(e){}
+const RV = {open:false, data:null, err:''};
 const esc = t => String(t==null?'':t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const RV_MORE = {
   manual:`<details><summary>수기 결제 청구월 선택 안 보기</summary>
@@ -1051,10 +1050,9 @@ function rvCard(it){
   return `<div class="card ${cur.reply==='확정'||cur.reply==='답변 완료'?'done':''}" id="rv-${it.id}">
     <div class="ch"><span class="no">${kind==='C'?'확정 '+it.id.slice(1):'질문 '+it.id.slice(1)}</span><span class="own">${it.own}</span></div>
     <div class="q">${esc(it.q)}</div><div class="bg">${esc(it.bg)}</div>${it.more?RV_MORE[it.more]:''}
-    ${has?`<div class="cur"><b>${esc(cur.reply||'의견')}</b>${cur.answer?' · '+esc(cur.answer).replace(/\n/g,'<br>'):''}<br><span class="mut">${esc(cur.who)}</span></div>`:''}
+    ${has?`<div class="cur"><b>${esc(cur.reply||'의견')}</b>${cur.answer?' · '+esc(cur.answer).replace(/\n/g,'<br>'):''}${cur.at?'<br><span class="mut">'+esc(cur.at)+' 저장</span>':''}</div>`:''}
     <div class="frm" data-id="${it.id}">
       <select><option value="">회신 선택</option>${RV_REPLY[kind].map(o=>`<option ${cur.reply===o?'selected':''}>${o}</option>`).join('')}</select>
-      <input placeholder="답변자 (이름 · 팀)" value="${esc(RV.who)}">
       <textarea placeholder="답변 · 의견">${esc(cur.answer||'')}</textarea>
       <button ${RV_API?'':'disabled'}>저장</button></div></div>`; }
 function renderRv(){
@@ -1076,16 +1074,15 @@ function renderRv(){
     ${RV_STAT.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td><td class="n">${r[4]}</td></tr>`).join('')}</table></div>
   <div class="sec"><h3>확정 요청</h3><p class="mut">프로토타입에 반영한 안입니다. 회신을 고르고 저장해 주세요.</p>${RV_ITEMS.filter(i=>i.id[0]==='C').map(rvCard).join('')}</div>
   <div class="sec"><h3>질문</h3>${RV_ITEMS.filter(i=>i.id[0]==='Q').map(rvCard).join('')}</div>
-  <div class="sec"><h3>최근 답변</h3>${log.length?'<ul>'+log.map(l=>`<li>${esc(l.at)} · ${esc(l.id)} · ${esc(l.who)} · ${esc(l.reply)} ${esc(l.answer).slice(0,60)}</li>`).join('')+'</ul>':'<p class="mut">아직 저장된 답변이 없습니다.</p>'}
+  <div class="sec"><h3>최근 답변</h3>${log.length?'<ul>'+log.map(l=>`<li>${esc(l.at)} · ${esc(l.id)} · ${esc(l.reply)} ${esc(l.answer).slice(0,60)}</li>`).join('')+'</ul>':'<p class="mut">아직 저장된 답변이 없습니다.</p>'}
     <p class="mut">모든 답변은 <a class="lnk" href="${RV_SHEET}" target="_blank" rel="noopener">구글 시트</a>에도 쌓입니다.</p></div>`;
   el.querySelector('#rvX').onclick=()=>toggleRv(false);
   el.querySelector('#rvGuide').onclick=()=>goGuide();
-  el.querySelectorAll('.frm').forEach(f=>{ const [sel,inp,ta,btn]=[f.querySelector('select'),f.querySelector('input'),f.querySelector('textarea'),f.querySelector('button')];
-    inp.oninput=()=>{ RV.who=inp.value; try{localStorage.setItem('rvWho',RV.who);}catch(e){} };
-    btn.onclick=async()=>{ const who=inp.value.trim(); if(!who){ toast('답변자 이름을 적어 주세요'); inp.focus(); return; }
+  el.querySelectorAll('.frm').forEach(f=>{ const [sel,ta,btn]=[f.querySelector('select'),f.querySelector('textarea'),f.querySelector('button')];
+    btn.onclick=async()=>{
       if(!sel.value && !ta.value.trim()){ toast('회신이나 답변을 적어 주세요'); return; }
       btn.disabled=true; btn.textContent='저장 중…';
-      try{ const r=await fetch(RV_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({id:f.dataset.id,reply:sel.value,answer:ta.value.trim(),who})});
+      try{ const r=await fetch(RV_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({id:f.dataset.id,reply:sel.value,answer:ta.value.trim()})});
         const j=await r.json(); if(!j.ok) throw new Error(j.error||'저장 실패'); RV.data=j; RV.err=''; renderRv(); toast('저장했습니다'); }
       catch(e){ btn.disabled=false; btn.textContent='저장'; toast('저장하지 못했습니다 — '+e.message); } }; }); }
 async function loadRv(){ if(!RV_API) return renderRv();
