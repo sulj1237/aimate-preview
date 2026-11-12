@@ -623,8 +623,8 @@ function payNote(name, ym){
 }
 // 비고의 결제 상태 — 결제 완료 목록에서는 `미결제` 배지를 빼고 결제 내역만
 const payNoteT = (name, ym) => { const h=payNote(name,ym); return S.tab==='paid' && h.startsWith('<b class="db">미결제</b>') ? '' : h; };
-// 전월 · 당월 내용이 같으면 배지 없이 한 번만, 다를 때만 `당월` / `전월` 배지로 나눔
-const memoJoin = (cur, prev) => !cur && !prev ? '' : cur===prev ? cur
+// 비고 = 전월 · 당월 내용이 다를 때만 `당월` / `전월` 배지로 표시, 같으면 비워 둠
+const memoJoin = (cur, prev) => !cur && !prev ? '' : cur===prev ? ''
   : (cur?'<b class="pmb pmc">당월</b><br>'+cur:'')+(cur&&prev?'<br>':'')+(prev?'<b class="pmb">전월</b><br>'+prev:'');
 // 비고 칸(서비스 행) — 계약 · 청구 근거. 항목이 1개인 약국은 결제 상태도 같은 칸에
 function memoCell(r, single){ const pm=MONTHS[S.month].prev, T=S.tab, first=S.sc==='first';
@@ -959,7 +959,7 @@ function renderGuide(){
       <tr><td class="k">미결제 목록</td><td>그 청구월에 미결제 금액이 있는 약국. <b>약국 결제 관리 ›</b> 버튼으로 이동, 뒤로 가기로 보던 위치에 복귀</td></tr>
       <tr><td class="k">당월</td><td>결제 마감 전 잠정 집계. 화면 위에 안내 문구 표시</td></tr>
       <tr><td class="k">서비스 금액</td><td>약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값</td></tr>
-      <tr><td class="k">비고 · 전월/당월</td><td>전월과 당월 내용이 같으면 배지 없이 한 번만 표기, 다를 때만 <b>당월</b> / <b>전월</b>로 나눠 표기</td></tr>
+      <tr><td class="k">비고 · 전월/당월</td><td>전월과 당월 내용이 다를 때만 <b>당월</b> / <b>전월</b>로 나눠 표기. 같으면 비워 둠</td></tr>
       <tr><td class="k">증감</td><td>늘면 빨간 +, 줄면 파란 −, 같으면 0. 전월 데이터가 없는 첫 달은 −</td></tr>
       <tr><td class="k">비고 위치</td><td>결제 상태 = 약국 행 · 원인 분류 = 서비스 행. 항목이 1개인 약국은 한 칸에 함께</td></tr>
     </tbody></table></div></div>
