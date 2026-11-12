@@ -655,8 +655,10 @@ let SID_MAP=null; const storeId = n => { if(!SID_MAP) SID_MAP=Object.fromEntries
 function openCalc(name){ const c=CALC_G[name]; if(!c) return; const {g,T,first,pm}=c;
   const w=document.createElement('div'); w.className='dlgw'; w.id='calcDlg';
   w.innerHTML='<div class="dlg" role="dialog" aria-label="계산 내역 상세"><div class="dh"><div><span class="sid">(ID '+storeId(name)+')</span><h4>'+name+'</h4></div><button class="x" aria-label="닫기">×</button></div><div class="db2">'+
-    '<div class="mh">당월 · '+S.month+'</div>'+calcTable(g.rows, r=>r[T].cur, r=>r.fc)+
-    (first?'':'<div class="mh">전월 · '+pm+'</div>'+calcTable(g.rows, r=>r[T].prev, r=>r.fp))+'</div></div>';
+    (()=>{ const cur=calcTable(g.rows, r=>r[T].cur, r=>r.fc), prev=first?'':calcTable(g.rows, r=>r[T].prev, r=>r.fp);
+      // 전월 · 당월 내용이 같으면 한 번만
+      return !first && cur===prev ? '<div class="mh">전월 · 당월 동일 · '+pm+' ~ '+S.month+'</div>'+cur
+        : '<div class="mh">당월 · '+S.month+'</div>'+cur+(first?'':'<div class="mh">전월 · '+pm+'</div>'+prev); })()+'</div></div>';
   const close=()=>{ w.remove(); document.removeEventListener('keydown',esc); }, esc=e=>{ if(e.key==='Escape') close(); };
   w.onclick=e=>{ if(e.target===w||e.target.closest('.x')) close(); }; document.addEventListener('keydown',esc); document.body.appendChild(w); }
 // 비고(약국) — 그 청구월의 결제 상태: 청구 전 · 미결제 · 재시도 결제(수기 결제 포함) · 중간 가입 결제
