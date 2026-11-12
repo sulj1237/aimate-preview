@@ -216,6 +216,8 @@
   .pager button.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
 
   /* 청구 확인 — 원인 분류 · 메모 (서비스 · 결제 수정은 원래 화면) */
+  .mfrm{display:flex;gap:4px;align-items:center}.minp{flex:1;min-width:0;max-width:200px;height:26px;border:1px solid var(--line);border-radius:5px;padding:0 7px;font:inherit;font-size:12px;outline:none}.minp:focus{border-color:#0AB4AD}
+  .ckwrap{margin-top:3px}
   .chk-ln:first-child{margin-top:0;padding-top:0;border-top:0}
   .chk-ln{margin-top:5px;padding-top:5px;border-top:1px dashed #e3e6ea;color:#1f2328;font-weight:500;white-space:normal}
   .ckb{display:inline-block;padding:0 5px;margin-right:4px;border-radius:3px;background:#fff1d6;color:#a86f00;font-weight:700}
@@ -702,12 +704,10 @@ const memoJoin = (cur, prev) => !cur && !prev ? '' : cur===prev ? ''
 // 비고 칸(서비스 행) = ① 계약 확인 필요 + ② 서비스 변경 문구(전월 · 당월이 다를 때만). 항목이 1개인 약국은 결제 상태도 같은 칸에
 function memoCell(r, single, g){ const pm=MONTHS[S.month].prev, first=S.sc==='first';
   const pay = single ? memoJoin(payNoteT(r.name,S.month), first?'':payNoteT(r.name,pm)) : '';
-  const ck=g ? (g.rows.some(x=>isChk(x.fc)||(!first&&isChk(x.fp)))?chkBadge(r.name):'') : chkNote(r);
-  return '<td class="memo">'+[pay, ck, chgNote(r)].filter(Boolean).join('<br>')+(single?chkLine(r.name):'')+'</td>'; }
+  return '<td class="memo">'+[pay, chgNote(r)].filter(Boolean).join('<br>')+(single?chkLine(r.name):'')+'</td>'; }
+// 비고(약국 행) — 결제 상태 내용 + 메모(작성 · 수정 · 등록). '계약 확인 필요' 배지는 실결제 금액 칸
 function phMemoCell(g){ const first=S.sc==='first';
-  // 접힌 상태에서도 보이도록 서비스 행 중 하나라도 계약 확인 필요면 약국 행에도 배지
-  const ck=g.rows.some(r=>isChk(r.fc)||(!first&&isChk(r.fp)))?chkBadge(g.name):'';
-  return '<td class="memo">'+[memoJoin(payNoteT(g.name,S.month), first?'':payNoteT(g.name,MONTHS[S.month].prev)), ck].filter(Boolean).join('<br>')+chkLine(g.name)+'</td>'; }
+  return '<td class="memo">'+memoJoin(payNoteT(g.name,S.month), first?'':payNoteT(g.name,MONTHS[S.month].prev))+chkLine(g.name)+'</td>'; }
 
 /* ───────── 청구 확인 ─────────
    통계 페이지 = 원인 분류 · 메모와 이력만. 서비스 · 결제 수정은 약국 서비스 수정 · 약국 결제 관리에서
@@ -725,11 +725,13 @@ const ME = '운영팀 관리자', NOW = TODAY.m+'-'+String(TODAY.d).padStart(2,'
 { const pick=k=>PH.find(p=>autoCauses(p.name).includes(k)); const a=pick('1-1'), b=pick('2');
   if(a) CHK[a.name]={cz:[], memo:'EDB 연동비 서비스 추가 요청 · 영업팀 전달', log:[{at:'11-08 10:12', who:'운영팀 관리자', what:'메모 작성'}]};
   if(b) CHK[b.name]={cz:[], memo:'계약서 확인, 정가 결제가 맞음. 등록 금액 수정 요청', log:[{at:'11-07 16:40', who:'운영팀 관리자', what:'메모 작성'}]}; }
-// 비고 칸(약국 행) — 모든 약국: 메모 + 메모 버튼 (작성자 · 일시는 창의 이력에서)
-function chkLine(name){ const c=CHK[name];
-  let h='<div class="chk-ln">';
-  if(c && c.memo) h+='<span class="ckm">'+c.memo+'</span><br>';
-  return h+'<button class="lnk" data-chk="'+name+'">'+(c&&c.memo?'메모 수정':'메모')+'</button></div>'; }
+// 비고 칸(약국 행) — 모든 약국: 메모를 바로 작성 · 수정 후 '등록'. 메모가 있으면 내용 + 수정
+function chkLine(name){ const c=CHK[name], m=c&&c.memo;
+  if(m && S.editMemo!==name) return '<div class="chk-ln"><span class="ckm">'+esc(m)+'</span> <button class="lnk mbtn" data-medit="'+esc(name)+'">수정</button></div>';
+  return '<div class="chk-ln mfrm"><input class="minp" data-mname="'+esc(name)+'" placeholder="메모 입력" value="'+esc(m||'')+'"><button class="btn sm mbtn" data-msave="'+esc(name)+'">등록</button></div>'; }
+function saveMemo(name, v){ const c=CHK[name]||{cz:[], memo:'', log:[]}, memo=v.trim();
+  if(memo!==(c.memo||'')) CHK[name]={cz:c.cz||[], memo, log:[...c.log, {at:NOW+' '+new Date().toTimeString().slice(0,5), who:ME, what:c.memo?(memo?'메모 수정':'메모 삭제'):'메모 작성'}]};
+  S.editMemo=null; render(); toast('등록했습니다'); }
 // 메모 창 — 약국 단위 메모 저장 · 이력. 할인 사유 · 서비스 수정은 약국 서비스 수정 화면으로 이동
 function openChk(name){
   const c=CHK[name]||{cz:[], memo:'', log:[]};
@@ -928,7 +930,8 @@ function renderMain(){
           const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>`;
           const e=etcOf(g.name), em=etcMemo(g.name);
           const etc=`<td class="num">${e?'<span class="downc">−'+fmt(e)+'</span>'+(em?'<div class="dsv">'+em+'</div>':''):'<span class="flat">0</span>'}</td>`;
-          const amt=`<td class="num">${calcBtn(g.name)}<b>${fmt(g.cur)}</b></td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
+          const ckb=(rowsOf[g.name]||g.rows).some(r=>isChk(r.fc)||(!first&&isChk(r.fp)))?'<div class="ckwrap"><b class="ckb">계약 확인 필요</b></div>':'';
+          const amt=`<td class="num">${calcBtn(g.name)}<b>${fmt(g.cur)}</b>${ckb}</td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
           // 옵션 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
           if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">(ID ${storeId(g.name)})</span><span class="tg"></span>${nm}</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
           <td class="num">${fmt(orig(r))}</td>${etc}${amt}${payWayCell(g.name,S.month)}${memoCell(r,1,g)}</tr>`; }
@@ -953,7 +956,7 @@ function bindMain(){
   const oc=$('optClear'); if(oc) oc.onclick=()=>{ S.opts=new Set(); resetList(); render(); };
   document.querySelectorAll('[data-cf]').forEach(b=>b.onclick=()=>{ const k=b.dataset.cf; S.cf=S.cf===k?'all':k; resetList(); render(); });
   document.querySelectorAll('[data-cpg]').forEach(b=>b.onclick=()=>{ S.cpage=+b.dataset.cpg; S.expAll=null; S.tog=new Set(); render(); });
-  document.querySelectorAll('tr[data-ph]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('.link,.lnk,.cbtn')) return; const n=tr.dataset.ph; S.tog.has(n)?S.tog.delete(n):S.tog.add(n); render(); });
+  document.querySelectorAll('tr[data-ph]').forEach(tr=>tr.onclick=e=>{ if(e.target.closest('.link,.lnk,.cbtn,.mfrm,.mbtn')) return; const n=tr.dataset.ph; S.tog.has(n)?S.tog.delete(n):S.tog.add(n); render(); });
   const ea=$('expAll'); if(ea) ea.onclick=()=>{ S.expAll=ea.textContent==='모두 펼치기'; S.tog=new Set(); render(); };
   const cs=$('cause'); if(cs) cs.onchange=e=>{ S.cause=e.target.checked?'chk':'all'; resetList(); render(); };
   const pp=$('pp'); if(pp) pp.onchange=e=>{ S.pp=+e.target.value; resetList(); render(); };
@@ -968,7 +971,10 @@ function bindMain(){
   const pg=$('payGo'); if(pg) pg.onclick=goPay;
   // 총 청구 · 결제 완료 · 미결제 탭
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ if(S.tab===b.dataset.tab) return; S.tab=b.dataset.tab; S.cf='all'; S.sort=null; resetList(); render(); });
-  // 메모
+  // 메모 — 비고 칸에서 바로 작성 · 수정 · 등록 (Enter로도 등록)
+  document.querySelectorAll('[data-msave]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const n=b.dataset.msave, i=b.parentElement.querySelector('.minp'); saveMemo(n, i.value); });
+  document.querySelectorAll('.minp').forEach(i=>{ i.onclick=e=>e.stopPropagation(); i.onkeydown=e=>{ if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); saveMemo(i.dataset.mname, i.value); } }; });
+  document.querySelectorAll('[data-medit]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); S.editMemo=b.dataset.medit; render(); const i=document.querySelector('.minp[data-mname="'+CSS.escape(S.editMemo)+'"]'); if(i){ i.focus(); i.select(); } });
   document.querySelectorAll('[data-chk]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openChk(b.dataset.chk); });
   // 계산 내역 상세
   document.querySelectorAll('[data-calc]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openCalc(b.dataset.calc); });
