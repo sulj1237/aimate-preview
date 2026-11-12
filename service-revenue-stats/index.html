@@ -648,9 +648,11 @@ function calcTable(rows, val, fOf){ const tot=rows.reduce((a,r)=>a+val(r),0);
     rows.map(r=>{ const v=val(r), f=fOf(r), c=notesOf(v,f).calc||(f&&f.x&&f.why&&!(f.cat||[]).length?stripCB(f.why):''), d=f&&f.dsc&&v===f.amt?'<div class="dsv">기타 할인 −'+fmt(f.dsc)+'원 (본금액 '+fmt(v+f.dsc)+'원)</div>':'';
       return '<tr><td>'+r.option+'</td><td class="num">'+(fOf(r)?fOf(r).q||'':'')+'</td><td>'+(c?'<div class="dc">'+c+'</div>':'<span class="flat">'+(!f?'이용 없음':v?'등록 금액':'−')+'</span>')+d+'</td><td class="num">'+fmt(v)+'</td></tr>'; }).join('')+
     '<tr class="tot"><td colspan="3">합계</td><td class="num">'+fmt(tot)+'원</td></tr></tbody></table>'; }
-function openCalc(name){ const c=CALC_G[name]; if(!c) return; const {g,T,first,pm}=c, TL={bill:'총 청구',paid:'결제 완료',unpaid:'미결제'}[T];
+// 약국 아이디(스토어 ID) — 프로토타입용 가상 번호 (약국 순서대로)
+let SID_MAP=null; const storeId = n => { if(!SID_MAP) SID_MAP=Object.fromEntries(PH.map((p,i)=>[p.name, String(20001+i)])); return SID_MAP[n]||''; };
+function openCalc(name){ const c=CALC_G[name]; if(!c) return; const {g,T,first,pm}=c;
   const w=document.createElement('div'); w.className='dlgw'; w.id='calcDlg';
-  w.innerHTML='<div class="dlg" role="dialog" aria-label="계산 내역 상세"><div class="dh"><h4>계산 내역 상세 · '+name+'</h4><span class="flat">'+TL+' 기준</span><button class="x" aria-label="닫기">×</button></div><div class="db2">'+
+  w.innerHTML='<div class="dlg" role="dialog" aria-label="계산 내역 상세"><div class="dh"><h4>계산 내역 상세 · '+name+'</h4><span class="flat">ID '+storeId(name)+'</span><button class="x" aria-label="닫기">×</button></div><div class="db2">'+
     '<div class="mh">당월 · '+S.month+'</div>'+calcTable(g.rows, r=>r[T].cur, r=>r.fc)+
     (first?'':'<div class="mh">전월 · '+pm+'</div>'+calcTable(g.rows, r=>r[T].prev, r=>r.fp))+'</div></div>';
   const close=()=>{ w.remove(); document.removeEventListener('keydown',esc); }, esc=e=>{ if(e.key==='Escape') close(); };
