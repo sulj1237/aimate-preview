@@ -169,6 +169,8 @@
   #phPanel .pnote{margin:0;padding:0 18px 10px}
   .sid{display:block;font-size:11px;font-weight:500;color:var(--muted);line-height:1.3;margin:0 0 1px 14px}
   .dlg .dh .sid{margin:0 0 2px}
+  .tbl td.ctr,.tbl th.ctr{text-align:center;white-space:nowrap}
+  .pway.man{background:#fff1d6;color:#a86f00}
   .pway{display:inline-block;padding:0 4px;border-radius:3px;background:#eef0f3;color:#4b5158;font-size:10.5px;font-weight:700}
   .bnote{font-size:11.5px;color:var(--muted);padding:0 18px 12px;margin-top:-6px}
   .ptabs{display:flex;gap:4px;margin:0 18px;border-top:1px solid var(--line);padding-top:6px}
@@ -670,10 +672,13 @@ function openCalc(name){ const c=CALC_G[name]; if(!c) return; const {g,T,first,p
         : '<div class="mh">당월 · '+S.month+'</div>'+cur+(first?'':'<div class="mh">전월 · '+pm+'</div>'+prev); })()+'</div></div>';
   const close=()=>{ w.remove(); document.removeEventListener('keydown',esc); }, esc=e=>{ if(e.key==='Escape') close(); };
   w.onclick=e=>{ if(e.target===w||e.target.closest('.x')) close(); }; document.addEventListener('keydown',esc); document.body.appendChild(w); }
-// 비고(약국) — 그 청구월의 결제 상태: 청구 전 · 미결제 · 재시도 결제(수기 결제 포함) · 중간 가입 결제
+// 비고(약국) — 그 청구월의 결제 상태: 청구 전 · 미결제 · 중간 가입 결제 (결제 방식은 별도 열)
 const mlab = ym => +ym.slice(5)+'월분';
 // 결제 방식 — 정기 결제일(5일) 자동 결제 = 자동, 결제 이유가 'N월 …'로 시작하는 관리자 결제 = 수기
-const payWay = x => ' <b class="pway">'+(/^\d+월/.test(x.reason) || +x.date.slice(8)!==5 ? '수기' : '자동')+'</b>';
+const wayOf = x => /^\d+월/.test(x.reason) || +x.date.slice(8)!==5 ? '수기' : '자동';
+// 결제 방식 열(약국 행) — 기준월에 결제된 건의 방식. 결제가 없으면 −
+const payWayCell = (name, ym) => { const w=[...new Set(PAYS.filter(x=>x.ok && x.name===name && x.date.slice(0,7)===ym && x.date<=TODAY_S).map(wayOf))].sort((a,b)=>a==='자동'?-1:1);
+  return '<td class="ctr">'+(w.length?w.map(t=>'<b class="pway'+(t==='수기'?' man':'')+'">'+t+'</b>').join(' + '):'<span class="flat">−</span>')+'</td>'; };
 function payNote(name, ym){
   const p=PH_BY[name], L=[];
   if(p && isPre(p,ym)) return '<b class="db">청구 전</b><br><span class="mt">'+p.pre.d+' 이용 시작 · '+p.pre.first+'분부터 청구</span>';
@@ -685,13 +690,9 @@ function payNote(name, ym){
   if(m){
     const bms=[...new Set(PAYS.filter(x=>x.ok && x.name===name && x.date===m.date).map(x=>x.bm))].sort();
     const late=m.date.slice(0,7)!==ym, newbie=PREV_OF[ym] && p && !hasSub(p,PREV_OF[ym]);
-    // 재시도 결제 = 그 청구월 안에서 실패 뒤 다시 결제 + 정기 결제일(5일) 외 결제. 결제 방식(수기 · 자동) 함께 표기
-    // 늦은 결제(다음 달 결제) · 여러 달 함께 결제 · 가입 첫 달은 표시 없음
-    const lab = !late && bms.length===1 && (fl.length || (!newbie && m.date!==d2(MON[ym],5))) ? '재시도 결제' : '';
-    if(lab){ const t=fl.map(f=>f.date.slice(5)+' 결제 실패');
-      t.push(m.date.slice(5)+' 결제 '+fmt(m.amt)+'원');
-      L.push('<b class="db">'+lab+'</b>'+payWay(m)+'<br><span class="mt">'+t.join('<br>')+'</span>'); } }
-  join.forEach(x=>L.push('<b class="db">중간 가입 결제</b>'+payWay(x)+'<br><span class="mt">'+x.date.slice(5)+' 결제 '+fmt(x.amt)+'원</span>'));
+    // 재시도 · 수기 결제는 비고 대신 '결제 방식' 열(자동 · 수기)로 표시 }
+  }
+  if(join.length) L.push('<b class="db">중간 가입 결제</b>');
   return L.join('<br>');
 }
 // 비고의 결제 상태 — 결제 완료 목록에서는 `미결제` 배지를 빼고 결제 내역만
@@ -907,18 +908,18 @@ function renderMain(){
           <button class="btn sm" id="expAll">${pageAllOpen?'모두 접기':'모두 펼치기'}</button><select class="sel sm" id="pp">${[10,30,50].map(n=>`<option value="${n}" ${S.pp===n?'selected':''}>${n}건씩 보기</option>`).join('')}</select></span></div>
       <div class="pnote" id="splitNote">ⓘ 결제 완료는 결제월 기준, 미결제는 청구월 기준입니다. 서비스 금액은 약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값입니다.</div>
       <div class="tblwrap"><table class="tbl">
-        <thead><tr><th>약국명</th><th>서비스 옵션</th><th class="num">수량</th>${sh('prev','전월')}${sh('cur','당월')}${sh('diff','증감')}<th>비고</th></tr></thead>
-        <tbody>${phPage.length?'':'<tr><td colspan="7" class="empty">조건에 맞는 약국이 없습니다.</td></tr>'}${phPage.map(g=>{
+        <thead><tr><th>약국명</th><th>서비스 옵션</th><th class="num">수량</th>${sh('prev','전월')}${sh('cur','당월')}${sh('diff','증감')}<th class="ctr">결제 방식</th><th>비고</th></tr></thead>
+        <tbody>${phPage.length?'':'<tr><td colspan="8" class="empty">조건에 맞는 약국이 없습니다.</td></tr>'}${phPage.map(g=>{
           const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>`;
           // 항목 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
           if(g.rows.length===1){ const r=g.rows[0]; return `<tr class="ph-row one"><td><span class="sid">(ID ${storeId(g.name)})</span><span class="tg"></span>${nm}</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
-          <td class="num">${prevCell(r)}</td><td class="num">${calcBtn(g.name)}${curCell(r)}</td><td class="num">${dl(r[T].cur-pv(r,T))}</td>${memoCell(r,1)}</tr>`; }
+          <td class="num">${prevCell(r)}</td><td class="num">${calcBtn(g.name)}${curCell(r)}</td><td class="num">${dl(r[T].cur-pv(r,T))}</td>${payWayCell(g.name,S.month)}${memoCell(r,1)}</tr>`; }
           // 항목 여러 개 = 약국 행(합계) + 접기 · 펼치기
           return `<tr class="ph-row" data-ph="${g.name}"><td><span class="sid">(ID ${storeId(g.name)})</span><span class="tg">${isOpen(g)?'▾':'▸'}</span>${nm}</td>
           <td class="svcn" title="${g.rows.map(r=>r.option).join(' · ')}">${g.rows.length}개 항목</td><td></td>
-          <td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${calcBtn(g.name)}${fmt(g.cur)}</td><td class="num">${dl(g.cur-g.prev)}</td>${phMemoCell(g)}</tr>`+
+          <td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${calcBtn(g.name)}${fmt(g.cur)}</td><td class="num">${dl(g.cur-g.prev)}</td>${payWayCell(g.name,S.month)}${phMemoCell(g)}</tr>`+
           (isOpen(g)?g.rows:[]).map(r=>`<tr class="sv-row"><td>└</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
-          <td class="num">${prevCell(r)}</td><td class="num">${curCell(r)}</td><td class="num">${dl(r[T].cur-pv(r,T))}</td>${memoCell(r)}</tr>`).join(''); }).join('')}</tbody></table></div>
+          <td class="num">${prevCell(r)}</td><td class="num">${curCell(r)}</td><td class="num">${dl(r[T].cur-pv(r,T))}</td><td></td>${memoCell(r)}</tr>`).join(''); }).join('')}</tbody></table></div>
       <div class="pager">${pager(cpages)}</div>
     </div>`;
   bindMain();
@@ -1003,8 +1004,7 @@ function renderGuide(){
   const PAYC=[
     ['청구 전','이번 달에 서비스를 시작해 다음 달부터 청구','이용 약국 수에는 포함, 금액은 0원'],
     ['미결제','청구월분 결제가 모두 실패','결제 실패일 · 실패 사유 · 실패 횟수. 미결제 목록에만 나옴'],
-    ['재시도 결제','그 청구월 안에서 실패한 뒤 다시 결제, 또는 정기 결제일(5일)이 아닌 날 결제. 다음 달에 늦게 결제한 건은 표시 없음','결제 방식(수기 · 자동) · 실패일 · 결제일 · 금액'],
-    ['중간 가입 결제','달 중간에 서비스를 추가해 따로 결제','결제 방식(수기 · 자동) · 결제일 · 금액'] ];
+    ['중간 가입 결제','달 중간에 서비스를 추가해 따로 결제','문구만 표시. 결제 방식은 결제 방식 열'] ];
   const payEx=lab=>{ for(const m of MM) for(const p of PH){ const h=payNote(p.name,m); if(h.includes('<b class="db">'+lab+'</b>')) return h.split('<br><b class="db">').map((x,i)=>i?'<b class="db">'+x:x).find(x=>x.includes('>'+lab+'<')); } return ''; };
   // 2. 서비스 구성 (금액 칸)
   const SVCC=[
@@ -1041,6 +1041,7 @@ function renderGuide(){
       <tr><td class="k">서비스 금액</td><td>약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값</td></tr>
       <tr><td class="k">비고 · 전월/당월</td><td>전월과 당월 내용이 다를 때만 <b>당월</b> / <b>전월</b>로 나눠 표기. 같으면 비워 둠</td></tr>
       <tr><td class="k">증감</td><td>늘면 빨간 +, 줄면 파란 −, 같으면 0. 전월 데이터가 없는 첫 달은 −</td></tr>
+      <tr><td class="k">결제 방식</td><td>약국 행에 기준월 결제 방식: 자동(5일 정기 결제) · 수기(관리자 결제, 재시도 포함) · 자동 + 수기(한 달에 두 번 결제) · 결제 없음 −</td></tr>
       <tr><td class="k">비고 내용</td><td>결제 상태 + ① <b>계약 확인 필요</b> + ② 전월과 서비스 · 금액이 다를 때 <b>서비스 추가 · 서비스 해지 · 서비스 변경 · 기타 할인 변경</b> 문구 하나</td></tr>
       <tr><td class="k">비고 위치</td><td>표의 가장 오른쪽 열. 결제 상태 = 약국 행(항목이 1개인 약국은 서비스 행과 한 칸), 계약 확인 필요 · 전월 대비 = 서비스 행. 기타 할인 사유는 서비스 옵션 밑</td></tr>
     </tbody></table></div></div>
