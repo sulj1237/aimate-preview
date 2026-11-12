@@ -887,7 +887,6 @@ function renderMain(){
         <div class="fitem"><span class="flabel">기준월</span><select class="sel" id="fMonth">${first?'<option value="2026-10">2026-10</option>':Object.keys(MONTHS).map(m=>`<option value="${m}" ${S.month===m?'selected':''}>${m}</option>`).join('')}</select></div>
       </div>
     </div>
-    ${mid?`<div class="mnote" id="midNote"><div><b>당월 데이터는 결제 마감 전 잠정 집계이며, 이후 결제 내역에 따라 변경될 수 있습니다.</b></div><div class="per">결제 완료는 결제한 달 기준입니다. 지난달 청구분을 이번 달에 결제하면 이번 달 결제 완료에 들어갑니다.</div></div>`:''}
 
     <div class="panel">
       <div class="ph"><h3>서비스별 청구 현황</h3></div>
@@ -1057,7 +1056,7 @@ function renderGuide(){
       <tr><td class="k">총 청구</td><td>그 달 이용 서비스 청구 금액. 결제 완료(결제월 기준)는 지난달 청구분 결제를 포함해 총 청구와 맞지 않을 수 있음 (11월 총 청구 ${fmt(Object.values(AMT['2026-11'].bill).reduce((a,b)=>a+b,0))} · 결제 완료 ${fmt(Object.values(AMT['2026-11'].paid).reduce((a,b)=>a+b,0))} · 미결제 ${fmt(Object.values(AMT['2026-11'].unpaid).reduce((a,b)=>a+b,0))})</td></tr>
       <tr><td class="k">결제 완료 목록</td><td>기준월에 조회일까지 결제한 약국(지난달 청구분을 이번 달에 결제한 약국 포함). 미결제 배지는 보이지 않음. 전월 대비 필터(전체 · 신규 · 해지 · 금액 변동) 사용</td></tr>
       <tr><td class="k">미결제 목록</td><td>그 청구월에 미결제 금액이 있는 약국. <b>약국 결제 관리 ›</b> 버튼으로 이동, 뒤로 가기로 보던 위치에 복귀</td></tr>
-      <tr><td class="k">당월</td><td>결제 마감 전 잠정 집계. 화면 위에 안내 문구 표시</td></tr>
+      <tr><td class="k">당월</td><td>조회일까지 결제된 건으로 집계</td></tr>
       <tr><td class="k">서비스 금액</td><td>약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값</td></tr>
       <tr><td class="k">비고 · 전월/당월</td><td>전월과 당월 내용이 다를 때만 <b>당월</b> / <b>전월</b>로 나눠 표기. 같으면 비워 둠</td></tr>
       <tr><td class="k">증감</td><td>늘면 빨간 +, 줄면 파란 −, 같으면 0. 전월 데이터가 없는 첫 달은 −</td></tr>
