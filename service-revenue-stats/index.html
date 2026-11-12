@@ -692,7 +692,7 @@ const PAY_FAILS = (()=>{ const last={};
 const ALL_OPTS = [...new Set(SERVICES.flatMap(s=>['2026-10','2026-11'].flatMap(m=>ROWS[m][s.code].map(x=>x.option))))];
 // 총 청구 = 합계만(목록 없음), 목록은 결제 완료 · 미결제로 나눠 봄
 const TABS = [{k:'bill', t:'총 청구', fix:1}, {k:'paid', t:'결제 완료'}, {k:'unpaid', t:'미결제'}];
-const CFLAB = {all:'전체', new:'신규', stop:'중단', chg:'금액 변동'};
+const CFLAB = {all:'전체', new:'신규', stop:'해지', chg:'금액 변동'};
 function momCell(c,p){
   if(S.sc==='first') return '<span class="flat">−</span>';
   if(p===0 && c===0) return '<span class="flat">−</span>';
@@ -745,11 +745,10 @@ function renderMain(){
 
   // 약국별 청구 — 탭(금액 기준) → 서비스명 · 약국명 검색 → 전월 대비 순으로 거름
   const q=S.q.trim();
-  // 결제 완료 목록 = 기준월에 결제한 약국 + 서비스를 해지해 결제가 끝난 약국(전월 대비 `중단`) / 미결제 목록 = 기준월 미결제 금액이 있는 약국
+  // 결제 완료 목록 = 그 청구월분을 조회일까지 결제한 약국 / 미결제 목록 = 기준월 미결제 금액이 있는 약국
   //   같은 약국의 전월 금액 · 0원 이용 옵션 행은 함께 보여 줌 (전월 대비 비교)
   const curPh=new Set(allRows.filter(r=>r[T].cur>0).map(r=>r.name)), unpaidPh=new Set(allRows.filter(r=>r.unpaid.cur>0).map(r=>r.name));
-  const stopPh=T==='paid' ? new Set(allRows.filter(r=>r.status==='stop' && pv(r,'paid') && !unpaidPh.has(r.name)).map(r=>r.name)) : new Set();
-  const inTab=r=> (curPh.has(r.name)||stopPh.has(r.name)) && (r[T].cur||pv(r,T)||(T==='paid' && r.use));
+  const inTab=r=> curPh.has(r.name) && (r[T].cur||pv(r,T)||(T==='paid' && r.use));
   // 원인 분류 — 서비스 행의 비고 배지(당월 · 전월) 대분류
   const causeOf=r=>causeAt(r.name,S.month) ? [CAUSE[causeAt(r.name,S.month)][0]] : [...((r.fc&&r.fc.cat)||[]),...((!first&&r.fp&&r.fp.cat)||[])].map(k=>CAUSE[k][0]);
   const base=allRows.filter(r=>inTab(r) && (!S.opts.size||S.opts.has(r.option)) && (!q||r.name.includes(q)) && (S.cause==='all'||causeOf(r).includes(S.cause)));
@@ -936,7 +935,7 @@ function renderGuide(){
     ['굿팜 POS 무료','POS는 함께 쓰는 서비스에만 청구','0원 + `굿팜 POS 무료`', r=>r.fc&&r.fc.t==='무료', 'amt'],
     ['스마트 OCR 기본 제공','스마트 OCR을 쓰면 모바일 OCR 0원','0원 + `스마트 OCR 기본 제공`', r=>r.fc&&r.fc.t==='스마트 OCR 기본 제공', 'amt'],
     ['신규','전월에 없던 서비스를 이번 달 시작','전월 0 · 증감 +. 전월 대비 필터 `신규`', r=>r.status==='new', 'q'],
-    ['중단','전월에 쓰던 서비스를 이번 달 해지','당월 0 · 수량 `2 → 0`. 전월 대비 필터 `중단`', r=>r.status==='stop'&&r.qtyPrev, 'q'],
+    ['해지','전월에 쓰던 서비스를 이번 달 해지','당월 0 · 수량 `2 → 0`. 전월 대비 필터 `해지`', r=>r.status==='stop'&&r.qtyPrev, 'q'],
     ['여러 항목 약국','한 약국이 서비스 2개 이상','약국 행 = 합계 + `N개 항목`, 눌러서 펼치면 서비스별 행', null, 'multi'] ];
   const svcEx=([, , , f, k])=>{ if(k==='multi') return '<span class="mt">▸ 약국명 · 3개 항목 · 합계 금액</span>';
     const x=find(f); if(!x) return ''; const {m,r}=x;
@@ -955,7 +954,7 @@ function renderGuide(){
     <div class="panel"><div class="ph"><h3>1. 기본 규칙</h3></div><div class="tblwrap"><table class="tbl"><tbody>
       <tr><td class="k">월 귀속</td><td>청구월 기준. 11월분을 12월에 늦게 결제해도 11월 결제 완료 금액</td></tr>
       <tr><td class="k">총 청구</td><td>결제 완료 + 미결제. 합계 카드로 보여 줌 (11월 ${fmt(Object.values(AMT['2026-11'].bill).reduce((a,b)=>a+b,0))} = ${fmt(Object.values(AMT['2026-11'].paid).reduce((a,b)=>a+b,0))} + ${fmt(Object.values(AMT['2026-11'].unpaid).reduce((a,b)=>a+b,0))})</td></tr>
-      <tr><td class="k">결제 완료 목록</td><td>그 청구월분을 조회일까지 결제한 약국 + 서비스를 해지해 결제가 끝난 약국(전월 대비 중단). 미결제 배지는 보이지 않음. 전월 대비 필터(전체 · 신규 · 중단 · 금액 변동) 사용</td></tr>
+      <tr><td class="k">결제 완료 목록</td><td>그 청구월분을 조회일까지 결제한 약국. 미결제 배지는 보이지 않음. 전월 대비 필터(전체 · 신규 · 해지 · 금액 변동) 사용</td></tr>
       <tr><td class="k">미결제 목록</td><td>그 청구월에 미결제 금액이 있는 약국. <b>약국 결제 관리 ›</b> 버튼으로 이동, 뒤로 가기로 보던 위치에 복귀</td></tr>
       <tr><td class="k">당월</td><td>결제 마감 전 잠정 집계. 화면 위에 안내 문구 표시</td></tr>
       <tr><td class="k">서비스 금액</td><td>약국 결제 금액을 서비스 옵션 등록 금액대로 나눈 값</td></tr>
@@ -988,7 +987,7 @@ function renderGuide(){
 
     <div class="panel"><div class="ph"><h3>6. 목록 · 필터</h3></div><div class="tblwrap"><table class="tbl"><tbody>
       <tr><td class="k">기본 정렬</td><td>원인 분류 전체 · 정렬 없음이면 케이스마다 대표 약국 1곳을 맨 앞에. 30건씩 보기 첫 페이지에서 모든 케이스 확인, 나머지는 증감이 큰 순</td></tr>
-      <tr><td class="k">전월 대비 필터</td><td>결제 완료 목록에만. 전체 · 신규 · 중단 · 금액 변동</td></tr>
+      <tr><td class="k">전월 대비 필터</td><td>결제 완료 목록에만. 전체 · 신규 · 해지 · 금액 변동</td></tr>
       <tr><td class="k">원인 분류 필터</td><td>대분류별(서비스 누락 · 할인 오입력 · 서비스 미갱신 · 기타 할인 · 과다 청구 의심). 기준월에 적용되는 분류로 거름</td></tr>
       <tr><td class="k">검색 · 서비스명</td><td>약국명 검색, 서비스명 여러 개 선택. 필터 · 검색을 쓰면 여러 항목 약국을 모두 펼침</td></tr>
     </tbody></table></div></div>
@@ -1075,13 +1074,13 @@ function renderRv(){
     <div class="nav">${[['rvs1','바뀐 내용'],['rvs2','확인 방법'],['rvs3','실데이터'],['rvs4','확정 요청 6'],['rvs5','질문 10']].map(([k,t])=>`<a data-go="${k}">${t}</a>`).join('')}</div></div>
   ${RV_API?'':'<div class="warn">답변 저장 주소를 연결하기 전입니다. 지금은 읽기만 할 수 있습니다.</div>'}${RV.err?'<div class="warn">'+esc(RV.err)+'</div>':''}
   <div class="sec" id="rvs1"><h3>바뀐 내용</h3>
-    <div class="key"><b>① 약국별 청구를 총 청구 / 결제 완료 / 미결제로 나눠 봅니다</b>총 청구 = 결제 완료 + 미결제(청구월 기준). 결제 완료 목록은 전월 대비(신규 · 중단 · 금액 변동)로 걸러 보고, 미결제 목록에서는 약국 결제 관리로 바로 이동합니다.</div>
+    <div class="key"><b>① 약국별 청구를 총 청구 / 결제 완료 / 미결제로 나눠 봅니다</b>총 청구 = 결제 완료 + 미결제(청구월 기준). 결제 완료 목록은 전월 대비(신규 · 해지 · 금액 변동)로 걸러 보고, 미결제 목록에서는 약국 결제 관리로 바로 이동합니다.</div>
     <div class="key"><b>② 기타 할인 · 금액이 다른 약국을 원인별로 분류합니다</b>비고에 [대분류] 소분류 배지와 원인 분류 필터를 붙였습니다. 원인 분류 · 메모는 화면에서 고칠 수 있고, 바꾼 달부터 적용하는 안입니다.</div>
     <details><summary>바뀐 내용 전체 보기</summary><table><tr><th>항목</th><th>바뀐 내용</th><th>이유</th></tr>
     <tr><td>금액 기준</td><td>모든 금액을 청구월 기준으로 집계. 11월분을 12월에 늦게 결제해도 11월 실적</td><td>재시도 · 밀린 대금 결제가 있어도 그 달 청구가 다 걷혔는지 보이도록</td></tr>
     <tr><td>화면 구성</td><td>요약 대시보드 삭제. 총 청구(합계 카드) = 결제 완료 + 미결제, 목록은 결제 완료 · 미결제 두 가지</td><td>같은 숫자를 여러 곳에서 보는 혼란 제거, 필요한 약국만 바로 확인</td></tr>
-    <tr><td>결제 완료 목록</td><td>그 달에 결제한 약국 + 서비스를 해지해 결제가 끝난 약국(전월 대비 중단). 미결제 배지는 보이지 않음</td><td>결제 완료 목록에 미결제 약국이 섞이지 않도록</td></tr>
-    <tr><td>전월 대비</td><td>결제 완료 목록에 필터(전체 · 신규 · 중단 · 금액 변동)</td><td>신규 결제 · 결제 중단 약국을 바로 추려 봄</td></tr>
+    <tr><td>결제 완료 목록</td><td>그 청구월분을 조회일까지 결제한 약국. 미결제 배지는 보이지 않음</td><td>결제 완료 목록에 미결제 약국이 섞이지 않도록</td></tr>
+    <tr><td>전월 대비</td><td>결제 완료 목록에 필터(전체 · 신규 · 해지 · 금액 변동)</td><td>신규 결제 · 서비스 해지 약국을 바로 추려 봄</td></tr>
     <tr><td>미결제</td><td>그 달 미결제 금액이 있는 약국. 약국 결제 관리로 이동, 뒤로 가기로 보던 위치에 복귀</td><td>재결제 · 승인은 기존 결제 관리에서 처리</td></tr>
     <tr><td>서비스별 청구 현황</td><td>열을 서비스 · 이용 약국 · 신규 · 해지 · 총 청구 · 비중으로 정리. 서비스로 나누지 않은 금액은 표 아래 한 줄</td><td>어떤 서비스가 늘고 줄었는지 한눈에</td></tr>
     <tr><td>원인 분류</td><td>결제 금액이 약국 서비스와 다르거나 기타 할인이 있으면 [대분류] 소분류 배지 + 원인 분류 필터</td><td>금액이 다른 이유를 약국마다 비고를 열어 보지 않아도 됨</td></tr>
