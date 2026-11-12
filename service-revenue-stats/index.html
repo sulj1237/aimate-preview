@@ -325,7 +325,7 @@ const SERVICES = [
   {code:'SMART2D', name:'스마트2D'}, {code:'MOBILE_OCR', name:'모바일 OCR'}, {code:'FULL_PACKAGE', name:'풀패키지'},
   {code:'ESL', name:'ESL'}, {code:'EDB', name:'EDB 연동'},
   {code:'POS', name:'굿팜 POS'}, {code:'MBF', name:'모바일 바코드프리'},
-  {code:'OFF', name:'서비스에 없는 청구'}, {code:'DISC', name:'청구 할인'}, {code:'UNALLOC', name:'서비스 미지정'} ];   // 실제 청구액이 계약 합계보다 많은 금액 (계약 확인 필요)
+  {code:'OFF', name:'미등록 청구'}, {code:'DISC', name:'청구 할인'}, {code:'UNALLOC', name:'서비스 미지정'} ];   // 실제 청구액이 계약 합계보다 많은 금액 (계약 확인 필요)
 const SVC_NAME = Object.fromEntries(SERVICES.map(s=>[s.code,s.name]));
 
 // 요금표 (VAT 별도) — 서비스 비용 · 장비임대료. 결합 할인은 서비스 비용에만, 가장 높은 가격(임대료 포함) 1개 정상가 · 나머지 50%
@@ -420,7 +420,7 @@ function billX(p, bm){
   const memo = x.memo ? '<br>'+x.memo : '';
   // 계약보다 많이 결제 — 비고에 무료 · 회수 = 과다 청구 의심, 0원 계약 옵션이 있으면 할인 오입력, 그 외 계약 미갱신
   const offK = /무료|회수/.test(x.memo||'') ? '6' : x.ct.some(v=>v===0) ? '2' : '3';
-  if(diff>0) out.OFF = {amt:diff, t:'off', opt:'서비스에 없는 청구', q:1, x:1, cat:[offK],
+  if(diff>0) out.OFF = {amt:diff, t:'off', opt:'미등록 청구', q:1, x:1, cat:[offK],
     why:CB(offK)+'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>서비스에 없는 금액 +'+w(diff)+'원'+(x.memo?'':' (쓰는 서비스가 약국 서비스에 빠졌을 수 있음)')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
   const discK = discWhy ? discCause('',discWhy) : '3';
   if(diff<0) out.DISC = {amt:diff, etc:discWhy?1:0, t:'disc', opt:'청구 할인', q:1, x:1, cat:[discK],
@@ -1011,7 +1011,7 @@ function renderGuide(){
       <tr><td class="k">기타 할인 사유</td><td>약국 서비스에 기타 할인이 있을 때. 서비스 옵션 밑에 사유 · 할인 금액</td><td class="num">${fmt(gdN(r=>[r.fc,r.fp].some(isDisc)))}</td>${ex(gdEx(r=>[r.fc,r.fp].some(isDisc), svcCell))}</tr>
       <tr><td class="k ex"><b class="ckb">계약 확인 필요</b></td><td>약국 서비스 등록 내용과 실제 결제가 다를 때(서비스 누락 · 등록 금액 0원인데 정가 결제 · 해지 후 결제 등). 비고에 배지만 표기</td><td class="num">${fmt(gdN(r=>isChk(r.fc)||isChk(r.fp)))}</td>${ex(gdEx(r=>isChk(r.fc)||isChk(r.fp), chkNote))}</tr>
       <tr><td class="k ex"><b class="pmb">전월 대비</b></td><td>전월과 서비스 · 수량 · 금액 · 기타 할인이 다를 때만. 비고에 바뀐 내용</td><td class="num">${fmt(gdN(r=>!!chgNote(r)))}</td>${ex(gdEx(r=>!!chgNote(r)&&r.status==='keep', chgNote))}</tr>
-      <tr><td class="k">서비스로 나누지 않은 금액</td><td>서비스에 없는 청구 · 청구 할인(기타 할인 외) · 서비스 미지정 금액</td><td></td>${ex('<span class="mt">서비스별 청구 현황 표 아래 한 줄로 합계 · 약국 수 표시</span>')}</tr>
+      <tr><td class="k">서비스로 나누지 않은 금액</td><td>미등록 청구 · 청구 할인(기타 할인 외) · 서비스 미지정 금액</td><td></td>${ex('<span class="mt">서비스별 청구 현황 표 아래 한 줄로 합계 · 약국 수 표시</span>')}</tr>
     </tbody></table></div></div>
 
     <div class="panel"><div class="ph"><h3>5. 목록 · 필터</h3></div><div class="tblwrap"><table class="tbl"><tbody>
