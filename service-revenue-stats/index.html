@@ -732,15 +732,12 @@ function chkLine(name){ const c=CHK[name];
   if(c && c.memo) h+='<span class="ckm">'+c.memo+'</span><br>';
   const l=c && c.log[c.log.length-1]; if(l) h+='<span class="ckw">'+l.at+' · '+l.who+'</span><br>';
   return h+'<button class="lnk" data-chk="'+name+'">확인 · 메모</button></div>'; }
-// 계약 확인 창 — 무엇이 다른지 보기 + 확인 완료 · 메모 저장. 할인 사유 · 서비스 수정은 약국 서비스 수정 화면으로 이동
+// 계약 확인 창 — 확인 상태 · 메모 저장. 할인 사유 · 서비스 수정은 약국 서비스 수정 화면으로 이동
 function openChk(name){
   const c=CHK[name]||{cz:[], done:false, memo:'', log:[]};
-  const items=[]; ['2026-11','2026-10'].forEach(m=>SERVICES.forEach(s=>ROWS[m][s.code].filter(r=>r.name===name).forEach(r=>{ const f=[r.fc,r.fp].find(isChk); if(!f) return;
-    const t='<b>'+r.option+'</b><br>'+stripCB(f.why); if(!items.includes(t)) items.push(t); })));
   const bg=document.createElement('div'); bg.className='mdl-bg';
   bg.innerHTML=`<div class="mdl" role="dialog" aria-label="계약 확인">
     <div><span class="sid" style="margin:0">(ID ${storeId(name)})</span><h4>${name} · 계약 확인</h4><div class="sub">약국 서비스 등록 내용과 실제 결제가 다른 내용입니다.</div></div>
-    <div><label class="fl">확인할 내용</label><div class="auto">${items.join('<br><br>')||'없음'}</div></div>
     <div><label class="fl">확인 상태</label><div class="ckst"><label><input type="radio" name="ckD" value="0" ${c.done?'':'checked'}> 계약 확인 필요</label><label><input type="radio" name="ckD" value="1" ${c.done?'checked':''}> 확인 완료</label></div></div>
     <div><label class="fl" for="ckM">메모</label><textarea id="ckM" placeholder="확인 내용 · 요청 사항">${c.memo||''}</textarea></div>
     <div class="go"><span class="lnk" data-toast="약국 상세 > 약국 서비스 수정을 새 탭으로 엽니다 (데모)">할인 사유 · 서비스 수정 ›</span></div>
