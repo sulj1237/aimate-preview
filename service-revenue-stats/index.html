@@ -430,7 +430,7 @@ function billX(p, bm){
     why:CB(offK)+'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>서비스에 없는 금액 +'+w(diff)+'원'+(x.memo?'':' (쓰는 서비스가 약국 서비스에 빠졌을 수 있음)')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
   const discK = discWhy ? discCause('',discWhy) : '3';
   if(diff<0) out.DISC = {amt:diff, etc:discWhy?1:0, t:'disc', opt:'청구 할인', q:1, x:1, cat:[discK],
-    why:CB(discK)+(discWhy?'기타 할인 사유 `'+discWhy+'` −'+w(-diff)+'원':'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>할인 −'+w(-diff)+'원 (구독료 · 등록 할인)')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
+    why:CB(discK)+(discWhy?'기타 할인 사유 `'+discWhy+'` −'+w(-diff)+'원':'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>차액 −'+w(-diff)+'원')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
   return out;
 }
 // 서비스 미지정 — 계약 · 옵션 정보 없이 결제되는 약국 (청구 설정 '미배분' 5곳 · 각 49,500원, Q14)
