@@ -853,9 +853,9 @@ function renderMain(){
     g.rows.sort((a,b)=>Math.abs(b[T].cur-pv(b,T))-Math.abs(a[T].cur-pv(a,T)));
     g.vis=g.rows.filter(r=>r.svc!=='DISC'); if(!g.vis.length) g.vis=g.rows; g.opt=g.vis.reduce((a,r)=>a+orig(r),0);
     g.pds=T==='unpaid'?[]:payDates(g.name,S.month); g.pd=T==='unpaid'?lastTry(g.name,S.month):(g.pds[g.pds.length-1]||''); return g; })
-    // 기본 정렬 = 결제 최신순 (미결제 탭은 마지막 결제 시도일 최신순)
+    // 기본 정렬 = 결제 최신순 → 같은 날이면 실결제(미결제) 금액 큰 순 (미결제 탭은 마지막 결제 시도일 최신순)
     .sort(S.sort ? (a,b)=>(S.dir==='desc'?1:-1)*(SORTKEY[S.sort](b)-SORTKEY[S.sort](a)) || b.cur-a.cur
-                 : (a,b)=>SORTKEY.date(b)-SORTKEY.date(a) || a.name.localeCompare(b.name));
+                 : (a,b)=>SORTKEY.date(b)-SORTKEY.date(a) || b.cur-a.cur || a.name.localeCompare(b.name));
   const cper=S.pp, cpages=Math.max(1,Math.ceil(phList.length/cper)); if(S.cpage>cpages) S.cpage=cpages;
   const phPage=phList.slice((S.cpage-1)*cper, S.cpage*cper);
   // 접기 · 펼치기 — 기본 접힘, 필터 · 검색을 쓰면 모두 펼침. 약국 행 클릭으로 개별 전환
