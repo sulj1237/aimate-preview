@@ -161,6 +161,7 @@
   .dlg table{width:100%;border-collapse:collapse;font-size:12px}.dlg td,.dlg th{padding:7px 8px;border-bottom:1px solid #EEF0F2;text-align:left;vertical-align:top}
   .dlg th{font-size:11px;color:var(--muted);font-weight:600;background:#F7F9FA}.dlg td.num,.dlg th.num{text-align:right;white-space:nowrap}
   .dlg .dc{text-align:left;margin:2px 0 0;white-space:normal}.dlg tr.tot td{font-weight:700;border-top:1px solid var(--line);border-bottom:0}
+  .bnote{font-size:11.5px;color:var(--muted);padding:0 18px 12px;margin-top:-6px}
   .ptabs{display:flex;gap:4px;margin:0 18px;border-top:1px solid var(--line);padding-top:6px}
   .ptab{height:40px;padding:0 14px;border:0;border-bottom:2px solid transparent;background:none;font:inherit;font-size:13.5px;font-weight:600;color:#6b7178;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
   .ptab b{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:#eef0f3;color:#5E646C}
@@ -811,7 +812,7 @@ function renderMain(){
   const prevCell=r=>first?NA:amtCell(pv(r,T),r.fp), curCell=r=>amtCell(r[T].cur,r.fc);
   const tabHtml=TABS.map((x,i)=>{ const v=TT[x.k];
     return `<div class="bcell"><div class="bk">${x.t}</div><div class="bv">${fmt(v.cur)}<small> 원</small></div>
-      <div class="bs">${fmt(v.ph)}곳</div></div>`; }).join('');
+      <div class="bs">${fmt(v.ph)}곳 · ${kpiDelta(v.cur,v.prev,'원')}</div></div>`; }).join('');
   CALC_G=Object.fromEntries(phPage.map(g=>[g.name,{g,T,first,pm:M.prev}]));
 
   document.getElementById('content').innerHTML=`
@@ -840,6 +841,7 @@ function renderMain(){
     <div class="panel" id="phPanel">
       <div class="ph"><h3>약국별 청구</h3></div>
       <div class="brow">${tabHtml}</div>
+      <div class="bnote">ⓘ 증감 · 증감률 = 전월 같은 항목 금액 대비 당월 (예: 결제 완료 = 전월 결제 완료 금액 대비)</div>
       <div class="ptabs" role="tablist">${TABS.filter(x=>!x.fix).map(x=>`<button class="ptab ${T===x.k?'on':''}" role="tab" aria-selected="${T===x.k}" data-tab="${x.k}">${x.t}<b>${fmt(TT[x.k].ph)}</b></button>`).join('')}</div>
       ${cfOn||T==='unpaid'?`<div class="tools">${!cfOn?'':`<span class="flabel">전월 대비</span>${Object.keys(CFLAB).map(k=>`<button class="schip ${S.cf===k?'on':''}" data-cf="${k}">${CFLAB[k]}<b>${fmt(cfCnt(k))}</b></button>`).join('')}`}
         ${T==='unpaid'?'<div class="tright"><button class="btn sm" id="payGo">약국 결제 관리 ›</button></div>':''}</div>`:''}
