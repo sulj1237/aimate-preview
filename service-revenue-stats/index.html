@@ -330,7 +330,7 @@ const SERVICES = [
   {code:'SMART2D', name:'스마트2D'}, {code:'MOBILE_OCR', name:'모바일 OCR'}, {code:'FULL_PACKAGE', name:'풀패키지'},
   {code:'ESL', name:'ESL'}, {code:'EDB', name:'EDB 연동'},
   {code:'POS', name:'굿팜 POS'}, {code:'MBF', name:'모바일 바코드프리'},
-  {code:'OFF', name:'미등록 청구'}, {code:'DISC', name:'청구 할인'}, {code:'UNALLOC', name:'서비스 미지정'} ];   // 실제 청구액이 계약 합계보다 많은 금액 (계약 확인 필요)
+  {code:'OFF', name:'미등록 청구'}, {code:'DISC', name:'기타 할인'}, {code:'UNALLOC', name:'서비스 미지정'} ];   // 실제 청구액이 계약 합계보다 많은 금액 (계약 확인 필요)
 const SVC_NAME = Object.fromEntries(SERVICES.map(s=>[s.code,s.name]));
 
 // 요금표 (VAT 별도) — 서비스 비용 · 장비임대료. 결합 할인은 서비스 비용에만, 가장 높은 가격(임대료 포함) 1개 정상가 · 나머지 50%
@@ -385,7 +385,7 @@ const LIST = i => i.c==='POS' ? 0 : i.c==='FULL_PACKAGE' ? FIXED.FULL_PACKAGE : 
 function billX(p, bm){
   const x=p.x, sub=p.sub[bm], canon=bill(sub), out={}, w=fmt, B=t=>'<b class="xb">'+t+'</b>';
   const ct = x.ct.slice(), ct0 = x.ct.slice(), note = sub.map(()=>[]), cat = sub.map(()=>[]);
-  // 계약 기타 할인 — 사유에 적힌 옵션에만 (옵션을 특정하지 않으면 청구 할인 행)
+  // 계약 기타 할인 — 사유에 적힌 옵션에만 (옵션을 특정하지 않으면 기타 할인 행)
   let discEtc=0, discWhy='';
   (x.disc||[]).forEach(([c,d,why])=>{ const n=sub.findIndex(i=>i.c===c); if(n<0){ discEtc+=d; discWhy=why; return; }
     const take=Math.min(d,ct[n]); ct[n]-=take; discEtc+=d-take; const k=discCause(c,why); cat[n].push(k); note[n].push(CB(k)+'기타 할인 사유 `'+why+'` −'+w(VAT(take))+'원'); });
@@ -429,7 +429,7 @@ function billX(p, bm){
   if(diff>0) out.OFF = {amt:diff, t:'off', opt:'미등록 청구', q:1, x:1, cat:[offK],
     why:CB(offK)+'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>서비스에 없는 금액 +'+w(diff)+'원'+(x.memo?'':' (쓰는 서비스가 약국 서비스에 빠졌을 수 있음)')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
   const discK = discWhy ? discCause('',discWhy) : '3';
-  if(diff<0) out.DISC = {amt:diff, etc:discWhy?1:0, t:'disc', opt:'청구 할인', q:1, x:1, cat:[discK],
+  if(diff<0) out.DISC = {amt:diff, etc:discWhy?1:0, t:'disc', opt:'기타 할인', q:1, x:1, cat:[discK],
     why:CB(discK)+(discWhy?'기타 할인 사유 `'+discWhy+'` −'+w(-diff)+'원':'서비스 합계 '+w(sumCt)+'원 → 실제 결제 '+w(x.billed)+'원<br>차액 −'+w(-diff)+'원')+memo+(rs?'<br>결제 이유 `'+rs+'`':'')};
   return out;
 }
@@ -654,10 +654,12 @@ const CALC_IC='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" strok
 const calcBtn = n => `<button class="cbtn" data-calc="${n}" title="계산 내역 상세" aria-label="계산 내역 상세">${CALC_IC}</button>`;
 let CALC_G = {};
 function calcTable(rows, val, fOf){ const tot=rows.reduce((a,r)=>a+val(r),0);
-  return '<table><thead><tr><th>서비스 옵션</th><th class="num">수량</th><th>계산식</th><th class="num">금액</th></tr></thead><tbody>'+
-    rows.map(r=>{ const v=val(r), f=fOf(r), c=notesOf(v,f).calc||(f&&f.x&&f.why&&!(f.cat||[]).length?stripCB(f.why):''), d=f&&f.dsc&&v===f.amt?'<div class="dsv">기타 할인 −'+fmt(f.dsc)+'원 (기타 할인 전 '+fmt(v+f.dsc)+'원)</div>':'';
-      return '<tr><td>'+r.option+'</td><td class="num">'+(fOf(r)?fOf(r).q||'':'')+'</td><td>'+(c?'<div class="dc">'+c+'</div>':'<span class="flat">'+(!f?'이용 없음':v?'등록 금액':'−')+'</span>')+d+'</td><td class="num">'+fmt(v)+'</td></tr>'; }).join('')+
-    '<tr class="tot"><td colspan="3">합계</td><td class="num">'+fmt(tot)+'원</td></tr></tbody></table>'; }
+  // 열 = 서비스 옵션 · 수량 · 금액 · 계산식(맨 오른쪽). 할인 없는 옵션은 '정가', 기타 할인 행은 수량 · 계산식 '−'
+  return '<table><thead><tr><th>서비스 옵션</th><th class="num">수량</th><th class="num">금액</th><th>계산식</th></tr></thead><tbody>'+
+    rows.map(r=>{ const v=val(r), f=fOf(r), etc=r.svc==='DISC', c=notesOf(v,f).calc||(f&&f.x&&f.why&&!(f.cat||[]).length?stripCB(f.why):''), d=f&&f.dsc&&v===f.amt?'<div class="dsv">기타 할인 −'+fmt(f.dsc)+'원 (기타 할인 전 '+fmt(v+f.dsc)+'원)</div>':'';
+      const calc = etc ? '<span class="flat">−</span>' : (c?'<div class="dc">'+c+'</div>':'<span class="flat">'+(!f?'이용 없음':v?'정가':'−')+'</span>')+d;
+      return '<tr><td>'+r.option+'</td><td class="num">'+(etc?'<span class="flat">−</span>':(f?f.q||'':''))+'</td><td class="num">'+fmt(v)+'</td><td>'+calc+'</td></tr>'; }).join('')+
+    '<tr class="tot"><td colspan="2">합계</td><td class="num">'+fmt(tot)+'원</td><td></td></tr></tbody></table>'; }
 // 약국 아이디(스토어 ID) — 프로토타입용 가상 번호 (약국 순서대로)
 let SID_MAP=null; const storeId = n => { if(!SID_MAP) SID_MAP=Object.fromEntries(PH.map((p,i)=>[p.name, String(20001+i)])); return SID_MAP[n]||''; };
 function openCalc(name){ const c=CALC_G[name]; if(!c) return; const {g,T,first,pm}=c;
@@ -802,7 +804,7 @@ function renderMain(){
     ph:new Set(allRows.filter(r=>r[m].cur>0).map(r=>r.name)).size}]));
 
   // 서비스별 청구 현황 — 이용 약국(0원 · 청구 전 포함) · 총 청구 · 결제 완료 · 미결제, 전월 대비 = 총 청구 기준
-  // 계약에 없는 청구 · 청구 할인 · 서비스 미지정 = 서비스로 나누지 않은 금액 → 표 아래 안내 한 줄
+  // 미등록 청구 · 기타 할인 · 서비스 미지정 = 서비스로 나누지 않은 금액 → 표 아래 안내 한 줄
   // 서비스 금액 = 금액(할인 전) → 기본할인 → 청구 금액(기본할인 후 · 기타 할인 전), VAT 포함. 기타 할인은 약국 단위 한 건이라 서비스로 나누지 않음
   const NOSVC=['OFF','DISC','UNALLOC'], noRows=NOSVC.flatMap(c=>R[c]).filter(r=>!(r.fc&&r.fc.etc));
   const orig=r=>r.fc && !isPre(PH_BY[r.name],S.month) ? (r.fc.amt||0)+(r.fc.dsc||0) : 0;
@@ -1063,7 +1065,7 @@ function renderGuide(){
       <tr><td class="k">기타 할인 사유</td><td>약국 서비스에 기타 할인이 있을 때. 서비스 옵션 밑에 사유 · 할인 금액</td><td class="num">${fmt(gdN(r=>[r.fc,r.fp].some(isDisc)))}</td>${ex(gdEx(r=>[r.fc,r.fp].some(isDisc), svcCell))}</tr>
       <tr><td class="k ex"><b class="ckb">계약 확인 필요</b></td><td>약국 서비스 등록 내용과 실제 결제가 다를 때(서비스 누락 · 등록 금액 0원인데 정가 결제 · 해지 후 결제 등). 비고에 배지만 표기</td><td class="num">${fmt(gdN(r=>isChk(r.fc)||isChk(r.fp)))}</td>${ex(gdEx(r=>isChk(r.fc)||isChk(r.fp), chkNote))}</tr>
       <tr><td class="k ex"><b class="pmb">전월 대비</b></td><td>전월과 서비스 · 수량 · 금액 · 기타 할인이 다를 때만. 비고에 바뀐 내용</td><td class="num">${fmt(gdN(r=>!!chgNote(r)))}</td>${ex(gdEx(r=>!!chgNote(r)&&r.status==='keep', chgNote))}</tr>
-      <tr><td class="k">서비스로 나누지 않은 금액</td><td>미등록 청구 · 청구 할인(기타 할인 외) · 서비스 미지정 금액</td><td></td>${ex('<span class="mt">서비스별 청구 현황 표 아래 한 줄로 합계 · 약국 수 표시</span>')}</tr>
+      <tr><td class="k">서비스로 나누지 않은 금액</td><td>미등록 청구 · 기타 할인(서비스를 정하지 않은 할인) · 서비스 미지정 금액</td><td></td>${ex('<span class="mt">서비스별 청구 현황 표 아래 한 줄로 합계 · 약국 수 표시</span>')}</tr>
     </tbody></table></div></div>
 
     <div class="panel"><div class="ph"><h3>5. 목록 · 필터</h3></div><div class="tblwrap"><table class="tbl"><tbody>
