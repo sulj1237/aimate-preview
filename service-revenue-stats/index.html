@@ -176,6 +176,7 @@
   .pway{display:inline-block;padding:0 4px;border-radius:3px;background:#eef0f3;color:#4b5158;font-size:10.5px;font-weight:700}
   .mlab{color:var(--muted);font-size:11px;font-weight:600}
   .ckf{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:#4b5158;cursor:pointer;white-space:nowrap}
+  .red{color:#d6336c;font-weight:600}
   .bnote{font-size:11.5px;color:var(--muted);padding:0 18px 12px;margin-top:-6px}
   .ptabs{display:flex;gap:4px;margin:0 18px;border-top:1px solid var(--line);padding-top:6px}
   .ptab{height:40px;padding:0 14px;border:0;border-bottom:2px solid transparent;background:none;font:inherit;font-size:13.5px;font-weight:600;color:#6b7178;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
@@ -673,10 +674,14 @@ function calcTable(rows, val, fOf){ const tot=rows.reduce((a,r)=>a+val(r),0);
       return '<tr><td>'+r.option+'</td><td class="num">'+(etc?'<span class="flat">−</span>':(f?f.q||'':''))+'</td><td class="num">'+fmt(v)+'</td><td>'+calc+'</td></tr>'; }).join('')+
     '<tr class="tot"><td colspan="2">합계</td><td class="num">'+fmt(tot)+'원</td><td></td></tr></tbody></table>'; }
 // 약국 아이디(스토어 ID) — 프로토타입용 가상 번호 (약국 순서대로)
+// 약국 위치(시도 · 시군구) — 프로토타입용 가상 지역
+const REGIONS = ['서울 성동구','서울 강남구','서울 송파구','서울 마포구','서울 노원구','경기 수원시','경기 성남시','경기 화성시','경기 고양시','경기 용인시','인천 미추홀구','인천 남동구','부산 부산진구','부산 해운대구','대구 수성구','대전 서구','광주 북구','울산 남구','강원 춘천시','충북 청주시','충남 천안시','전북 전주시','경남 창원시','경북 포항시','제주 제주시'];
+const regionOf = n => { const i=PH.findIndex(p=>p.name===n); return i<0?'':REGIONS[(i*7+3)%REGIONS.length]; };
+const sidLine = n => '('+regionOf(n)+' · ID '+storeId(n)+')';
 let SID_MAP=null; const storeId = n => { if(!SID_MAP) SID_MAP=Object.fromEntries(PH.map((p,i)=>[p.name, String(20001+i)])); return SID_MAP[n]||''; };
 function openCalc(name){ const c=CALC_G[name]; if(!c) return; const {g,T,first,pm}=c;
   const w=document.createElement('div'); w.className='dlgw'; w.id='calcDlg';
-  w.innerHTML='<div class="dlg" role="dialog" aria-label="계산 내역 상세"><div class="dh"><div><span class="sid">(ID '+storeId(name)+')</span><h4>'+name+'</h4></div><button class="x" aria-label="닫기">×</button></div><div class="db2">'+
+  w.innerHTML='<div class="dlg" role="dialog" aria-label="계산 내역 상세"><div class="dh"><div><span class="sid">'+sidLine(name)+'</span><h4>'+name+'</h4></div><button class="x" aria-label="닫기">×</button></div><div class="db2">'+
     (()=>{ const cur=calcTable(g.rows, r=>r[T].cur, r=>r.fc), prev=first?'':calcTable(g.rows, r=>r[T].prev, r=>r.fp);
       // 전월 · 당월 내용이 같으면 한 번만
       return !first && cur===prev ? '<div class="mh">전월 · 당월 동일 · '+pm+' ~ '+S.month+'</div>'+cur
@@ -742,7 +747,7 @@ function openChk(name){
   const c=CHK[name]||{cz:[], memo:'', log:[]};
   const bg=document.createElement('div'); bg.className='mdl-bg';
   bg.innerHTML=`<div class="mdl" role="dialog" aria-label="메모">
-    <div><span class="sid" style="margin:0">(ID ${storeId(name)})</span><h4>${name} · 메모</h4>${c.log.length?'<div class="sub">등록 '+c.log[0].at+' · '+c.log[0].who+(c.log.length>1?' / 최종 수정 '+c.log[c.log.length-1].at+' · '+c.log[c.log.length-1].who:'')+'</div>':''}</div>
+    <div><span class="sid" style="margin:0">${sidLine(name)}</span><h4>${name} · 메모</h4>${c.log.length?'<div class="sub">등록 '+c.log[0].at+' · '+c.log[0].who+(c.log.length>1?' / 최종 수정 '+c.log[c.log.length-1].at+' · '+c.log[c.log.length-1].who:'')+'</div>':''}</div>
     <div><label class="fl" for="ckM">메모</label><textarea id="ckM" placeholder="확인 내용 · 요청 사항">${c.memo||''}</textarea></div>
     <div class="go"><span class="lnk" data-toast="약국 상세 > 약국 서비스 수정을 새 탭으로 엽니다 (데모)">할인 사유 · 서비스 수정 ›</span></div>
     ${c.log.length?'<div class="log"><b>이력</b><br>'+c.log.slice().reverse().map(l=>l.at+' · '+l.who+' · '+l.what).join('<br>')+'</div>':''}
@@ -830,7 +835,7 @@ function renderMain(){
   const maxShare=Math.max(...stats.map(x=>x.share));
   // 신규 · 해지 = 전월 대비 서비스 이용 변화(약국 수)
   const cnt=(n,cls)=>first?'<span class="flat">−</span>':n?'<span class="'+cls+'">'+fmt(n)+'</span>':'<span class="flat">0</span>';
-  const rowHtml=x=>`<tr><td class="svc">${x.s.name}</td><td class="num">${fmt(x.pay)}</td><td class="num">${x.free?fmt(x.free):'<span class="flat">0</span>'}</td><td class="num">${fmt(x.use)}</td><td class="num">${cnt(x.nw,'upc')}</td><td class="num">${cnt(x.stop,'downc')}</td><td class="num">${fmt(x.gross)}</td><td class="num">${x.gross>x.bill?'<span class="downc">−'+fmt(x.gross-x.bill)+'</span>':'<span class="flat">0</span>'}</td><td class="num"><b>${fmt(x.bill)}</b></td>
+  const rowHtml=x=>`<tr><td class="svc">${x.s.name}</td><td class="num"><b>${fmt(x.use)}</b></td><td class="num">${fmt(x.pay)}</td><td class="num">${x.free?fmt(x.free):'<span class="flat">0</span>'}</td><td class="num">${cnt(x.nw,'upc')}</td><td class="num">${cnt(x.stop,'downc')}</td><td class="num">${fmt(x.gross)}</td><td class="num">${x.gross>x.bill?'<span class="red">−'+fmt(x.gross-x.bill)+'</span>':'<span class="flat">0</span>'}</td><td class="num"><b>${fmt(x.bill)}</b></td>
       <td><div class="share"><div class="bar" style="width:${maxShare?Math.max(0,x.share)/maxShare*64:0}px"></div><span class="pct">${x.share.toFixed(1)}%</span></div></td></tr>`;
 
   // 약국별 청구 — 탭(금액 기준) → 서비스명 · 약국명 검색 → 전월 대비 순으로 거름
@@ -899,9 +904,9 @@ function renderMain(){
       <div class="tblwrap"><table class="tbl svct">
         <thead><tr>
           <th>서비스</th>
+          <th class="num">토탈<span class="tip" data-tip="유료처 + 무료처+VIP">i</span></th>
           <th class="num">유료처<span class="tip" data-tip="옵션 금액(기본할인 후)이 0원보다 큰 약국">i</span></th>
           <th class="num">무료처+VIP<span class="tip" data-tip="옵션 금액이 0원인 약국 (무료처 · VIP 포함)">i</span></th>
-          <th class="num">토탈</th>
           <th class="num">신규</th>
           <th class="num">해지</th>
           <th class="num">금액<span class="tip" data-tip="할인 전 · 옵션 금액 × 수량">i</span></th>
@@ -938,10 +943,10 @@ function renderMain(){
           const ckb=(rowsOf[g.name]||g.rows).some(r=>isChk(r.fc)||(!first&&isChk(r.fp)))?'<div class="ckwrap"><b class="ckb">계약 확인 필요</b></div>':'';
           const amt=`<td class="num">${calcBtn(g.name)}<b>${fmt(g.cur)}</b>${ckb}</td><td class="ctr dt">${g.pds.length?g.pds.join('<br>'):(g.pd?'<span class="flat">'+g.pd+'</span>':'<span class="flat">−</span>')}</td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
           // 옵션 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
-          if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">(ID ${storeId(g.name)})</span><span class="tg"></span>${nm}</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
+          if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">${sidLine(g.name)}</span><span class="tg"></span>${nm}</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
           <td class="num">${fmt(orig(r))}</td>${etc}${amt}${payWayCell(g.name,S.month)}${memoCell(r,1,g)}</tr>`; }
           // 옵션 여러 개 = 약국 행(옵션 총액 · 기타 할인 · 실결제) + 접기 · 펼치기
-          return `<tr class="ph-row" data-ph="${g.name}"><td><span class="sid">(ID ${storeId(g.name)})</span><span class="tg">${isOpen(g)?'▾':'▸'}</span>${nm}</td>
+          return `<tr class="ph-row" data-ph="${g.name}"><td><span class="sid">${sidLine(g.name)}</span><span class="tg">${isOpen(g)?'▾':'▸'}</span>${nm}</td>
           <td class="svcn" title="${g.vis.map(r=>r.option).join(' · ')}">${g.vis.length}개 항목</td><td></td>
           <td class="num">${fmt(g.opt)}</td>${etc}${amt}${payWayCell(g.name,S.month)}${phMemoCell(g)}</tr>`+
           (isOpen(g)?g.vis:[]).map(r=>`<tr class="sv-row"><td>└</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
@@ -1199,7 +1204,7 @@ function renderRv(){
     <tr><td>결제 완료 목록</td><td>기준월에 결제한 약국(결제월 기준). 미결제 배지는 보이지 않음</td><td>결제 완료 목록에 미결제 약국이 섞이지 않도록</td></tr>
     <tr><td>전월 대비</td><td>결제 완료 목록에 필터(전체 · 신규 · 해지 · 금액 변동)</td><td>신규 결제 · 서비스 해지 약국을 바로 추려 봄</td></tr>
     <tr><td>미결제</td><td>그 달 미결제 금액이 있는 약국. 약국 결제 관리로 이동, 뒤로 가기로 보던 위치에 복귀</td><td>재결제 · 승인은 기존 결제 관리에서 처리</td></tr>
-    <tr><td>서비스별 청구 현황</td><td>열을 서비스 · 유료처 · 무료처+VIP · 토탈 · 신규 · 해지 · 금액 · 기본할인 · 서비스 요금 합계 · 비중으로 정리. 서비스 요금 합계 = 금액 − 기본할인(기타 할인 전). 서비스로 나누지 않은 금액은 표 아래 한 줄</td><td>어떤 서비스가 늘고 줄었는지 한눈에</td></tr>
+    <tr><td>서비스별 청구 현황</td><td>열을 서비스 · 토탈 · 유료처 · 무료처+VIP · 신규 · 해지 · 금액 · 기본할인 · 서비스 요금 합계 · 비중으로 정리. 서비스 요금 합계 = 금액 − 기본할인(기타 할인 전). 서비스로 나누지 않은 금액은 표 아래 한 줄</td><td>어떤 서비스가 늘고 줄었는지 한눈에</td></tr>
     <tr><td>기타 할인 · 계약 확인 필요</td><td>기타 할인 = 약국 행 '기타 할인' 칸(금액 · 사유). 등록 · 계약과 결제가 다르면 비고에 계약 확인 필요 + 비고 필터(전체 · 계약 확인 필요)</td><td>원인 카테고리는 범위가 넓어 운영하면서 보완</td></tr>
     <tr><td>수정 위치</td><td>서비스는 서비스 수정 ›(약국 상세), 결제는 약국 결제 관리에서 수정</td><td>수정 규칙 · 권한을 한 곳에서 관리</td></tr>
     <tr><td>용어</td><td>화면의 '계약'을 '서비스'로 변경(예: 서비스 누락 · 서비스 미갱신)</td><td>계약은 계약서를 뜻하므로, 약국에 등록된 서비스와 구분</td></tr>
