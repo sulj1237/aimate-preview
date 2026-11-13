@@ -445,7 +445,15 @@ function billX(p, bm){
 }
 // 서비스 미지정 — 계약 · 옵션 정보 없이 결제되는 약국 (청구 설정 '미배분' 5곳 · 각 49,500원, Q14)
 const UN_FEE = {amt:49500, t:'un', opt:'서비스 미지정', q:'', x:1, cat:['1-2'], why:CB('1-2')+'서비스 · 옵션 정보 없이 결제 · 결제 이유 `굿팜결제`'};
-const billP = (p, bm) => p.un ? {UNALLOC:UN_FEE} : p.x ? billX(p, bm) : bill(p.sub[bm]);
+// 첫 달 무료 — 달 중간에 서비스를 추가하면 그 달은 요금 없음, 다음 달부터 청구 (기존 서비스 금액은 추가 전 구성 그대로)
+const PREV_BM = {'2026-10':'2026-09', '2026-11':'2026-10'};
+function billFirstFree(p, bm){ const sub=p.sub[bm], prev=p.sub[PREV_BM[bm]];
+  if(!prev || !prev.length) return bill(sub);
+  const added=sub.filter(i=>!prev.some(j=>j.c===i.c)); if(!added.length) return bill(sub);
+  const full=bill(sub), out=bill(sub.filter(i=>!added.includes(i)));
+  added.forEach(i=>{ out[i.c]={amt:0, gross:0, reg:full[i.c].amt, t:'첫 달 무료', opt:full[i.c].opt, q:full[i.c].q, x:0, why:'<b class="db">첫 달 무료</b><br>이번 달 추가 · 다음 달부터 '+fmt(full[i.c].amt)+'원 청구'}; });
+  return out; }
+const billP = (p, bm) => p.un ? {UNALLOC:UN_FEE} : p.x ? billX(p, bm) : billFirstFree(p, bm);
 
 // ───────── 가상 약국명 · 대표자명 · 사업자 번호 ─────────
 const NM_A = ['메디팜','온누리','늘푸른','새봄','참','바른','행복','건강','하나','미소','다온','소망','희망','열린','해맑은','튼튼','365','가온','나래','누리','단골','도담','라온','모아','세움','아름','이음','자연','한결','함께','하늘','별빛','봄날','정성','태평','성심','동행','은혜','새길','푸른숲','온새미','한빛','늘봄','다솜','예림','지음','청솔','백세','고운','참좋은'];
@@ -544,7 +552,7 @@ const PAYS = [];   // {name, bm(청구월), amt, reason, ok, date, fail}
 const MON = {'2026-09':9, '2026-10':10, '2026-11':11};
 const d2 = (m,d) => '2026-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
 const reasonOf = (p,bm) => p.x && p.x.reason ? p.x.reason : p.sub[bm].some(i=>i.c==='EDB') ? '굿팜결제(굿팜사용료+EDB연동비)' : '굿팜결제';
-const amtOf = (p,bm) => billTotal(p.x ? billP(p,bm) : bill(p.sub[bm]));
+const amtOf = (p,bm) => billTotal(billP(p,bm));
 // 정기 결제 실패 · 처리 (약국 인덱스 고정)
 const r9 = rng(909), pickPH = (cond, n, seed) => { const r=rng(seed), c=PH.filter(cond); const o=[];
   while(o.length<n){ const p=c[Math.floor(r()*c.length)]; if(!o.includes(p)) o.push(p); } return o; };
@@ -562,10 +570,10 @@ const pay = (p,bm,amt,reason,ok,date,fail) => PAYS.push({name:p.name,bm,amt,reas
 PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
   if(!live(bm)(p)) return;
   const m=MON[bm], a=amtOf(p,bm), late=(t)=>MON[bm]+'월 굿팜결제';
-  // 11월 중간 파머시 퍼스트 가입 — 정기 결제는 기존 구성, 가입분은 따로 결제
-  const pfJoin = bm==='2026-11' && p.sub['2026-10'].length && !p.sub['2026-10'].some(i=>i.c==='PHARMACY_FIRST') && p.sub[bm].some(i=>i.c==='PHARMACY_FIRST') && p.sub[bm].length===2 && p.sub[bm][0].c==='KIOSK';
-  const base = pfJoin ? amtOf({sub:{x:p.sub['2026-10']}},'x') : a;
+  // 서비스 추가 달은 그 서비스 무료(billP), 신규 약국 첫 달은 결제 없음 (첫 달 무료 · 다음 달부터 청구)
+  const base = a;
   const newJoin = bm!=='2026-09' && !p.sub[bm==='2026-10'?'2026-09':'2026-10'].length;
+  if(newJoin && !p.x){ p.pre=p.pre||{bm, d:'', first:(MON[bm]%12+1)+'월'}; return; }
   if(bm==='2026-10' && OCT_RETRY.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),true,d2(10,7+OCT_RETRY.indexOf(p)*5)); return; }
   if(bm==='2026-10' && OCT_LATE.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),true,d2(11,9)); return; }
   if(bm==='2026-10' && OCT_OPEN.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),false,d2(10,20+OCT_OPEN.indexOf(p)*3),nextFail()); return; }
@@ -575,9 +583,7 @@ PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
   if(bm==='2026-11' && NOV_RETRY.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(11,5),nextFail()); pay(p,bm,base,late(),true,d2(11,6+NOV_RETRY.indexOf(p)%3)); return; }
   if(bm==='2026-11' && NOV_OPEN.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(11,5),nextFail()); return; }
   if(bm==='2026-11' && OCT_LATE.includes(p)){ pay(p,bm,base,late(),true,d2(11,9)); return; }
-  if(newJoin && bm==='2026-11'){ pay(p,bm,base,late(),true,d2(11,7)); return; }
   pay(p,bm,base,reasonOf(p,bm),true,d2(m,5));
-  if(pfJoin) pay(p,bm,a-base,'11월 파머시퍼스트 가입 (미결제분 결제)',true,d2(11,6+PH.indexOf(p)%2));
 }));
 UN_PH.forEach(n=>['2026-09','2026-10','2026-11'].forEach(bm=>PAYS.push({name:n,bm,amt:49500,reason:'굿팜결제',ok:true,date:d2(MON[bm],5),fail:''})));
 // 결제 예시를 만든 뒤 목록에 추가 (다른 약국의 결제 실패 · 재시도 예시는 그대로)
@@ -598,7 +604,6 @@ const hasSub = (p,ym) => !!(p.sub[ym] && p.sub[ym].length);
 // 결제 → 서비스별 금액: 그 청구월의 이용 서비스 금액으로 나눔 (중간 가입분은 그 서비스로)
 function splitPay(x){
   const p=PH_BY[x.name]; if(!p) return null;
-  if(x.reason.includes('파머시퍼스트 가입')) return {PHARMACY_FIRST:x.amt};
   const b=billP(p,x.bm), tot=billTotal(b), o={};
   if(tot===x.amt){ Object.entries(b).forEach(([c,v])=>o[c]=v.amt); return o; }
   // 정기 결제가 기존 구성(중간 가입 전)일 때
@@ -689,7 +694,7 @@ const payWayCell = (name, ym) => { const w=new Set(PAYS.filter(x=>x.ok && x.name
   return '<td class="ctr">'+(t?'<b class="pway'+(t==='수기'?' man':'')+'">'+t+'</b>':'<span class="flat">−</span>')+'</td>'; };
 function payNote(name, ym){
   const p=PH_BY[name];
-  if(p && isPre(p,ym)) return '<span class="mt">청구 전 · '+p.pre.d+' 이용 시작 · '+p.pre.first+'분부터 청구</span>';
+  if(p && isPre(p,ym)) return '<span class="mt">청구 전 · '+(p.pre.d?p.pre.d+' 이용 시작':'첫 달 무료')+' · '+p.pre.first+'분부터 청구</span>';
   const ps=PAYS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S).sort((a,b)=>a.date.localeCompare(b.date));
   const fl=ps.filter(x=>!x.ok), ok=ps.filter(x=>x.ok);
   if(!ok.length && fl.length){ const f=fl[fl.length-1];
@@ -817,7 +822,7 @@ function renderMain(){
   const stats=SERVICES.filter(s=>!NOSVC.includes(s.code)).map(s=>{ const rs=R[s.code], sum=m=>rs.reduce((a,r)=>a+r[m].cur,0);
     const ph=st=>new Set(rs.filter(r=>r.status===st).map(r=>r.name)).size;
     // 사용처수 — 유료처 = 옵션 금액(기본할인 후, 기타 할인 전) > 0 · 무료처+VIP = 0원 · 토탈 = 이용 약국
-    const reg=r=>(r.fc.amt||0)+(r.fc.dsc||0), ns=f=>new Set(rs.filter(r=>r.fc&&f(r)).map(r=>r.name)).size;
+    const reg=r=>r.fc.reg!=null?r.fc.reg:(r.fc.amt||0)+(r.fc.dsc||0), ns=f=>new Set(rs.filter(r=>r.fc&&f(r)).map(r=>r.name)).size;
     return {s, use:ns(()=>true), pay:ns(r=>reg(r)>0), free:ns(r=>reg(r)===0), nw:ph('new'), stop:ph('stop'), gross:rs.reduce((a,r)=>a+grossOf(r),0), bill:rs.reduce((a,r)=>a+orig(r),0)}; })
     .filter(x=>x.use||x.bill||x.stop).sort((a,b)=>b.bill-a.bill || b.use-a.use);
   const origTot=stats.reduce((a,x)=>a+x.bill,0);
