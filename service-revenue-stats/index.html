@@ -1053,7 +1053,7 @@ function renderMain(){
   // 옵션별 금액 — 서비스 미지정은 0원(등록 서비스 없음), 광동 지원 상품은 0원 + 이용 금액
   const tabHtml=TABS.map((x,i)=>{ const v=TT[x.k];
     return `<div class="bcell"><div class="bk">${x.t}</div><div class="bv">${fmt(v.cur)}<small> 원</small></div>
-      <div class="bs">${fmt(v.ph)}곳 · ${kpiDelta(v.cur,v.prev,'원')}</div>${x.k==='paid'&&RF.cur?'<div class="bs"><span class="red">환불 −'+fmt(RF.cur)+'원 · '+RF.n+'건 포함</span></div>':''}</div>`; }).join('');
+      <div class="bs">${fmt(v.ph)}곳 · ${kpiDelta(v.cur,v.prev,'원')}</div></div>`; }).join('');
   CALC_G=Object.fromEntries(phPage.map(g=>[g.name,{g,rows:rowsOf[g.name]||g.rows,T,first,pm:M.prev}]));
 
   document.getElementById('content').innerHTML=`
