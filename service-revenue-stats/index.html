@@ -1340,12 +1340,6 @@ const RV_API = '';
 const RV_SHEET = 'https://docs.google.com/spreadsheets/d/10HAOHUz9KitW_oMLdEpeTrCVD4p6-DeIhdKhz7keOkU/edit#gid=900300';
 const RV_CAT = 'https://docs.google.com/spreadsheets/d/10HAOHUz9KitW_oMLdEpeTrCVD4p6-DeIhdKhz7keOkU/edit#gid=900100';
 const RV_ITEMS = [
-  {id:'C1', own:'박단님', q:'월 실적 기준', bg:'청구월 기준. 약국별 청구는 청구월마다 한 건, 결제일은 따로 기록. 실제 납부월 수납 합계가 따로 필요한지는 확인 중'},
-  {id:'C2', own:'박단님', q:'청구 예정 정의', bg:'청구 예정 = 그 청구월 결제 예정 금액 합계, VAT 포함 = 결제 완료 + 미결제'},
-  {id:'C3', own:'영업팀 · 박단님', q:'원인 분류 체계', bg:'대분류 5개 · 소분류 11개 (아래 실데이터 점검 결과 표)'},
-  {id:'C4', own:'영업팀 · 박단님', q:'원인 분류 변경 적용 시점', bg:'바꾼 달부터 적용, 다시 바꾸기 전까지 유지. 이전 달은 기존 분류'},
-  {id:'C5', own:'영업팀 · 박단님', q:'통계 화면의 수정 범위', bg:'원인 분류 · 메모만 기록. 서비스 · 결제는 약국 상세 · 약국 결제 관리에서 수정'},
-  {id:'C6', own:'영업팀', q:'용어', bg:'\'계약\'은 계약서에만, 약국에 등록된 내용은 \'서비스\''},
   {id:'Q1', own:'영업팀', q:'서비스 누락 약국 19곳(EDB 연동비 13곳 등)의 서비스 등록을 언제까지 보완할 수 있나요?', bg:'영업팀이 맡고 있는 등록 작업 중 아직 처리되지 않은 건. 결제는 되는데 등록에 없어 서비스별 통계에서 빠짐. 약국 목록: 원인 분류 시트 분류 코드 1-1 ~ 1-4'},
   {id:'Q2', own:'영업팀 · 박단님', q:'할인 오입력 10곳(월 +492,250원)은 등록 금액을 정가로 고치는 것이 맞나요? 계약서에 할인을 약속한 약국이 있는지도 확인해 주세요', bg:'등록은 할인 0원인데 매월 정가 결제 중. 10곳 모두 굿팜 플러스 때부터 정가로 결제해 왔고, 굿팜 솔루션(NEW)으로 옮기면서 할인 −45,000이 등록됨(정기 결제는 기존 금액 그대로). 솔루션 계약서: 없음 6곳 · 기한 만료 1곳 · 서명 완료 3곳 — 서명 완료 3곳은 계약서 할인 여부 확인. 약국 목록: 원인 분류 시트 분류 코드 2'},
   {id:'Q3', own:'박단님', q:'과다 청구 의심 1곳(월 +27,500원)은 환불 · 청구 중지 대상인가요?', bg:'비고에 키오스크 무료 · 회수인데 매월 71,500원 결제(등록 44,000). 약국: 원인 분류 시트 분류 코드 6'},
@@ -1424,7 +1418,7 @@ function renderRv(){
   const log=(RV.data&&RV.data.log||[]).slice(-10).reverse();
   const done=RV_ITEMS.filter(i=>{ const c=RV.data&&RV.data.items[i.id]; return c&&(c.reply||c.answer); }).length;
   el.innerHTML=`<div class="rvh"><div class="rvt"><h2>설명 · 확인 사항</h2><span class="prog">답변 ${done} / ${RV_ITEMS.length}</span><button class="x" id="rvX" aria-label="닫기">✕</button></div>
-    <div class="nav">${[['rvs1','바뀐 내용'],['rvs2','확인 방법'],['rvs3','실데이터'],['rvs4','확정 요청 6'],['rvs5','질문 10']].map(([k,t])=>`<a data-go="${k}">${t}</a>`).join('')}</div></div>
+    <div class="nav">${[['rvs1','바뀐 내용'],['rvs2','확인 방법'],['rvs3','실데이터'],['rvs5','질문 10']].map(([k,t])=>`<a data-go="${k}">${t}</a>`).join('')}</div></div>
   ${RV_API?'':'<div class="warn">답변 저장 주소를 연결하기 전입니다. 지금은 읽기만 할 수 있습니다.</div>'}${RV.err?'<div class="warn">'+esc(RV.err)+'</div>':''}
   <div class="sec" id="rvs1"><h3>바뀐 내용</h3>
     <div class="key"><b>① 약국별 청구를 청구 예정 / 결제 완료 / 미결제로 나눠 봅니다</b>청구월 기준. 청구 예정 = 그 청구월 결제 예정 금액, 결제 완료 = 그 청구월분으로 결제된 금액(결제일은 따로 표기), 미결제 = 청구 예정 − 결제 완료. 결제 완료 목록은 전월 대비(신규 · 해지 · 금액 변동)로 걸러 보고, 미결제 목록에서는 약국 결제 관리로 바로 이동합니다.</div>
@@ -1450,7 +1444,6 @@ function renderRv(){
     <p>결제 금액이 등록 서비스와 다르거나 기타 할인이 있는 약국 <b>52곳</b> · 등록보다 매월 <b>973,500원</b> 더 결제 · 기타 할인 매월 247,500원</p>
     <table><tr><th>대분류</th><th>소분류</th><th>곳</th><th>차이(월)</th><th>기타 할인</th></tr>
     ${RV_STAT.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td><td class="n">${r[4]}</td></tr>`).join('')}</table></div>
-  <div class="sec" id="rvs4"><h3>확정 요청 <small>프로토타입에 반영한 안 · 회신을 고르고 저장</small></h3>${RV_ITEMS.filter(i=>i.id[0]==='C').map(rvCard).join('')}</div>
   <div class="sec" id="rvs5"><h3>질문 <small>답변을 적고 저장</small></h3>${RV_ITEMS.filter(i=>i.id[0]==='Q').map(rvCard).join('')}</div>
   <div class="sec"><h3>최근 답변</h3>${log.length?'<ul>'+log.map(l=>`<li>${esc(l.at)} · ${esc(l.id)} · ${esc(l.reply)} ${esc(l.answer).slice(0,60)}</li>`).join('')+'</ul>':'<p class="mut">아직 저장된 답변이 없습니다.</p>'}
     <p class="mut">모든 답변은 <a class="lnk" href="${RV_SHEET}" target="_blank" rel="noopener">구글 시트</a>에도 쌓입니다.</p></div>`;
