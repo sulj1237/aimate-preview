@@ -691,7 +691,7 @@ function amtCell(v, f){ return fmt(v); }
 const CALC_IC='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="1.5" width="10" height="13" rx="1.5"/><path d="M5.5 4.5h5M5.5 8h.5M8 8h.5M10 8h.5M5.5 11h.5M8 11h.5M10 11h.5"/></svg>';
 const calcBtn = n => `<button class="cbtn" data-calc="${n}" title="계산 내역 상세" aria-label="계산 내역 상세">${CALC_IC}</button>`;
 let CALC_G = {};
-// 계산 내역 — 옵션별 정가 · 결합 할인 · 금액(결합 할인 후) → 서비스 요금 → 기타 할인(약국 총액에서 차감, 별도 줄) → 기타 할인 적용 후 서비스 요금 → 결제 예정 금액
+// 계산 내역 — 옵션별 정가 · 결합 할인 · 금액(결합 할인 후) → 서비스 요금 → 기타 할인(약국 총액에서 차감, 별도 줄) → 할인 후 요금 → 결제 예정 금액
 function calcTable(rows, ym, side){ const name=rows[0]&&rows[0].name, p=PH_BY[name], pre=p&&isPre(p,ym), w=fmt;
   const A=phSum(name, rows, ym, side), svc=rows.filter(r=>!NOSVC_C.includes(r.svc)&&sideF(r,side));
   const red=v=>v?'<span class="red">−'+w(v)+'</span>':'<span class="flat">0</span>';
@@ -708,7 +708,7 @@ function calcTable(rows, ym, side){ const name=rows[0]&&rows[0].name, p=PH_BY[na
   // 기타 할인 — 약국 총액에서 차감
   const why=[...new Set(rows.map(r=>{ const f=sideF(r,side); return f&&f.why&&(f.why.match(/기타 할인 사유 `([^`]+)`/)||[])[1]; }).filter(Boolean))].join(' · ');
   h+='<tr class="etc"><td colspan="4">기타 할인'+(why?' <span class="dsv" style="display:inline">'+why+'</span>':'')+'</td><td class="num">'+red(A.etc)+'</td><td><span class="flat">약국 총액에서 차감</span></td></tr>'+
-    '<tr class="tot"><td colspan="4">기타 할인 적용 후 서비스 요금</td><td class="num">'+w(A.after)+'원</td><td></td></tr>';
+    '<tr class="tot"><td colspan="4">할인 후 요금</td><td class="num">'+w(A.after)+'원</td><td></td></tr>';
   // 결제 예정 금액 — 등록된 정기 결제 금액. 서비스 요금과 다르면 차이와 이유
   const ex=rows.filter(r=>['OFF','UNALLOC'].includes(r.svc)||(r.svc==='DISC'&&sideF(r,side)&&!sideF(r,side).etc)).map(r=>sideF(r,side)).filter(Boolean);
   h+='<tr class="tot"><td colspan="4">결제 예정 금액'+(A.diff?' <b class="ckb">계약 확인 필요</b>':'')+'</td><td class="num">'+w(A.plan)+'원</td><td>'+
@@ -808,7 +808,7 @@ const EQUIPS = ['모바일OCR','파머시퍼스트','키오스크','스캐너','
 const equipOf = (name, ym) => { const p=PH_BY[name]; if(!p||!p.sub) return []; const sub=(p.sub[ym]&&p.sub[ym].length?p.sub[ym]:p.sub['2026-10'])||[], o=new Set();
   sub.forEach(i=>{ if(i.c==='KIOSK') o.add('키오스크'); else if(i.c==='SMART_OCR') o.add('스캐너'); else if(i.c==='MOBILE_OCR') o.add('모바일OCR'); else if(i.c==='PHARMACY_FIRST') o.add('파머시퍼스트'); else if(i.c==='SMART2D') o.add('2D'); else if(i.c==='FULL_PACKAGE') o.add(/OCR/.test(i.v||'')?'스캐너':'키오스크'); });
   if(PH.indexOf(p)%9===4) o.add('VAN'); return EQUIPS.filter(e=>o.has(e)); };
-const S = { sc:'cmp', month:'2026-11', tab:'paid', cause:'all', man:false, rf:false, eq:'all', cf:'all', cpage:1, opts:new Set(), optOpen:false, pp:10, expAll:null, tog:new Set(), q:'', sort:null, dir:'desc', page:'stats' };
+const S = { sc:'cmp', month:'2026-11', tab:'paid', cause:'all', man:false, rf:false, eq:'all', cf:'all', cpage:1, opts:new Set(), optOpen:false, pp:30, expAll:null, tog:new Set(), q:'', sort:null, dir:'desc', page:'stats' };
 // 약국 결제 관리 이동 화면 — 조회일 기준 최근 1개월 결제 실패 중 아직 결제되지 않은 청구 (재시도 성공 · 이후 결제분 제외, 마지막 실패 시도 1건)
 const PAY_FROM='2026-10-09', PAY_TO=TODAY_S;
 const PAY_FAILS = (()=>{ const last={};
@@ -855,7 +855,7 @@ const payDT = x => x.date.slice(2)+' '+payTime(x);
 // 결제일시 — 결제 완료: 그 청구월분이 결제된 일시(여러 번이면 모두, 다음 달에 결제해도 그 일시) · 미결제: 마지막 결제 시도(실패) 일시
 const payDates = (name, ym) => [...new Set(PAYS.filter(x=>x.ok && x.name===name && x.bm===ym && x.date<=TODAY_S).map(payDT))].sort();
 const lastTry = (name, ym) => PAYS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S).map(payDT).sort().pop()||'';
-// 약국 금액 — 서비스 요금(기타 할인 전) → 기타 할인 → 기타 할인 적용 후 서비스 요금 / 결제 예정 금액(등록된 정기 결제 금액) / 실결제 금액
+// 약국 금액 — 서비스 요금(기타 할인 전) → 기타 할인 → 할인 후 요금 / 결제 예정 금액(등록된 정기 결제 금액) / 실결제 금액
 //   rs = 기준월 ROWS의 그 약국 행, side = 'cur'(당월) · 'prev'(전월)
 const NOSVC_C = ['OFF','DISC','UNALLOC'];
 const sideF = (r, side) => side==='cur' ? r.fc : r.fp;
@@ -874,7 +874,7 @@ const etcMemoR=rows=>[...new Set(rows.map(r=>r.fc&&r.fc.why&&(r.fc.why.match(/�
 function mkG(name, all, ym, T, first, listRows){ const pm=MONTHS[ym].prev, pv=(r,m)=>first?0:r[m].prev, g={name, rows:(listRows||all).slice()};
   g.rows.sort((a,b)=>Math.abs(b[T].cur-pv(b,T))-Math.abs(a[T].cur-pv(a,T)));
   g.vis=g.rows.filter(r=>r.svc!=='DISC'&&r.svc!=='OFF'); if(!g.vis.length) g.vis=g.rows.filter(r=>r.svc!=='DISC'); if(!g.vis.length) g.vis=g.rows;
-  // 금액 — 기타 할인 적용 후 서비스 요금 · 결제 예정 · 실결제(미결제면 0원). 전월 · 증감 = 결제 완료 탭은 실결제, 미결제 탭은 결제 예정 기준
+  // 금액 — 할인 후 요금 · 결제 예정 · 실결제(미결제면 0원). 전월 · 증감 = 결제 완료 탭은 실결제, 미결제 탭은 결제 예정 기준
   g.a=phSum(name, all, ym, 'cur'); g.ap=first?null:phSum(name, all, pm, 'prev'); g.opt=g.a.opt;
   g.cur=T==='paid'?g.a.paid:g.a.plan; g.prev=first?0:(T==='paid'?g.ap.paid:g.ap.plan); g.plan=g.a.plan;
   g.pds=T==='unpaid'?[]:payDates(name,ym); g.pd=T==='unpaid'?lastTry(name,ym):(g.pds[g.pds.length-1]||''); return g; }
@@ -890,7 +890,7 @@ function phRowHtml(g, c){
   const etc=`<td class="num">${e?'<span class="downc">−'+fmt(e)+'</span>'+(em?'<div class="dsv">'+em+'</div>':''):'<span class="flat">0</span>'}</td>`;
   // 계약 확인 필요 — 결제 예정 금액 칸. 서비스 요금과 결제 예정 금액이 다르면 두 금액을 함께
   const chk=c.all.some(r=>isChk(r.fc)||(!first&&isChk(r.fp))), dd=g.a.diff;
-  const ckb=chk||dd?'<div class="ckwrap"><b class="ckb">계약 확인 필요</b>'+(dd?'<div class="ckd">서비스 요금 '+fmt(g.a.after)+' → 결제 예정 '+fmt(g.a.plan)+' <b class="'+(dd>0?'upc':'downc')+'">'+(dd>0?'+':'−')+fmt(Math.abs(dd))+'</b></div>':'')+'</div>':'';
+  const ckb=chk||dd?'<div class="ckwrap"><b class="ckb">계약 확인 필요</b>'+(dd?'<div class="ckd">할인 후 요금 '+fmt(g.a.after)+' → 결제 예정 '+fmt(g.a.plan)+' <b class="'+(dd>0?'upc':'downc')+'">'+(dd>0?'+':'−')+fmt(Math.abs(dd))+'</b></div>':'')+'</div>':'';
   const amt=`<td class="num">${fmt(g.a.after)}</td><td class="num">${calcBtn(c.key)}<b>${fmt(g.a.plan)}</b>${ckb}</td><td class="num"><b>${fmt(g.a.paid)}</b></td><td class="ctr dt">${g.pds.length?g.pds.join('<br>'):(g.pd?'<span class="flat">'+g.pd+'</span>':'<span class="flat">−</span>')}</td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
   // 옵션 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
   if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">${sidLine(g.name)}</span><span class="tg"></span>${nm}</td>${eqc}<td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
@@ -901,45 +901,66 @@ function phRowHtml(g, c){
   <td class="num">${fmt(g.opt)}</td>${etc}${amt}${payWayCell(g.name,c.ym)}${phMemoCell(g)}</tr>`+
   (c.open?g.vis:[]).map(r=>`<tr class="sv-row"><td>└</td><td></td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
   <td class="num">${optCell(r)}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>${memoCell(r)}</tr>`).join(''); }
-const PH_HEAD=(T,sh)=>`<thead><tr><th>약국명</th><th>설치 장비</th><th>서비스 옵션</th><th class="num">수량</th><th class="num">옵션별 금액<span class="tip" data-tip="등록 옵션 금액(결합 할인 후) · 약국 행은 옵션 총액">i</span></th><th class="num">기타 할인</th><th class="num">기타 할인 적용 후<br>서비스 요금<span class="tip" data-tip="옵션 총액 − 기타 할인">i</span></th>${sh('plan','결제 예정 금액')}${sh('paid','실결제 금액')}${sh('date',T==='unpaid'?'결제 시도일시':'결제일시')}${sh('prev','전월')}${sh('diff','증감')}<th class="ctr">결제 방식</th><th>비고</th></tr></thead>`;
+const PH_HEAD=(T,sh)=>`<thead><tr><th>약국명</th><th>설치 장비</th><th>서비스 옵션</th><th class="num">수량</th><th class="num">옵션별 금액<span class="tip" data-tip="등록 옵션 금액(결합 할인 후) · 약국 행은 옵션 총액">i</span></th><th class="num">기타 할인</th><th class="num">할인 후 요금<span class="tip" data-tip="옵션 총액 − 기타 할인">i</span></th>${sh('plan','결제 예정 금액')}${sh('paid','실결제 금액')}${sh('date',T==='unpaid'?'결제 시도일시':'결제일시')}${sh('prev','전월')}${sh('diff','증감')}<th class="ctr">결제 방식</th><th>비고</th></tr></thead>`;
 
 /* ───────── 케이스별 예시 (약국별 청구 아래) ─────────
    케이스마다 대표 약국 1곳을 약국별 청구와 같은 양식으로. 케이스 = [이름, 언제 · 어떻게 보이는지, 목록(paid · unpaid), 청구월, 조건] */
 const rowsByM={};
 const rowsBy=ym=>rowsByM[ym]||(rowsByM[ym]=(()=>{ const o={}; SERVICES.forEach(sv=>ROWS[ym][sv.code].forEach(r=>{ (o[r.name]=o[r.name]||[]).push(r); })); return o; })());
+const catHas=(rs,k)=>rs.some(r=>[r.fc].some(f=>f&&(f.cat||[]).includes(k)));
+// 조건 = (약국명, 청구월 행 묶음, 당월 합계(phSum), 청구월, 전월)
 const CASE_GROUPS=[
   ['결제 상태', [
-    ['정기 결제', '5일 정기 결제로 자동 결제. 결제 방식 자동, 비고 비어 있음', 'paid', '2026-11', (n,by,s)=>s.paid>0 && !s.diff && !s.etc && by[n].length===1 && by[n][0].fc && by[n][0].fp && by[n][0].fc.t==='정상가' && wayIs(n,'2026-11')==='자동' && !chgNote(by[n][0])],
-    ['청구 전', '이번 달에 서비스를 시작해 다음 달부터 청구. 금액 0원, 비고에 이용 시작일 · 청구 시작 월', 'paid', '2026-11', n=>isPre(PH_BY[n],'2026-11')],
+    ['정기 결제', '5일 정기 결제로 자동 결제. 결제 방식 자동, 비고 비어 있음', 'paid', '2026-11', (n,by,s,ym,pm)=>s.paid>0 && !s.diff && !s.etc && by[n].length===1 && by[n][0].fc && by[n][0].fp && by[n][0].fc.t==='정상가' && feeIn(by[n][0].fp,pm,n)>0 && wayIs(n,ym)==='자동' && !chgNote(by[n][0])],
+    ['청구 전', '이번 달에 서비스를 시작해 다음 달부터 청구. 금액 0원, 비고에 이용 시작일 · 청구 시작 월', 'paid', '2026-11', (n,by,s,ym)=>isPre(PH_BY[n],ym)],
     ['미결제', '청구월분 결제가 모두 실패. 미결제 목록에 나오고 실결제 0원, 비고에 실패일 · 실패 사유 · 횟수', 'unpaid', '2026-11', (n,by,s)=>s.unpaid>0 && s.paid===0 && !s.diff],
-    ['수기 결제', '관리자가 결제(수기). 결제 방식 수기, 비고에 결제 이유(메모)', 'paid', '2026-11', n=>PAYS.some(x=>x.ok && x.name===n && x.bm==='2026-11' && x.date<=TODAY_S && wayOf(x)==='수기')],
-    ['지난 청구월분 결제', '10월분을 11월에 결제. 10월분 결제 완료로 집계, 결제일시는 실제 결제한 11월 일시', 'paid', '2026-10', n=>PAYS.some(x=>x.ok && x.name===n && x.bm==='2026-10' && x.date.slice(0,7)==='2026-11' && x.date<=TODAY_S)] ]],
+    ['수기 결제', '관리자가 결제(수기). 결제 방식 수기, 비고에 결제 이유(메모)', 'paid', '2026-11', (n,by,s,ym)=>PAYS.some(x=>x.ok && x.name===n && x.bm===ym && x.date.slice(0,7)===ym && x.date<=TODAY_S && wayOf(x)==='수기')],
+    ['지난 청구월분 결제', '10월분을 11월에 결제. 10월분 결제 완료로 집계, 결제일시는 실제 결제한 11월 일시', 'paid', '2026-10', (n,by,s,ym)=>PAYS.some(x=>x.ok && x.name===n && x.bm===ym && x.date.slice(0,7)>ym && x.date<=TODAY_S)] ]],
   ['서비스 구성', [
     ['결합할인', '2개 이상 함께 이용. 가장 비싼 서비스 외 50%. 계산 아이콘으로 결합 내용 · 계산식 확인', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='결합할인 50%') && !s.diff && !s.etc && s.paid>0],
     ['같은 서비스 2대 이상', '장비가 있는 서비스 2대 이상. 2대째부터 50%, 장비임대료는 할인 없음', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.qty>1&&/결합할인/.test(r.fc.t)) && s.paid>0],
     ['풀패키지', '정액 상품. 옵션명 풀패키지 + 정액 금액', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='정액') && s.paid>0],
+    ['할인 불가 서비스', 'EDB 연동 · ESL은 결합해도 정가', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='할인 불가') && s.paid>0],
     ['굿팜 POS 무료', 'POS는 함께 쓰는 서비스에만 청구. POS 옵션 0원', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='무료') && s.paid>0],
     ['스마트 OCR 기본 제공', '스마트 OCR을 쓰면 모바일 OCR 0원', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='스마트 OCR 기본 제공') && s.paid>0],
     ['광동 VIP', '광동 지원 서비스 1개는 약국 결제 0원 + 이용 금액 표기, 그 외 서비스는 50% 할인(장비비 별도)', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>isKdFree(r.fc)) && s.paid>0] ]],
   ['전월 대비', [
-    ['신규', '이번 달 처음 요금이 발생. 전월 0원 · 증감 +', 'paid', '2026-11', (n,by,s)=>s.paid>0 && by[n].some(r=>feeIn(r.fc,'2026-11',n)>0 && !feeIn(r.fp,'2026-10',n))],
-    ['해지', '해지 후 이번 달 처음 청구가 중단. 수량 N → 0 · 증감 −', 'paid', '2026-11', (n,by)=>by[n].some(r=>feeIn(r.fp,'2026-10',n)>0 && !r.fc && r.qtyPrev) && by[n].some(r=>r.fc)],
-    ['금액 변동', '같은 서비스인데 금액이 바뀜. 전월 · 증감으로 확인, 계산 아이콘에서 두 달 계산 내역', 'paid', '2026-11', (n,by,s)=>{ const p=phSum(n,by[n],'2026-10','prev'); return s.paid>0 && p.paid>0 && s.paid!==p.paid && by[n].every(r=>r.fc&&r.fp); }] ]],
-  ['기타 할인 · 계약 확인 필요', [
-    ['기타 할인', '약국 단위 할인. 기타 할인 칸에 금액 · 사유, 기타 할인 적용 후 서비스 요금 = 결제 예정 금액', 'paid', '2026-11', (n,by,s)=>s.etc>0 && !s.diff && s.paid>0],
-    ['기타 할인 변경', '전월과 기타 할인이 다름. 서비스 행 비고에 기타 할인 변경', 'paid', '2026-11', (n,by)=>by[n].some(r=>!!chgNote(r))],
-    ['미등록 청구', '약국 서비스에 없는 항목이 청구됨. 결제 예정 금액이 더 크고 계약 확인 필요 + 두 금액 비교', 'paid', '2026-11', (n,by,s)=>s.diff>0 && by[n].some(r=>r.svc==='OFF') && s.paid>0],
-    ['청구 부족', '등록 옵션 금액보다 적게 청구됨. 결제 예정 금액이 더 작고 계약 확인 필요 + 두 금액 비교', 'paid', '2026-11', (n,by,s)=>s.diff<0 && s.paid>0],
-    ['서비스 미지정', '등록 서비스 · 옵션 없이 결제만 됨. 서비스 요금 0원, 결제 예정 금액만 있음', 'paid', '2026-11', (n,by)=>by[n].some(r=>r.svc==='UNALLOC')] ]] ];
+    ['신규', '이번 달 처음 요금이 발생. 전월 0원 · 증감 +', 'paid', '2026-11', (n,by,s,ym,pm)=>s.paid>0 && by[n].some(r=>feeIn(r.fc,ym,n)>0 && !feeIn(r.fp,pm,n))],
+    ['해지', '해지 후 이번 달 처음 청구가 중단. 수량 N → 0 · 증감 −', 'paid', '2026-11', (n,by,s,ym,pm)=>by[n].some(r=>feeIn(r.fp,pm,n)>0 && !r.fc && r.qtyPrev) && by[n].some(r=>r.fc)],
+    ['금액 변동', '같은 서비스인데 금액이 바뀜. 전월 · 증감으로 확인, 계산 아이콘에서 두 달 계산 내역', 'paid', '2026-11', (n,by,s,ym,pm)=>{ const p=phSum(n,by[n],pm,'prev'); return s.paid>0 && p.paid>0 && s.paid!==p.paid && by[n].every(r=>r.fc&&r.fp); }] ]],
+  ['기타 할인', [
+    ['기타 할인', '약국 단위 할인. 기타 할인 칸에 금액 · 사유, 할인 후 요금 = 결제 예정 금액', 'paid', '2026-11', (n,by,s)=>s.etc>0 && !s.diff && s.paid>0 && !catHas(by[n],'5')],
+    ['기타 할인 사유 없음', '기타 할인 금액만 있고 사유가 비어 있음', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'5') && s.paid>0],
+    ['기타 할인 변경', '전월과 기타 할인이 다름. 서비스 행 비고에 기타 할인 변경', 'paid', '2026-11', (n,by)=>by[n].some(r=>!!chgNote(r))] ]],
+  ['계약 확인 필요', [
+    ['EDB 연동비 누락', '결제 이유에 EDB 연동비가 있는데 약국 서비스에 없음. 결제 예정 금액이 더 큼', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'1-1') && s.paid>0],
+    ['서비스 미지정', '등록 서비스 · 옵션 없이 결제만 됨. 할인 후 요금 0원, 결제 예정 금액만 있음', 'paid', '2026-11', (n,by)=>by[n].some(r=>r.svc==='UNALLOC')],
+    ['해지 후 결제', '서비스 해지 상태인데 계속 결제', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'1-3') && s.paid>0],
+    ['솔루션 외 서비스', '굿팜 솔루션 외 서비스(모바일 바코드프리 등)가 함께 결제', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'1-4') && s.paid>0],
+    ['할인 0원 · 정가 결제', '등록 금액은 할인으로 0원인데 정가로 결제', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'2') && s.paid>0],
+    ['서비스 · 금액 변경 미반영', '서비스 · 금액이 바뀌었는데 약국 서비스에 반영 전. 결제 금액이 실제', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'3') && s.diff>=0 && s.paid>0],
+    ['회수 · 무료 서비스 청구', '비고에 회수 · 무료인데 금액 청구', 'paid', '2026-11', (n,by,s)=>catHas(by[n],'6') && s.paid>0],
+    ['청구 부족', '등록 옵션 금액보다 적게 청구됨. 결제 예정 금액이 더 작음', 'paid', '2026-11', (n,by,s)=>s.diff<0 && s.paid>0] ]] ];
 const wayIs=(n,ym)=>{ const w=new Set(PAYS.filter(x=>x.ok && x.name===n && x.bm===ym && x.date<=TODAY_S).map(wayOf)); return w.has('수기')?'수기':w.has('자동')?'자동':''; };
 const feeIn=(f,ym,n)=>f&&!isPre(PH_BY[n],ym)?(f.amt||0)+(f.dsc||0):0;
+const CASE_FLAT=CASE_GROUPS.flatMap(([g,cs])=>cs.map(c=>({g,t:c[0],d:c[1],tab:c[2],ym0:c[3],f:c[4]})));
+// 케이스마다 대표 약국 1곳 — 겹치지 않게: 후보가 적은 케이스부터, 다른 케이스에 덜 걸리는 약국을 먼저 배정
+const CASE_CAND={};
+function caseCand(ym, i){ const k=ym+'|'+i; if(CASE_CAND[k]) return CASE_CAND[k];
+  const c=CASE_FLAT[i], by=rowsBy(ym), pm=MONTHS[ym].prev;
+  return CASE_CAND[k]=Object.keys(by).filter(n=>{ try{ return !!c.f(n,by,phSum(n,by[n],ym,'cur'),ym,pm); }catch(e){ return false; } }); }
+function caseAssign(ym, idx, allowed){
+  const cand={}, cnt={}; idx.forEach(i=>{ cand[i]=caseCand(ym,i).filter(n=>!allowed||allowed.has(n)); cand[i].forEach(n=>cnt[n]=(cnt[n]||0)+1); });
+  const used=new Set(), out={};
+  [...idx].sort((a,b)=>cand[a].length-cand[b].length).forEach(i=>{ const n=cand[i].filter(n=>!used.has(n)).sort((a,b)=>cnt[a]-cnt[b])[0]; if(n){ used.add(n); out[i]=n; } });
+  return out; }
+// 약국별 청구 첫 페이지 — 기본 정렬이면 케이스 대표 약국을 케이스 순서대로 맨 앞에
+function caseFront(ym, tab, names){ const idx=CASE_FLAT.map((c,i)=>i).filter(i=>CASE_FLAT[i].tab===tab), a=caseAssign(ym, idx, new Set(names));
+  return idx.map(i=>a[i]).filter(Boolean); }
 let CASE_EX=null;
-function caseList(){ if(CASE_EX) return CASE_EX; const used=new Set();
-  CASE_EX=CASE_GROUPS.map(([gt,cs])=>[gt, cs.map(([t,d,tab,ym0,f])=>{
-    const ok=(n,ym)=>{ try{ const by=rowsBy(ym); return by[n] && f(n,by,phSum(n,by[n],ym,'cur')); }catch(e){ return false; } };
-    const find=ym=>{ const ns=Object.keys(rowsBy(ym)); return ns.find(n=>!used.has(n)&&ok(n,ym)) || ns.find(n=>ok(n,ym)); };
-    const ym=ym0, n=find(ym);
-    if(n) used.add(n); return {t,d,tab,ym,name:n||null}; })]);
+function caseList(){ if(CASE_EX) return CASE_EX; const pick={};
+  [...new Set(CASE_FLAT.map(c=>c.ym0+'|'+c.tab))].forEach(k=>{ const [ym,tab]=k.split('|'); Object.assign(pick, caseAssign(ym, CASE_FLAT.map((c,i)=>i).filter(i=>CASE_FLAT[i].ym0===ym&&CASE_FLAT[i].tab===tab))); });
+  CASE_EX=CASE_GROUPS.map(([gt])=>[gt, CASE_FLAT.map((c,i)=>({...c, i})).filter(c=>c.g===gt).map(c=>({t:c.t, d:c.d, tab:c.tab, ym:c.ym0, name:pick[c.i]||null}))]);
   return CASE_EX; }
 function caseHtml(){
   if(S.sc==='first') return '';
@@ -1022,6 +1043,9 @@ function renderMain(){
     // 기본 정렬 = 결제 최신순 → 같은 날이면 실결제(미결제) 금액 큰 순 (미결제 탭은 마지막 결제 시도일 최신순)
     .sort(S.sort ? (a,b)=>(S.dir==='desc'?1:-1)*(SORTKEY[S.sort](b)-SORTKEY[S.sort](a)) || b.cur-a.cur
                  : (a,b)=>SORTKEY.date(b)-SORTKEY.date(a) || b.cur-a.cur || a.name.localeCompare(b.name));
+  // 기본 정렬 — 케이스마다 대표 약국 1곳(겹치지 않게)을 케이스 순서대로 첫 페이지 맨 앞에
+  if(!S.sort){ const fr=caseFront(S.month, T, phList.map(g=>g.name)), pos=new Map(fr.map((n,i)=>[n,i]));
+    phList.sort((a,b)=>(pos.has(a.name)?pos.get(a.name):1e9)-(pos.has(b.name)?pos.get(b.name):1e9)); }
   const cper=S.pp, cpages=Math.max(1,Math.ceil(phList.length/cper)); if(S.cpage>cpages) S.cpage=cpages;
   const phPage=phList.slice((S.cpage-1)*cper, S.cpage*cper);
   // 접기 · 펼치기 — 기본 접힘, 필터 · 검색을 쓰면 모두 펼침. 약국 행 클릭으로 개별 전환
@@ -1215,7 +1239,7 @@ function renderGuide(){
       <tr><td class="k">결제일시</td><td>YY-MM-DD HH:MM (예: 26-11-05 09:12). 결제 완료 = 그 청구월분이 결제된 일시(다음 달에 결제했으면 그 일시, 여러 번이면 모두) · 미결제 = 마지막 결제 시도 일시. 시각은 예시값</td></tr>
       <tr><td class="k">비고 내용</td><td>약국 행: 결제 상태(청구 전 · 미결제 · 수기 결제 메모) + 메모. 서비스 행: 전월과 다를 때 <b>기타 할인 변경</b>. '계약 확인 필요' 배지는 결제 예정 금액 칸</td></tr>
       <tr><td class="k">비고 위치</td><td>표의 가장 오른쪽 열. 결제 상태 = 약국 행(항목이 1개인 약국은 서비스 행과 한 칸), 계약 확인 필요 · 서비스 변경 = 서비스 행. 기타 할인 금액 · 사유는 약국 행 '기타 할인' 칸</td></tr>
-      <tr><td class="k">약국별 금액</td><td>옵션별 금액(등록 옵션 금액, 결합 할인 후) · 약국 행은 옵션 총액 → 기타 할인 → 기타 할인 적용 후 서비스 요금 → 결제 예정 금액(등록된 정기 결제 금액) → 실결제 금액(그 청구월분 결제, 미결제 0원). 서비스 요금과 결제 예정 금액이 다르면 결제 예정 금액 칸에 계약 확인 필요 + 두 금액 비교</td></tr>
+      <tr><td class="k">약국별 금액</td><td>옵션별 금액(등록 옵션 금액, 결합 할인 후) · 약국 행은 옵션 총액 → 기타 할인 → 할인 후 요금 → 결제 예정 금액(등록된 정기 결제 금액) → 실결제 금액(그 청구월분 결제, 미결제 0원). 서비스 요금과 결제 예정 금액이 다르면 결제 예정 금액 칸에 계약 확인 필요 + 두 금액 비교</td></tr>
       <tr><td class="k">신규 · 해지</td><td>서비스별 청구 기준. 신규 = 처음 요금이 발생한 달(첫 달 무료면 다음 달), 해지 = 해지 후 처음 청구가 중단된 달</td></tr>
       <tr><td class="k">광동 VIP</td><td>키오스크 · 스마트 OCR · 스마트2D 중 1개가 광동 지원 서비스(이용 금액 45,000 + VAT = ${fmt(KD_FEE)}원, 할인 불가). 약국 결제 0원으로 집계하고 옵션별 금액 아래 이용 금액을 함께 표기. 그 외 서비스는 서비스 비용 50% 할인(장비비 별도)</td></tr>
     </tbody></table></div></div>
@@ -1404,7 +1428,7 @@ function renderRv(){
     <details><summary>바뀐 내용 전체 보기</summary><table><tr><th>항목</th><th>바뀐 내용</th><th>이유</th></tr>
     <tr><td>금액 기준</td><td>청구월 기준. 9월분 · 10월분을 10월에 함께 결제해도 청구월마다 한 건, 결제일은 따로 기록</td><td>회의 결정 (11-16)</td></tr>
     <tr><td>화면 구성</td><td>청구 예정 · 결제 완료 · 미결제 카드, 목록은 결제 완료 · 미결제 두 가지</td><td>같은 숫자를 여러 곳에서 보는 혼란 제거, 필요한 약국만 바로 확인</td></tr>
-    <tr><td>약국별 금액 열</td><td>옵션별 금액 · 기타 할인 · 기타 할인 적용 후 서비스 요금 · 결제 예정 금액 · 실결제 금액(미결제 0원)</td><td>계약 요금과 등록된 결제 예정 금액을 비교</td></tr>
+    <tr><td>약국별 금액 열</td><td>옵션별 금액 · 기타 할인 · 할인 후 요금 · 결제 예정 금액 · 실결제 금액(미결제 0원)</td><td>계약 요금과 등록된 결제 예정 금액을 비교</td></tr>
     <tr><td>결제 완료 목록</td><td>기준월 청구분을 결제한 약국. 미결제 배지는 보이지 않음</td><td>결제 완료 목록에 미결제 약국이 섞이지 않도록</td></tr>
     <tr><td>전월 대비</td><td>결제 완료 목록에 필터(전체 · 신규 · 해지 · 금액 변동)</td><td>신규 결제 · 서비스 해지 약국을 바로 추려 봄</td></tr>
     <tr><td>미결제</td><td>그 달 미결제 금액이 있는 약국. 약국 결제 관리로 이동, 뒤로 가기로 보던 위치에 복귀</td><td>재결제 · 승인은 기존 결제 관리에서 처리</td></tr>
