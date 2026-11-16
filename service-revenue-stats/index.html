@@ -193,7 +193,7 @@
   .inx .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.addb{display:inline-block;padding:0 5px;border-radius:3px;background:#e6f6f3;color:#0f8a74;font-size:10.5px;font-weight:700;vertical-align:1px}
   .inx .mini{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}.inx .mini th,.inx .mini td{padding:6px 8px;border-bottom:1px solid #eef0f2;text-align:left}.inx .mini th{background:#f7f9fa;color:var(--muted);font-weight:600}.inx .mini .num{text-align:right}.inx .mini tr.tot td{font-weight:700}
   .rfl{font-size:11px;margin-top:2px}
-  .eqp{display:block;margin:2px 0 0 14px;font-size:11px;font-weight:500;color:#5E646C}
+  .eqc{font-size:12px;color:#5E646C;white-space:nowrap}
   .bnote{font-size:11.5px;color:var(--muted);padding:0 18px 12px;margin-top:-6px}
   .ptabs{display:flex;gap:4px;margin:0 18px;border-top:1px solid var(--line);padding-top:6px}
   .ptab{height:40px;padding:0 14px;border:0;border-bottom:2px solid transparent;background:none;font:inherit;font-size:13.5px;font-weight:600;color:#6b7178;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
@@ -885,7 +885,7 @@ function phRowHtml(g, c){
   const orig=r=>r.fc && !isPre(PH_BY[r.name],c.ym) ? (r.fc.amt||0)+(r.fc.dsc||0) : 0;
   const optCell=r=>(r.svc==='UNALLOC'?'0':fmt(orig(r)))+(isKdFree(r.fc)?'<div class="dsv">광동 VIP 지원 · 이용 금액 '+fmt(KD_FEE)+'</div>':'');
   const eq=equipOf(g.name,c.ym);
-  const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>${eq.length?'<span class="eqp">'+eq.join(' · ')+'</span>':''}`;
+  const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>`, eqc=`<td class="eqc">${eq.length?eq.join(' · '):'<span class="flat">−</span>'}</td>`;
   const e=g.a.etc, em=etcMemoR(c.all);
   const etc=`<td class="num">${e?'<span class="downc">−'+fmt(e)+'</span>'+(em?'<div class="dsv">'+em+'</div>':''):'<span class="flat">0</span>'}</td>`;
   // 계약 확인 필요 — 결제 예정 금액 칸. 서비스 요금과 결제 예정 금액이 다르면 두 금액을 함께
@@ -893,15 +893,15 @@ function phRowHtml(g, c){
   const ckb=chk||dd?'<div class="ckwrap"><b class="ckb">계약 확인 필요</b>'+(dd?'<div class="ckd">서비스 요금 '+fmt(g.a.after)+' → 결제 예정 '+fmt(g.a.plan)+' <b class="'+(dd>0?'upc':'downc')+'">'+(dd>0?'+':'−')+fmt(Math.abs(dd))+'</b></div>':'')+'</div>':'';
   const amt=`<td class="num">${fmt(g.a.after)}</td><td class="num">${calcBtn(c.key)}<b>${fmt(g.a.plan)}</b>${ckb}</td><td class="num"><b>${fmt(g.a.paid)}</b></td><td class="ctr dt">${g.pds.length?g.pds.join('<br>'):(g.pd?'<span class="flat">'+g.pd+'</span>':'<span class="flat">−</span>')}</td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
   // 옵션 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
-  if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">${sidLine(g.name)}</span><span class="tg"></span>${nm}</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
+  if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">${sidLine(g.name)}</span><span class="tg"></span>${nm}</td>${eqc}<td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
   <td class="num">${optCell(r)}</td>${etc}${amt}${payWayCell(g.name,c.ym)}${memoCell(r,1,g)}</tr>`; }
   // 옵션 여러 개 = 약국 행(옵션 총액 · 기타 할인 · 실결제) + 접기 · 펼치기
-  return `<tr class="ph-row"${c.tog?` data-ph="${g.name}"`:''}><td><span class="sid">${sidLine(g.name)}</span><span class="tg">${c.open?'▾':'▸'}</span>${nm}</td>
+  return `<tr class="ph-row"${c.tog?` data-ph="${g.name}"`:''}><td><span class="sid">${sidLine(g.name)}</span><span class="tg">${c.open?'▾':'▸'}</span>${nm}</td>${eqc}
   <td class="svcn" title="${g.vis.map(r=>r.option).join(' · ')}">${g.vis.length}개 항목</td><td></td>
   <td class="num">${fmt(g.opt)}</td>${etc}${amt}${payWayCell(g.name,c.ym)}${phMemoCell(g)}</tr>`+
-  (c.open?g.vis:[]).map(r=>`<tr class="sv-row"><td>└</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
+  (c.open?g.vis:[]).map(r=>`<tr class="sv-row"><td>└</td><td></td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
   <td class="num">${optCell(r)}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>${memoCell(r)}</tr>`).join(''); }
-const PH_HEAD=(T,sh)=>`<thead><tr><th>약국명</th><th>서비스 옵션</th><th class="num">수량</th><th class="num">옵션별 금액<span class="tip" data-tip="등록 옵션 금액(결합 할인 후) · 약국 행은 옵션 총액">i</span></th><th class="num">기타 할인</th><th class="num">기타 할인 적용 후<br>서비스 요금<span class="tip" data-tip="옵션 총액 − 기타 할인">i</span></th>${sh('plan','결제 예정 금액')}${sh('paid','실결제 금액')}${sh('date',T==='unpaid'?'결제 시도일시':'결제일시')}${sh('prev','전월')}${sh('diff','증감')}<th class="ctr">결제 방식</th><th>비고</th></tr></thead>`;
+const PH_HEAD=(T,sh)=>`<thead><tr><th>약국명</th><th>설치 장비</th><th>서비스 옵션</th><th class="num">수량</th><th class="num">옵션별 금액<span class="tip" data-tip="등록 옵션 금액(결합 할인 후) · 약국 행은 옵션 총액">i</span></th><th class="num">기타 할인</th><th class="num">기타 할인 적용 후<br>서비스 요금<span class="tip" data-tip="옵션 총액 − 기타 할인">i</span></th>${sh('plan','결제 예정 금액')}${sh('paid','실결제 금액')}${sh('date',T==='unpaid'?'결제 시도일시':'결제일시')}${sh('prev','전월')}${sh('diff','증감')}<th class="ctr">결제 방식</th><th>비고</th></tr></thead>`;
 
 /* ───────── 케이스별 예시 (약국별 청구 아래) ─────────
    케이스마다 대표 약국 1곳을 약국별 청구와 같은 양식으로. 케이스 = [이름, 언제 · 어떻게 보이는지, 목록(paid · unpaid), 청구월, 조건] */
@@ -944,9 +944,9 @@ function caseList(){ if(CASE_EX) return CASE_EX; const used=new Set();
 function caseHtml(){
   if(S.sc==='first') return '';
   const o={m:S.month,t:S.tab}, plain=(k,t)=>`<th class="num">${t}</th>`;
-  let i=0; const body=caseList().map(([gt,cs])=>`<tr class="cs-g"><td colspan="13">${gt}</td></tr>`+cs.map(c=>{
-    const h=`<tr class="cs-h"><td colspan="13"><b>${c.t}</b><span class="csd">${c.d}</span><span class="cst">${c.ym} · ${c.tab==='unpaid'?'미결제':'결제 완료'} 목록</span></td></tr>`;
-    if(!c.name) return h+'<tr><td colspan="13" class="empty">프로토타입 데이터에 예시 약국이 없습니다.</td></tr>';
+  let i=0; const body=caseList().map(([gt,cs])=>`<tr class="cs-g"><td colspan="14">${gt}</td></tr>`+cs.map(c=>{
+    const h=`<tr class="cs-h"><td colspan="14"><b>${c.t}</b><span class="csd">${c.d}</span><span class="cst">${c.ym} · ${c.tab==='unpaid'?'미결제':'결제 완료'} 목록</span></td></tr>`;
+    if(!c.name) return h+'<tr><td colspan="14" class="empty">프로토타입 데이터에 예시 약국이 없습니다.</td></tr>';
     S.month=c.ym; S.tab=c.tab; const by=rowsBy(c.ym), all=by[c.name], key='cs'+(i++);
     const g=mkG(c.name, all, c.ym, c.tab, false);
     CALC_G[key]={g, rows:all, T:c.tab, first:false, pm:MONTHS[c.ym].prev, ym:c.ym, name:c.name};
@@ -1082,7 +1082,7 @@ function renderMain(){
       <div class="pnote" id="splitNote">ⓘ 청구월 기준 — 9월분 · 10월분을 10월에 함께 결제해도 청구월마다 한 건씩 보이고, 결제일시는 실제 결제한 일시입니다. 옵션별 금액 = 등록 옵션 금액(결합 할인 후) · 결제 예정 금액 = 약국에 등록된 정기 결제 금액 · 실결제 금액 = 그 청구월분으로 결제된 금액(미결제 0원).</div>
       <div class="tblwrap"><table class="tbl">
         ${PH_HEAD(T,sh)}
-        <tbody>${phPage.length?'':'<tr><td colspan="13" class="empty">조건에 맞는 약국이 없습니다.</td></tr>'}${phPage.map(g=>phRowHtml(g,{ym:S.month, all:rowsOf[g.name]||g.rows, first, open:isOpen(g), tog:1, key:g.name})).join('')}</tbody></table></div>
+        <tbody>${phPage.length?'':'<tr><td colspan="14" class="empty">조건에 맞는 약국이 없습니다.</td></tr>'}${phPage.map(g=>phRowHtml(g,{ym:S.month, all:rowsOf[g.name]||g.rows, first, open:isOpen(g), tog:1, key:g.name})).join('')}</tbody></table></div>
       <div class="pager">${pager(cpages)}</div>
     </div>
     ${caseHtml()}`;
