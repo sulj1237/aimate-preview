@@ -746,8 +746,7 @@ function payNote(name, ym){
   if(!ok.length && fl.length){ const f=fl[fl.length-1];
     return '<span class="mt">미결제 · '+f.date.slice(5)+' 결제 실패 · '+failTxt(f.fail)+(fl.length>1?' · 실패 '+fl.length+'회':'')+'</span>'; }
   // 수기 결제 = 관리자가 결제할 때 적은 결제 이유(메모)를 그대로
-  const rf=refundsOf(name, ym).map(x=>'<span class="mt red">환불 · '+x.date.slice(5)+' '+x.way+' −'+fmt(x.amt)+'원 · '+x.why+'</span>');
-  return [...ok.filter(x=>wayOf(x)==='수기').map(x=>'<span class="mt">'+x.reason+'</span>'), ...rf].join('<br>');
+  return ok.filter(x=>wayOf(x)==='수기').map(x=>'<span class="mt">'+x.reason+'</span>').join('<br>');
 }
 // 비고의 결제 상태 — 결제 완료 목록에서는 `미결제` 배지를 빼고 결제 내역만
 const payNoteT = (name, ym) => { const h=payNote(name,ym); return S.tab==='paid' && h.startsWith('<span class="mt">미결제') ? '' : h; };
@@ -804,16 +803,6 @@ function openChk(name){
     close(); render(); toast('저장했습니다'); };
   bg.querySelector('#ckM').focus(); }
 /* ───────── 상태 ───────── */
-// 환불 (시안) — 환불한 달 결제 완료에서 뺌. 방식: 페이앱 결제 취소 / 계좌 입금(결제 수단 환불이 안 될 때)
-const REFUNDS = (()=>{ const ok11=n=>PAYS.find(x=>x.ok && x.name===n && x.date===d2(11,5)); const o=[];
-  const a=PH.find(p=>!p.x && !p.un && !p.pre && p.sub['2026-11'].length===1 && p.sub['2026-11'][0].c==='KIOSK' && ok11(p.name));
-  const b=PH.find(p=>!p.x && !p.un && !p.pre && p !== a && p.sub['2026-11'].some(i=>i.c==='PHARMACY_FIRST') && p.sub['2026-11'].length===2 && ok11(p.name));
-  if(a) o.push({name:a.name, bm:'2026-11', date:'2026-11-08', amt:ok11(a.name).amt, way:'페이앱 결제 취소', why:'서비스 해지 요청 · 11월분 전액'});
-  if(b) o.push({name:b.name, bm:'2026-11', date:'2026-11-07', amt:22000, way:'계좌 입금', why:'파머시 퍼스트 미사용 · 부분 환불'});
-  return o; })();
-// 환불은 환불한 결제의 청구월 결제 완료에서 뺌
-const refundsOf = (name, ym) => REFUNDS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S);
-const refundSum = (ym, name) => REFUNDS.filter(x=>x.bm===ym && x.date<=TODAY_S && (!name||x.name===name)).reduce((a,x)=>a+x.amt,0);
 // 설치 장비 — 약국 상세 > 약국 정보 '설치 장비' (프로토타입: 이용 서비스로 만든 가상 값, VAN은 일부 약국)
 const EQUIPS = ['모바일OCR','파머시퍼스트','키오스크','스캐너','2D','VAN'];
 const equipOf = (name, ym) => { const p=PH_BY[name]; if(!p||!p.sub) return []; const sub=(p.sub[ym]&&p.sub[ym].length?p.sub[ym]:p.sub['2026-10'])||[], o=new Set();
@@ -875,7 +864,7 @@ function phSum(name, rs, ym, side){ const p=PH_BY[name], pre=p&&isPre(p,ym), k=s
   const svc=rs.filter(r=>!NOSVC_C.includes(r.svc)), opt=svc.reduce((a,r)=>a+o(r),0);
   const etc=svc.reduce((a,r)=>{ const f=sideF(r,side); return a+(f&&!pre?f.dsc||0:0); },0)
     + rs.filter(r=>r.svc==='DISC').reduce((a,r)=>{ const f=sideF(r,side); return a+(f&&f.etc?-(f.amt||0):0); },0);
-  const plan=rs.reduce((a,r)=>a+r.bill[k],0), paid=rs.reduce((a,r)=>a+r.paid[k],0)-refundSum(ym,name), unpaid=rs.reduce((a,r)=>a+r.unpaid[k],0);
+  const plan=rs.reduce((a,r)=>a+r.bill[k],0), paid=rs.reduce((a,r)=>a+r.paid[k],0), unpaid=rs.reduce((a,r)=>a+r.unpaid[k],0);
   return {opt, etc, after:opt-etc, plan, paid, unpaid, diff:plan-(opt-etc)}; }
 // 광동 VIP 지원 서비스 — 약국 결제는 0원, 이용 금액(45,000 + VAT)은 따로 표기
 const KD_FEE = VIP_FEE;
@@ -887,7 +876,6 @@ function mkG(name, all, ym, T, first, listRows){ const pm=MONTHS[ym].prev, pv=(r
   g.vis=g.rows.filter(r=>r.svc!=='DISC'&&r.svc!=='OFF'); if(!g.vis.length) g.vis=g.rows.filter(r=>r.svc!=='DISC'); if(!g.vis.length) g.vis=g.rows;
   // 금액 — 기타 할인 적용 후 서비스 요금 · 결제 예정 · 실결제(미결제면 0원). 전월 · 증감 = 결제 완료 탭은 실결제, 미결제 탭은 결제 예정 기준
   g.a=phSum(name, all, ym, 'cur'); g.ap=first?null:phSum(name, all, pm, 'prev'); g.opt=g.a.opt;
-  g.rf=T==='paid'?refundSum(ym,name):0;
   g.cur=T==='paid'?g.a.paid:g.a.plan; g.prev=first?0:(T==='paid'?g.ap.paid:g.ap.plan); g.plan=g.a.plan;
   g.pds=T==='unpaid'?[]:payDates(name,ym); g.pd=T==='unpaid'?lastTry(name,ym):(g.pds[g.pds.length-1]||''); return g; }
 // c = {ym, all(약국 전체 행), first, open, tog(행 클릭 접기 · 펼치기), key(계산 내역)}. 비고 칸은 S.month · S.tab 기준이라 호출하는 쪽에서 맞춰 둠
@@ -903,7 +891,7 @@ function phRowHtml(g, c){
   // 계약 확인 필요 — 결제 예정 금액 칸. 서비스 요금과 결제 예정 금액이 다르면 두 금액을 함께
   const chk=c.all.some(r=>isChk(r.fc)||(!first&&isChk(r.fp))), dd=g.a.diff;
   const ckb=chk||dd?'<div class="ckwrap"><b class="ckb">계약 확인 필요</b>'+(dd?'<div class="ckd">서비스 요금 '+fmt(g.a.after)+' → 결제 예정 '+fmt(g.a.plan)+' <b class="'+(dd>0?'upc':'downc')+'">'+(dd>0?'+':'−')+fmt(Math.abs(dd))+'</b></div>':'')+'</div>':'';
-  const amt=`<td class="num">${fmt(g.a.after)}</td><td class="num">${calcBtn(c.key)}<b>${fmt(g.a.plan)}</b>${ckb}</td><td class="num"><b>${fmt(g.a.paid)}</b>${g.rf?'<div class="rfl red">환불 −'+fmt(g.rf)+'</div>':''}</td><td class="ctr dt">${g.pds.length?g.pds.join('<br>'):(g.pd?'<span class="flat">'+g.pd+'</span>':'<span class="flat">−</span>')}</td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
+  const amt=`<td class="num">${fmt(g.a.after)}</td><td class="num">${calcBtn(c.key)}<b>${fmt(g.a.plan)}</b>${ckb}</td><td class="num"><b>${fmt(g.a.paid)}</b></td><td class="ctr dt">${g.pds.length?g.pds.join('<br>'):(g.pd?'<span class="flat">'+g.pd+'</span>':'<span class="flat">−</span>')}</td><td class="num">${first?NA:fmt(g.prev)}</td><td class="num">${dl(g.cur-g.prev)}</td>`;
   // 옵션 1개 = 약국 행 한 줄에 바로 표시 (접기 · 펼치기 없음)
   if(g.vis.length===1){ const r=g.vis[0]; return `<tr class="ph-row one"><td><span class="sid">${sidLine(g.name)}</span><span class="tg"></span>${nm}</td><td>${svcCell(r)}</td><td class="num">${qcell(r)}</td>
   <td class="num">${optCell(r)}</td>${etc}${amt}${payWayCell(g.name,c.ym)}${memoCell(r,1,g)}</tr>`; }
@@ -925,8 +913,7 @@ const CASE_GROUPS=[
     ['청구 전', '이번 달에 서비스를 시작해 다음 달부터 청구. 금액 0원, 비고에 이용 시작일 · 청구 시작 월', 'paid', '2026-11', n=>isPre(PH_BY[n],'2026-11')],
     ['미결제', '청구월분 결제가 모두 실패. 미결제 목록에 나오고 실결제 0원, 비고에 실패일 · 실패 사유 · 횟수', 'unpaid', '2026-11', (n,by,s)=>s.unpaid>0 && s.paid===0 && !s.diff],
     ['수기 결제', '관리자가 결제(수기). 결제 방식 수기, 비고에 결제 이유(메모)', 'paid', '2026-11', n=>PAYS.some(x=>x.ok && x.name===n && x.bm==='2026-11' && x.date<=TODAY_S && wayOf(x)==='수기')],
-    ['지난 청구월분 결제', '10월분을 11월에 결제. 10월분 결제 완료로 집계, 결제일시는 실제 결제한 11월 일시', 'paid', '2026-10', n=>PAYS.some(x=>x.ok && x.name===n && x.bm==='2026-10' && x.date.slice(0,7)==='2026-11' && x.date<=TODAY_S)],
-    ['환불', '결제 취소 · 계좌 입금으로 돌려줌. 원래 결제의 청구월 결제 완료에서 빼고, 실결제 금액 아래 빨간 글씨', 'paid', null, n=>REFUNDS.some(x=>x.name===n)] ]],
+    ['지난 청구월분 결제', '10월분을 11월에 결제. 10월분 결제 완료로 집계, 결제일시는 실제 결제한 11월 일시', 'paid', '2026-10', n=>PAYS.some(x=>x.ok && x.name===n && x.bm==='2026-10' && x.date.slice(0,7)==='2026-11' && x.date<=TODAY_S)] ]],
   ['서비스 구성', [
     ['결합할인', '2개 이상 함께 이용. 가장 비싼 서비스 외 50%. 계산 아이콘으로 결합 내용 · 계산식 확인', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='결합할인 50%') && !s.diff && !s.etc && s.paid>0],
     ['같은 서비스 2대 이상', '장비가 있는 서비스 2대 이상. 2대째부터 50%, 장비임대료는 할인 없음', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.qty>1&&/결합할인/.test(r.fc.t)) && s.paid>0],
@@ -951,9 +938,8 @@ function caseList(){ if(CASE_EX) return CASE_EX; const used=new Set();
   CASE_EX=CASE_GROUPS.map(([gt,cs])=>[gt, cs.map(([t,d,tab,ym0,f])=>{
     const ok=(n,ym)=>{ try{ const by=rowsBy(ym); return by[n] && f(n,by,phSum(n,by[n],ym,'cur')); }catch(e){ return false; } };
     const find=ym=>{ const ns=Object.keys(rowsBy(ym)); return ns.find(n=>!used.has(n)&&ok(n,ym)) || ns.find(n=>ok(n,ym)); };
-    let ym=ym0, n;
-    if(!ym){ const x=REFUNDS[0]; if(x){ ym=x.bm; n=x.name; } } else n=find(ym);
-    if(n) used.add(n); return {t,d,tab,ym:ym||ym0||'2026-11',name:n||null}; })]);
+    const ym=ym0, n=find(ym);
+    if(n) used.add(n); return {t,d,tab,ym,name:n||null}; })]);
   return CASE_EX; }
 function caseHtml(){
   if(S.sc==='first') return '';
@@ -978,9 +964,6 @@ function renderMain(){
   // 탭 합계 — 기준월 전체 (목록 필터 · 검색과 무관)
   const TT=Object.fromEntries(MS.map(m=>[m,{cur:allRows.reduce((a,r)=>a+r[m].cur,0), prev:allRows.reduce((a,r)=>a+pv(r,m),0),
     ph:new Set(allRows.filter(r=>r[m].cur>0).map(r=>r.name)).size}]));
-  // 결제 완료 = 그 달 결제 − 그 달 환불
-  const RF={cur:refundSum(S.month), prev:first?0:refundSum(MONTHS[S.month].prev), n:REFUNDS.filter(x=>x.bm===S.month && x.date<=TODAY_S).length};
-  TT.paid.cur-=RF.cur; TT.paid.prev-=RF.prev;
 
   // 서비스별 청구 현황 — 총 사용수(이용 약국) 많은 순
   // 미등록 청구 · 기타 할인 · 서비스 미지정 = 서비스로 나누지 않은 금액 → 표 아래 안내 한 줄
@@ -1024,9 +1007,7 @@ function renderMain(){
   const manOn=T!=='unpaid'; if(!manOn) S.man=false;
   const manSet=new Set(PAYS.filter(x=>x.ok && x.bm===S.month && x.date<=TODAY_S && wayOf(x)==='수기').map(x=>x.name));
   const manCnt=new Set(pre0.filter(r=>manSet.has(r.name)).map(r=>r.name)).size;
-  const rfSet=new Set(REFUNDS.filter(x=>x.bm===S.month && x.date<=TODAY_S).map(x=>x.name)); const rfOn=T==='paid'; if(!rfOn) S.rf=false;
-  const rfCnt=new Set(pre0.filter(r=>rfSet.has(r.name)).map(r=>r.name)).size;
-  const base=pre0.filter(r=>(S.cause==='all'||MEMO_F[S.cause][1](r)) && (!S.man||manSet.has(r.name)) && (!S.rf||rfSet.has(r.name)));
+  const base=pre0.filter(r=>(S.cause==='all'||MEMO_F[S.cause][1](r)) && (!S.man||manSet.has(r.name)));
   const feeOf=(f,ym,n)=>f&&!isPre(PH_BY[n],ym)?(f.amt||0)+(f.dsc||0):0;
   const cfOf=r=> feeOf(r.fc,S.month,r.name)>0 && !feeOf(r.fp,M.prev,r.name)?'new' : feeOf(r.fp,M.prev,r.name)>0 && !r.fc?'stop' : r[T].cur!==pv(r,T)?'chg':'';
   const cfCnt=k=>new Set((k==='all'?base:base.filter(r=>cfOf(r)===k)).map(r=>r.name)).size;
@@ -1093,7 +1074,6 @@ function renderMain(){
         <span class="pctl"><select class="sel sm ${S.eq!=='all'?'on':''}" id="eqSel" aria-label="설치 장비"><option value="all">설치 장비 · 전체</option>${EQUIPS.map(e=>`<option value="${e}" ${S.eq===e?'selected':''}>${e}</option>`).join('')}</select>
           <label class="ckf"><input type="checkbox" id="cause" ${S.cause==='chk'?'checked':''}> 계약 확인 필요만 (${fmt(memoCnt('chk'))})</label>
           ${manOn?`<label class="ckf"><input type="checkbox" id="man" ${S.man?'checked':''}> 수기 결제만 (${fmt(manCnt)})</label>`:''}
-          ${rfOn&&rfCnt?`<label class="ckf"><input type="checkbox" id="rfOnly" ${S.rf?'checked':''}> 환불만 (${fmt(rfCnt)})</label>`:''}
           <div class="msel"><button class="btn sm ${S.opts.size?'on':''}" id="optBtn">서비스명 · ${S.opts.size? (S.opts.size===1?[...S.opts][0]:[...S.opts][0]+' 외 '+(S.opts.size-1)) : '전체'} ▾</button>
           ${S.optOpen?`<div class="mpanel">${ALL_OPTS.map(o=>`<label><input type="checkbox" data-opt="${o}" ${S.opts.has(o)?'checked':''}>${o}</label>`).join('')}
             <div class="mfoot"><button class="btn sm" id="optClear">선택 해제</button></div></div>`:''}</div>
@@ -1123,7 +1103,6 @@ function bindMain(){
   const ea=$('expAll'); if(ea) ea.onclick=()=>{ S.expAll=ea.textContent==='모두 펼치기'; S.tog=new Set(); render(); };
   const cs=$('cause'); if(cs) cs.onchange=e=>{ S.cause=e.target.checked?'chk':'all'; resetList(); render(); };
   const mc=$('man'); if(mc) mc.onchange=e=>{ S.man=e.target.checked; resetList(); render(); };
-  const rfc=$('rfOnly'); if(rfc) rfc.onchange=e=>{ S.rf=e.target.checked; resetList(); render(); };
   const eqs=$('eqSel'); if(eqs) eqs.onchange=e=>{ S.eq=e.target.value; resetList(); render(); };
   const pp=$('pp'); if(pp) pp.onchange=e=>{ S.pp=+e.target.value; resetList(); render(); };
   // 정렬 — 같은 열을 누를 때마다 내림차순 → 오름차순 → 기본(증감 크기 큰 순)
@@ -1194,7 +1173,6 @@ function renderGuide(){
   const PAYC=[
     ['청구 전','이번 달에 서비스를 시작해 다음 달부터 청구','이용 시작일 · 청구 시작 월. 이용 약국 수에는 포함, 금액은 0원'],
     ['미결제','청구월분 결제가 모두 실패','결제 실패일 · 실패 사유 · 실패 횟수. 미결제 목록에만 나옴'],
-    ['환불','페이앱 결제 취소 또는 계좌 입금으로 돌려줌 (시안)','환불일 · 방식 · 금액 · 사유. 환불한 달 결제 완료에서 빼고, 실결제 금액 아래 빨간 글씨로 표시'],
     ['수기 결제 메모','관리자가 결제(수기)할 때 적은 결제 이유','메모를 그대로 표시 (예: 11월 굿팜결제)'] ];
   const payEx=lab=>{ const key=lab==='수기 결제 메모'?'월 ':lab+' ·'; for(const m of MM) for(const p of PH){ const h=payNote(p.name,m); if(h && h.replace(/<[^>]+>/g,'').includes(key) && (lab!=='수기 결제 메모' || !/청구 전|미결제/.test(h))) return h; } return ''; };
   const payExOld=lab=>{ for(const m of MM) for(const p of PH){ const h=payNote(p.name,m); if(h.includes('<b class="db">'+lab+'</b>')) return h.split('<br><b class="db">').map((x,i)=>i?'<b class="db">'+x:x).find(x=>x.includes('>'+lab+'<')); } return ''; };
@@ -1273,8 +1251,6 @@ function renderGuide(){
    ① 수기 결제 창 = 청구월 + 결제 사유 카테고리 + 메모 / ② 약국 서비스 수정 > 기타 할인 = 금액 + 사유 카테고리 + 메모(필수)
    카테고리는 6개월 결제 실데이터 · 기타 할인 실데이터 기준 */
 const PAY_CAT = [['재시도 결제','정기 결제 실패 후 다시 결제 · 밀린 대금 포함'],['누락분 결제','서비스에는 있는데 정기 결제에서 빠진 금액'],['신규 · 개국 첫 결제','가입한 달 첫 결제 (첫 달 무료 정책 확인 후 유지 여부 결정)'],['요금제 변경','요금제를 바꾸면서 결제'],['서비스 외 결제','라벨 구매 · 검사 수수료 등, 통계에서 제외'],['기타','위에 해당하지 않음 · 메모 필수']];
-const RF_WAY = [['페이앱 결제 취소','카드 결제를 취소 · 결제일 기준 취소 가능 기간 안'],['계좌 입금','결제 취소가 안 될 때 약국 계좌로 입금 · 입금 후 등록']];
-const RF_CAT = [['서비스 해지','해지 요청 후 결제된 금액'],['서비스 미사용','이용하지 않은 서비스 금액'],['중복 결제','같은 청구월을 두 번 결제'],['과다 청구','등록보다 많이 결제'],['기타','메모 필수']];
 const DISC_CAT = [['결합 무료','함께 쓰는 서비스를 무상 제공 (예: POS 무료)'],['계약 할인','제휴처 · 중복 가입 할인 (예: 온비타 · drs)'],['금액 할인','오류 보상 · 테스트 (예: 스캐너 인식 오류, OCR 테스트)'],['기타','위에 해당하지 않음']];
 function renderInputs(){
   const opt=(a,v)=>a.map(([t,d])=>`<option value="${t}" ${t===v?'selected':''}>${t}</option>`).join('');
@@ -1308,25 +1284,11 @@ function renderInputs(){
         <div class="acts"><button class="btn">취소</button><button class="btn pri" data-toast="시안 — 저장되지 않습니다">저장</button></div>
       </div>
       <div class="foot">기타 할인 실데이터 13곳: 결합 무료 3 · 계약 할인 6 · 금액 할인 2 · 기타(사유 없음) 2 → 메모 필수</div></div>
-    <div class="panel"><div class="ph"><h3>③ 환불</h3><p>약국 상세 &gt; 정기 결제 &gt; 결제 내역 &gt; 환불</p></div>
-      <div class="frm">
-        <label class="fl">환불할 결제</label><div class="ro">26-11-05 09:12 · 49,500원 · 11월분 · 자동</div>
-        <label class="fl">청구월</label><div class="ro">2026-11 (환불할 결제의 청구월)</div>
-        <label class="fl">환불 방식 <b class="addb">추가</b></label><select class="fi" id="irWay">${opt(RF_WAY,'페이앱 결제 취소')}</select>
-        <div class="hint" id="irWHint">${RF_WAY[0][1]}</div>
-        <label class="fl">환불 금액 <b class="addb">추가</b></label><input class="fi" id="irAmt" value="49,500">
-        <label class="fl">환불 사유 <b class="addb">추가</b></label><select class="fi" id="irCat">${opt(RF_CAT,'서비스 해지')}</select>
-        <label class="fl">메모 <b class="addb">추가</b></label><input class="fi" id="irMemo" value="11월분 전액">
-        <div class="pv"><span class="mlab">통계 화면 실결제 금액 · 비고에 보이는 내용</span><br><span id="irPv"></span></div>
-        <div class="acts"><button class="btn">취소</button><button class="btn pri" data-toast="시안 — 환불되지 않습니다">환불</button></div>
-      </div>
-      <div class="foot">환불 금액은 청구월 결제 완료에서 뺌. 전액 환불이면 실결제 0원, 부분 환불이면 남은 금액</div></div>
     </div>
     <div class="panel"><div class="ph"><h3>확인 필요</h3></div><div class="tblwrap"><table class="tbl"><tbody>
       <tr><td class="k">수기 결제</td><td>'신규 · 개국 첫 결제'는 첫 달 무료 정책 확인 후 유지 여부 결정 · 청구월 기본값(결제한 달 / 미결제 청구월)</td></tr>
       <tr><td class="k">기타 할인</td><td>금액 할인을 '오류 보상' / '테스트 · 체험'으로 나눌지, 끝나는 달 입력 · 대상 서비스(옵션) 선택을 넣을지</td></tr>
-      <tr><td class="k">환불</td><td>계좌 입금 환불은 입금을 마친 뒤 등록할지 · 환불 사유 카테고리 · 환불 금액을 어느 달 결제 완료에서 뺄지(시안: 환불한 결제의 청구월)</td></tr>
-      <tr><td class="k">개발 범위</td><td>세 입력 화면 개발 범위 · 일정 (통계 화면과 함께 / 따로)</td></tr>
+      <tr><td class="k">개발 범위</td><td>두 입력 화면 개발 범위 · 일정 (통계 화면과 함께 / 따로)</td></tr>
     </tbody></table></div></div>
   </div>`;
   const $=id=>document.getElementById(id);
@@ -1334,10 +1296,8 @@ function renderInputs(){
     $('ipPv').innerHTML='<b>['+c+']</b> '+(+$('ipBm').value.slice(5))+'월분'+(m?' · '+esc(m):'');
     const d=$('idCat').value, dm=$('idMemo').value.trim(); $('idHint').textContent=DISC_CAT.find(x=>x[0]===d)[1];
     $('idPv').innerHTML='<span class="red">−'+esc($('idAmt').value)+'</span> <b>['+d+']</b> '+(dm?esc(dm):'<span class="red">메모를 입력하세요</span>');
-    const rw=$('irWay').value, rc=$('irCat').value, rm=$('irMemo').value.trim(); $('irWHint').textContent=RF_WAY.find(x=>x[0]===rw)[1];
-    $('irPv').innerHTML='<span class="red">환불 −'+esc($('irAmt').value)+'</span> · 환불 · 11-08 '+esc(rw)+' · <b>['+esc(rc)+']</b> '+(rm?esc(rm):(rc==='기타'?'<span class="red">메모를 입력하세요</span>':''));
   };
-  ['ipCat','ipBm','ipMemo','idCat','idMemo','idAmt','irWay','irAmt','irCat','irMemo'].forEach(id=>{ $(id).oninput=upd; $(id).onchange=upd; }); upd();
+  ['ipCat','ipBm','ipMemo','idCat','idMemo','idAmt'].forEach(id=>{ $(id).oninput=upd; $(id).onchange=upd; }); upd();
 }
 function goInputs(){ if(S.page==='inputs') return; S.backY=window.scrollY; S.page='inputs'; history.pushState({page:'inputs'},'','#inputs'); render(); window.scrollTo(0,0); }
 document.getElementById('inBtn').onclick=goInputs;
@@ -1370,7 +1330,7 @@ const RV_ITEMS = [
   {id:'Q10', own:'박단님', q:'약국별 청구 목록을 엑셀로 내려받을 수 있어야 하나요? (엑셀 다운로드: 아래 엑셀 열 구성안 참고)', bg:'지금 화면은 조회만 가능. 내려받게 한다면 열 구성은 아래 엑셀 열 구성안 참고', more:'excel'},
   {id:'Q11', own:'박단님', q:'비고를 서비스나 금액이 바뀐 경우에 표시하고, 바뀐 내용(예: 키오스크 1 → 2대)을 적을까요?', bg:'지금은 결제 상태 · 원인 분류 문구가 전월과 다를 때만 표시. 금액이 바뀌어도 비고가 비는 경우가 있음'},
   {id:'Q12', own:'박단님', q:'VIP · 무료 · 할인으로 빠진 금액(차감액)을 실제 청구액과 따로 보여 줄까요?', bg:'지금은 청구액만 표시하고, 할인 내용은 금액 아래 계산식으로 보여 줌'},
-  {id:'Q13', own:'박단님', q:'결제 완료 목록에서 전액 환불 건은 빼고, 부분 환불은 환불을 뺀 금액으로 볼까요?', bg:'해지 후 결제는 대부분 환불 처리됨. 지금 화면에는 환불 반영이 없음'},
+  {id:'Q13', own:'박단님', q:'[오픈 이슈] 환불 반영 — 1차 범위에서 제외했습니다. 관리자에 환불 기록(페이앱 결제 취소 · 계좌 입금)이 남는 곳이 있나요?', bg:'통계에 환불을 보여 주려면 약국 결제 관리에도 환불 정보 · 환불 입력이 함께 필요. 1차 통계의 결제 완료는 결제된 금액 기준(환불 전). 환불 기록이 확인되면 약국 결제 관리 · 통계 · 환불 입력을 함께 설계'},
   {id:'Q14', own:'박단님', q:'미결제 목록에서 결제 예정일이 아직 안 된 건과 기한이 지났거나 결제에 실패한 건을 나눠 볼까요?', bg:'지금은 조회일까지 결제가 확인되지 않은 건을 모두 미결제로 표시'} ];
 const RV_REPLY = {C:['확정','수정 필요','논의 필요'], Q:['답변 완료','확인 중','논의 필요']};
 const RV = {open:false, data:null, err:''};
@@ -1418,7 +1378,7 @@ function rvCard(it){
       <select><option value="">회신 선택</option>${RV_REPLY[kind].map(o=>`<option ${cur.reply===o?'selected':''}>${o}</option>`).join('')}</select>
       <textarea placeholder="답변 · 의견">${esc(cur.answer||'')}</textarea>
       <button ${RV_API?'':'disabled'}>저장</button></div></div>`; }
-// 리뷰 예시 — VIP 무료 · 유료 병용 · 금액 불일치 · 미납분 수기 결제 · 기타 할인 · 전월 증감 · 환불 (케이스마다 대표 약국 1곳)
+// 리뷰 예시 — VIP 무료 · 유료 병용 · 금액 불일치 · 미납분 수기 결제 · 기타 할인 · 전월 증감 (케이스마다 대표 약국 1곳)
 let RV_EX=null;
 function rvExList(){ if(RV_EX) return RV_EX; const m='2026-11', by={};
   SERVICES.forEach(sv=>ROWS[m][sv.code].forEach(r=>{ (by[r.name]=by[r.name]||[]).push(r); }));
@@ -1429,8 +1389,7 @@ function rvExList(){ if(RV_EX) return RV_EX; const m='2026-11', by={};
     pick('금액 불일치', n=>sum(n).diff>0 && paidN(n) && by[n].some(r=>r.svc==='OFF')),
     late?{t:'미납분 수기 결제', m:'2026-10', tab:'paid', name:late.name}:null,
     pick('기타 할인', n=>sum(n).etc>0 && paidN(n)),
-    pick('전월 증감', n=>{ const a=sum(n), b=phSum(n, by[n], '2026-10', 'prev'); return a.paid>0 && b.paid>0 && a.paid!==b.paid && by[n].every(r=>r.fc&&r.fp); }),
-    REFUNDS[0]?{t:'환불', m:REFUNDS[0].bm, tab:'paid', name:REFUNDS[0].name}:null].filter(Boolean);
+    pick('전월 증감', n=>{ const a=sum(n), b=phSum(n, by[n], '2026-10', 'prev'); return a.paid>0 && b.paid>0 && a.paid!==b.paid && by[n].every(r=>r.fc&&r.fp); })].filter(Boolean);
   return RV_EX; }
 function renderRv(){
   const el=document.getElementById('rv'); if(!el) return;
