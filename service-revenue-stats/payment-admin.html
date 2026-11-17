@@ -113,27 +113,27 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const $=id=>document.getElementById(id);
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>el.classList.remove('show'),1800); }
 
-/* 카테고리 — 실데이터 기준 */
-const DISC_CAT=[ // 금액 할인 사유 (금액 할인 실데이터 13곳)
-  ['결합 무료','함께 쓰는 서비스를 무상 제공 (예: POS 무료 · 풀패키지 포스 비용 할인) — 3곳'],
-  ['계약 할인','제휴처 · 중복 가입 할인 (예: 온비타 · drs 파머시 퍼스트 중복) — 6곳'],
-  ['보상 · 테스트','오류 보상 · 테스트 (예: 스캐너 인식 오류, OCR 테스트) — 2곳'],
-  ['기타','위에 해당하지 않음 · 메모 필수 — 사유 미입력 2곳']];
-const PAY_CAT=[ // 수기 결제 사유 (6개월 5일 외 성공 결제 159건 + A/S 환불 사례)
-  ['재시도 결제','정기 결제 실패 후 다시 결제 · 밀린 대금 포함 (`N월 굿팜결제`) — 대부분'],
-  ['누락분 결제','서비스에는 있는데 정기 결제에서 빠진 금액 (`파머시퍼스트 가입 (미결제분 결제)`) — 2건'],
-  ['취소 후 재결제','결제 취소 뒤 차액 · 일할 · 반값으로 다시 결제 (`2,3월 환불후 차액결제`) — A/S 6건'],
-  ['요금제 변경','요금제를 바꾸면서 결제 (`(요금제변경)`)'],
-  ['개국','개국하면서 결제 (`(개국)`)'],
-  ['서비스 외 결제','라벨 구매 · 검사 수수료 — 서비스 청구 통계에서 제외'],
-  ['기타','위에 해당하지 않음 · 메모 필수']];
-const CANCEL_CAT=[ // 결제 취소 사유 (A/S · 약국 메모 굿팜 이용료 환불 사례 19건 + 원인 분류)
-  ['해지','서비스 해지로 그 달 결제 취소 — 7건'],
-  ['폐업 · 양도','폐업 · 양도양수로 결제 취소 (일할 · 반값 재결제와 함께) — 4건'],
-  ['과다 청구','해지 · 할인 · 서비스 변경이 정기 결제 금액에 반영되지 않아 더 결제됨 — 3건 (원인 분류 할인 0원 · 정가 결제 10곳)'],
-  ['중복 결제','같은 청구월이 두 번 결제됨 — 2건'],
-  ['카드 변경','다른 카드로 다시 결제하기 위해 취소 — 1건'],
-  ['기타','위에 해당하지 않음 · 메모 필수 — 2건']];
+/* 카테고리 — 실데이터 기준으로 정함. 화면에는 안내 문구만 */
+const DISC_CAT=[ // 금액 할인 사유 — 화면 안내 문구 (근거 데이터는 스토리보드 디스크립션)
+  ['결합 무료','함께 쓰는 서비스를 무상으로 제공할 때 (예: POS 무료)'],
+  ['계약 할인','제휴처 · 중복 가입으로 할인할 때 (예: 온비타 · drs)'],
+  ['보상 · 테스트','서비스 오류 보상 · 테스트로 할인할 때'],
+  ['기타','위에 해당하지 않을 때 — 메모에 이유 입력']];
+const PAY_CAT=[ // 수기 결제 사유
+  ['재시도 결제','정기 결제가 실패한 달을 다시 결제할 때 (밀린 대금 포함)'],
+  ['누락분 결제','이용 중인 서비스 금액이 정기 결제에서 빠졌을 때'],
+  ['취소 후 재결제','결제 취소 뒤 받을 금액을 다시 결제할 때 (차액 · 일할 · 반값)'],
+  ['요금제 변경','요금제를 바꾸면서 결제할 때'],
+  ['개국','개국하면서 결제할 때'],
+  ['서비스 외 결제','라벨 구매 · 검사 수수료처럼 서비스 요금이 아닐 때 — 서비스 청구 통계에서 제외'],
+  ['기타','위에 해당하지 않을 때 — 메모에 이유 입력']];
+const CANCEL_CAT=[ // 결제 취소 사유
+  ['해지','서비스를 해지해 그 달 결제를 돌려줄 때'],
+  ['폐업 · 양도','폐업 · 양도양수로 결제를 돌려줄 때'],
+  ['과다 청구','해지 · 할인 · 서비스 변경이 정기 결제 금액에 반영되지 않아 더 결제됐을 때'],
+  ['중복 결제','같은 청구월이 두 번 결제됐을 때'],
+  ['카드 변경','다른 카드로 다시 결제하기 위해 취소할 때'],
+  ['기타','위에 해당하지 않을 때 — 메모에 이유 입력']];
 const opt=(a,v)=>a.map(([t])=>`<option value="${t}" ${t===v?'selected':''}>${t}</option>`).join('');
 const hintOf=(a,v)=>(a.find(x=>x[0]===v)||a[0])[1];
 
@@ -141,13 +141,14 @@ const hintOf=(a,v)=>(a.find(x=>x[0]===v)||a[0])[1];
 const PH={name:'샘플약국', store:'2024047xxxx', card:'신한카드 · 뒤 4자리 ****', method:'수기 정기결제(레거시)'};
 // 정기 결제 내역: [id, 과금일, 청구월, 결제상태, 결제액, 취소 금액, 실패 사유, 결제 이유, 취소 사유 · 메모]
 const HIST=[
-  [6,'2026-11-05 10:02','2026-11','px',71500,22000,'','굿팜결제','[과다 청구] 파머시 퍼스트 10월 해지 미반영'],
+  [7,'2026-11-06 11:20','2026-11','ok',49500,0,'','[취소 후 재결제] 11월분 · 파머시 퍼스트 해지 반영',''],
+  [6,'2026-11-05 10:02','2026-11','cx',71500,71500,'','굿팜결제','[과다 청구] 파머시 퍼스트 10월 해지 미반영'],
   [5,'2026-10-08 14:21','2026-10','ok',71500,0,'','[재시도 결제] 10월분 · 카드 한도 초과 후 결제',''],
   [4,'2026-10-05 10:02','2026-10','fail',71500,0,'기타오류(8326 : 사용 한도 초과)','굿팜결제',''],
   [3,'2026-09-05 10:03','2026-09','ok',71500,0,'','굿팜결제',''],
   [2,'2026-08-05 10:04','2026-08','cx',71500,71500,'','굿팜결제','[중복 결제] 같은 날 두 번 결제'],
   [1,'2026-08-05 10:02','2026-08','ok',71500,0,'','굿팜결제','']];
-const ST={ok:['ok','성공'],fail:['fail','실패'],cx:['cx','취소 완료'],px:['px','부분 취소'],rq:['rq','취소 요청 중']};
+const ST={ok:['ok','성공'],fail:['fail','실패'],cx:['cx','취소 완료'],rq:['rq','취소 요청 중']};
 
 const S={page:'sub'};
 function side(){ $('side').innerHTML='<div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">약국관리</div>'+
@@ -177,7 +178,8 @@ function svcList(){
 
 /* 정기 결제 섹션 */
 // 결제 취소 창을 띄운 화면은 취소 전 상태(11-05 결제 = 성공)로 보여 준다
-const view=()=>S.page==='cancel' ? HIST.map(h=>h[0]===S.cid&&h[3]==='px'?[h[0],h[1],h[2],'ok',h[4],0,'',h[7],'']:h) : HIST;
+// 11-05 결제 취소 전 = 11-06 재결제 전 상태
+const view=()=>S.page==='cancel'&&S.cid===6 ? HIST.filter(h=>h[0]!==7).map(h=>h[0]===6?[h[0],h[1],h[2],'ok',h[4],0,'',h[7],'']:h) : HIST;
 function subPanel(){
   const HIST=view();
   return `<div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
@@ -185,7 +187,7 @@ function subPanel(){
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월<span class="addb">추가</span></th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액<span class="addb">추가</span></th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소<span class="addb">추가</span></th></tr></thead>
-    <tbody>${HIST.map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'||h[3]==='px';
+    <tbody>${HIST.map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok';
       return `<tr data-id="${h[0]}"><td>${h[1]}</td><td>${h[2]}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
       <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}</td>
@@ -220,11 +222,10 @@ function cancelModal(){
   return `<div class="dim"></div><div class="mdl" id="cxMdl"><div class="mh"><h3>결제 취소</h3><button class="x" data-close>×</button></div>
   <div class="mb">
     <div class="sum" id="cxSum"><div>과금일<b>${h[1].slice(0,10)}</b></div><div>청구월<b>${h[2]}</b></div><div>결제액<b>${fmt(h[4])}원</b></div></div>
-    <div class="fr" id="cxTypeRow"><span class="fl">취소 방식</span><div class="seg" id="cxType"><label class="on"><input type="radio" name="ct" value="all" checked>전체 취소</label><label><input type="radio" name="ct" value="part">부분 취소</label></div></div>
-    <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div><input class="fi" id="cxAmt" value="${fmt(left)}"><div class="hint">취소할 수 있는 금액 ${fmt(left)}원 · 취소 후 결제액 <b id="cxLeft">0</b>원</div></div></div>
+    <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div class="ro"><b class="red">${fmt(left)}원</b> (결제액 전액)<div class="hint">결제 건 단위 전체 취소 — 일부만 돌려줄 때는 전액 취소 후 받을 금액을 수기 결제</div></div></div>
     <div class="fr" id="cxCatRow"><span class="fl">취소 사유</span><div><select class="fi" id="cxCat">${opt(CANCEL_CAT,'과다 청구')}</select><div class="hint" id="cxHint"></div></div></div>
     <div class="fr" id="cxMemoRow"><span class="fl">메모</span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영"><div class="hint">기타면 필수</div></div></div>
-    <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전 결제 → 바로 <b>취소 완료</b> &nbsp;· 정산 후 결제 → <b>취소 요청 중</b>, 페이앱 결과가 오면 취소 완료<br>· 다시 결제할 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>)로 진행</div>
+    <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전 결제 → 바로 <b>취소 완료</b><br>· 정산 후 결제 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>
   </div>
   <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="cxGo">결제 취소</button></div></div>`;
 }
@@ -234,10 +235,10 @@ function manualModal(){
   return `<div class="dim"></div><div class="mdl" id="mpMdl"><div class="mh"><h3>수기 결제</h3><button class="x" data-close>×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">결제 카드</span><div class="ro">${PH.card}</div></div>
-    <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm"><option>2026-11</option><option selected>2026-10</option><option>2026-09</option><option>2026-08</option></select><div class="hint">몇 월분 결제인지 — 서비스 청구 통계는 이 달에 결제 완료로 반영</div></div></div>
-    <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'재시도 결제')}</select><div class="hint" id="mpHint"></div></div></div>
-    <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="71,500"></div></div>
-    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span></span><div><input class="fi" id="mpMemo" value="카드 한도 초과 후 결제"><div class="hint">기타면 필수</div></div></div>
+    <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm"><option selected>2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select><div class="hint">몇 월분 결제인지 — 서비스 청구 통계는 이 달에 결제 완료로 반영</div></div></div>
+    <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'취소 후 재결제')}</select><div class="hint" id="mpHint"></div></div></div>
+    <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="49,500"></div></div>
+    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span></span><div><input class="fi" id="mpMemo" value="파머시 퍼스트 해지 반영"><div class="hint">기타면 필수</div></div></div>
     <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"></span></div>
   </div>
   <div class="mf"><button class="btn" data-close>취소</button><button class="btn pri" data-toast="시안 — 실제 결제는 진행되지 않습니다">결제</button></div></div>`;
@@ -247,21 +248,15 @@ function bindAll(){
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>go('sub'));
   document.querySelectorAll('[data-toast]').forEach(b=>b.onclick=()=>toast(b.dataset.toast));
-  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.cancel; S.cxPart=false; go('cancel'); });
+  document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.cancel; go('cancel'); });
   const r=$('svcRow'); if(r){ r.style.cursor='pointer'; r.onclick=()=>go('svc'); }
   if($('dCat')){ const u=()=>{ const c=$('dCat').value, m=$('dMemo').value.trim(), a=+String($('dAmt').value).replace(/\D/g,'')||0, f=$('dFrom').value, t=$('dTo').value;
       $('dHint').textContent=hintOf(DISC_CAT,c); $('dTot').textContent=fmt(55000-a)+'원';
       $('dPvT').innerHTML=(m||c!=='기타')?discText({amt:a,cat:c,memo:m,from:f,to:t}):'<span class="red">사유 기타는 메모를 입력하세요</span>'; };
     ['dCat','dMemo','dAmt','dFrom','dTo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
   if($('cxCat')){ const h=view().find(x=>x[0]===S.cid)||HIST[0], max=h[4]-h[5];
-    const u=()=>{ const part=document.querySelector('input[name=ct]:checked').value==='part';
-      document.querySelectorAll('#cxType label').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
-      if(!part) $('cxAmt').value=fmt(max); $('cxAmt').disabled=!part;
-      const a=Math.min(max,+String($('cxAmt').value).replace(/\D/g,'')||0); $('cxLeft').textContent=fmt(h[4]-h[5]-a);
-      $('cxHint').textContent=hintOf(CANCEL_CAT,$('cxCat').value); };
-    document.querySelectorAll('input[name=ct]').forEach(x=>x.onchange=u); ['cxAmt','cxCat'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; });
-    if(S.cxPart){ document.querySelector('input[value=part]').checked=true; $('cxAmt').value='22,000'; S.cxPart=false; }
-    u(); $('cxGo').onclick=()=>toast('시안 — 페이앱 취소 요청은 진행되지 않습니다'); }
+    const u=()=>{ $('cxHint').textContent=hintOf(CANCEL_CAT,$('cxCat').value); };
+    $('cxCat').onchange=u; u(); $('cxGo').onclick=()=>toast('시안 — 페이앱 취소 요청은 진행되지 않습니다'); }
   if($('mpCat')){ const u=()=>{ const c=$('mpCat').value, m=$('mpMemo').value.trim();
       $('mpHint').textContent=hintOf(PAY_CAT,c); $('mpPvT').innerHTML='<b>['+c+']</b> '+(+$('mpBm').value.slice(5))+'월분'+(m?' · '+esc(m):''); };
     ['mpCat','mpBm','mpMemo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
@@ -274,8 +269,8 @@ function render(){
   $('content').innerHTML = base + mdl;
   bindAll();
 }
-function go(p){ S.page=p; if(p==='cancel'&&!S.cid){ S.cid=6; S.cxPart=true; } render(); }
-S.cid=6; S.cxPart=true;
+function go(p){ S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
+S.cid=6;
 const P0=new URLSearchParams(location.search).get('p'); if(['svc','sub','cancel','manual'].includes(P0)) S.page=P0;
 render();
 </script>
