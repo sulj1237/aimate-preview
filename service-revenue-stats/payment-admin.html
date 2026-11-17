@@ -230,12 +230,19 @@ function cancelModal(){
   <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="cxGo">결제 취소</button></div></div>`;
 }
 
+/* 청구월 선택지 — 항상 표시. 미결제 청구월 = 정기 결제 내역에서 실패만 있고 성공(정기 · 수기)이 없는 달 */
+const BM=['2026-11','2026-10','2026-09','2026-08','2026-07','2026-06'];
+const unpaid=()=>BM.filter(m=>HIST.some(h=>h[2]===m&&h[3]==='fail')&&!HIST.some(h=>h[2]===m&&h[3]==='ok')).sort();
+const bmDefault=()=>unpaid()[0]||NOW;
+const bmOpts=()=>BM.map(m=>`<option value="${m}" ${m===bmDefault()?'selected':''}>${m}${unpaid().includes(m)?' (미결제)':''}</option>`).join('');
+const bmHint=()=>unpaid().length?`미결제 청구월 ${unpaid().join(' · ')} — 가장 오래된 달이 기본값`:`미결제 청구월 없음 — 기본값은 결제하는 달(${NOW})`;
+
 /* ③ 수기 결제 창 */
 function manualModal(){
   return `<div class="dim"></div><div class="mdl" id="mpMdl"><div class="mh"><h3>수기 결제</h3><button class="x" data-close>×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">결제 카드</span><div class="ro">${PH.card}</div></div>
-    <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm"><option selected>2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select><div class="hint">몇 월분 결제인지 — 서비스 청구 통계는 이 달에 결제 완료로 반영</div></div></div>
+    <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm">${bmOpts()}</select><div class="hint">${bmHint()}</div></div></div>
     <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'취소 후 재결제')}</select><div class="hint" id="mpHint"></div></div></div>
     <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="49,500"></div></div>
     <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span></span><div><input class="fi" id="mpMemo" value="파머시 퍼스트 해지 반영"><div class="hint">기타면 필수</div></div></div>
