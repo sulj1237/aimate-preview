@@ -147,7 +147,8 @@ const HIST=[
   [4,'2026-10-05 10:02','2026-10','fail',71500,0,'기타오류(8326 : 사용 한도 초과)','굿팜결제',''],
   [3,'2026-09-05 10:03','2026-09','ok',71500,0,'','굿팜결제',''],
   [2,'2026-08-05 10:04','2026-08','cx',71500,71500,'','굿팜결제','[중복 결제] 같은 날 두 번 결제'],
-  [1,'2026-08-05 10:02','2026-08','ok',71500,0,'','굿팜결제','']];
+  [1,'2026-08-05 10:02','2026-08','ok',71500,0,'','굿팜결제',''],
+  [0,'2026-07-05 10:03','2026-07','fail',71500,0,'기타오류(8324 : 거래 정지 카드)','굿팜결제','']];
 const ST={ok:['ok','성공'],fail:['fail','실패'],cx:['cx','취소 완료'],rq:['rq','취소 요청 중']};
 
 const S={page:'sub'};
@@ -185,10 +186,10 @@ function subPanel(){
   return `<div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>${PH.method}</div><div class="k">결제카드정보</div><div>${PH.card} &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
-  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
+  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span><span class="addb">추가</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월<span class="addb">추가</span></th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액<span class="addb">추가</span></th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소<span class="addb">추가</span></th></tr></thead>
     <tbody>${HIST.map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok';
-      return `<tr data-id="${h[0]}"><td>${h[1]}</td><td>${h[2]}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
+      return `<tr data-id="${h[0]}"><td>${h[1]}</td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
       <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}</td>
       <td class="ctr">${can?`<button class="btn sm line" data-cancel="${h[0]}">결제 취소</button>`:''}</td></tr>`; }).join('')}</tbody></table></div>`;
@@ -231,11 +232,14 @@ function cancelModal(){
 }
 
 /* 청구월 선택지 — 항상 표시. 미결제 청구월 = 정기 결제 내역에서 실패만 있고 성공(정기 · 수기)이 없는 달 */
-const BM=['2026-11','2026-10','2026-09','2026-08','2026-07','2026-06'];
+// 선택지 = 과금시작월(2024-06) ~ 이번 달 전체, 미결제 청구월은 맨 위 묶음
+const BILL_START='2024-06';
+const BM=(()=>{ const a=[]; let m=BILL_START; while(m<=NOW){ a.unshift(m); m=nextM(m); } return a; })();
 const unpaid=()=>BM.filter(m=>HIST.some(h=>h[2]===m&&h[3]==='fail')&&!HIST.some(h=>h[2]===m&&h[3]==='ok')).sort();
 const bmDefault=()=>unpaid()[0]||NOW;
-const bmOpts=()=>BM.map(m=>`<option value="${m}" ${m===bmDefault()?'selected':''}>${m}${unpaid().includes(m)?' (미결제)':''}</option>`).join('');
-const bmHint=()=>unpaid().length?`미결제 청구월 ${unpaid().join(' · ')} — 가장 오래된 달이 기본값`:`미결제 청구월 없음 — 기본값은 결제하는 달(${NOW})`;
+const bmOpts=()=>{ const u=unpaid(), o=m=>`<option value="${m}" ${m===bmDefault()?'selected':''}>${m}${u.includes(m)?' (미결제)':''}</option>`;
+  return (u.length?`<optgroup label="미결제 청구월">${u.map(o).join('')}</optgroup>`:'')+`<optgroup label="전체 (과금 시작 ${BILL_START} ~ 이번 달)">${BM.filter(m=>!u.includes(m)).map(o).join('')}</optgroup>`; };
+const bmHint=()=>unpaid().length?`미결제 ${unpaid().join(' · ')} — 가장 오래된 미결제 달이 기본값`:`미결제 없음 — 기본값은 이번 달(${NOW})`;
 
 /* ③ 수기 결제 창 */
 function manualModal(){
@@ -243,9 +247,9 @@ function manualModal(){
   <div class="mb">
     <div class="fr"><span class="fl">결제 카드</span><div class="ro">${PH.card}</div></div>
     <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm">${bmOpts()}</select><div class="hint">${bmHint()}</div></div></div>
-    <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'취소 후 재결제')}</select><div class="hint" id="mpHint"></div></div></div>
-    <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="49,500"></div></div>
-    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span></span><div><input class="fi" id="mpMemo" value="파머시 퍼스트 해지 반영"><div class="hint">기타면 필수</div></div></div>
+    <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'재시도 결제')}</select><div class="hint" id="mpHint"></div></div></div>
+    <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="71,500"></div></div>
+    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span></span><div><input class="fi" id="mpMemo" value="카드 변경 후 결제"><div class="hint">기타면 필수</div></div></div>
     <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"></span></div>
   </div>
   <div class="mf"><button class="btn" data-close>취소</button><button class="btn pri" data-toast="시안 — 실제 결제는 진행되지 않습니다">결제</button></div></div>`;
