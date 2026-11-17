@@ -236,7 +236,7 @@ function cancelModal(){
     <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div class="ro"><b class="red">${fmt(left)}원</b> (결제액 전액)<div class="hint">결제 건 단위 전체 취소 — 일부만 돌려줄 때는 전액 취소 후 받을 금액을 수기 결제</div></div></div>
     <div class="fr" id="cxCatRow"><span class="fl">취소 사유</span><div><select class="fi" id="cxCat">${opt(CANCEL_CAT,'과다 청구')}</select><div class="hint" id="cxHint"></div></div></div>
     <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">필수</span></span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전 결제 → 바로 <b>취소 완료</b><br>· 정산 후 결제 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>
+    <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전(결제 후 영업일 3~5일 이내) → 바로 <b>취소 완료</b><br>· 정산 후 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>
   </div>
   <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="cxGo">결제 취소</button></div></div>`;
 }
