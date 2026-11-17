@@ -85,6 +85,9 @@
   .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
   .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
   code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
+  .req{display:none;font-size:9.5px;font-weight:800;color:#fff;background:var(--up);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  .req.on{display:inline-block}
+  .fi.need{border-color:var(--up);background:#fff7f6}
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
   .toast.show{opacity:1}
 </style>
@@ -206,7 +209,7 @@ function svcModal(){
       <tr class="tot"><td colspan="4">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
     <div class="fr" id="dCatRow"><span class="fl">할인 사유<span class="addb">추가</span></span><div><select class="fi" id="dCat">${opt(DISC_CAT,'결합 무료')}</select><div class="hint" id="dHint"></div></div></div>
-    <div class="fr" id="dMemoRow"><span class="fl">메모</span><div><input class="fi" id="dMemo" value="POS 무상 제공"><div class="hint">기타면 필수</div></div></div>
+    <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="POS 무상 제공" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="fr" id="dPerRow"><span class="fl">적용 기간<span class="addb">추가</span></span><div><div class="seg"><select class="fi" id="dFrom" style="width:150px">${['2026-06','2026-11','2026-12'].map(m=>`<option ${m===D.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi" id="dTo" style="width:170px"><option value="">계속 (종료월 없음)</option>${['2026-11','2026-12','2027-01','2027-03','2027-06'].map(m=>`<option ${m===D.to?'selected':''}>${m}</option>`).join('')}</select></div><div class="hint">청구월 기준 — 시작월 청구분부터 종료월 청구분까지 할인</div></div></div>
     <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot"></b> <span class="hint">(옵션 총액 − 금액 할인, VAT 별도)</span></div></div>
     <div class="pv" id="dPv"><span class="mlab">약국 서비스 목록에 보이는 내용</span><br><span id="dPvT"></span></div>
@@ -225,10 +228,17 @@ function cancelModal(){
     <div class="sum" id="cxSum"><div>과금일<b>${h[1].slice(0,10)}</b></div><div>청구월<b>${h[2]}</b></div><div>결제액<b>${fmt(h[4])}원</b></div></div>
     <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div class="ro"><b class="red">${fmt(left)}원</b> (결제액 전액)<div class="hint">결제 건 단위 전체 취소 — 일부만 돌려줄 때는 전액 취소 후 받을 금액을 수기 결제</div></div></div>
     <div class="fr" id="cxCatRow"><span class="fl">취소 사유</span><div><select class="fi" id="cxCat">${opt(CANCEL_CAT,'과다 청구')}</select><div class="hint" id="cxHint"></div></div></div>
-    <div class="fr" id="cxMemoRow"><span class="fl">메모</span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영"><div class="hint">기타면 필수</div></div></div>
+    <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">필수</span></span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전 결제 → 바로 <b>취소 완료</b><br>· 정산 후 결제 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>
   </div>
   <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="cxGo">결제 취소</button></div></div>`;
+}
+
+/* 사유 기타 → 메모 필수: 라벨에 필수 표시, 비어 있으면 저장 · 결제 · 취소 막음 */
+function memoReq(catId,memoId,reqId,btn){
+  const u=()=>{ const on=$(catId).value==='기타'; $(reqId).classList.toggle('on',on); $(memoId).classList.toggle('need',on&&!$(memoId).value.trim()); };
+  $(catId).addEventListener('change',u); $(memoId).addEventListener('input',u); u();
+  if(btn) btn.addEventListener('click',e=>{ if($(catId).value==='기타'&&!$(memoId).value.trim()){ e.stopImmediatePropagation(); toast('기타를 고르면 메모를 입력해야 합니다'); $(memoId).focus(); } },true);
 }
 
 /* 청구월 선택지 — 항상 표시. 미결제 청구월 = 정기 결제 내역에서 실패만 있고 성공(정기 · 수기)이 없는 달 */
@@ -249,7 +259,7 @@ function manualModal(){
     <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm">${bmOpts()}</select><div class="hint">${bmHint()}</div></div></div>
     <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'재시도 결제')}</select><div class="hint" id="mpHint"></div></div></div>
     <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="71,500"></div></div>
-    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span></span><div><input class="fi" id="mpMemo" value="카드 변경 후 결제"><div class="hint">기타면 필수</div></div></div>
+    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span><span class="req" id="mpReq">필수</span></span><div><input class="fi" id="mpMemo" value="카드 변경 후 결제" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"></span></div>
   </div>
   <div class="mf"><button class="btn" data-close>취소</button><button class="btn pri" data-toast="시안 — 실제 결제는 진행되지 않습니다">결제</button></div></div>`;
@@ -272,13 +282,17 @@ function bindAll(){
       $('mpHint').textContent=hintOf(PAY_CAT,c); $('mpPvT').innerHTML='<b>['+c+']</b> '+(+$('mpBm').value.slice(5))+'월분'+(m?' · '+esc(m):''); };
     ['mpCat','mpBm','mpMemo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
 }
-function render(){
+function render(){ renderBase(); }
+function renderBase(){
   side();
   document.querySelectorAll('.demo button').forEach(b=>b.classList.toggle('on',b.dataset.go===S.page));
   const base = svcList()+subPanel();
   const mdl = S.page==='svc'?svcModal():S.page==='cancel'?cancelModal():S.page==='manual'?manualModal():'';
   $('content').innerHTML = base + mdl;
   bindAll();
+  if($('dCat')) memoReq('dCat','dMemo','dReq',document.querySelector('#svcMdl .btn.pri'));
+  if($('cxCat')) memoReq('cxCat','cxMemo','cxReq',$('cxGo'));
+  if($('mpCat')) memoReq('mpCat','mpMemo','mpReq',document.querySelector('#mpMdl .btn.pri'));
 }
 function go(p){ S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
 S.cid=6;
