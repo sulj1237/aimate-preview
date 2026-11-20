@@ -323,7 +323,7 @@ flowchart TD
   B -- "열기 실패" --> B2["토스트 : 버튼 다시 클릭"] --> A
   B -- "뜸" --> C["원격지원 모달<br/>6자리 코드 · 입력 위치 안내 · 만료 5분 카운트"]
   C --> D["상담원 · 약사님께 코드와 입력 위치 안내"]
-  D --> E["약사 · 키오스크 설정 아이콘 → 관리자 비밀번호 창<br/>→ 원격지원 요청 → 6자리 입력 → 요청"]
+  D --> E["약사 · 키오스크 설정 아이콘 → 관리자 비밀번호 창<br/>→ 원격지원 요청 → 6자리 입력 → 연결"]
   C -. "5분 경과" .-> X["원격지원 모달 : 만료<br/>새 코드 받기 버튼"]
   X -- "새 코드 받기" --> C
   E --> F{"코드 확인"}
@@ -412,7 +412,7 @@ flowchart TD
     $('tab-remote').innerHTML = '원격지원 모달' + (S.view!=='remote' && ['connected','dropped','ended','expired'].includes(S.status) ? '<span class="dot"></span>' : '');
   }
 
-  const guide = `<div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>요청</b>을 누릅니다.</li></ol></div>`;
+  const guide = `<div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>연결</b>을 누릅니다.</li></ol></div>`;
   function renderAdmin(){
     const C=$('r-card'); C.className='r-card';
     const digits = dim => `<div class="code ${dim?'dim':''}">${[...S.code].map(c=>`<span>${c}</span>`).join('')}</div>`;
@@ -451,7 +451,7 @@ flowchart TD
   function end(by){ S.status='ended'; S.endedBy=by; render(); }
 
   function check(){
-    if (S.offline) return '인터넷 연결이 끊겨 요청할 수 없습니다. 연결을 확인한 뒤 다시 시도해 주세요.';
+    if (S.offline) return '인터넷 연결이 끊겨 연결할 수 없습니다. 연결을 확인한 뒤 다시 시도해 주세요.';
     if (S.status==='connected') return '이미 원격지원 중입니다.';
     if (S.status==='waiting' && S.entry===S.code) return '';
     if (S.used.includes(S.entry)) return '이미 사용한 인증코드입니다. 상담원에게 새 코드를 요청해 주세요.';
@@ -479,7 +479,7 @@ flowchart TD
         <h4>원격지원 요청</h4><p ${S.msg?'class="k-msg"':''}>${S.msg||'상담원이 불러 준 인증코드 6자리를 입력해 주세요.'}</p>
         <div class="k-boxes">${boxes}</div>
         <div class="k-pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-n="${n}">${n}</button>`).join('')}<button class="fn" data-fn="clear">전체 지우기</button><button data-n="0">0</button><button class="fn" data-fn="back">지우기</button></div>
-        <div class="k-acts"><button class="k-cancel" id="k-cancel">취소</button><button class="k-ok" id="k-ok" ${S.entry.length<6?'disabled':''}>요청</button></div></div></div>`;
+        <div class="k-acts"><button class="k-cancel" id="k-cancel">취소</button><button class="k-ok" id="k-ok" ${S.entry.length<6?'disabled':''}>연결</button></div></div></div>`;
     }
     L.innerHTML=html;
     const req=$('k-req'); if (req) req.onclick=()=>{ S.kiosk='req'; S.entry=''; S.msg=''; render(); };
