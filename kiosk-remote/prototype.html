@@ -202,7 +202,7 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
     <h1>키오스크 원격지원</h1>
     <div class="tabs" role="tablist">
       <button class="tab" id="tab-admin" role="tab" aria-selected="true">슈퍼어드민</button>
-      <button class="tab" id="tab-remote" role="tab" aria-selected="false">원격지원 모달</button>
+      <button class="tab" id="tab-remote" role="tab" aria-selected="false">원격지원 창 (새 창)</button>
       <button class="tab" id="tab-kiosk" role="tab" aria-selected="false">키오스크</button>
       <button class="tab" id="tab-flow" role="tab" aria-selected="false">플로우 차트</button>
     </div>
@@ -210,7 +210,7 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
   </div>
   <ol class="steps" id="steps">
     <li data-s="1"><b>1</b>상담원 · 키오스크 원격지원 클릭</li>
-    <li data-s="2"><b>2</b>원격지원 모달 · 6자리 코드 발급</li>
+    <li data-s="2"><b>2</b>원격지원 창(새 창) · 6자리 코드 발급</li>
     <li data-s="3"><b>3</b>약사 · 설정 → 원격지원 요청 → 코드 입력</li>
     <li data-s="4"><b>4</b>원격 연결</li>
     <li data-s="5"><b>5</b>종료 · 연결 종료 또는 해제</li>
@@ -291,9 +291,9 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
         </div>
       </div>
 
-      <div class="note sim admin-sim"><h5>프로토타입 안내 · 모달이 뜨지 않는 경우 확인하기</h5>
-        키오스크 원격지원을 누르면 약국 상세 위에 원격지원 모달이 뜹니다.
-        <button id="sim-ticket">모달 열기 실패 보기</button>
+      <div class="note sim admin-sim"><h5>프로토타입 안내 · 창이 열리지 않는 경우 확인하기</h5>
+        키오스크 원격지원을 누르면 원격지원 창이 새 창으로 열립니다.
+        <button id="sim-ticket">창 열기 실패 보기</button>
         
       </div>
     </div>
@@ -304,7 +304,7 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
   <!-- 원격지원 모달 -->
   <section id="view-remote" class="remote-area" aria-label="원격지원 페이지" hidden>
     <div class="browser">
-      <div class="b-bar"><i></i><i></i><i></i><div class="b-url">슈퍼어드민 › 약국 상세 위 모달</div></div>
+      <div class="b-bar"><i></i><i></i><i></i><div class="b-url">원격지원 창 (새 창)</div></div>
       <div class="r-page">
         <div class="r-head"><span class="logo"><i></i>굿팜</span><b>키오스크 원격지원</b></div>
         <div class="r-card" id="r-card"></div>
@@ -319,24 +319,24 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
       <p>정상 흐름과 연결 안 되는 경우를 함께 표시합니다. 초록 : 연결 · 종료, 빨강 : 연결 안 되는 경우.</p>
       <pre class="mermaid">
 flowchart TD
-  A["상담원 · 약국 상세 › 태블릿 정보<br/>키오스크 원격지원 클릭"] --> B{"원격지원 모달<br/>뜸?"}
+  A["상담원 · 약국 상세 › 태블릿 정보<br/>키오스크 원격지원 클릭"] --> B{"원격지원 창<br/>열림?"}
   B -- "열기 실패" --> B2["토스트 : 버튼 다시 클릭"] --> A
-  B -- "뜸" --> C["원격지원 모달<br/>6자리 코드 · 입력 위치 안내 · 만료 5분 카운트"]
+  B -- "열림" --> C["원격지원 창(새 창)<br/>6자리 코드 · 입력 위치 안내 · 만료 5분 카운트"]
   C --> D["상담원 · 약사님께 코드와 입력 위치 안내"]
   D --> E["약사 · 키오스크 설정 아이콘 → 관리자 비밀번호 창<br/>→ 원격지원 요청 → 6자리 입력 → 요청"]
-  C -. "5분 경과" .-> X["원격지원 모달 : 만료<br/>새 코드 받기 버튼"]
+  C -. "5분 경과" .-> X["원격지원 창 : 만료<br/>새 코드 받기 버튼"]
   X -- "새 코드 받기" --> C
   E --> F{"코드 확인"}
   F -- "인터넷 끊김" --> F1["키오스크 : 인터넷 연결 확인 안내"] --> E
   F -- "코드 틀림" --> F2["키오스크 : 코드 다시 확인 안내"] --> E
   F -- "만료 · 이미 사용한 코드" --> F3["키오스크 : 상담원에게 새 코드 요청 안내"] --> X
   F -- "이미 원격지원 중" --> F4["키오스크 : 이미 원격지원 중 안내"]
-  F -- "맞음" --> G["연결됨<br/>원격지원 모달 : 연결 토스트 · 약국 · 기기 정보 · 키오스크 화면<br/>키오스크 : 오른쪽 위 원격 지원 중 + 해제"]
+  F -- "맞음" --> G["연결됨<br/>원격지원 창 : 연결 토스트 · 약국 · 기기 정보 · 키오스크 화면<br/>키오스크 : 오른쪽 위 원격 지원 중 + 해제"]
   G --> H{"종료"}
   H -- "상담원 연결 종료" --> Z["종료"]
   H -- "약사 해제" --> Z
   H -- "연결 30분 경과(자동 해지)" --> Z
-  H -- "키오스크 인터넷 끊김" --> Y["원격지원 모달 : 연결 끊김<br/>새 코드 받기 버튼"]
+  H -- "키오스크 인터넷 끊김" --> Y["원격지원 창 : 연결 끊김<br/>새 코드 받기 버튼"]
   Y -- "새 코드 받기" --> C
   classDef ok fill:#e1f5ea,stroke:#2fb36b,color:#1c3d2b;
   classDef bad fill:#fde3e1,stroke:#e2463f,color:#5a1a16;
@@ -362,8 +362,8 @@ flowchart TD
       <div id="k-layer"></div>
     </div>
     <div class="notes">
-      <div class="note"><h5>프로토타입 안내</h5>슈퍼어드민에서 <b>키오스크 원격지원</b>을 눌러 원격지원 모달에서 코드를 받은 뒤, 이 화면에서 설정 아이콘을 눌러 진행합니다.</div>
-      <div class="note" id="code-note"><h5>원격지원 모달에서 발급한 코드</h5><span id="code-hint">아직 발급 전</span></div>
+      <div class="note"><h5>프로토타입 안내</h5>슈퍼어드민에서 <b>키오스크 원격지원</b>을 눌러 원격지원 창에서 코드를 받은 뒤, 이 화면에서 설정 아이콘을 눌러 진행합니다.</div>
+      <div class="note" id="code-note"><h5>원격지원 창에서 발급한 코드</h5><span id="code-hint">아직 발급 전</span></div>
       <div class="note"><h5>화면 표시</h5>원격지원이 연결되었을 때만 표시합니다.<br>왼쪽 위 : 태블릿 ID · Store ID<br>오른쪽 위 : ‘원격 지원 중’과 해제 버튼 (누르면 바로 해제)</div>
       <div class="note sim"><h5>연결 안 되는 경우 확인하기</h5>
         <button id="sim-expire">만료시간 지나게 하기</button>
@@ -409,7 +409,7 @@ flowchart TD
   function renderSteps(){
     const cur=step();
     document.querySelectorAll('#steps li').forEach(li=>{ const n=+li.dataset.s; li.className = n===cur?'on':(n<cur?'done':''); });
-    $('tab-remote').innerHTML = '원격지원 모달' + (S.view!=='remote' && ['connected','dropped','ended','expired'].includes(S.status) ? '<span class="dot"></span>' : '');
+    $('tab-remote').innerHTML = '원격지원 창 (새 창)' + (S.view!=='remote' && ['connected','dropped','ended','expired'].includes(S.status) ? '<span class="dot"></span>' : '');
   }
 
   const guide = `<div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>요청</b>을 누릅니다.</li></ol></div>`;
@@ -417,7 +417,7 @@ flowchart TD
     const C=$('r-card'); C.className='r-card';
     const digits = dim => `<div class="code ${dim?'dim':''}">${[...S.code].map(c=>`<span>${c}</span>`).join('')}</div>`;
     let body='';
-    if (S.status==='idle') body = `<h3>열린 원격지원 모달이 없습니다</h3><p>슈퍼어드민 약국 상세의 키오스크 원격지원을 누르면 이 모달이 뜹니다.</p>`;
+    if (S.status==='idle') body = `<h3>열린 원격지원 창이 없습니다</h3><p>슈퍼어드민 약국 상세의 키오스크 원격지원을 누르면 이 창이 새로 열립니다.</p>`;
     else if (S.status==='waiting') body = `
       <h3>${PHARM} <span class="state">약사 입력 대기</span></h3>
       ${digits(false)}${guide}
@@ -508,13 +508,13 @@ flowchart TD
   $('open-remote').onclick=()=>{
     const b=$('open-remote'); b.setAttribute('aria-busy','true');
     setTimeout(()=>{ b.removeAttribute('aria-busy');
-      if (failNext==='ticket'){ failNext=''; toast('원격지원 모달을 열지 못했습니다. 버튼을 다시 눌러 주세요.'); return; }
+      if (failNext==='ticket'){ failNext=''; toast('원격지원 창을 열지 못했습니다. 버튼을 다시 눌러 주세요.'); return; }
       if (failNext==='popup'){ failNext=''; toast('브라우저에서 팝업이 차단되었습니다. 팝업을 허용한 뒤 다시 눌러 주세요.'); return; }
       if (S.status==='connected'){ toast('이미 원격지원 중입니다.'); S.view='remote'; render(); return; }
       issue(); S.view='remote'; render();
     },500);
   };
-  $('sim-ticket').onclick=()=>{ failNext='ticket'; toast('다음 클릭 한 번은 모달 열기에 실패합니다.'); };
+  $('sim-ticket').onclick=()=>{ failNext='ticket'; toast('다음 클릭 한 번은 창 열기에 실패합니다.'); };
   $('k-gear').onclick=()=>{ S.kiosk='pw'; render(); };
   $('k-release').onclick=()=>{ end('kiosk'); banner('원격지원을 해제했습니다.'); renderKiosk(); };
   $('sim-timeout').onclick=()=>{ if (S.status==='connected'){ clearInterval(sessT); end('timeout'); banner('연결 30분이 지나 원격지원이 해지되었습니다.'); renderKiosk(); } };

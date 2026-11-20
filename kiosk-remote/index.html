@@ -176,7 +176,7 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   <h2>작동 흐름</h2>
   <ol class="fl">
     <li><b>① 상담원</b>키오스크 원격지원 클릭</li>
-    <li><b>② 모달</b>6자리 코드 발급</li>
+    <li><b>② 새 창</b>6자리 코드 발급</li>
     <li><b>③ 상담원</b>약사님께 코드 안내</li>
     <li><b>④ 약사</b>키오스크에 코드 입력</li>
     <li class="ok"><b>⑤ 원격 연결</b>키오스크 화면을 보며 지원</li>
@@ -189,8 +189,8 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   <ul class="rules">
     <li>코드는 5분 동안 유효합니다.</li>
     <li>5분이 지나면 ‘입력 시간이 만료되었습니다.’ → [새 코드 받기]</li>
-    <li>연결 30분이 지나면 자동으로 끊깁니다. 남은 시간은 원격지원 모달에 보입니다.</li>
-    <li>모달을 닫거나 버튼을 다시 누르면 이전 코드는 못 씁니다.</li>
+    <li>연결 30분이 지나면 자동으로 끊깁니다. 남은 시간은 원격지원 창에 보입니다.</li>
+    <li>창을 닫거나 버튼을 다시 누르면 이전 코드는 못 씁니다.</li>
   </ul>
 </section>
 
@@ -221,15 +221,15 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   </div>
   <div class="desc">
     <ol>
-      <li><i>1</i><div><b>[키오스크 원격지원]</b>누르면 약국 상세 위에 원격지원 모달이 뜹니다.</div></li>
+      <li><i>1</i><div><b>[키오스크 원격지원]</b>누르면 원격지원 창이 새 창으로 열립니다.</div></li>
     </ol>
-    <div class="nav"><b>모달이 안 뜨면 :</b> 버튼을 다시 누릅니다.</div>
+    <div class="nav"><b>창이 안 열리면 :</b> 브라우저 팝업을 허용한 뒤 다시 누릅니다.</div>
   </div>
 </section>
 
 <!-- 2 -->
 <section class="sec scr">
-  <div class="scr-h"><span class="id">STEP 2</span><h3>모달 · 6자리 코드 확인</h3><span class="where">원격지원 모달</span></div>
+  <div class="scr-h"><span class="id">STEP 2</span><h3>새 창 · 6자리 코드 확인</h3><span class="where">원격지원 창 (새 창)</span></div>
   <div class="canvas">
     <div class="rp">
       
@@ -317,7 +317,7 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
 
 <!-- 6 -->
 <section class="sec scr">
-  <div class="scr-h"><span class="id">STEP 6</span><h3>상담원 · 원격지원 진행</h3><span class="where">원격지원 모달 · 연결 중</span></div>
+  <div class="scr-h"><span class="id">STEP 6</span><h3>상담원 · 원격지원 진행</h3><span class="where">원격지원 창 · 연결 중</span></div>
   <div class="canvas">
     <div class="rp">
       <div class="rp-head"><span>굿팜</span>키오스크 원격지원</div>
@@ -345,8 +345,8 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   <div class="tbl-wrap"><table class="tblx">
     <thead><tr><th>상황</th><th>이렇게 하세요</th></tr></thead>
     <tbody>
-      <tr><td>원격지원 모달이 안 떠요</td><td>버튼을 다시 누릅니다.</td></tr>
-      <tr><td>코드 시간이 지났어요 (5분)</td><td>모달에서 [새 코드 받기] → 새 코드를 불러 줍니다.</td></tr>
+      <tr><td>원격지원 창이 안 열려요</td><td>팝업을 허용하고 버튼을 다시 누릅니다.</td></tr>
+      <tr><td>코드 시간이 지났어요 (5분)</td><td>원격지원 창에서 [새 코드 받기] → 새 코드를 불러 줍니다.</td></tr>
       <tr><td>키오스크에 ‘인증코드가 맞지 않습니다’</td><td>코드를 다시 불러 줍니다.</td></tr>
       <tr><td>키오스크에 ‘유효시간이 지난’ · ‘이미 사용한 인증코드’</td><td>[새 코드 받기]로 새 코드를 받아 불러 줍니다.</td></tr>
       <tr><td>키오스크에 ‘인터넷 연결이 끊겨’ · 연결 중 끊김</td><td>키오스크 인터넷을 확인한 뒤 [새 코드 받기]를 누릅니다.</td></tr>
