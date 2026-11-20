@@ -202,7 +202,7 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
     <h1>키오스크 원격지원</h1>
     <div class="tabs" role="tablist">
       <button class="tab" id="tab-admin" role="tab" aria-selected="true">슈퍼어드민</button>
-      <button class="tab" id="tab-remote" role="tab" aria-selected="false">원격지원 창 (새 창)</button>
+      <button class="tab" id="tab-remote" role="tab" aria-selected="false">원격지원 모달 → 연결 후 새 창</button>
       <button class="tab" id="tab-kiosk" role="tab" aria-selected="false">키오스크</button>
       <button class="tab" id="tab-flow" role="tab" aria-selected="false">플로우 차트</button>
     </div>
@@ -210,7 +210,7 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
   </div>
   <ol class="steps" id="steps">
     <li data-s="1"><b>1</b>상담원 · 키오스크 원격지원 클릭</li>
-    <li data-s="2"><b>2</b>원격지원 창(새 창) · 6자리 코드 발급</li>
+    <li data-s="2"><b>2</b>원격지원 모달 · 6자리 코드 발급</li>
     <li data-s="3"><b>3</b>약사 · 설정 → 원격지원 요청 → 코드 입력</li>
     <li data-s="4"><b>4</b>원격 연결</li>
     <li data-s="5"><b>5</b>종료 · 연결 종료 또는 해제</li>
@@ -291,9 +291,9 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
         </div>
       </div>
 
-      <div class="note sim admin-sim"><h5>프로토타입 안내 · 창이 열리지 않는 경우 확인하기</h5>
-        키오스크 원격지원을 누르면 원격지원 창이 새 창으로 열립니다.
-        <button id="sim-ticket">창 열기 실패 보기</button>
+      <div class="note sim admin-sim"><h5>프로토타입 안내 · 모달이 뜨지 않는 경우 확인하기</h5>
+        키오스크 원격지원을 누르면 약국 상세 위에 원격지원 모달이 뜨고, 연결되면 원격지원 창이 새 창으로 열립니다.
+        <button id="sim-ticket">모달 열기 실패 보기</button>
         
       </div>
     </div>
@@ -304,7 +304,7 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
   <!-- 원격지원 모달 -->
   <section id="view-remote" class="remote-area" aria-label="원격지원 페이지" hidden>
     <div class="browser">
-      <div class="b-bar"><i></i><i></i><i></i><div class="b-url">원격지원 창 (새 창)</div></div>
+      <div class="b-bar"><i></i><i></i><i></i><div class="b-url">원격지원 모달 → 연결 후 새 창</div></div>
       <div class="r-page">
         <div class="r-head"><span class="logo"><i></i>굿팜</span><b>키오스크 원격지원</b></div>
         <div class="r-card" id="r-card"></div>
@@ -319,9 +319,9 @@ td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-s
       <p>정상 흐름과 연결 안 되는 경우를 함께 표시합니다. 초록 : 연결 · 종료, 빨강 : 연결 안 되는 경우.</p>
       <pre class="mermaid">
 flowchart TD
-  A["상담원 · 약국 상세 › 태블릿 정보<br/>키오스크 원격지원 클릭"] --> B{"원격지원 창<br/>열림?"}
+  A["상담원 · 약국 상세 › 태블릿 정보<br/>키오스크 원격지원 클릭"] --> B{"원격지원 모달<br/>뜸?"}
   B -- "열기 실패" --> B2["토스트 : 버튼 다시 클릭"] --> A
-  B -- "열림" --> C["원격지원 창(새 창)<br/>6자리 코드 · 입력 위치 안내 · 만료 5분 카운트"]
+  B -- "뜸" --> C["원격지원 모달<br/>6자리 코드 · 입력 위치 안내 · 만료 5분 카운트"]
   C --> D["상담원 · 약사님께 코드와 입력 위치 안내"]
   D --> E["약사 · 키오스크 설정 아이콘 → 관리자 비밀번호 창<br/>→ 원격지원 요청 → 6자리 입력 → 연결"]
   C -. "5분 경과" .-> X["원격지원 창 : 만료<br/>새 코드 받기 버튼"]
@@ -409,7 +409,7 @@ flowchart TD
   function renderSteps(){
     const cur=step();
     document.querySelectorAll('#steps li').forEach(li=>{ const n=+li.dataset.s; li.className = n===cur?'on':(n<cur?'done':''); });
-    $('tab-remote').innerHTML = '원격지원 창 (새 창)' + (S.view!=='remote' && ['connected','dropped','ended','expired'].includes(S.status) ? '<span class="dot"></span>' : '');
+    $('tab-remote').innerHTML = '원격지원 모달 → 연결 후 새 창' + (S.view!=='remote' && ['connected','dropped','ended','expired'].includes(S.status) ? '<span class="dot"></span>' : '');
   }
 
   const guide = `<div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>연결</b>을 누릅니다.</li></ol></div>`;
@@ -508,7 +508,7 @@ flowchart TD
   $('open-remote').onclick=()=>{
     const b=$('open-remote'); b.setAttribute('aria-busy','true');
     setTimeout(()=>{ b.removeAttribute('aria-busy');
-      if (failNext==='ticket'){ failNext=''; toast('원격지원 창을 열지 못했습니다. 버튼을 다시 눌러 주세요.'); return; }
+      if (failNext==='ticket'){ failNext=''; toast('원격지원 모달을 열지 못했습니다. 버튼을 다시 눌러 주세요.'); return; }
       if (failNext==='popup'){ failNext=''; toast('브라우저에서 팝업이 차단되었습니다. 팝업을 허용한 뒤 다시 눌러 주세요.'); return; }
       if (S.status==='connected'){ toast('이미 원격지원 중입니다.'); S.view='remote'; render(); return; }
       issue(); S.view='remote'; render();
