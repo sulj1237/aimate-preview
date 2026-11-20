@@ -60,6 +60,7 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
 .nav b{color:var(--ink);font-weight:500}
 .decided{display:inline-block;font-size:11px;background:var(--teal-soft);color:var(--teal-dark);border-radius:4px;padding:0 6px;margin-left:4px}
 
+.sess{margin-left:auto;font-size:11px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}.sess b{color:var(--red)}
 /* 마커 */
 .mk{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--mk);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 3px #fff;z-index:5}
 
@@ -179,7 +180,7 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
     <li><b>③ 상담원</b>약사님께 코드 안내</li>
     <li><b>④ 약사</b>키오스크에 코드 입력</li>
     <li class="ok"><b>⑤ 원격 연결</b>키오스크 화면을 보며 지원</li>
-    <li><b>⑥ 종료</b>연결 종료 · 해제 · 30분 자동</li>
+    <li><b>⑥ 연결 종료</b>상담원 [연결 종료] · 약사 [해제] · 30분 자동 해지</li>
   </ol>
 </section>
 
@@ -188,7 +189,7 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   <ul class="rules">
     <li>코드는 5분 동안 유효합니다.</li>
     <li>5분이 지나면 같은 창에서 [다시 시도] → 새 코드</li>
-    <li>연결 30분이 지나면 자동으로 끊깁니다.</li>
+    <li>연결 30분이 지나면 자동으로 끊깁니다. 남은 시간은 원격지원 창에 보입니다.</li>
     <li>버튼을 다시 누르거나 창을 닫으면 이전 코드는 못 씁니다.</li>
   </ul>
 </section>
@@ -314,6 +315,31 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   </div>
 </section>
 
+<!-- 6 -->
+<section class="sec scr">
+  <div class="scr-h"><span class="id">STEP 6</span><h3>상담원 · 원격지원 진행</h3><span class="where">원격지원 창 · 연결됨</span></div>
+  <div class="canvas">
+    <div class="rp">
+      <div class="rp-head"><span>굿팜</span>키오스크 원격지원</div>
+      <div class="rp-body"><div class="rp-card wide">
+        <h4>테라약국 · T1<span class="sess">자동 해지까지 <b>29:59</b></span></h4><span class="mk" style="right:-11px;top:16px">1</span>
+        <div class="mini-k"><div><b>처방전 접수</b>키오스크 화면이 이 영역에 보입니다</div></div><span class="mk" style="left:-11px;top:90px">2</span>
+        <div class="dev"><div class="k">약국명</div><div>테라약국</div><div class="k">태블릿 아이디</div><div>T1</div><div class="k">Store ID</div><div>2020033113441969592</div></div><span class="mk" style="left:-11px;bottom:62px">3</span>
+        <div class="acts" style="align-items:center"><span class="st ok">● 연결 중</span><span class="btn-r">연결 종료</span></div><span class="mk" style="right:-11px;bottom:16px">4</span>
+      </div></div>
+    </div>
+  </div>
+  <div class="desc">
+    <ol>
+      <li><i>1</i><div><b>자동 해지 카운트</b>연결되면 30:00부터 줄어듭니다. 0이 되면 자동으로 끊깁니다.</div></li>
+      <li><i>2</i><div><b>키오스크 화면</b>약국 키오스크 화면을 보며 지원합니다.</div></li>
+      <li><i>3</i><div><b>약국 정보</b>맞는 약국 · 기기에 연결됐는지 확인합니다.</div></li>
+      <li><i>4</i><div><b>‘연결 중’ + [연결 종료]</b>연결 중일 때만 버튼 옆에 ‘연결 중’을 표시합니다. 지원이 끝나면 [연결 종료]를 누르고, 상태가 ‘연결 종료’로 바뀝니다.</div></li>
+    </ol>
+    <div class="nav">약사님이 키오스크에서 [해제]를 눌러도 바로 끝납니다.</div>
+  </div>
+</section>
+
 <section class="sec">
   <h2>이럴 땐 이렇게</h2>
   <div class="tbl-wrap"><table class="tblx">
@@ -329,7 +355,7 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
   </table></div>
 </section>
 
-<footer class="meta">직접 눌러 보는 프로토타입 : <a href="prototype.html">키오스크 원격지원 프로토타입</a></footer>
+<footer class="meta">CS 매뉴얼 : <a href="manual.html">키오스크 원격지원 CS 매뉴얼</a> · 직접 눌러 보는 프로토타입 : <a href="prototype.html">키오스크 원격지원 프로토타입</a></footer>
 </div>
 
 </body>

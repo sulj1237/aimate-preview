@@ -383,9 +383,10 @@ flowchart TD
 (() => {
   const STORE = '2020033113441969592', PHARM = '테라약국', TTL = 300;
   const tablets = [['T1','192.168.0.17',true],['T2','192.168.0.15',true],['T3','192.168.0.10',true],['T4','192.168.45.146',false]];
-  const init = () => ({ view:'admin', status:'idle', code:'', left:TTL, modal:false, kiosk:'home', entry:'', msg:'', endedBy:'', offline:false, used:[], expired:[], banner:'' });
+  const init = () => ({ view:'admin', status:'idle', code:'', left:TTL, modal:false, kiosk:'home', entry:'', msg:'', endedBy:'', offline:false, used:[], expired:[], banner:'', sess:1800 });
   const S = init();
-  let tick = null, bannerT = null;
+  let tick = null, bannerT = null, sessT = null;
+  function startSess(){ clearInterval(sessT); S.sess=1800; sessT=setInterval(()=>{ if (S.status!=='connected'){ clearInterval(sessT); return; } S.sess=Math.max(0,S.sess-1); if (S.sess===0){ clearInterval(sessT); end('timeout'); banner('연결 30분이 지나 원격지원이 해지되었습니다.'); renderKiosk(); } else if (S.view==='remote') renderAdmin(); },1000); }
   const $ = id => document.getElementById(id);
 
   const power = '<svg class="ico pw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5v6M9 8.4a5 5 0 1 0 6 0"/></svg>';
@@ -429,16 +430,16 @@ flowchart TD
       <div class="timer">만료시간 <b>00:00</b> · 인증코드 유효시간이 지났습니다.</div>
       <div class="m-acts"><button class="btn-gray" id="m-close">창 닫기</button><button class="btn-fill" id="m-retry">다시 시도</button></div>`;
     else if (S.status==='connected'){ C.className='r-card wide'; body = `
-      <h3>${PHARM} · T1 <span class="state ok">연결됨</span></h3>
+      <h3>${PHARM} · T1<span style="margin-left:auto;font-size:13px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums">자동 해지까지 <b style="color:var(--red)">${mmss(S.sess)}</b></span></h3>
       <div class="screen"><div><b>처방전 접수</b><div style="text-align:center;margin-top:10px">키오스크 화면이 이 영역에 보입니다</div></div></div>
       <div class="dev"><div class="k">약국명</div><div>${PHARM}</div><div class="k">태블릿 아이디</div><div>T1</div><div class="k">Store ID</div><div>${STORE}</div></div>
-      <div class="m-acts"><button class="btn-danger" id="m-end">연결 종료</button></div>`; }
+      <div class="m-acts" style="align-items:center"><span class="state ok">● 연결 중</span><button class="btn-danger" id="m-end">연결 종료</button></div>`; }
     else if (S.status==='dropped') body = `
       <h3>${PHARM} <span class="state bad">연결 끊김</span></h3>
       <p>키오스크 인터넷 연결이 끊겨 원격지원이 끝났습니다. 키오스크 연결상태를 확인한 뒤 다시 시도를 누르면 새 인증코드가 발급됩니다.</p>
       <div class="m-acts"><button class="btn-gray" id="m-close">창 닫기</button><button class="btn-fill" id="m-retry">다시 시도</button></div>`;
     else if (S.status==='ended') body = `
-      <h3>${PHARM} <span class="state end">종료</span></h3>
+      <h3>${PHARM} <span class="state end">연결 종료</span></h3>
       <p>${S.endedBy==='kiosk'?'약사님이 키오스크에서 해제를 눌러 원격지원이 끝났습니다.':(S.endedBy==='timeout'?'연결 30분이 지나 원격지원이 자동으로 해지되었습니다.':'원격지원을 종료했습니다.')}</p>
       <div class="m-acts"><button class="btn-fill" id="m-close">창 닫기</button></div>`;
     C.innerHTML = body;
@@ -491,7 +492,7 @@ flowchart TD
       $('k-cancel').onclick=()=>{ S.kiosk='home'; render(); };
       $('k-ok').onclick=()=>{
         const m=check();
-        if (!m){ S.used.push(S.code); S.status='connected'; S.kiosk='home'; clearInterval(tick); banner('원격지원이 연결되었습니다.'); toast('키오스크와 연결되었습니다.'); render(); }
+        if (!m){ S.used.push(S.code); S.status='connected'; startSess(); S.kiosk='home'; clearInterval(tick); banner('원격지원이 연결되었습니다.'); toast('키오스크와 연결되었습니다.'); render(); }
         else { S.msg=m; S.entry=''; render(); }
       };
     }
@@ -518,11 +519,11 @@ flowchart TD
   $('sim-popup').onclick=()=>{ failNext='popup'; toast('다음 클릭 한 번은 팝업이 차단됩니다.'); };
   $('k-gear').onclick=()=>{ S.kiosk='pw'; render(); };
   $('k-release').onclick=()=>{ end('kiosk'); banner('원격지원을 해제했습니다.'); renderKiosk(); };
-  $('sim-timeout').onclick=()=>{ if (S.status==='connected'){ end('timeout'); banner('연결 30분이 지나 원격지원이 해지되었습니다.'); renderKiosk(); } };
+  $('sim-timeout').onclick=()=>{ if (S.status==='connected'){ clearInterval(sessT); end('timeout'); banner('연결 30분이 지나 원격지원이 해지되었습니다.'); renderKiosk(); } };
   $('sim-expire').onclick=()=>{ if (S.status==='waiting') expire(); };
   $('sim-offline').onclick=()=>{ S.offline=!S.offline; if (S.offline && S.status==='connected') S.status='dropped'; render(); };
   ['admin','remote','kiosk','flow'].forEach(v=>$('tab-'+v).onclick=()=>{ S.view=v; render(); });
-  $('reset').onclick=()=>{ clearInterval(tick); failNext=''; Object.assign(S,init()); render(); };
+  $('reset').onclick=()=>{ clearInterval(tick); clearInterval(sessT); failNext=''; Object.assign(S,init()); render(); };
   render();
 })();
 </script>
