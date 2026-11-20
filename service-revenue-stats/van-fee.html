@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>약국 수익 통계 · VAN 정산 관리 시안</title>
+<title>경영 요약 · 약국 수익 통계 · VAN 정산 관리 시안</title>
 <!--
   슈퍼어드민 시안 — 서비스 청구 통계 스토리보드 SA-02-001 ~ 004에서 iframe으로 사용
-  화면: stats 통계 > 약국 수익 통계 / mgmt 약국관리 > VAN 정산 관리(정산 내역 · 업로드 이력) / upload 업로드 검증 창 / map 약국 연결 창
+  화면: dash 통계 > 경영 요약 / stats 통계 > 약국 수익 통계 / mgmt 약국관리 > VAN 정산 관리(정산 내역 · 업로드 이력) / upload 업로드 검증 창 / map 약국 연결 창
   금액 · 단말기 구성은 2026-11 정산 파일 기준, 약국명 · 사업자번호 · 스토어 ID · TID는 가상값
 -->
 <style>
@@ -139,6 +139,7 @@
     <div class="topbar">
       <div class="crumb" id="crumb"></div>
       <div class="demo">시안 화면
+        <button data-go="dash">경영 요약</button>
         <button data-go="stats">약국 수익 통계</button>
         <button data-go="mgmt">VAN 정산 관리</button>
         <button data-go="upload">업로드 검증</button>
@@ -170,18 +171,79 @@ const HIST=[ // 집계 월, 파일명, 업로드, 확정자, 확정 일시, 행,
   ['2026-09','9월 헬스포트.xlsx','2026-10-26 14:09','김운영','2026-10-26 14:35',247,5672394,'on'],
   ['2026-08','헬스포트_8월.xlsx','2026-10-26 14:21','김운영','2026-10-26 14:33',246,5344936,'on']];
 
-const S={page:'stats', tab:'all', q:'', open:new Set(), pick:0};
+const S={page:'dash', tab:'all', q:'', open:new Set(), pick:0};
 const vanOk=()=>D.filter(o=>o.st==='ok'), vanNg=()=>D.filter(o=>o.st!=='ok');
 const sumV=a=>a.reduce((s,o)=>s+o.vam,0);
 const VAN_ALL=sumV(D); HIST[0][6]=VAN_ALL;
 // 월별 추이 — VAN은 8~11월 정산 파일 총액, 이용료는 예시값
 const TREND=[['2026-08',60912000,5344936],['2026-09',61540500,5672394],['2026-10',61987000,5793588],['2026-11',FEE_ALL,VAN_ALL]];
-const MENU={stats:['통계',['서비스 청구 통계','약국 수익 통계<span class="addb">NEW</span>','굿팜플러스','굿팜솔루션NEW','모바일약국','AI MATE','업무 이용 통계'],1,'통계 &gt; <b>약국 수익 통계</b>'],
+const MENU={dash:['통계',['경영 요약<span class="addb">NEW</span>','서비스 청구 통계','약국 수익 통계<span class="addb">NEW</span>','굿팜플러스','굿팜솔루션NEW','모바일약국','AI MATE','업무 이용 통계'],0,'통계 &gt; <b>경영 요약</b>'],
+  stats:['통계',['경영 요약<span class="addb">NEW</span>','서비스 청구 통계','약국 수익 통계<span class="addb">NEW</span>','굿팜플러스','굿팜솔루션NEW','모바일약국','AI MATE','업무 이용 통계'],2,'통계 &gt; <b>약국 수익 통계</b>'],
   mgmt:['약국관리',['약국 관리','신규 약국 관리','약국 A/S','약국 결제 관리','VAN 정산 관리<span class="addb">NEW</span>','태블릿 관리'],4,'약국관리 &gt; <b>VAN 정산 관리</b>']};
-const area=()=>S.page==='stats'?'stats':'mgmt';
+const area=()=>S.page==='dash'?'dash':S.page==='stats'?'stats':'mgmt';
 function side(){ const m=MENU[area()]; $('side').innerHTML='<div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">'+m[0]+'</div>'+
   m[1].map((x,i)=>'<div class="side-item'+(i===m[2]?' on':'')+'">'+x+'</div>').join(''); $('crumb').innerHTML=m[3]; }
 const monthSel=id=>`<select class="fi" id="${id}" style="width:150px;height:32px"><option>2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select>`;
+
+
+/* ── 통계 > 경영 요약 ── 서비스 · 미수 · 이상 징후 수치는 예시값 */
+const SVC=[ // 서비스, 이용 약국, 결제 완료, 전월 결제 완료, 유료 신규, 무료 신규, 유료 전환, 해지
+  ['키오스크',612,21450000,21120000,9,2,3,4],['스마트 OCR',540,14850000,14960000,6,4,2,8],['파머시 퍼스트',388,8536000,8140000,12,0,0,3],
+  ['스마트2D',301,6622000,6600000,3,1,1,2],['POS',215,4730000,4840000,2,3,0,5],['모바일 OCR',190,2090000,2068000,4,2,1,1]];
+(()=>{ const s=SVC.reduce((a,r)=>a+r[2],0), sp=SVC.reduce((a,r)=>a+r[3],0); SVC.push(['그 외 (EDB · ESL · 스캐너 등)',164,FEE_ALL-s,TREND[2][1]-sp,1,0,0,1]); })();
+const UNPAID={amt:2871500, n:38, longN:7, longAmt:1193500};
+const ALERTS=[ // id, 항목, 기준, 곳, 금액, 이동
+  ['aLong','장기 미결제','2개월 이상 연속 미결제',UNPAID.longN,UNPAID.longAmt,'약국 결제 관리 ›'],
+  ['aMiss','미과금','서비스 이용 중인데 결제 예정 금액에 빠짐(원인 분류 서비스 누락)',19,null,'서비스 청구 통계 ›'],
+  ['aDrop','매출 급감','전월 대비 결제 완료 30% 이상 감소 <span class="tbu">기준 확인 필요</span>',5,null,'서비스 청구 통계 ›'],
+  ['aVan','VAN 연결 실패','정산 파일 행이 굿팜 약국에 연결되지 않음',vanNg().length,sumV(vanNg()),'VAN 정산 관리 ›'],
+  ['aCost','원가 초과','원가가 수익보다 큰 약국',null,null,'']];
+const pct=(c,p)=>p? ((c-p)/p*100) : null;
+const dir=v=>v==null?'<span class="sub2">−</span>':v>0?`<span style="color:var(--up)">▲ ${v.toFixed(1)}%</span>`:v<0?`<span style="color:var(--down)">▼ ${Math.abs(v).toFixed(1)}%</span>`:'<span class="sub2">0.0%</span>';
+function dashHead(){
+  const tot=FEE_ALL+VAN_ALL, prevTot=TREND[2][1]+TREND[2][2];
+  return `<div class="panel" id="dSum"><div class="ph"><h3>경영 요약</h3><span class="sub">총수익 · 객단가 · 미수금 · 수익성 · 이상 징후를 한 화면에서</span><div class="right">${monthSel('dMonth')}</div></div>
+  <div class="cards">
+    <div class="kc tot" id="dTot"><div class="l">총수익</div><div class="v">${fmt(tot)}</div><div class="s">전월 대비 ${dir(pct(tot,prevTot))}<br>이용료 ${fmt(FEE_ALL)} · VAN ${fmt(VAN_ALL)} · 기타 판매 <span class="tbu">1차 확장</span></div></div>
+    <div class="kc" id="dArpu"><div class="l">객단가</div><div class="v">—</div><div class="s">목표 120,000 · 달성률 — · 미달 금액 —<br>달성 약국 — <span class="tbu">집계 대상 확인 필요</span></div></div>
+    <div class="kc" id="dUnpaid"><div class="l">미수금</div><div class="v">${fmt(UNPAID.amt)}</div><div class="s">미결제 ${UNPAID.n}곳 · 2개월 이상 ${UNPAID.longN}곳 ${fmt(UNPAID.longAmt)}</div></div>
+    <div class="kc" id="dProfit"><div class="l">수익성 (이익)</div><div class="v" style="font-size:15px;color:var(--muted)">미집계</div><div class="s">원가 데이터(OCR 판독료 · AI 입고장 처리 비용) 확보 후 계산</div></div>
+    <div class="kc" id="dAlert"><div class="l">이상 징후</div><div class="v">${ALERTS.filter(a=>a[3]!=null).reduce((s,a)=>s+a[3],0)}건</div><div class="s">아래 목록에서 항목별 확인</div></div>
+  </div>
+  <div class="basis" id="dBasis"><b>기준</b> · 이용료는 청구월 결제 완료, VAN은 입금월 정산금액(VAT 포함). 청구월과 입금월이 달라 총수익은 회계 매출이 아니라 <b>그 달에 확인된 수익</b>이에요.</div></div>`;
+}
+function dashTrend(){
+  const W=560,H=200,L=56,B=26,T=10, mx=Math.max(...TREND.map(r=>r[1]+r[2]))*1.1, bw=56, gap=(W-L-20-bw*TREND.length)/(TREND.length-1);
+  const y=v=>T+(H-T-B)*(1-v/mx), ticks=[0,20e6,40e6,60e6];
+  const bars=TREND.map((r,i)=>{ const x=L+10+i*(bw+gap), yf=y(r[1]), yv=y(r[1]+r[2]);
+    return `<g><title>${r[0]} · 이용료 ${fmt(r[1])} · VAN ${fmt(r[2])} · 총수익 ${fmt(r[1]+r[2])}</title>
+      <rect x="${x}" y="${yf}" width="${bw}" height="${y(0)-yf}" fill="#2a78d6"/><rect x="${x}" y="${yv}" width="${bw}" height="${Math.max(0,yf-yv-2)}" rx="3" fill="#eb6834"/>
+      <text x="${x+bw/2}" y="${yv-5}" text-anchor="middle" font-size="11" fill="#2b2f33" font-weight="700">${(r[1]+r[2])/1e6>=1?((r[1]+r[2])/1e6).toFixed(1)+'백만':''}</text>
+      <text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="#8a9099">${r[0].slice(2).replace('-','.')}</text></g>`; }).join('');
+  const grid=ticks.map(v=>`<line x1="${L}" x2="${W-6}" y1="${y(v)}" y2="${y(v)}" stroke="#eff1f3"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="#8a9099">${v/1e6}백만</text>`).join('');
+  return `<div class="panel" id="dTrend" style="flex:1"><div class="ph"><h3>월별 총수익</h3><span class="sub">막대에 마우스를 올리면 금액</span>
+    <div class="right" style="font-size:11.5px;color:#5b6168;gap:12px"><span><i style="display:inline-block;width:10px;height:10px;background:#2a78d6;border-radius:2px;vertical-align:-1px"></i> 이용료</span><span><i style="display:inline-block;width:10px;height:10px;background:#eb6834;border-radius:2px;vertical-align:-1px"></i> VAN</span></div></div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;padding:0 12px 12px">${grid}${bars}</svg></div>`;
+}
+function dashShare(){
+  const mx=Math.max(...SVC.map(r=>r[2]));
+  return `<div class="panel" id="dShare" style="flex:1"><div class="ph"><h3>서비스별 구성비</h3><span class="sub">이용료 결제 완료 기준</span></div>
+  <div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:7px">${SVC.map(r=>`<div style="display:grid;grid-template-columns:150px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="${r[0]} ${fmt(r[2])}">
+    <span>${r[0]}</span><span style="background:#f3f5f7;border-radius:4px;height:12px"><span style="display:block;height:12px;border-radius:0 4px 4px 0;background:#2a78d6;width:${(r[2]/mx*100).toFixed(1)}%"></span></span><span class="num" style="text-align:right">${(r[2]/FEE_ALL*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
+}
+function dashSvc(){
+  return `<div class="panel" id="dSvc"><div class="ph"><h3>서비스별 지표</h3><span class="sub">행을 누르면 그 서비스 이용 약국 목록(서비스 청구 통계)으로 이동 · 신규 · 전환 · 해지는 <span class="tbu">1차 확장</span></span></div>
+  <div class="tblwrap"><table class="tbl" id="svcTbl"><thead><tr><th>서비스</th><th class="num">이용 약국</th><th class="num">결제 완료</th><th class="num">전월 대비</th><th class="num">유료 신규</th><th class="num">무료 신규</th><th class="num">유료 전환</th><th class="num">해지</th><th class="num">원가 · 이익</th></tr></thead><tbody>
+  ${SVC.map(r=>`<tr data-svc="${esc(r[0])}" style="cursor:pointer"><td>${r[0]}</td><td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2])}</td><td class="num">${dir(pct(r[2],r[3]))}</td><td class="num">${r[4]}</td><td class="num">${r[5]}</td><td class="num">${r[6]}</td><td class="num">${r[7]}</td><td class="num sub2">미집계</td></tr>`).join('')}
+  <tr class="tot"><td>합계</td><td class="num">—</td><td class="num">${fmt(FEE_ALL)}</td><td class="num">${dir(pct(FEE_ALL,TREND[2][1]))}</td><td class="num">${SVC.reduce((a,r)=>a+r[4],0)}</td><td class="num">${SVC.reduce((a,r)=>a+r[5],0)}</td><td class="num">${SVC.reduce((a,r)=>a+r[6],0)}</td><td class="num">${SVC.reduce((a,r)=>a+r[7],0)}</td><td class="num sub2">미집계</td></tr>
+  </tbody></table></div></div>`;
+}
+function dashAlert(){
+  return `<div class="panel" id="dAlerts"><div class="ph"><h3>이상 징후</h3><span class="sub">항목을 누르면 해당 약국 목록 · 관리 화면으로 이동</span></div>
+  <div class="tblwrap"><table class="tbl" id="aTbl"><thead><tr><th>항목</th><th>기준</th><th class="num">약국</th><th class="num">금액</th><th></th></tr></thead><tbody>
+  ${ALERTS.map(a=>`<tr id="${a[0]}"><td><b>${a[1]}</b></td><td style="white-space:normal">${a[2]}</td><td class="num">${a[3]==null?'<span class="sub2">미집계</span>':a[3]+'곳'}</td><td class="num">${a[4]==null?'—':fmt(a[4])}</td><td class="ctr">${a[5]?`<button class="btn sm" data-alert="${a[0]}">${a[5]}</button>`:'<span class="sub2">원가 데이터 확보 후</span>'}</td></tr>`).join('')}
+  </tbody></table></div></div>`;
+}
 
 /* ── 통계 > 약국 수익 통계 ── */
 function statHead(){
@@ -193,7 +255,7 @@ function statHead(){
     <div class="kc" id="kVan"><div class="l">VAN</div><div class="v">${fmt(VAN_ALL)}</div><div class="s">VAN 정산 관리에서 확정한 정산금액 · 입금월 2026-11 <span class="tbu">확인 필요</span></div></div>
     <div class="kc tot" id="kTot"><div class="l">총수익</div><div class="v">${fmt(FEE_ALL+VAN_ALL)}</div><div class="s">이용료 + VAN</div></div>
     <div class="kc" id="kPh"><div class="l">약국 수</div><div class="v">${fmt(FEE_PH)}</div><div class="s">이용료 약국 ${fmt(FEE_PH)} · VAN 약국 ${fmt(vanOk().length)}</div></div>
-    <div class="kc" id="kArpu"><div class="l">객단가</div><div class="v">—</div><div class="s">총수익 ÷ 대상 약국 수 · 목표 120,000 · <span class="tbu">집계 대상 확인 필요</span></div></div>
+    <div class="kc" id="kArpu"><div class="l">객단가</div><div class="v">—</div><div class="s">목표 120,000 · 달성률 — · 달성 약국 — <span class="tbu">집계 대상 확인 필요</span></div></div>
   </div>
   <div class="basis" id="basis"><b>기준</b> · 이용료는 청구월, VAN은 정산 파일의 월을 입금월로 집계해요(약 2개월 전 카드 결제분). 금액은 모두 VAT 포함.
     ${ng.length?`<br><b>약국 연결 전 VAN ${ng.length}곳 · ${fmt(sumV(ng))}원</b> — VAN · 총수익 합계에는 포함, 약국별 목록에는 연결 후 표시돼요. <a href="#" id="toMgmt">VAN 정산 관리 ›</a>`:''}</div></div>`;
@@ -297,7 +359,7 @@ function mapModal(){
 function render(){
   side();
   document.querySelectorAll('.demo button').forEach(b=>b.classList.toggle('on',b.dataset.go===S.page||(b.dataset.go==='mgmt'&&['upload','map'].includes(S.page)&&false)));
-  const base = area()==='stats' ? statHead()+trend()+statList() : mgmtHead()+mgmtList()+hist();
+  const base = area()==='dash' ? dashHead()+`<div style="display:flex;gap:14px">${dashTrend()}${dashShare()}</div>`+dashAlert()+dashSvc() : area()==='stats' ? statHead()+trend()+statList() : mgmtHead()+mgmtList()+hist();
   const mdl = S.page==='upload'?upModal():S.page==='map'?mapModal():'';
   $('content').innerHTML = base + mdl;
   bind();
@@ -309,14 +371,16 @@ function bind(){
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>go(S.page==='map'&&S.from==='upload'?'upload':'mgmt'));
   document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{S.pick=+b.dataset.pick;render();});
   const q=$('q'); if(q) q.oninput=()=>{S.q=q.value; const p=q.selectionStart; render(); const n=$('q'); n.focus(); n.setSelectionRange(p,p);};
+  document.querySelectorAll('[data-alert]').forEach(b=>b.onclick=()=>b.dataset.alert==='aVan'?go('mgmt'):toast('시안 — '+b.textContent.replace(' ›','')+'로 이동'));
+  document.querySelectorAll('[data-svc]').forEach(r=>r.onclick=()=>toast('시안 — 서비스 청구 통계 '+r.dataset.svc+' 이용 약국 목록으로 이동'));
   if($('toMgmt')) $('toMgmt').onclick=e=>{e.preventDefault(); go('mgmt');};
   if($('upBtn')) $('upBtn').onclick=()=>go('upload');
   if($('upGo')) $('upGo').onclick=()=>{toast('시안 — 2026-11 정산 파일을 반영했어요'); go('mgmt');};
   if($('mapGo')) $('mapGo').onclick=()=>{toast('시안 — 약국을 연결했어요'); go('mgmt');};
 }
-function go(p){ if((p==='stats')!==(S.page==='stats')){S.tab='all';S.q='';} S.from=S.page; S.page=p; render(); }
+function go(p){ if(area()!==(p==='dash'?'dash':p==='stats'?'stats':'mgmt')){S.tab='all';S.q='';} S.from=S.page; S.page=p; render(); }
 document.querySelectorAll('.demo button').forEach(b=>b.onclick=()=>go(b.dataset.go));
-const P0=new URLSearchParams(location.search).get('p'); if(['stats','mgmt','upload','map'].includes(P0)) S.page=P0;
+const P0=new URLSearchParams(location.search).get('p'); if(['dash','stats','mgmt','upload','map'].includes(P0)) S.page=P0;
 render();
 </script>
 </body>
