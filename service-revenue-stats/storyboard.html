@@ -103,10 +103,10 @@
         <tr><td>SA-01-004</td><td>슈퍼어드민 · 약국관리 &gt; 약국 관리 &gt; 상세</td><td>정기 결제 내역 — 청구월 · 결제 취소 · 취소 상태</td></tr>
         <tr><td>SA-01-005</td><td>슈퍼어드민 · 약국관리 &gt; 약국 관리 &gt; 상세</td><td>결제 취소 창 — 전액 취소 · 취소 사유 (페이앱 결제 취소)</td></tr>
         <tr><td>SA-01-006</td><td>슈퍼어드민 · 약국관리 &gt; 약국 관리 &gt; 상세</td><td>수기 결제 창 — 청구월 · 결제 사유 카테고리</td></tr>
-        <tr><td>SA-02-001</td><td>슈퍼어드민 · 통계 &gt; VAN 정산</td><td>VAN 정산 — 이용료 · VAN · 총수익 요약, 약국별 정산(TID 합산 · 미연결)</td></tr>
-        <tr><td>SA-02-002</td><td>슈퍼어드민 · 통계 &gt; VAN 정산</td><td>업로드 이력 — 집계 월 · 확정자 · 반영 금액 · 반영 중 / 대체됨</td></tr>
-        <tr><td>SA-02-003</td><td>슈퍼어드민 · 통계 &gt; VAN 정산</td><td>정산 파일 업로드 창 — 집계 연월 · 검증 결과 · 확정</td></tr>
-        <tr><td>SA-02-004</td><td>슈퍼어드민 · 통계 &gt; VAN 정산</td><td>약국 연결 창 — 사업자번호 · 약국 검색 · 연결 저장</td></tr>
+        <tr><td>SA-02-001</td><td>슈퍼어드민 · 통계 &gt; 약국 수익 통계</td><td>이용료 + VAN = 총수익 · 객단가, 월별 추이, 약국별 총수익</td></tr>
+        <tr><td>SA-02-002</td><td>슈퍼어드민 · 약국관리 &gt; VAN 정산 관리</td><td>정산 내역(사업자번호 연결 · TID 합산) · 업로드 이력</td></tr>
+        <tr><td>SA-02-003</td><td>슈퍼어드민 · 약국관리 &gt; VAN 정산 관리</td><td>정산 파일 업로드 창 — 집계 연월 · 검증 결과 · 확정</td></tr>
+        <tr><td>SA-02-004</td><td>슈퍼어드민 · 약국관리 &gt; VAN 정산 관리</td><td>약국 연결 창 — 사업자번호 · 약국 검색 · 연결 저장</td></tr>
       </tbody>
     </table></div>
     <div class="dh">공통 기준</div>
@@ -301,60 +301,58 @@
 
   <!-- ════════════════════ SA-02-001 ════════════════════ -->
   <section class="card screen" id="sa7">
-    <div class="sc-head"><span class="sid">SA-02-001</span><span class="nm">VAN 정산 — 약국별 정산 (기본 화면, 집계 월 2026-11)</span><span class="pf">슈퍼어드민 · 통계 &gt; VAN 정산</span></div>
+    <div class="sc-head"><span class="sid">SA-02-001</span><span class="nm">약국 수익 통계 — 이용료 + VAN = 총수익 · 객단가 (기준월 2026-11)</span><span class="pf">슈퍼어드민 · 통계 &gt; 약국 수익 통계</span></div>
     <div class="sc-grid">
-    <div class="shot"><iframe src="van-fee.html?p=main" title="SA-02-001 화면" tabindex="-1"></iframe><div class="marks"></div></div>
+    <div class="shot"><iframe src="van-fee.html?p=stats" title="SA-02-001 화면" tabindex="-1"></iframe><div class="marks"></div></div>
 
     <div class="dcol">
-      <div class="dhead"><span class="dh">데이터 정의 — VAN 정산 · 약국별 정산</span><span class="dpg"><button type="button" class="pb" data-pg="-1">‹ 이전</button><span class="pi"></span><button type="button" class="pb" data-pg="1">다음 ›</button></span></div>
+      <div class="dhead"><span class="dh">데이터 정의 — 약국 수익 통계</span><span class="dpg"><button type="button" class="pb" data-pg="-1">‹ 이전</button><span class="pi"></span><button type="button" class="pb" data-pg="1">다음 ›</button></span></div>
     <ol class="desc">
-        <li data-n="1"><span class="di">1</span><div class="dt"><b class="ti">집계 월</b><div class="kv"><span class="k">입력</span><span class="v">월 선택, 기본값 = 가장 최근 확정한 월</span></div><div class="kv"><span class="k">기준</span><span class="v">VAN은 정산 파일의 월을 입금월로 집계(약 2개월 전 카드 결제분) <span class="tbu">확인 필요</span></span></div></div></li>
-        <li data-n="2"><span class="di">2</span><div class="dt"><b class="ti">정산 파일 업로드</b><div class="kv"><span class="k">동작</span><span class="v">클릭 → 업로드 창(SA-02-003)</span></div></div></li>
-        <li data-n="3"><span class="di">3</span><div class="dt"><b class="ti">이용료</b><div class="kv"><span class="k">출력</span><span class="v">서비스 청구 통계의 같은 월 결제 완료 합계 — 화면 아래 줄 <code>서비스 청구 통계 결제 완료 · 청구월 2026-11</code></span></div><div class="kv"><span class="k">기준</span><span class="v">청구월 기준, VAT 포함, 결제 취소 금액은 원래 청구월에서 뺀 값</span></div></div></li>
-        <li data-n="4"><span class="di">4</span><div class="dt"><b class="ti">VAN</b><div class="kv"><span class="k">출력</span><span class="v">확정한 정산 파일의 정산금액 합계(미연결 포함)</span></div><div class="kv"><span class="k">기준</span><span class="v">정산금액 = 파일의 VAT 포함 금액 <span class="tbu">확인 필요</span>. 파일 금액을 그대로 쓰고 승인건수 × 단가와 달라도 오류로 보지 않음(9월부터 일부 행이 최대 25% 적음)</span></div></div></li>
-        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">총수익</b><div class="kv"><span class="k">출력</span><span class="v">이용료 + VAN</span></div><div class="kv"><span class="k">기준</span><span class="v">이용료와 VAN은 따로 저장하고 화면에서만 더함</span></div></div></li>
-        <li data-n="6"><span class="di">6</span><div class="dt"><b class="ti">약국 수</b><div class="kv"><span class="k">출력</span><span class="v">이용료 약국 수 · VAN 약국 수(연결 완료 수)</span></div><div class="kv"><span class="k">이유</span><span class="v">객단가 대상 약국을 정하기 전이라 두 기준을 함께 보여 줌</span></div></div></li>
-        <li data-n="7"><span class="di">7</span><div class="dt"><b class="ti">객단가</b><div class="kv"><span class="k">출력</span><span class="v"><code>—</code> + <code>집계 대상 확인 필요</code></span></div><div class="kv"><span class="k">산식</span><span class="v">총수익 ÷ 대상 약국 수. 무료 · VIP · VAN만 쓰는 약국 · 미연결 포함 여부와 중복 제거 방식이 정해지면 계산 <span class="tbu">확인 필요</span></span></div><div class="kv"><span class="k">목표</span><span class="v">12만 원 달성률은 기준 확정 후 표시</span></div></div></li>
-        <li data-n="8"><span class="di">8</span><div class="dt"><b class="ti">기준 안내</b><div class="kv"><span class="k">출력</span><span class="v">월 · VAT 기준 한 줄 + 미연결 곳 수 · 금액</span></div><div class="kv"><span class="k">이유</span><span class="v">이용료(청구월)와 VAN(입금월)의 기준이 달라 합계 옆에 항상 표시</span></div></div></li>
-        <li data-n="9"><span class="di">9</span><div class="dt"><b class="ti">목록 탭</b><div class="kv"><span class="k">선택지</span><span class="v"><code>전체</code> · <code>미연결 · 확인 필요</code> · <code>이용료 0원</code>(무료 · VIP · 해지 약국)</span></div><div class="kv"><span class="k">정렬</span><span class="v">미연결 · 확인 필요가 맨 위, 그다음 VAN 큰 순</span></div></div></li>
-        <li data-n="10"><span class="di">10</span><div class="dt"><b class="ti">검색</b><div class="kv"><span class="k">입력</span><span class="v">약국명 · 사업자번호(하이픈 없이도 찾음)</span></div></div></li>
-        <li data-n="11"><span class="di">11</span><div class="dt"><b class="ti">약국명</b><div class="kv"><span class="k">출력</span><span class="v">연결 완료 = 굿팜 약국명 + 지역 · 스토어 ID, 태그 <code>무료</code> · <code>VIP</code> · <code>해지</code>. 미연결 = 파일의 가맹점명</span></div><div class="kv"><span class="k">펼치기</span><span class="v">▸ 클릭 → 그 약국의 TID(단말기)별 단가 · 승인건수 · 승인금액 · 정산금액</span></div></div></li>
-        <li data-n="12"><span class="di">12</span><div class="dt"><b class="ti">연결</b><div class="kv"><span class="k">출력</span><span class="v"><code>연결 완료</code> · <code>확인 필요</code>(같은 사업자번호 약국 여러 곳) · <code>미연결</code>(일치 약국 없음) + <code>약국 연결</code> 버튼 → SA-02-004</span></div><div class="kv"><span class="k">기준</span><span class="v">사업자번호의 하이픈 · 공백을 빼고 굿팜 약국 사업자번호와 비교. 이름은 확인용</span></div></div></li>
-        <li data-n="13"><span class="di">13</span><div class="dt"><b class="ti">TID</b><div class="kv"><span class="k">출력</span><span class="v">약국의 단말기 수</span></div><div class="kv"><span class="k">기준</span><span class="v">파일 한 행 = 약국 × 단말기 한 달 합계 → 같은 사업자번호 행을 합산</span></div></div></li>
-        <li data-n="14"><span class="di">14</span><div class="dt"><b class="ti">이용료</b><div class="kv"><span class="k">출력</span><span class="v">그 약국의 같은 월 결제 완료. 미연결은 <code>—</code></span></div><div class="kv"><span class="k">이유</span><span class="v">무료 · VIP 약국도 VAN 수익이 보이도록 0원으로 표시</span></div></div></li>
-        <li data-n="15"><span class="di">15</span><div class="dt"><b class="ti">VAN</b><div class="kv"><span class="k">출력</span><span class="v">그 약국의 정산금액 합계. 음수도 그대로(취소가 승인보다 많은 단말기)</span></div></div></li>
-        <li data-n="16"><span class="di">16</span><div class="dt"><b class="ti">총수익</b><div class="kv"><span class="k">출력</span><span class="v">이용료 + VAN, 미연결은 <code>—</code></span></div></div></li>
-        <li data-n="17"><span class="di">17</span><div class="dt"><b class="ti">미연결 합계</b><div class="kv"><span class="k">출력</span><span class="v">미연결 · 확인 필요 곳 수 · 금액</span></div></div></li>
-        <li data-n="18"><span class="di">18</span><div class="dt"><b class="ti">VAN 전체 합계</b><div class="kv"><span class="k">출력</span><span class="v">연결 완료 + 미연결 = 정산 파일 총액</span></div><div class="kv"><span class="k">이유</span><span class="v">파일 총액과 대조해 빠진 금액이 없는지 확인</span></div></div></li>
+        <li data-n="1"><span class="di">1</span><div class="dt"><b class="ti">기준월</b><div class="kv"><span class="k">입력</span><span class="v">월 선택, 기본값 = 가장 최근 VAN 확정 월. 화면 전체에 적용</span></div></div></li>
+        <li data-n="2"><span class="di">2</span><div class="dt"><b class="ti">이용료</b><div class="kv"><span class="k">출력</span><span class="v">서비스 청구 통계의 같은 월 결제 완료 합계</span></div><div class="kv"><span class="k">기준</span><span class="v">청구월, VAT 포함, 결제 취소 금액은 원래 청구월에서 뺀 값</span></div></div></li>
+        <li data-n="3"><span class="di">3</span><div class="dt"><b class="ti">VAN</b><div class="kv"><span class="k">출력</span><span class="v">VAN 정산 관리에서 확정한 그 월 정산금액 합계(약국 연결 전 금액 포함)</span></div><div class="kv"><span class="k">기준</span><span class="v">정산 파일의 월 = 입금월 <span class="tbu">확인 필요</span> · 정산금액(VAT 포함) <span class="tbu">확인 필요</span></span></div></div></li>
+        <li data-n="4"><span class="di">4</span><div class="dt"><b class="ti">총수익</b><div class="kv"><span class="k">출력</span><span class="v">이용료 + VAN</span></div><div class="kv"><span class="k">이유</span><span class="v">이용료만 보면 무료 · VIP 약국 수익이 0원으로 보여서 약국이 실제 벌어 주는 금액을 확인하기 위함</span></div></div></li>
+        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">약국 수</b><div class="kv"><span class="k">출력</span><span class="v">이용료 약국 수 · VAN 약국 수</span></div><div class="kv"><span class="k">이유</span><span class="v">객단가 대상 약국을 정하기 전이라 두 기준을 함께 보여 줌</span></div></div></li>
+        <li data-n="6"><span class="di">6</span><div class="dt"><b class="ti">객단가</b><div class="kv"><span class="k">출력</span><span class="v"><code>—</code> + <code>집계 대상 확인 필요</code>, 목표 120,000</span></div><div class="kv"><span class="k">산식</span><span class="v">총수익 ÷ 대상 약국 수. 무료 · VIP · 해지 · VAN만 쓰는 약국 · 연결 전 VAN의 포함 여부와 중복 제거 방식이 정해지면 계산 <span class="tbu">확인 필요</span></span></div><div class="kv"><span class="k">근거</span><span class="v">11월 VAN 약국 149곳 중 해지 · 데모 15곳, 이용료 0원 21곳</span></div></div></li>
+        <li data-n="7"><span class="di">7</span><div class="dt"><b class="ti">기준 안내</b><div class="kv"><span class="k">출력</span><span class="v">월 · VAT 기준 + 약국 연결 전 VAN 곳 수 · 금액 + <code>VAN 정산 관리 ›</code></span></div><div class="kv"><span class="k">이유</span><span class="v">이용료(청구월)와 VAN(입금월)의 기준이 달라 합계 옆에 항상 표시</span></div></div></li>
+        <li data-n="8"><span class="di">8</span><div class="dt"><b class="ti">월별 추이</b><div class="kv"><span class="k">출력</span><span class="v">최근 4개월 이용료 · VAN · 총수익 · VAN 비중 · 객단가</span></div><div class="kv"><span class="k">VAN 비중</span><span class="v">VAN ÷ 총수익, 소수 1자리</span></div></div></li>
+        <li data-n="9"><span class="di">9</span><div class="dt"><b class="ti">목록 탭</b><div class="kv"><span class="k">선택지</span><span class="v"><code>VAN 약국</code> · <code>이용료 0원</code>(무료 · VIP · 해지)</span></div></div></li>
+        <li data-n="10"><span class="di">10</span><div class="dt"><b class="ti">약국명</b><div class="kv"><span class="k">출력</span><span class="v">굿팜 약국명 + 지역 · 스토어 ID, 태그 <code>무료</code> · <code>VIP</code> · <code>해지</code></span></div></div></li>
+        <li data-n="11"><span class="di">11</span><div class="dt"><b class="ti">이용료 · VAN · 총수익</b><div class="kv"><span class="k">출력</span><span class="v">그 약국의 같은 월 결제 완료 · VAN 정산금액(단말기 합산) · 합계. 총수익 큰 순</span></div><div class="kv"><span class="k">무료 · VIP</span><span class="v">이용료 0원, VAN은 그대로 표시</span></div></div></li>
+        <li data-n="12"><span class="di">12</span><div class="dt"><b class="ti">VAN 비중</b><div class="kv"><span class="k">출력</span><span class="v">VAN ÷ 총수익, 정수 %</span></div></div></li>
     </ol>
     </div>
     </div>
-    <div class="flow"><span class="fh">흐름</span><code>SA-02-001</code> <code>정산 파일 업로드</code> <span class="ar">→</span> <code>SA-02-003</code> 검증 · 확정 <span class="ar">→</span> <code>SA-02-001</code> 반영 <span class="ar">→</span> 미연결 행 <code>약국 연결</code> <span class="ar">→</span> <code>SA-02-004</code></div>
+    <div class="flow"><span class="fh">흐름</span>통계 &gt; <code>SA-02-001</code> 약국 수익 통계 <span class="ar">→</span> 연결 전 VAN이 있으면 <code>VAN 정산 관리 ›</code> <span class="ar">→</span> <code>SA-02-002</code></div>
   </section>
 
   <!-- ════════════════════ SA-02-002 ════════════════════ -->
   <section class="card screen" id="sa8">
-    <div class="sc-head"><span class="sid">SA-02-002</span><span class="nm">VAN 정산 — 업로드 이력</span><span class="pf">슈퍼어드민 · 통계 &gt; VAN 정산</span></div>
+    <div class="sc-head"><span class="sid">SA-02-002</span><span class="nm">VAN 정산 관리 — 정산 내역 · 업로드 이력 (집계 월 2026-11)</span><span class="pf">슈퍼어드민 · 약국관리 &gt; VAN 정산 관리</span></div>
     <div class="sc-grid">
-    <div class="shot"><iframe src="van-fee.html?p=hist" title="SA-02-002 화면" tabindex="-1"></iframe><div class="marks"></div></div>
+    <div class="shot"><iframe src="van-fee.html?p=mgmt" title="SA-02-002 화면" tabindex="-1"></iframe><div class="marks"></div></div>
 
     <div class="dcol">
-      <div class="dhead"><span class="dh">데이터 정의 — 업로드 이력</span><span class="dpg"><button type="button" class="pb" data-pg="-1">‹ 이전</button><span class="pi"></span><button type="button" class="pb" data-pg="1">다음 ›</button></span></div>
+      <div class="dhead"><span class="dh">데이터 정의 — VAN 정산 관리</span><span class="dpg"><button type="button" class="pb" data-pg="-1">‹ 이전</button><span class="pi"></span><button type="button" class="pb" data-pg="1">다음 ›</button></span></div>
     <ol class="desc">
-        <li data-n="1"><span class="di">1</span><div class="dt"><b class="ti">집계 월</b><div class="kv"><span class="k">출력</span><span class="v">파일을 반영한 월</span></div></div></li>
-        <li data-n="2"><span class="di">2</span><div class="dt"><b class="ti">파일명 · 업로드 일시</b><div class="kv"><span class="k">출력</span><span class="v">올린 파일 이름과 시각. 원본 파일도 보관</span></div></div></li>
-        <li data-n="3"><span class="di">3</span><div class="dt"><b class="ti">확정자 · 확정 일시</b><div class="kv"><span class="k">출력</span><span class="v">확정한 운영자와 시각</span></div></div></li>
-        <li data-n="4"><span class="di">4</span><div class="dt"><b class="ti">반영 금액</b><div class="kv"><span class="k">출력</span><span class="v">그 파일의 정산금액 합계</span></div></div></li>
-        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">상태</b><div class="kv"><span class="k">출력</span><span class="v"><code>반영 중</code> · <code>대체됨</code></span></div><div class="kv"><span class="k">기준</span><span class="v">같은 월 파일을 다시 확정하면 새 파일이 <code>반영 중</code>, 이전 파일은 <code>대체됨</code>. 한 달에 파일이 여러 개 오는지(누적 · 대체) <span class="tbu">확인 필요</span></span></div></div></li>
+        <li data-n="1"><span class="di">1</span><div class="dt"><b class="ti">집계 월 · 정산 파일 업로드</b><div class="kv"><span class="k">입력</span><span class="v">월 선택</span></div><div class="kv"><span class="k">동작</span><span class="v"><code>정산 파일 업로드</code> → SA-02-003</span></div></div></li>
+        <li data-n="2"><span class="di">2</span><div class="dt"><b class="ti">요약</b><div class="kv"><span class="k">출력</span><span class="v">정산 총액(곳 · TID 수) · 연결 완료 · 미연결 · 확인 필요 · 반영 파일(확정 일시 · 확정자)</span></div></div></li>
+        <li data-n="3"><span class="di">3</span><div class="dt"><b class="ti">목록 탭 · 검색</b><div class="kv"><span class="k">선택지</span><span class="v"><code>전체</code> · <code>미연결 · 확인 필요</code></span></div><div class="kv"><span class="k">검색</span><span class="v">가맹점명 · 사업자번호(하이픈 없이도 찾음)</span></div></div></li>
+        <li data-n="4"><span class="di">4</span><div class="dt"><b class="ti">가맹점명 (파일)</b><div class="kv"><span class="k">출력</span><span class="v">정산 파일의 가맹점명</span></div><div class="kv"><span class="k">펼치기</span><span class="v">▸ 클릭 → TID(단말기)별 구분 · 단가 · 승인금액 · 승인건수 · 정산금액</span></div></div></li>
+        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">연결</b><div class="kv"><span class="k">출력</span><span class="v"><code>연결 완료</code> · <code>확인 필요</code>(같은 사업자번호 약국 여러 곳) · <code>미연결</code>(일치 약국 없음)</span></div><div class="kv"><span class="k">기준</span><span class="v">사업자번호의 하이픈 · 공백을 빼고 굿팜 약국 사업자번호와 비교. 이름은 확인용</span></div><div class="kv"><span class="k">근거</span><span class="v">11월 파일 152곳 중 149곳 바로 연결, 2곳 확인 필요(테스트 계정 포함), 1곳 미연결</span></div></div></li>
+        <li data-n="6"><span class="di">6</span><div class="dt"><b class="ti">굿팜 약국</b><div class="kv"><span class="k">출력</span><span class="v">연결된 약국명 + 지역 · 스토어 ID. 연결 전이면 <code>약국 연결</code> → SA-02-004</span></div></div></li>
+        <li data-n="7"><span class="di">7</span><div class="dt"><b class="ti">TID · 승인건수 · 정산금액</b><div class="kv"><span class="k">출력</span><span class="v">약국의 단말기 수 · 승인건수 합 · 정산금액 합</span></div><div class="kv"><span class="k">기준</span><span class="v">파일 한 행 = 약국 × 단말기 한 달 합계 → 같은 사업자번호 행을 합산. 음수도 그대로. 파일 금액을 그대로 쓰고 승인건수 × 단가와 달라도 오류로 보지 않음</span></div></div></li>
+        <li data-n="8"><span class="di">8</span><div class="dt"><b class="ti">합계</b><div class="kv"><span class="k">출력</span><span class="v">목록 정산금액 합 = 정산 파일 총액</span></div><div class="kv"><span class="k">이유</span><span class="v">파일 총액과 대조해 빠진 금액이 없는지 확인</span></div></div></li>
+        <li data-n="9"><span class="di">9</span><div class="dt"><b class="ti">업로드 이력</b><div class="kv"><span class="k">출력</span><span class="v">집계 월 · 파일명 · 업로드 일시 · 확정자 · 확정 일시 · 행 수 · 반영 금액 · 상태(<code>반영 중</code> · <code>대체됨</code>)</span></div><div class="kv"><span class="k">기준</span><span class="v">같은 월 파일을 다시 확정하면 새 파일이 반영 중, 이전 파일은 대체됨. 원본 파일 보관</span></div></div></li>
     </ol>
     </div>
     </div>
-    <div class="flow"><span class="fh">흐름</span><code>SA-02-003</code> 확정 <span class="ar">→</span> <code>SA-02-002</code> 이력 한 줄 추가</div>
+    <div class="flow"><span class="fh">흐름</span><code>SA-02-002</code> <code>정산 파일 업로드</code> <span class="ar">→</span> <code>SA-02-003</code> 확정 <span class="ar">→</span> 미연결 행 <code>약국 연결</code> <span class="ar">→</span> <code>SA-02-004</code> <span class="ar">→</span> <code>SA-02-001</code> 약국 수익 통계에 반영</div>
   </section>
 
   <!-- ════════════════════ SA-02-003 ════════════════════ -->
   <section class="card screen" id="sa9">
-    <div class="sc-head"><span class="sid">SA-02-003</span><span class="nm">정산 파일 업로드 창 — 검증 · 확정</span><span class="pf">슈퍼어드민 · 통계 &gt; VAN 정산</span></div>
+    <div class="sc-head"><span class="sid">SA-02-003</span><span class="nm">정산 파일 업로드 창 — 검증 · 확정</span><span class="pf">슈퍼어드민 · 약국관리 &gt; VAN 정산 관리</span></div>
     <div class="sc-grid">
     <div class="shot"><iframe src="van-fee.html?p=upload" title="SA-02-003 화면" tabindex="-1"></iframe><div class="marks"></div></div>
 
@@ -365,18 +363,18 @@
         <li data-n="2"><span class="di">2</span><div class="dt"><b class="ti">파일</b><div class="kv"><span class="k">입력</span><span class="v">.xlsx 선택 → 파일명 · 행 수</span></div><div class="kv"><span class="k">형식</span><span class="v">.xlsx 우선. 1~7월 .xlsb 자료를 올려야 하면 지원 또는 변환 방식 <span class="tbu">확인 필요</span></span></div></div></li>
         <li data-n="3"><span class="di">3</span><div class="dt"><b class="ti">집계 연월</b><div class="kv"><span class="k">입력</span><span class="v">파일 이름의 월로 기본값을 채우고 바꿀 수 있음</span></div><div class="kv"><span class="k">이유</span><span class="v">파일 안에 정산 기간 · 입금일 열이 없음</span></div></div></li>
         <li data-n="4"><span class="di">4</span><div class="dt"><b class="ti">검증 결과</b><div class="kv"><span class="k">출력</span><span class="v">정산 총액(곳 · TID 수) · 연결 완료 · 연결 필요 · 오류의 건수와 금액</span></div></div></li>
-        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">연결 필요 목록</b><div class="kv"><span class="k">출력</span><span class="v">가맹점명 · 사업자번호 · 사유 · 금액 + <code>약국 연결</code> → SA-02-004</span></div><div class="kv"><span class="k">근거</span><span class="v">2026-11 파일 152곳 중 149곳이 굿팜 약국 1곳과 사업자번호 일치. 2곳은 같은 사업자번호 약국이 여러 곳(테스트 계정 포함), 1곳은 일치 없음</span></div></div></li>
+        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">연결 필요 목록</b><div class="kv"><span class="k">출력</span><span class="v">가맹점명 · 사업자번호 · 사유 · 금액 + <code>약국 연결</code> → SA-02-004</span></div></div></li>
         <li data-n="6"><span class="di">6</span><div class="dt"><b class="ti">안내</b><div class="kv"><span class="k">출력</span><span class="v">오류는 확정 불가, 연결 필요는 확정 가능, 같은 월 재확정 시 대체</span></div><div class="kv"><span class="k">오류 기준</span><span class="v">필수 열 누락 · 금액을 읽을 수 없음 · 중복 행 — 개발팀과 확정 <span class="tbu">확인 필요</span></span></div></div></li>
-        <li data-n="7"><span class="di">7</span><div class="dt"><b class="ti">확정하여 반영</b><div class="kv"><span class="k">동작</span><span class="v">클릭 → 그 월 VAN에 반영 → SA-02-001 · 이력 추가</span></div><div class="kv"><span class="k">기록</span><span class="v">원본 파일 · 반영 금액 · 확정자 · 확정 일시</span></div></div></li>
+        <li data-n="7"><span class="di">7</span><div class="dt"><b class="ti">확정하여 반영</b><div class="kv"><span class="k">동작</span><span class="v">클릭 → 그 월 VAN에 반영 → SA-02-002 이력 추가 · SA-02-001 반영</span></div><div class="kv"><span class="k">기록</span><span class="v">원본 파일 · 반영 금액 · 확정자 · 확정 일시</span></div></div></li>
     </ol>
     </div>
     </div>
-    <div class="flow"><span class="fh">흐름</span><code>SA-02-001</code> <code>정산 파일 업로드</code> <span class="ar">→</span> <code>SA-02-003</code> <span class="ar">→</span> (필요하면 <code>SA-02-004</code>) <span class="ar">→</span> <code>확정하여 반영</code> <span class="ar">→</span> <code>SA-02-001</code></div>
+    <div class="flow"><span class="fh">흐름</span><code>SA-02-002</code> <code>정산 파일 업로드</code> <span class="ar">→</span> <code>SA-02-003</code> <span class="ar">→</span> (필요하면 <code>SA-02-004</code>) <span class="ar">→</span> <code>확정하여 반영</code> <span class="ar">→</span> <code>SA-02-002</code></div>
   </section>
 
   <!-- ════════════════════ SA-02-004 ════════════════════ -->
   <section class="card screen" id="sa10">
-    <div class="sc-head"><span class="sid">SA-02-004</span><span class="nm">약국 연결 창</span><span class="pf">슈퍼어드민 · 통계 &gt; VAN 정산</span></div>
+    <div class="sc-head"><span class="sid">SA-02-004</span><span class="nm">약국 연결 창</span><span class="pf">슈퍼어드민 · 약국관리 &gt; VAN 정산 관리</span></div>
     <div class="sc-grid">
     <div class="shot"><iframe src="van-fee.html?p=map" title="SA-02-004 화면" tabindex="-1"></iframe><div class="marks"></div></div>
 
@@ -387,11 +385,11 @@
         <li data-n="2"><span class="di">2</span><div class="dt"><b class="ti">굿팜 약국 검색</b><div class="kv"><span class="k">입력</span><span class="v">사업자번호로 먼저 찾고, 약국명 · 스토어 ID로도 검색</span></div></div></li>
         <li data-n="3"><span class="di">3</span><div class="dt"><b class="ti">검색 결과</b><div class="kv"><span class="k">출력</span><span class="v">약국명 · 지역 · 스토어 ID · 사업자번호 · 서비스 상태, 하나 선택</span></div></div></li>
         <li data-n="4"><span class="di">4</span><div class="dt"><b class="ti">안내</b><div class="kv"><span class="k">출력</span><span class="v">사업자번호가 다른 약국에 연결하는 것은 허용 여부 <span class="tbu">확인 필요</span></span></div></div></li>
-        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">연결 저장</b><div class="kv"><span class="k">동작</span><span class="v">클릭 → 그 정산 행을 고른 약국에 연결 → 연결 완료, 약국별 정산에 이용료 · 총수익 표시</span></div><div class="kv"><span class="k">기록</span><span class="v">연결한 운영자 · 일시. 다음 달 같은 사업자번호는 같은 약국으로 자동 연결</span></div></div></li>
+        <li data-n="5"><span class="di">5</span><div class="dt"><b class="ti">연결 저장</b><div class="kv"><span class="k">동작</span><span class="v">클릭 → 그 정산 행을 고른 약국에 연결 → 연결 완료, 약국 수익 통계 약국별 목록에 표시</span></div><div class="kv"><span class="k">기록</span><span class="v">연결한 운영자 · 일시. 다음 달 같은 사업자번호는 같은 약국으로 자동 연결</span></div></div></li>
     </ol>
     </div>
     </div>
-    <div class="flow"><span class="fh">흐름</span><code>SA-02-001</code> · <code>SA-02-003</code> <code>약국 연결</code> <span class="ar">→</span> <code>SA-02-004</code> <span class="ar">→</span> 연결 완료</div>
+    <div class="flow"><span class="fh">흐름</span><code>SA-02-002</code> · <code>SA-02-003</code> <code>약국 연결</code> <span class="ar">→</span> <code>SA-02-004</code> <span class="ar">→</span> 연결 완료</div>
   </section>
 
 </div>
@@ -424,13 +422,13 @@ var MARKS = {
   sa6: { setup: 'go("manual");', list: [
     {n:1, sel:'#mpBmRow'}, {n:2, sel:'#mpLinkRow'}, {n:3, sel:'#mpCatRow'}, {n:4, sel:'#mpAmtRow'}, {n:5, sel:'#mpMemoRow'}, {n:6, sel:'#mpPv'}
   ]},
-  sa7: { setup: 'go("main");', list: [
-    {n:1, sel:'#fMonth'}, {n:2, sel:'#upBtn'}, {n:3, sel:'#kFee'}, {n:4, sel:'#kVan'}, {n:5, sel:'#kTot'}, {n:6, sel:'#kPh'}, {n:7, sel:'#kArpu'}, {n:8, sel:'#basis'},
-    {n:9, sel:'.ptabs'}, {n:10, sel:'#q'}, {n:11, sel:'#vTbl', th:0}, {n:12, sel:'#vTbl', th:2}, {n:13, sel:'#vTbl', th:3}, {n:14, sel:'#vTbl', th:5},
-    {n:15, sel:'#vTbl', th:6}, {n:16, sel:'#vTbl', th:7}, {n:17, sel:'#unmRow'}, {n:18, sel:'#allRow'}
+  sa7: { setup: 'go("stats");', list: [
+    {n:1, sel:'#fMonth'}, {n:2, sel:'#kFee'}, {n:3, sel:'#kVan'}, {n:4, sel:'#kTot'}, {n:5, sel:'#kPh'}, {n:6, sel:'#kArpu'}, {n:7, sel:'#basis'},
+    {n:8, sel:'#tTbl', th:0}, {n:9, sel:'.ptabs'}, {n:10, sel:'#sTbl', th:0}, {n:11, sel:'#sTbl', th:1, also:[2,3]}, {n:12, sel:'#sTbl', th:4}
   ]},
-  sa8: { setup: 'go("hist");', list: [
-    {n:1, sel:'#hTbl', th:0}, {n:2, sel:'#hTbl', th:1, also:2}, {n:3, sel:'#hTbl', th:3, also:4}, {n:4, sel:'#hTbl', th:6}, {n:5, sel:'#hTbl', th:7}
+  sa8: { setup: 'go("mgmt");', list: [
+    {n:1, sel:'#upBtn'}, {n:2, sel:'#mSum .cards'}, {n:3, sel:'.ptabs'}, {n:4, sel:'#vTbl', th:0}, {n:5, sel:'#vTbl', th:2}, {n:6, sel:'#vTbl', th:3},
+    {n:7, sel:'#vTbl', th:4, also:[5,6]}, {n:8, sel:'#allRow'}, {n:9, sel:'#hTbl'}
   ]},
   sa9: { setup: 'go("upload");', list: [
     {n:1, sel:'#upSteps'}, {n:2, sel:'#upFileRow'}, {n:3, sel:'#upMonthRow'}, {n:4, sel:'#upSum'}, {n:5, sel:'#upNg'}, {n:6, sel:'#upNote'}, {n:7, sel:'#upGo'}
