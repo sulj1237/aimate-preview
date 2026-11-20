@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>키오스크 원격지원 프로토타입</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: 시나리오 바(상단 고정) + 화면 탭(관리자 / 키오스크) + 실제 어드민 · 키오스크를 본뜬 무대. 실제 화면을 재현하므로 라이트 단일 테마. */
+:root{
+  color-scheme: light;
+  --page:#dfe1e3; --bar:#ffffff; --ink:#2f3237; --muted:#7a7f86; --line:#e3e5e8;
+  --admin-bg:#e9e9e9; --side:#4a4b4d; --side-dark:#2f3032; --card:#ffffff; --thead:#f4f5f6;
+  --teal:#5bbfba; --teal-dark:#3fa49f; --teal-soft:#e8f6f5;
+  --kiosk:#e3302b; --navy:#1d2a7a; --yellow:#ffd83a;
+  --red:#e2463f; --green:#2fb36b; --note:#fff6c9; --note-line:#e8d77a;
+  --font:"Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font-family:var(--font);font-size:14px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 32px}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+/* 시나리오 바 */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bar)}
+.scenario{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);margin:0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 16px;
+  padding:12px max(16px, env(safe-area-inset-left, 0px));border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.scn-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.scn-top h1{font-size:16px;margin:0;font-weight:700}
+.tabs{display:flex;gap:4px;background:#eef0f2;border-radius:8px;padding:3px}
+.tab{border:0;background:transparent;padding:6px 14px;border-radius:6px;font-size:13px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px}
+.tab[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.tab .dot{width:7px;height:7px;border-radius:50%;background:var(--red)}
+.reset{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 12px;font-size:12px;color:var(--muted)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.steps li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:4px 10px 4px 4px;border-radius:999px;background:#f3f4f6}
+.steps li b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#d9dce0;color:#fff;font-size:11px}
+.steps li.on{background:var(--teal-soft);color:var(--ink);font-weight:500}
+.steps li.on b{background:var(--teal)}
+.steps li.done b{background:var(--teal-dark)}
+
+.stage-wrap{position:relative;overflow-x:auto;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ===== 관리자 화면 ===== */
+.admin{display:flex;min-width:1180px;background:var(--admin-bg);position:relative;min-height:900px}
+.side{width:210px;flex:none;background:var(--side);color:#fff;padding:14px 8px}
+.logo{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:900;font-size:24px;color:var(--teal);margin:2px 0 14px}
+.logo i{width:16px;height:22px;border-radius:8px;background:linear-gradient(160deg,var(--teal) 50%,#f3c64b 50%);display:inline-block;transform:skew(-12deg)}
+.me{background:#5b5c5f;border-radius:6px;padding:10px 12px;font-weight:700;font-size:13px;display:flex;justify-content:space-between;margin-bottom:12px}
+.grp{font-size:12px;color:#cfd0d2;margin:14px 8px 6px}
+.menu{background:#5b5c5f;border-radius:6px;padding:9px 12px;font-weight:700;font-size:13px;margin-bottom:6px;display:flex;justify-content:space-between}
+.menu.open{background:#5b5c5f}
+.sub{padding:7px 18px;font-size:13px;color:#e9e9ea;border-radius:6px}
+.sub.cur{background:var(--side-dark);font-weight:700}
+.reddot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-left:4px;vertical-align:middle}
+.main{flex:1;padding:22px 64px 40px 32px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.ptitle{font-size:22px;font-weight:700;margin:4px 0 2px}
+.crumb{font-size:12px;color:var(--muted)}
+.card{background:var(--card);border-radius:8px;padding:18px 20px}
+.card-h{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.card-h h2{font-size:17px;margin:0;font-weight:700}
+.card-h .cnt{font-size:13px;color:var(--muted)}
+.card-h .cnt em{font-style:normal;color:var(--teal);font-weight:700}
+.card-h .acts{margin-left:auto;display:flex;gap:8px}
+.btn-fill{background:var(--teal);color:#fff;border:0;border-radius:4px;padding:8px 16px;font-size:13px;font-weight:500}
+.btn-line{background:#fff;color:var(--teal-dark);border:1px solid var(--teal);border-radius:4px;padding:7px 14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px}
+.btn-line svg{width:15px;height:15px}
+.btn-line.new{position:relative;box-shadow:0 0 0 3px rgba(91,191,186,.25)}
+.btn-gray{background:#e4e5e7;border:1px solid #d3d5d8;border-radius:4px;padding:6px 16px;font-size:13px}
+.tag-new{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:10.5px;padding:2px 7px;border-radius:4px;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{background:var(--thead);font-weight:500;font-size:13px;padding:11px 8px;text-align:center}
+td{padding:10px 8px;text-align:center;border-bottom:1px solid var(--line);font-size:13px}
+.info-grid{display:grid;grid-template-columns:120px 1fr 120px 1fr 120px 1fr;border:1px solid var(--line)}
+.info-grid div{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.info-grid .k{background:var(--thead);font-weight:500}
+.ocr{display:flex;align-items:center;gap:12px}
+.chip{border:1px solid var(--line);border-radius:6px;padding:8px 16px;font-size:13px;color:var(--muted)}
+.chip.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-dark);font-weight:500}
+.pw{color:var(--red)}
+.wifi-ok{color:var(--teal)} .wifi-off{color:var(--red)}
+.ico{width:22px;height:22px;display:inline-block;vertical-align:middle}
+.quick{position:absolute;right:10px;top:330px;width:46px;background:#fff;border-radius:10px;padding:8px 0;display:flex;flex-direction:column;gap:12px;align-items:center;font-size:10.5px;color:var(--muted);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.quick span.cur{color:var(--teal-dark);font-weight:700}
+
+/* 관리자 모달 */
+.overlay{position:fixed;inset:0;background:rgba(20,22,26,.45);display:grid;place-items:center;z-index:40;padding:16px}
+.modal{background:#fff;border-radius:12px;width:min(440px,100%);padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.modal h3{margin:0;font-size:18px;display:flex;align-items:center;gap:8px}
+.state{font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;background:#fff1d6;color:#9a6a00}
+.state.ok{background:#e1f5ea;color:#1c7d48}
+.state.end{background:#eceef0;color:var(--muted)}
+.modal p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.code{display:flex;justify-content:center;gap:8px}
+.code span{width:46px;height:58px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;font-size:28px;font-weight:700;background:#fafbfb;font-variant-numeric:tabular-nums}
+.code.dim span{color:#c3c6ca}
+.timer{text-align:center;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.timer b{color:var(--red);font-weight:700}
+.howto{background:#f6f7f8;border-radius:8px;padding:12px 14px;font-size:12.5px;line-height:1.7;color:var(--ink)}
+.howto ol{margin:4px 0 0;padding-left:18px}
+.dev{border:1px solid var(--line);border-radius:8px;display:grid;grid-template-columns:96px 1fr}
+.dev div{padding:9px 12px;font-size:13px;border-bottom:1px solid var(--line)}
+.dev div:nth-last-child(-n+2){border-bottom:0}
+.dev .k{background:var(--thead);color:var(--muted)}
+.m-acts{display:flex;gap:8px;justify-content:flex-end}
+.m-acts .btn-gray{padding:8px 16px}
+.btn-danger{background:var(--red);color:#fff;border:0;border-radius:4px;padding:8px 16px;font-size:13px;font-weight:500}
+.ask{display:inline-block;font-size:10.5px;background:var(--note);border:1px solid var(--note-line);color:#7a6400;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:#2f3237;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:60}
+
+/* ===== 키오스크 화면 ===== */
+.kiosk-area{display:flex;gap:20px;align-items:flex-start;min-width:1180px;padding:24px;background:#cfd2d6}
+.kiosk{position:relative;width:960px;flex:none;aspect-ratio:16/10;background:var(--kiosk);border-radius:18px;border:14px solid #1b1c1f;overflow:hidden;font-family:var(--font)}
+.k-top{position:absolute;inset:16px 18px auto 18px;display:flex;align-items:center;gap:10px;z-index:2}
+.k-ids{background:rgba(25,10,10,.55);color:#fff;border-radius:999px;padding:7px 16px;font-size:13px;display:flex;gap:14px;font-variant-numeric:tabular-nums}
+.k-ids b{font-weight:500;color:#ffd0ce;margin-right:4px}
+.k-remote{margin-left:auto;background:#2a0f0f;border-radius:999px;padding:5px 5px 5px 14px;display:flex;align-items:center;gap:10px;color:#fff;font-size:14px}
+.k-remote i{width:9px;height:9px;border-radius:50%;background:#ff6b63;box-shadow:0 0 0 3px rgba(255,107,99,.25)}
+.k-remote button{border:0;background:#e86a64;color:#fff;font-weight:700;border-radius:999px;padding:6px 16px;font-size:14px}
+.k-gear{border:0;background:transparent;padding:4px;color:#d9d9d9;margin-left:auto}
+.k-remote + .k-gear{margin-left:0}
+.k-gear svg{width:40px;height:40px}
+.k-title{position:absolute;top:44px;left:0;right:0;text-align:center;font-size:78px;font-weight:900;color:var(--navy);
+  -webkit-text-stroke:10px #fff;paint-order:stroke fill;letter-spacing:2px;line-height:1.1}
+.k-sub{position:absolute;top:168px;left:0;right:0;text-align:center;color:#fff;font-size:36px;font-weight:700}
+.k-sub em{font-style:normal;color:var(--yellow)}
+.k-photos{position:absolute;left:18px;right:18px;bottom:18px;top:240px;background:#fff;border-radius:4px;display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:22px 36px}
+.k-ph{background:linear-gradient(180deg,#eef0f2,#dcdfe3);border-radius:4px;position:relative;display:grid;place-items:center;color:#8a8f96;font-size:15px}
+.k-ph::before{content:"";position:absolute;top:18%;left:50%;width:46%;height:30%;transform:translateX(-50%);background:#1d1e21;border-radius:10px 10px 24px 24px}
+.k-ph::after{content:"";position:absolute;top:22%;left:50%;width:6px;height:6px;border-radius:50%;background:#3ddc6f;transform:translateX(-50%)}
+.k-ph span{position:absolute;bottom:14%;background:#fff;padding:6px 14px;border-radius:6px;color:#4b5058;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.k-dim{position:absolute;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:5}
+.k-modal{background:#fff;border-radius:18px;width:430px;padding:26px 28px;display:flex;flex-direction:column;gap:16px;align-items:stretch}
+.k-modal h4{margin:0;font-size:22px;text-align:center}
+.k-modal p{margin:0;text-align:center;color:var(--muted);font-size:14px}
+.k-dots{display:flex;justify-content:center;gap:14px}
+.k-dots span{width:16px;height:16px;border-radius:50%;border:2px solid #c7cacf}
+.k-boxes{display:flex;justify-content:center;gap:8px}
+.k-boxes span{width:48px;height:58px;border:2px solid #d5d8dc;border-radius:10px;display:grid;place-items:center;font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.k-boxes span.cur{border-color:var(--navy)}
+.k-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.k-pad button{border:0;background:#f1f2f4;border-radius:10px;height:46px;font-size:20px;font-weight:500;color:var(--ink)}
+.k-pad button.fn{font-size:14px;color:var(--muted)}
+.k-msg{color:var(--red)!important;font-size:13px!important}
+.k-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.k-acts button{border:0;border-radius:10px;height:48px;font-size:16px;font-weight:700}
+.k-cancel{background:#e9eaec;color:var(--ink)}
+.k-ok{background:var(--navy);color:#fff}
+.k-ok:disabled{background:#aab0c8;cursor:default}
+.k-link{border:0;background:transparent;color:var(--navy);font-weight:700;font-size:15px;text-decoration:underline;text-underline-offset:3px;padding:6px;align-self:center}
+.k-link.new{box-shadow:0 0 0 3px rgba(29,42,122,.18);border-radius:6px;text-decoration:none}
+
+/* 원격지원 페이지 */
+.remote-area{min-width:1180px;padding:24px;background:#cfd2d6}
+.browser{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+.b-bar{display:flex;align-items:center;gap:6px;background:#eceef1;padding:10px 14px;border-bottom:1px solid var(--line)}
+.b-bar i{width:11px;height:11px;border-radius:50%;background:#d0d3d7}
+.b-url{margin-left:12px;flex:1;background:#fff;border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted)}
+.r-page{background:#f4f5f7;min-height:640px;display:flex;flex-direction:column;align-items:center;padding:0 0 40px}
+.r-head{align-self:stretch;display:flex;align-items:center;gap:14px;background:#fff;padding:14px 24px;border-bottom:1px solid var(--line);font-size:15px}
+.r-head .logo{margin:0;font-size:20px}
+.r-card{margin-top:40px;width:520px;background:#fff;border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.r-card.wide{width:880px}
+.r-card h3{margin:0;font-size:19px;display:flex;align-items:center;gap:8px}
+.r-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.6}
+.r-card .code span{width:56px;height:68px;font-size:34px}
+.screen{aspect-ratio:16/10;background:var(--kiosk);border-radius:10px;display:grid;place-items:center;color:#fff;font-size:15px;position:relative}
+.screen b{font-size:42px;font-weight:900;color:var(--navy);-webkit-text-stroke:6px #fff;paint-order:stroke fill;display:block;text-align:center}
+.admin-sim{max-width:560px}
+.btn-line[aria-busy="true"]{opacity:.6}
+/* 플로우 차트 */
+.flow-area{min-width:1180px;padding:24px;background:#cfd2d6}
+.flow-area.off{position:absolute;left:-99999px;top:0;width:1180px}
+.flow-card{background:#fff;border-radius:10px;padding:24px}
+.flow-card h2{margin:0 0 4px;font-size:18px}
+.flow-card p{margin:0 0 16px;color:var(--muted);font-size:13px}
+.flow-card pre{margin:0;background:transparent;display:flex;justify-content:center}
+/* 설명 메모 */
+.notes{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.note{background:var(--note);border:1px solid var(--note-line);border-radius:8px;padding:12px 14px;font-size:12.5px;line-height:1.65}
+.note h5{margin:0 0 4px;font-size:13px}
+.note .code-hint{font-size:20px;font-weight:700;letter-spacing:4px;font-variant-numeric:tabular-nums;color:var(--navy)}
+.sim button{display:block;width:100%;margin:6px 0;border:1px solid var(--note-line);background:#fff;border-radius:6px;padding:7px 10px;font-size:12.5px;text-align:left}
+.sim button[aria-pressed="true"]{background:#fde3e1;border-color:var(--red);color:#a1241e}
+.sim-hint{color:#6b5d17;margin-top:4px}
+.sim-hint b{letter-spacing:2px}
+.state.bad{background:#fde3e1;color:#a1241e}
+.k-offline{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);z-index:3;background:#fff;border:6px solid var(--kiosk);border-radius:22px;padding:22px 44px;display:flex;align-items:center;gap:18px;color:var(--kiosk);font-size:46px;font-weight:900;white-space:nowrap}
+.k-offline svg{width:64px;height:64px}
+.k-banner{position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:4;background:#1b1c1f;color:#fff;border-radius:10px;padding:10px 20px;font-size:16px;white-space:nowrap}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .2s ease-out}@keyframes up{from{transform:translate(-50%,8px);opacity:0}}}
+</style>
+</head>
+<body>
+
+
+<div class="scenario">
+  <div class="scn-top">
+    <h1>키오스크 원격지원</h1>
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-admin" role="tab" aria-selected="true">슈퍼어드민</button>
+      <button class="tab" id="tab-remote" role="tab" aria-selected="false">원격지원 페이지 (새 창)</button>
+      <button class="tab" id="tab-kiosk" role="tab" aria-selected="false">키오스크</button>
+      <button class="tab" id="tab-flow" role="tab" aria-selected="false">플로우 차트</button>
+    </div>
+    <button class="reset" id="reset">처음부터</button>
+  </div>
+  <ol class="steps" id="steps">
+    <li data-s="1"><b>1</b>상담원 · 키오스크 원격지원 클릭</li>
+    <li data-s="2"><b>2</b>원격지원 페이지 새 창 · 6자리 코드 발급</li>
+    <li data-s="3"><b>3</b>약사 · 설정 → 원격지원 요청 → 코드 입력</li>
+    <li data-s="4"><b>4</b>원격 연결</li>
+    <li data-s="5"><b>5</b>종료 · 연결 종료 또는 해제</li>
+  </ol>
+</div>
+
+<div class="stage-wrap">
+  <!-- 관리자: 약국 관리 > 약국 상세 -->
+  <section id="view-admin" class="admin" aria-label="관리자 화면">
+    <nav class="side">
+      <div class="logo"><i></i>굿팜</div>
+      <div class="me">기솔아 <span>⇥</span></div>
+      <div class="grp">굿팜 공통</div>
+      <div class="menu open">약국관리<span>⌃</span></div>
+      <div class="sub cur">약국 관리</div>
+      <div class="sub">신규 약국 관리<span class="reddot"></span></div>
+      <div class="sub">약국 A/S</div>
+      <div class="sub">약국 결제 관리</div>
+      <div class="sub">태블릿 관리</div>
+      <div class="menu">헬스포트 관리<span>⌄</span></div>
+      <div class="menu">굿팜 서비스 관리<span>⌄</span></div>
+      <div class="menu">게시판 관리<span>⌄</span></div>
+      <div class="grp">굿팜 약국 솔루션</div>
+      <div class="menu">바코드 프리<span>⌄</span></div>
+      <div class="menu">전자입고 관리<span>⌄</span></div>
+      <div class="menu">바코드 관리<span>⌄</span></div>
+      <div class="menu">AI MATE 추천 상품<span>⌄</span></div>
+      <div class="menu">ESL 관리<span>⌄</span></div>
+      <div class="grp">모바일 약국</div>
+      <div class="menu">모바일 약국 관리<span>⌄</span></div>
+      <div class="menu">포인트/쿠폰 관리<span>⌄</span></div>
+    </nav>
+
+    <div class="main">
+      <div>
+        <div class="crumb">약국 관리 › 약국 상세</div>
+        <div class="ptitle">테라약국</div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>서비스 정보</h2></div>
+        <table>
+          <thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th>과금액</th><th>서비스상태</th><th>계약서상태</th></tr></thead>
+          <tbody>
+            <tr><td>굿팜 플러스</td><td>2024-10-24</td><td>2026-01-05</td><td>2024-11-03</td><td>2026-01-05</td><td>0</td><td>승인</td><td>없음</td></tr>
+            <tr><td>굿팜 솔루션 (NEW)</td><td>2025-11-04</td><td>2026-01-05</td><td>2025-11-04</td><td>2026-01-05</td><td>110,000</td><td>승인</td><td>없음</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>처방전 OCR 정보</h2></div>
+        <div class="ocr"><b>사용중인 OCR 엔진</b><span class="chip on">● 지킴</span><span class="chip">● 이지닷큐</span></div>
+      </div>
+
+      <div class="card" id="tablet-card">
+        <div class="card-h">
+          <h2>태블릿 정보</h2><span class="cnt">전체 <em>4</em></span>
+          <div class="acts">
+            <button class="btn-line new" id="open-remote">
+              <span class="tag-new">추가</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+              키오스크 원격지원
+            </button>
+            <button class="btn-fill">태블릿 등록</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>태블릿 아이디</th><th>태블릿 아이피</th><th>전원</th><th>연결상태</th><th>수정</th><th>삭제</th></tr></thead>
+          <tbody id="tablet-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>VAN 가맹점</h2></div>
+        <div class="info-grid">
+          <div class="k">가맹점</div><div>올댓페이 (직접 가맹)</div><div class="k">상태</div><div>활성</div><div class="k">단말기(TID)</div><div>4개</div>
+        </div>
+      </div>
+
+      <div class="note sim admin-sim"><h5>프로토타입 안내 · 창이 열리지 않는 경우 확인하기</h5>
+        키오스크 원격지원을 누르면 원격지원 페이지가 새 창으로 열립니다. 누를 때마다 새 창이 열립니다.
+        <button id="sim-ticket">창 열기 실패 보기 (접속 정보 만료)</button>
+        <button id="sim-popup">팝업 차단 보기</button>
+      </div>
+    </div>
+
+    <div class="quick" aria-hidden="true"><span>상세</span><span>A/S</span><span>메모</span><span>서비스</span><span>OCR</span><span class="cur">태블릿</span><span>VAN</span><span>결제</span><span>위치</span><span>TOP</span></div>
+  </section>
+
+  <!-- 원격지원 페이지 (새 창) -->
+  <section id="view-remote" class="remote-area" aria-label="원격지원 페이지" hidden>
+    <div class="browser">
+      <div class="b-bar"><i></i><i></i><i></i><div class="b-url">원격지원 페이지 · 주소는 배포 후 확정</div></div>
+      <div class="r-page">
+        <div class="r-head"><span class="logo"><i></i>굿팜</span><b>키오스크 원격지원</b></div>
+        <div class="r-card" id="r-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 플로우 차트 -->
+  <section id="view-flow" class="flow-area off" aria-label="플로우 차트">
+    <div class="flow-card">
+      <h2>원격지원 플로우 차트</h2>
+      <p>정상 흐름과 연결 안 되는 경우를 함께 표시합니다. 초록 : 연결 · 종료, 빨강 : 연결 안 되는 경우.</p>
+      <pre class="mermaid">
+flowchart TD
+  A["상담원 · 약국 상세 › 태블릿 정보<br/>키오스크 원격지원 클릭"] --> B{"원격지원 창<br/>열림?"}
+  B -- "팝업 차단" --> B1["토스트 : 팝업 허용 후 다시 클릭"] --> A
+  B -- "접속 정보 만료(30초 · 1회용)" --> B2["토스트 : 버튼 다시 클릭"] --> A
+  B -- "열림" --> C["원격지원 페이지(새 창)<br/>6자리 코드 · 입력 위치 안내 · 만료 5분 카운트"]
+  C --> D["상담원 · 약사님께 코드와 입력 위치 안내"]
+  D --> E["약사 · 키오스크 설정 아이콘 → 관리자 비밀번호 창<br/>→ 원격지원 요청 → 6자리 입력 → 요청"]
+  C -. "5분 경과" .-> X["원격지원 페이지 : 만료<br/>다시 시도 버튼"]
+  X -- "다시 시도" --> C
+  E --> F{"코드 확인"}
+  F -- "인터넷 끊김" --> F1["키오스크 : 인터넷 연결 확인 안내"] --> E
+  F -- "코드 틀림" --> F2["키오스크 : 코드 다시 확인 안내"] --> E
+  F -- "만료 · 이미 사용한 코드" --> F3["키오스크 : 상담원에게 새 코드 요청 안내"] --> X
+  F -- "이미 원격지원 중" --> F4["키오스크 : 이미 원격지원 중 안내"]
+  F -- "맞음" --> G["연결됨<br/>원격지원 페이지 : 연결 토스트 · 약국 · 기기 정보 · 키오스크 화면<br/>키오스크 : 오른쪽 위 원격 지원 중 + 해제"]
+  G --> H{"종료"}
+  H -- "상담원 연결 종료" --> Z["종료"]
+  H -- "약사 해제" --> Z
+  H -- "연결 30분 경과(자동 해지)" --> Z
+  H -- "키오스크 인터넷 끊김" --> Y["원격지원 페이지 : 연결 끊김<br/>다시 시도 버튼"]
+  Y -- "다시 시도" --> C
+  classDef ok fill:#e1f5ea,stroke:#2fb36b,color:#1c3d2b;
+  classDef bad fill:#fde3e1,stroke:#e2463f,color:#5a1a16;
+  class G,Z ok;
+  class B1,B2,X,F1,F2,F3,F4,Y bad;
+      </pre>
+    </div>
+  </section>
+
+  <!-- 키오스크 -->
+  <section id="view-kiosk" class="kiosk-area" aria-label="키오스크 화면" hidden>
+    <div class="kiosk" id="kiosk">
+      <div class="k-top">
+        <div class="k-ids" id="k-ids" hidden><span><b>태블릿 ID</b>T1</span><span><b>Store ID</b>2020033113441969592</span></div>
+        <div class="k-remote" id="k-remote" hidden><i></i>원격 지원 중<button id="k-release">해제</button></div>
+        <button class="k-gear" id="k-gear" aria-label="설정">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
+        </button>
+      </div>
+      <div class="k-title">처방전 접수</div>
+      <div class="k-sub">하단 초록불에 <em>QR코드를</em> 대주세요</div>
+      <div class="k-photos"><div class="k-ph"><span>처방전 QR</span></div><div class="k-ph"><span>상품 바코드</span></div></div>
+      <div id="k-layer"></div>
+    </div>
+    <div class="notes">
+      <div class="note"><h5>프로토타입 안내</h5>슈퍼어드민에서 <b>키오스크 원격지원</b>을 눌러 원격지원 페이지에서 코드를 받은 뒤, 이 화면에서 설정 아이콘을 눌러 진행합니다.</div>
+      <div class="note" id="code-note"><h5>원격지원 페이지에서 발급한 코드</h5><span id="code-hint">아직 발급 전</span></div>
+      <div class="note"><h5>화면 표시</h5>원격지원이 연결되었을 때만 표시합니다.<br>왼쪽 위 : 태블릿 ID · Store ID<br>오른쪽 위 : ‘원격 지원 중’과 해제 버튼 (누르면 바로 해제)</div>
+      <div class="note sim"><h5>연결 안 되는 경우 확인하기</h5>
+        <button id="sim-expire">만료시간 지나게 하기</button>
+        <button id="sim-offline">키오스크 인터넷 끊기</button>
+        <button id="sim-timeout">연결 30분 지나게 하기 (자동 해지)</button>
+        <div class="sim-hint">코드 틀림 · 만료 코드 · 이미 사용한 코드는 원격지원 요청 창에 직접 입력해 확인합니다.<span id="used-hint"></span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="admin-layer"></div>
+<div id="toast-layer"></div>
+
+<script>
+(() => {
+  const STORE = '2020033113441969592', PHARM = '테라약국', TTL = 300;
+  const tablets = [['T1','192.168.0.17',true],['T2','192.168.0.15',true],['T3','192.168.0.10',true],['T4','192.168.45.146',false]];
+  const init = () => ({ view:'admin', status:'idle', code:'', left:TTL, modal:false, kiosk:'home', entry:'', msg:'', endedBy:'', offline:false, used:[], expired:[], banner:'' });
+  const S = init();
+  let tick = null, bannerT = null;
+  const $ = id => document.getElementById(id);
+
+  const power = '<svg class="ico pw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5v6M9 8.4a5 5 0 1 0 6 0"/></svg>';
+  const wifi = ok => `<svg class="ico ${ok?'wifi-ok':'wifi-off'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2.5 8.5a14 14 0 0 1 19 0M5.5 12a9.5 9.5 0 0 1 13 0M8.5 15.4a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.3" fill="currentColor"/></svg>`;
+  const wifiOff = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2.5 8.5a14 14 0 0 1 19 0M5.5 12a9.5 9.5 0 0 1 13 0M8.5 15.4a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.3" fill="currentColor"/><path d="M5 3l14 18"/></svg>';
+  $('tablet-rows').innerHTML = tablets.map(([id,ip,ok]) => `<tr><td>${id}</td><td>${ip}</td><td>${power}</td><td>${wifi(ok)}</td><td><button class="btn-gray">수정</button></td><td><button class="btn-gray">삭제</button></td></tr>`).join('');
+
+  const newCode = () => String(Math.floor(100000 + Math.random()*900000));
+  const mmss = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  function issue(){ if (S.code && !S.expired.includes(S.code)) S.expired.push(S.code); S.status='waiting'; S.code=newCode(); S.left=TTL; clearInterval(tick); tick=setInterval(()=>{ if (S.status!=='waiting') return; S.left=Math.max(0,S.left-1); if (S.left===0) expire(); else renderAdmin(); },1000); }
+  function expire(){ S.left=0; S.status='expired'; if (!S.expired.includes(S.code)) S.expired.push(S.code); clearInterval(tick); render(); }
+  function toast(t){ const el=document.createElement('div'); el.className='toast'; el.textContent=t; $('toast-layer').replaceChildren(el); setTimeout(()=>el.remove(),2400); }
+  function banner(t){ S.banner=t; clearTimeout(bannerT); bannerT=setTimeout(()=>{ S.banner=''; renderKiosk(); },3000); }
+
+  function step(){
+    if (S.status==='ended' || S.status==='dropped') return 5;
+    if (S.status==='connected') return 4;
+    if (S.status==='waiting' || S.status==='expired') return S.view==='kiosk' && S.kiosk!=='home' ? 3 : 2;
+    return 1;
+  }
+  function renderSteps(){
+    const cur=step();
+    document.querySelectorAll('#steps li').forEach(li=>{ const n=+li.dataset.s; li.className = n===cur?'on':(n<cur?'done':''); });
+    $('tab-remote').innerHTML = '원격지원 페이지 (새 창)' + (S.view!=='remote' && ['connected','dropped','ended','expired'].includes(S.status) ? '<span class="dot"></span>' : '');
+  }
+
+  const guide = `<div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>요청</b>을 누릅니다.</li></ol></div>`;
+  function renderAdmin(){
+    const C=$('r-card'); C.className='r-card';
+    const digits = dim => `<div class="code ${dim?'dim':''}">${[...S.code].map(c=>`<span>${c}</span>`).join('')}</div>`;
+    let body='';
+    if (S.status==='idle') body = `<h3>열린 원격지원 창이 없습니다</h3><p>슈퍼어드민 약국 상세의 키오스크 원격지원을 누르면 이 창이 새로 열립니다.</p>`;
+    else if (S.status==='waiting') body = `
+      <h3>${PHARM} <span class="state">약사 입력 대기</span></h3>
+      ${digits(false)}${guide}
+      <div class="timer">만료시간 <b>${mmss(S.left)}</b></div>
+      <div class="m-acts"><button class="btn-gray" id="m-close">창 닫기</button></div>`;
+    else if (S.status==='expired') body = `
+      <h3>${PHARM} <span class="state bad">만료</span></h3>
+      ${digits(true)}${guide}
+      <div class="timer">만료시간 <b>00:00</b> · 인증코드 유효시간이 지났습니다.</div>
+      <div class="m-acts"><button class="btn-gray" id="m-close">창 닫기</button><button class="btn-fill" id="m-retry">다시 시도</button></div>`;
+    else if (S.status==='connected'){ C.className='r-card wide'; body = `
+      <h3>${PHARM} · T1 <span class="state ok">연결됨</span></h3>
+      <div class="screen"><div><b>처방전 접수</b><div style="text-align:center;margin-top:10px">키오스크 화면이 이 영역에 보입니다</div></div></div>
+      <div class="dev"><div class="k">약국명</div><div>${PHARM}</div><div class="k">태블릿 아이디</div><div>T1</div><div class="k">Store ID</div><div>${STORE}</div></div>
+      <div class="m-acts"><button class="btn-danger" id="m-end">연결 종료</button></div>`; }
+    else if (S.status==='dropped') body = `
+      <h3>${PHARM} <span class="state bad">연결 끊김</span></h3>
+      <p>키오스크 인터넷 연결이 끊겨 원격지원이 끝났습니다. 키오스크 연결상태를 확인한 뒤 다시 시도를 누르면 새 인증코드가 발급됩니다.</p>
+      <div class="m-acts"><button class="btn-gray" id="m-close">창 닫기</button><button class="btn-fill" id="m-retry">다시 시도</button></div>`;
+    else if (S.status==='ended') body = `
+      <h3>${PHARM} <span class="state end">종료</span></h3>
+      <p>${S.endedBy==='kiosk'?'약사님이 키오스크에서 해제를 눌러 원격지원이 끝났습니다.':(S.endedBy==='timeout'?'연결 30분이 지나 원격지원이 자동으로 해지되었습니다.':'원격지원을 종료했습니다.')}</p>
+      <div class="m-acts"><button class="btn-fill" id="m-close">창 닫기</button></div>`;
+    C.innerHTML = body;
+    const on=(id,fn)=>{ const b=$(id); if (b) b.onclick=fn; };
+    on('m-close',()=>{ if (S.status==='waiting'||S.status==='expired'){ if(!S.expired.includes(S.code)) S.expired.push(S.code); clearInterval(tick); } S.status='idle'; S.view='admin'; render(); });
+    on('m-retry',()=>{ issue(); toast('새 인증코드를 발급했습니다.'); render(); });
+    on('m-end',()=>{ end('admin'); toast('원격지원을 종료했습니다.'); });
+  }
+
+  function end(by){ S.status='ended'; S.endedBy=by; render(); }
+
+  function check(){
+    if (S.offline) return '인터넷 연결이 끊겨 요청할 수 없습니다. 연결을 확인한 뒤 다시 시도해 주세요.';
+    if (S.status==='connected') return '이미 원격지원 중입니다.';
+    if (S.status==='waiting' && S.entry===S.code) return '';
+    if (S.used.includes(S.entry)) return '이미 사용한 인증코드입니다. 상담원에게 새 코드를 요청해 주세요.';
+    if (S.expired.includes(S.entry) || (S.status==='expired' && S.entry===S.code)) return '유효시간이 지난 인증코드입니다. 상담원에게 새 코드를 요청해 주세요.';
+    return '인증코드가 맞지 않습니다. 다시 확인해 주세요.';
+  }
+
+  function renderKiosk(){
+    $('k-remote').hidden = S.status!=='connected'; $('k-ids').hidden = S.status!=='connected'; $('sim-timeout').disabled = S.status!=='connected';
+    $('code-hint').innerHTML = S.status==='waiting' ? `<span class="code-hint">${S.code}</span> · 만료 ${mmss(S.left)}` : (S.status==='expired' ? `<span class="code-hint" style="opacity:.4">${S.code}</span> · 만료됨` : (S.status==='connected' ? '연결 완료' : '아직 발급 전'));
+    $('used-hint').innerHTML = S.used.length ? `<br>이미 사용한 코드 : <b>${S.used.at(-1)}</b>` : '';
+    $('sim-offline').setAttribute('aria-pressed', S.offline); $('sim-offline').textContent = S.offline ? '키오스크 인터넷 다시 연결' : '키오스크 인터넷 끊기';
+    $('sim-expire').disabled = S.status!=='waiting';
+    const L=$('k-layer'); let html='';
+    if (S.offline) html += `<div class="k-offline">${wifiOff}에이전트 연결 안됨</div>`;
+    if (S.banner) html += `<div class="k-banner">${S.banner}</div>`;
+    if (S.kiosk==='pw') html += `<div class="k-dim" data-dim><div class="k-modal">
+        <h4>관리자 비밀번호</h4><p>비밀번호 4자리를 입력해 주세요.</p>
+        <div class="k-dots"><span></span><span></span><span></span><span></span></div>
+        <div class="k-pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button tabindex="-1">${n}</button>`).join('')}<button class="fn" tabindex="-1">취소</button><button tabindex="-1">0</button><button class="fn" tabindex="-1">지우기</button></div>
+        <button class="k-link new" id="k-req">원격지원 요청</button></div></div>`;
+    else if (S.kiosk==='req'){
+      const boxes=Array.from({length:6},(_,i)=>`<span class="${i===S.entry.length?'cur':''}">${S.entry[i]||''}</span>`).join('');
+      html += `<div class="k-dim"><div class="k-modal">
+        <h4>원격지원 요청</h4><p ${S.msg?'class="k-msg"':''}>${S.msg||'상담원이 불러 준 인증코드 6자리를 입력해 주세요.'}</p>
+        <div class="k-boxes">${boxes}</div>
+        <div class="k-pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-n="${n}">${n}</button>`).join('')}<button class="fn" data-fn="clear">전체 지우기</button><button data-n="0">0</button><button class="fn" data-fn="back">지우기</button></div>
+        <div class="k-acts"><button class="k-cancel" id="k-cancel">취소</button><button class="k-ok" id="k-ok" ${S.entry.length<6?'disabled':''}>요청</button></div></div></div>`;
+    }
+    L.innerHTML=html;
+    const req=$('k-req'); if (req) req.onclick=()=>{ S.kiosk='req'; S.entry=''; S.msg=''; render(); };
+    const dim=L.querySelector('[data-dim]'); if (dim) dim.onclick=e=>{ if (e.target===dim){ S.kiosk='home'; render(); } };
+    if (S.kiosk==='req'){
+      L.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{ if (S.entry.length<6){ S.entry+=b.dataset.n; S.msg=''; render(); } });
+      L.querySelector('[data-fn="back"]').onclick=()=>{ S.entry=S.entry.slice(0,-1); render(); };
+      L.querySelector('[data-fn="clear"]').onclick=()=>{ S.entry=''; render(); };
+      $('k-cancel').onclick=()=>{ S.kiosk='home'; render(); };
+      $('k-ok').onclick=()=>{
+        const m=check();
+        if (!m){ S.used.push(S.code); S.status='connected'; S.kiosk='home'; clearInterval(tick); banner('원격지원이 연결되었습니다.'); toast('키오스크와 연결되었습니다.'); render(); }
+        else { S.msg=m; S.entry=''; render(); }
+      };
+    }
+  }
+
+  function render(){
+    ['admin','remote','kiosk'].forEach(v=>{ $('view-'+v).hidden=S.view!==v; });
+    ['admin','remote','kiosk','flow'].forEach(v=>$('tab-'+v).setAttribute('aria-selected',S.view===v));
+    $('view-flow').classList.toggle('off', S.view!=='flow');
+    renderSteps(); renderAdmin(); renderKiosk();
+  }
+
+  let failNext='';
+  $('open-remote').onclick=()=>{
+    const b=$('open-remote'); b.setAttribute('aria-busy','true');
+    setTimeout(()=>{ b.removeAttribute('aria-busy');
+      if (failNext==='ticket'){ failNext=''; toast('원격지원 창을 열지 못했습니다. 버튼을 다시 눌러 주세요.'); return; }
+      if (failNext==='popup'){ failNext=''; toast('브라우저에서 팝업이 차단되었습니다. 팝업을 허용한 뒤 다시 눌러 주세요.'); return; }
+      if (S.status==='connected'){ toast('이미 원격지원 중인 창이 있습니다.'); S.view='remote'; render(); return; }
+      issue(); S.view='remote'; render();
+    },500);
+  };
+  $('sim-ticket').onclick=()=>{ failNext='ticket'; toast('다음 클릭 한 번은 창 열기에 실패합니다.'); };
+  $('sim-popup').onclick=()=>{ failNext='popup'; toast('다음 클릭 한 번은 팝업이 차단됩니다.'); };
+  $('k-gear').onclick=()=>{ S.kiosk='pw'; render(); };
+  $('k-release').onclick=()=>{ end('kiosk'); banner('원격지원을 해제했습니다.'); renderKiosk(); };
+  $('sim-timeout').onclick=()=>{ if (S.status==='connected'){ end('timeout'); banner('연결 30분이 지나 원격지원이 해지되었습니다.'); renderKiosk(); } };
+  $('sim-expire').onclick=()=>{ if (S.status==='waiting') expire(); };
+  $('sim-offline').onclick=()=>{ S.offline=!S.offline; if (S.offline && S.status==='connected') S.status='dropped'; render(); };
+  ['admin','remote','kiosk','flow'].forEach(v=>$('tab-'+v).onclick=()=>{ S.view=v; render(); });
+  $('reset').onclick=()=>{ clearInterval(tick); failNext=''; Object.assign(S,init()); render(); };
+  render();
+})();
+</script>
+
+</body>
+</html>
