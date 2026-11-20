@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>원격지원 모달 · 코드 확인</title>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>원격지원 창(새 창) · 코드 확인</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
@@ -204,8 +204,11 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
 @media (max-width:900px){.row{grid-template-columns:minmax(0,1fr)}.note{padding-top:0}.zoom{zoom:.55}}
 </style>
 <style>
-.row.ar{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
-.row.ar .zoom{zoom:.6}
+.hl{position:relative;outline:2.5px solid #ff3b30;outline-offset:3px;border-radius:6px}
+.hl::after{content:attr(data-n);position:absolute;top:-14px;left:-14px;width:20px;height:20px;border-radius:50%;background:#ff3b30;color:#fff;font:700 11px/20px "Noto Sans KR",sans-serif;text-align:center;box-shadow:0 0 0 2px #fff;z-index:6}
+.hl.r::after{left:auto;right:-14px}
+.row.ar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.row.ar .zoom{zoom:.87}
 .full{position:relative;container-type:inline-size;border-radius:8px;overflow:hidden;border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .full>img{display:block;width:100%;height:auto}
 .full .mask{font-size:1.6cqw!important;position:absolute;left:.4%;top:8.2%;width:13.2%;height:5.4%;background:#5c5d60;border-radius:.4cqw;color:#fff;font-size:1cqw;font-weight:700;display:flex;align-items:center;padding-left:.8cqw}
@@ -214,15 +217,15 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
 .full .mk3{position:absolute;left:72.4%;top:47%;width:2.6cqw;height:2.6cqw;border-radius:50%;background:#ff3b30;color:#fff;font-size:1.4cqw;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 .3cqw #fff}
 .full .bigv{position:absolute;right:1.2%;bottom:2%;background:var(--navy);color:#fff;text-decoration:none;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:3}
 .full .dimF{position:absolute;inset:0;background:rgba(20,22,26,.45)}
-.full .popw{position:absolute;inset:0;display:grid;place-items:center}
-.full .pop{zoom:.5;filter:drop-shadow(0 10px 24px rgba(0,0,0,.3))}
-.win{width:440px;background:#fff;border-radius:12px;overflow:visible}
+.full .popw{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:flex-end;padding:3% 9% 0 0}
+.full .pop{zoom:.42;filter:drop-shadow(0 10px 24px rgba(0,0,0,.3))}
+.win{width:440px;background:#fff;border:1px solid #c4c8cd;border-radius:10px;overflow:visible}
 .win.wide{width:600px}
 .win .wbar{display:flex;align-items:center;gap:6px;background:#e9ebee;padding:8px 12px;border-bottom:1px solid #d6d9dd;border-radius:10px 10px 0 0}
 .win .wbar i{width:10px;height:10px;border-radius:50%;background:#ff5f57}.win .wbar i:nth-child(2){background:#febc2e}.win .wbar i:nth-child(3){background:#28c840}
 .win .wbar span{margin-left:10px;flex:1;background:#fff;border-radius:5px;padding:2px 10px;font-size:11px;color:var(--muted)}
 .win .whead{display:flex;align-items:center;gap:8px;padding:14px 22px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}
-.win .whead{justify-content:space-between;border-radius:10px 10px 0 0}
+.win .whead span{color:var(--teal);font-weight:900}
 .win .whead em{font-style:normal;color:var(--muted);font-weight:400;font-size:16px}
 .win .wbody{padding:20px 22px 0;display:flex;flex-direction:column;gap:16px;position:relative}
 .win .wfoot{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:14px 22px;margin-top:20px;border-top:1px solid var(--line);background:#fafbfc;border-radius:0 0 10px 10px}
@@ -249,4 +252,4 @@ h2{font-size:19px;margin:0 0 12px;text-wrap:balance}
 .crop{position:relative;container-type:inline-size;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
 .crop img{display:block;width:100%}
 @media (max-width:900px){.row.ar{grid-template-columns:minmax(0,1fr)}.full .pop{zoom:.32}}
-</style><style>body{margin:0;background:#2b2d31}.vh{color:#fff;font:600 14px/1.4 "Noto Sans KR",sans-serif;padding:12px 20px}.full{border-radius:0;border:0;max-width:2000px;margin:0 auto}.full .bigv{display:none}</style></head><body><div class="vh">원격지원 모달 · 코드 확인</div><div class="full"><img src="img/a-bg.jpg" alt="슈퍼어드민 약국 상세 화면"><span class="mask">관리자</span><span class="btnx">키오스크 원격지원</span><div class="dimF"></div><div class="popw"><div class="pop" style="zoom:1"><div class="win"><div class="whead">키오스크 원격지원<em>✕</em></div><div class="wbody"><div class="top"><b>테라약국</b><span class="st wait">약사 입력 대기</span></div><div class="cw"><div class="code"><span>7</span><span>3</span><span>0</span><span>5</span><span>8</span><span>1</span></div></div><div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>연결</b>을 누릅니다.</li></ol></div><div class="cw" style="padding:0"><div class="tm">만료시간 <b>04:52</b></div></div></div><div class="wfoot"><span class="b g">닫기</span></div></div></div></div></div></body></html>
+</style><style>body{margin:0;background:#2b2d31}.vh{color:#fff;font:600 14px/1.4 "Noto Sans KR",sans-serif;padding:12px 20px}.full{border-radius:0;border:0;max-width:2000px;margin:0 auto}.full .bigv{display:none}</style></head><body><div class="vh">원격지원 창(새 창) · 코드 확인</div><div class="full"><img src="img/a-bg.jpg" alt="슈퍼어드민 약국 상세 화면"><span class="mask">관리자</span><span class="btnx">키오스크 원격지원</span><div class="popw"><div class="pop" style="zoom:1"><div class="win"><div class="wbar"><i></i><i></i><i></i><span>원격지원 창</span></div><div class="whead"><span>굿팜</span>키오스크 원격지원</div><div class="wbody"><div class="top"><b>테라약국</b><span class="st wait">약사 입력 대기</span></div><div class="cw"><div class="code hl" data-n="1"><span>7</span><span>3</span><span>0</span><span>5</span><span>8</span><span>1</span></div></div><div class="howto"><b>약사님께 이렇게 안내해 주세요</b><ol><li>키오스크 오른쪽 위 <b>설정 아이콘</b>을 누릅니다.</li><li>관리자 비밀번호 창 아래 <b>‘원격지원 요청’</b>을 누릅니다.</li><li>인증코드 6자리를 입력하고 <b>연결</b>을 누릅니다.</li></ol></div><div class="cw" style="padding:0"><div class="tm hl" data-n="2" style="padding:2px 8px">만료시간 <b>04:52</b></div></div></div><div class="wfoot"><span class="b g">닫기</span></div></div></div></div></div></body></html>
