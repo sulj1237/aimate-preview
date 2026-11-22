@@ -1127,7 +1127,7 @@ function renderMain(){
         <tbody>${phPage.length?'':'<tr><td colspan="13" class="empty">조건에 맞는 약국이 없습니다.</td></tr>'}${phPage.map(g=>phRowHtml(g,{ym:S.month, all:rowsOf[g.name]||g.rows, first, open:isOpen(g), tog:1, key:g.name})).join('')}</tbody></table></div>
       <div class="pager">${pager(cpages)}</div>
     </div>
-    ${caseHtml()}`;
+`;
   bindMain();
 }
 
