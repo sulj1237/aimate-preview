@@ -323,36 +323,36 @@ const KD=(()=>{ const pre=['온','봄','늘','숲','빛','솔','별','들','샘'
 const kdAdm=()=>KD.filter(o=>o.admin), kdMiss=()=>KD.filter(o=>o.admin&&!o.inKd), kdOnly=()=>KD.filter(o=>!o.admin), kdNew=()=>KD.filter(o=>o.admin&&o.st==='2026-11');
 function kdHead(){
   const tot=kdAdm().length*KD_FEE, miss=kdMiss().length*KD_FEE, prevPaid=KD.filter(o=>o.admin&&o.paid===true).length*KD_FEE, prevUn=KD.filter(o=>o.admin&&o.paid===false).length;
-  return `<div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3><span class="sub">광동 VIP처는 지원 서비스 금액을 약국 대신 광동에 청구해 받아요 · 어드민 VIP처와 광동 목록을 대조</span><div class="right">${monthSel('kMonth')}</div></div>
+  return `<div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3><span class="sub">광동 VIP처는 지원 서비스 금액을 약국 대신 광동에 청구해 받아요 · 광동이 준 VIP 목록(엑셀)과 굿팜 VIP처를 비교</span><div class="right">${monthSel('kMonth')}</div></div>
   <div class="cards">
     <div class="kc" id="kNew"><div class="l">금월 신규 VIP처</div><div class="v">${kdNew().length}곳</div><div class="s">이번 달 VIP 지원 시작 · 전체 VIP처 ${kdAdm().length}곳</div></div>
-    <div class="kc" id="kMiss"><div class="l">빠진 처</div><div class="v" style="color:var(--up)">${kdMiss().length}곳</div><div class="s">어드민 VIP처인데 광동 목록에 없음 → 청구 요청</div></div>
+    <div class="kc" id="kMiss"><div class="l">광동 추가 필요</div><div class="v" style="color:var(--up)">${kdMiss().length}곳</div><div class="s">굿팜 VIP처인데 광동 목록에 없음 → 광동에 추가 · 청구 요청</div></div>
     <div class="kc" id="kBill"><div class="l">총 청구 금액</div><div class="v">${fmt(tot)}</div><div class="s">VIP처 ${kdAdm().length}곳 × ${fmt(KD_FEE)} (45,000 + VAT)</div></div>
     <div class="kc" id="kDone"><div class="l">청구 완료 금액</div><div class="v">${fmt(tot-miss)}</div><div class="s">광동 목록과 일치한 ${kdAdm().length-kdMiss().length}곳</div></div>
-    <div class="kc" id="kUn"><div class="l">미청구 금액</div><div class="v" style="color:var(--up)">${fmt(miss)}</div><div class="s">빠진 처 ${kdMiss().length}곳</div></div>
+    <div class="kc" id="kUn"><div class="l">미청구 금액</div><div class="v" style="color:var(--up)">${fmt(miss)}</div><div class="s">광동 추가 필요 ${kdMiss().length}곳</div></div>
   </div>
-  <div class="basis" id="kBasis"><b>입금</b> · 전월분 광동 입금 <b>${fmt(prevPaid)}원</b> · 미입금 ${prevUn}곳 ${fmt(prevUn*KD_FEE)}원 &nbsp; <b>광동 목록에만 있는 처</b> · ${kdOnly().length}곳 — 어드민에 VIP로 등록되지 않음(해지 반영 여부 확인)
+  <div class="basis" id="kBasis"><b>입금</b> · 전월분 광동 입금 <b>${fmt(prevPaid)}원</b> · 미입금 ${prevUn}곳 ${fmt(prevUn*KD_FEE)}원 &nbsp; <b>굿팜 추가 필요</b> · ${kdOnly().length}곳 — 광동 목록에는 있는데 굿팜 어드민에 VIP로 등록되지 않음
     <br>광동 VIP 지원 금액은 약국별 수익 · 객단가에 넣지 않고 여기서 따로 관리해요. 매출에 넣을 때는 광동이 입금한 월 기준.</div></div>`;
 }
-const KDST=o=>!o.admin?['chk','광동에만 있음']:o.inKd?['ok','일치']:['no','빠진 처'];
+const KDB=o=>!o.admin?'<span class="ms chk" style="margin-left:6px">굿팜 추가 필요</span>':!o.inKd?'<span class="ms no" style="margin-left:6px">광동 추가 필요</span>':'';
 function kdList(){
   let a=KD.slice(); if(S.tab==='miss') a=kdMiss(); else if(S.tab==='only') a=kdOnly(); else if(S.tab==='new') a=kdNew();
   if(S.q) a=a.filter(o=>o.n.includes(S.q));
-  const ORD={no:0,chk:1,ok:2}; a.sort((x,y)=>ORD[KDST(x)[0]]-ORD[KDST(y)[0]] || y.st.localeCompare(x.st));
-  return `<div class="panel" id="kList"><div class="ph"><h3>VIP처 대조</h3><span class="sub">어드민 VIP처 ↔ 광동 VIP 목록</span>
+  const ord=o=>!o.admin?1:!o.inKd?0:2; a.sort((x,y)=>ord(x)-ord(y) || y.st.localeCompare(x.st));
+  return `<div class="panel" id="kList"><div class="ph"><h3>VIP처 목록</h3><span class="sub">광동 VIP 목록과 다른 약국은 약국명 옆 배지로 표시</span>
     <div class="right" id="kBtns"><button class="btn" id="kTpl">파일 양식 다운로드</button><button class="btn pri" id="kUp">광동 VIP 목록 업로드</button></div></div>
   <div class="tools"><div class="ptabs">
     <button class="ptab ${S.tab==='all'?'on':''}" data-tab="all">전체<b>${KD.length}</b></button>
-    <button class="ptab ${S.tab==='miss'?'on':''}" data-tab="miss">빠진 처<b>${kdMiss().length}</b></button>
-    <button class="ptab ${S.tab==='only'?'on':''}" data-tab="only">광동에만 있음<b>${kdOnly().length}</b></button>
+    <button class="ptab ${S.tab==='miss'?'on':''}" data-tab="miss">광동 추가 필요<b>${kdMiss().length}</b></button>
+    <button class="ptab ${S.tab==='only'?'on':''}" data-tab="only">굿팜 추가 필요<b>${kdOnly().length}</b></button>
     <button class="ptab ${S.tab==='new'?'on':''}" data-tab="new">금월 신규<b>${kdNew().length}</b></button></div>
     ${S.tab==='miss'?'<button class="btn sm" id="kReq">청구 요청 목록 다운로드</button>':''}
     <input class="q" id="q" placeholder="약국명 검색" value="${esc(S.q)}"></div>
-  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>VIP 지원 서비스</th><th>VIP 시작월</th><th class="num">청구 금액</th><th class="ctr">대조</th><th class="ctr">청구</th><th class="ctr">전월분 입금</th></tr></thead><tbody>
-  ${a.map(o=>{ const s=KDST(o); return `<tr class="${s[0]==='ok'?'':'unm'}"><td>${esc(o.n)}${o.st==='2026-11'?'<span class="tg vip">신규</span>':''}<div class="sub2">${o.admin?o.r+' · '+o.sid:'어드민 VIP 아님'}</div></td><td>${o.biz}</td><td>${o.svc}</td><td>${o.st}</td>
-    <td class="num">${o.admin?fmt(KD_FEE):'—'}</td><td class="ctr"><span class="ms ${s[0]}">${s[1]}</span></td>
+  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>VIP 지원 서비스</th><th>VIP 시작월</th><th class="num">청구 금액</th><th class="ctr">청구</th><th class="ctr">전월분 입금</th></tr></thead><tbody>
+  ${a.map(o=>`<tr class="${o.admin&&o.inKd?'':'unm'}"><td>${esc(o.n)}${o.st==='2026-11'?'<span class="tg vip">신규</span>':''}${KDB(o)}<div class="sub2">${o.admin?o.r+' · '+o.sid:'굿팜 어드민 VIP 아님'}</div></td><td>${o.biz}</td><td>${o.svc}</td><td>${o.st}</td>
+    <td class="num">${o.admin?fmt(KD_FEE):'—'}</td>
     <td class="ctr">${!o.admin?'<span class="sub2">—</span>':o.inKd?'청구 완료':'<b style="color:var(--up)">미청구</b>'}</td>
-    <td class="ctr">${o.paid===true?'입금 완료':o.paid===false?'<b style="color:var(--up)">미입금</b>':'<span class="sub2">—</span>'}</td></tr>`; }).join('')}
+    <td class="ctr">${o.paid===true?'입금 완료':o.paid===false?'<b style="color:var(--up)">미입금</b>':'<span class="sub2">—</span>'}</td></tr>`).join('')}
   </tbody></table></div></div>`;
 }
 
