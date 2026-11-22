@@ -419,12 +419,12 @@ flowchart TD
     let body='';
     if (S.status==='idle') body = `<h3>열린 원격지원 창이 없습니다</h3><p>슈퍼어드민 약국 상세의 키오스크 원격지원을 누르면 이 창이 새로 열립니다.</p>`;
     else if (S.status==='waiting') body = `
-      <h3>${PHARM} <span class="state">약사 입력 대기</span></h3>
+      <h3>${PHARM}</h3>
       ${digits(false)}${guide}
       <div class="timer">만료시간 <b>${mmss(S.left)}</b></div>
       <div class="m-acts"><button class="btn-gray" id="m-close">닫기</button></div>`;
     else if (S.status==='expired') body = `
-      <h3>${PHARM} <span class="state bad">시간 만료</span></h3>
+      <h3>${PHARM}</h3>
       ${digits(true)}${guide}
       <div class="timer">입력 시간이 만료되었습니다.</div>
       <div class="m-acts"><button class="btn-gray" id="m-close">닫기</button><button class="btn-fill" id="m-retry">새 코드 받기</button></div>`;
