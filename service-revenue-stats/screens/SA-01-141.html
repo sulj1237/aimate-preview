@@ -53,6 +53,7 @@
   .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
   .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
   .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .ctag{display:inline-block;border:1px solid #cfd4da;border-radius:4px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:#3f454c;background:#fff;font-weight:500;white-space:nowrap}
   .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
   .rs b{color:var(--ink)}
   .red{color:var(--up);font-weight:700}
@@ -118,25 +119,25 @@
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 7</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
-    <tbody><tr data-id="6"><td>2026-11-05 10:02</td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+    <tbody><tr data-id="6"><td>2026-11-05 10:02 <span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
       <td class="num"><span class="red">−71,500</span></td>
-      <td>굿팜결제<div class="rs"><b>취소</b> [과다 청구] 파머시 퍼스트 10월 해지 미반영</div></td>
-      <td class="ctr"></td></tr><tr class="bmh"><td colspan="8"><b>2026-10분</b> <span class="st ok">결제 완료</span> <span class="wy">수기 결제</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="4" class="bmi"><td><span class="bml">└</span>2026-10-05 10:02 <span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
+      <td>굿팜결제<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영</div></td>
+      <td class="ctr"></td></tr><tr data-id="5"><td>2026-10-08 14:21 <span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td><span class="ctag">재시도 결제</span>10월분 · 카드 한도 초과 후 결제</td>
+      <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="4"><td>2026-10-05 10:02 <span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"></td></tr><tr data-id="5" class="bmi"><td><span class="bml">└</span>2026-10-08 14:21 <span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>[재시도 결제] 10월분 · 카드 한도 초과 후 결제</td>
-      <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"></td></tr><tr data-id="3"><td>2026-09-05 10:03 <span class="wy">정기</span></td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"></td></tr><tr class="bmh"><td colspan="8"><b>2026-08분</b> <span class="st ok">결제 완료</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="1" class="bmi"><td><span class="bml">└</span>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>굿팜결제</td>
-      <td class="ctr"></td></tr><tr data-id="2" class="bmi"><td><span class="bml">└</span>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"></td></tr><tr data-id="2"><td>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
       <td class="num"><span class="red">−71,500</span></td>
-      <td>굿팜결제<div class="rs"><b>취소</b> [중복 결제] 같은 날 두 번 결제</div></td>
-      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
+      <td>굿팜결제<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제</div></td>
+      <td class="ctr"></td></tr><tr data-id="1"><td>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>굿팜결제</td>
+      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03 <span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
       <td class="ctr"></td></tr></tbody></table></div></div>

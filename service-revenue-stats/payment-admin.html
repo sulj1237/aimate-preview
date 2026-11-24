@@ -53,6 +53,7 @@
   .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
   .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
   .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .ctag{display:inline-block;border:1px solid #cfd4da;border-radius:4px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:#3f454c;background:#fff;font-weight:500;white-space:nowrap}
   .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
   .rs b{color:var(--ink)}
   .red{color:var(--up);font-weight:700}
@@ -140,6 +141,8 @@ const CANCEL_CAT=[ // 결제 취소 사유
   ['카드 변경','다른 카드로 다시 결제하기 위해 취소할 때'],
   ['기타','위에 해당하지 않을 때 — 메모에 이유 입력']];
 const opt=(a,v)=>a.map(([t])=>`<option value="${t}" ${t===v?'selected':''}>${t}</option>`).join('');
+/* 사유 표시 — 고른 카테고리는 회색 테두리 태그, 직접 쓴 메모는 일반 글자. 저장 값은 '[카테고리] 메모' */
+const rsn=s=>{ const m=/^\[([^\]]+)\]\s*(.*)$/.exec(s||''); return m?'<span class="ctag">'+esc(m[1])+'</span>'+esc(m[2]):esc(s||''); };
 const hintOf=(a,v)=>(a.find(x=>x[0]===v)||a[0])[1];
 
 /* 예시 약국 — 스마트 OCR 단독(49,500) · 10월 말 파머시 퍼스트 해지 */
@@ -173,7 +176,7 @@ const DEMO={opt:'스마트2D', price:30000, from:'2026-11', to:'2026-12'};
 function demoText(d=DEMO){ const [c,t]=dState(d);
   return `데모 <b>${d.opt}</b> · ${period(d)} <span class="st ${c}">${t}</span>`+(d.to?` <span class="hint">→ ${nextM(d.to)} 청구분부터 ${d.opt} 정가 ${fmt(d.price*1.1)}원 · 정기 결제 금액 직접 변경</span>`:''); }
 function discText(d=D){
-  return `금액 할인 <span class="red">−${fmt(d.amt*1.1)}</span> <b>[${d.cat}]</b> ${esc(d.memo)}${d.who?' <span class="hint">등록 '+d.who+(d.at?' · '+d.at:'')+'</span>':''}`; }
+  return `금액 할인 <span class="red">−${fmt(d.amt*1.1)}</span> <span class="ctag">${d.cat}</span>${esc(d.memo)}${d.who?' <span class="hint">등록 '+d.who+(d.at?' · '+d.at:'')+'</span>':''}`; }
 
 /* 약국 상세 — 상단 기본 정보 + 약국 서비스 목록 */
 function svcList(){
@@ -189,12 +192,8 @@ function svcList(){
 const TODAY='2026-11-17', CANCEL_DAYS=60;
 const canCancel=at=>(new Date(TODAY)-new Date(at.slice(0,10)))/864e5<=CANCEL_DAYS;
 
-/* 청구월 결제 이력 — 같은 청구월의 결제 시도(정기 실패 → 수기 결제 성공, 취소 → 취소 후 재결제 등)를 한 묶음으로. 묶음 안은 시각순 */
+/* 정기 결제 내역 — 과금일(결제일) 최신순 한 줄씩. 몇 월분인지는 청구월 칸 (11-24 회의: 결제일 최신순) */
 const isMan=h=>h[1].slice(8,10)!=='05'||/^\[/.test(h[7]);
-const groups=H=>{ const o=[]; H.forEach(h=>{ let g=o.find(x=>x[0]===h[2]); if(!g) o.push(g=[h[2],[]]); g[1].push(h); }); o.forEach(g=>g[1].sort((a,b)=>a[1]<b[1]?-1:1)); return o; };
-const bmHead=(m,rs)=>{ const ok=rs.filter(h=>h[3]==='ok'), last=ok[ok.length-1], rq=rs.some(h=>h[3]==='rq');
-  const st=ok.length?'<span class="st ok">결제 완료</span>'+(isMan(last)?' <span class="wy">수기 결제</span>':''):rq?'<span class="st rq">취소 요청 중</span>':'<span class="st fail">미결제</span>';
-  return `<tr class="bmh"><td colspan="8"><b>${m}분</b> ${st} <span class="bmn">결제 ${rs.length}건</span>${ok.length?' · 결제액 '+fmt(last[4])+'원':''}</td></tr>`; };
 /* 실패 건을 재결제한 수기 결제 — 같은 청구월, 실패 뒤 성공 */
 const paidBy=h=>h[3]==='fail'?HIST.find(x=>x[2]===h[2]&&x[3]==='ok'&&x[1]>h[1]):null;
 
@@ -209,11 +208,11 @@ function subPanel(){
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
-    <tbody>${groups(HIST).map(([m,rs])=>(rs.length>1?bmHead(m,rs):'')+rs.map(h=>{ const sub=rs.length>1, [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
-      return `<tr data-id="${h[0]}"${sub?' class="bmi"':''}><td>${sub?'<span class="bml">└</span>':''}${h[1]}${sub?' <span class="wy">'+(isMan(h)?'수기':'정기')+'</span>':''}</td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
+    <tbody>${[...HIST].sort((a,b)=>b[1].localeCompare(a[1])).map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
+      return `<tr data-id="${h[0]}"><td>${h[1]} <span class="wy">${isMan(h)?'수기':'정기'}</span></td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
-      <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+' — 입금하면 페이앱이 카드 취소 후 알려 줘 취소 완료로 바뀜'+'</div>':''}</td>
-      <td class="ctr">${can||h[3]==='cf'?`<button class="btn sm line" data-cancel="${h[0]}">${h[3]==='cf'?'다시 취소':'결제 취소'}</button>`:''}</td></tr>`; }).join('')).join('')}</tbody></table></div>`;
+      <td>${rsn(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+rsn(h[8])+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+' — 입금하면 페이앱이 카드 취소 후 알려 줘 취소 완료로 바뀜'+'</div>':''}</td>
+      <td class="ctr">${can||h[3]==='cf'?`<button class="btn sm line" data-cancel="${h[0]}">${h[3]==='cf'?'다시 취소':'결제 취소'}</button>`:''}</td></tr>`; }).join('')}</tbody></table></div>`;
 }
 
 /* ① 약국 서비스 수정 — 금액 할인 사유 */
@@ -277,10 +276,10 @@ function memoReq(catId,memoId,reqId,btn){
 const BILL_START='2024-06';
 const BM=(()=>{ const a=[]; let m=BILL_START; while(m<=NOW){ a.unshift(m); m=nextM(m); } return a; })();
 const unpaid=()=>BM.filter(m=>HIST.some(h=>h[2]===m&&h[3]==='fail')&&!HIST.some(h=>h[2]===m&&h[3]==='ok')).sort();
-const bmDefault=()=>unpaid()[0]||NOW;
+const bmDefault=()=>NOW;   // 기본값 = 이번 달. 지난 미결제 달은 목록 위쪽에서 고름
 const bmOpts=()=>{ const u=unpaid(), o=m=>`<option value="${m}" ${m===bmDefault()?'selected':''}>${m}${u.includes(m)?' (미결제)':''}</option>`;
   return (u.length?`<optgroup label="미결제 청구월">${u.map(o).join('')}</optgroup>`:'')+`<optgroup label="전체 (과금 시작 ${BILL_START} ~ 이번 달)">${BM.filter(m=>!u.includes(m)).map(o).join('')}</optgroup>`; };
-const bmHint=()=>unpaid().length?`미결제 ${unpaid().join(' · ')} — 가장 오래된 미결제 달이 기본값`:`미결제 없음 — 기본값은 이번 달(${NOW})`;
+const bmHint=()=>`기본값은 이번 달(${NOW})`+(unpaid().length?` · 미결제 ${unpaid().join(' · ')}은 목록에서 고름`:'')+' · 두 달 치는 달마다 한 건씩 결제';
 
 /* ③ 수기 결제 창 */
 function manualModal(){
@@ -318,7 +317,7 @@ function bindAll(){
       $('mpLink').innerHTML=f?`<b>${f[1].slice(0,10)} · ${fmt(f[4])}원 · ${esc(f[6])}</b><div class="hint">결제되면 이 건은 이 실패 건과 수기 결제가 <b>같은 청구월 결제 이력</b>으로 묶여 보임</div>`
         :'<span class="hint">이 청구월은 미결제 건 없음 — 새 결제로 저장</span>';
       if(f && e0!==bm){ $('mpAmt').value=fmt(f[4]); e0=bm; }
-      $('mpHint').textContent=hintOf(PAY_CAT,c); $('mpPvT').innerHTML='<b>['+c+']</b> '+(+$('mpBm').value.slice(5))+'월분'+(m?' · '+esc(m):''); };
+      $('mpHint').textContent=hintOf(PAY_CAT,c); $('mpPvT').innerHTML='<span class="ctag">'+c+'</span>'+(+$('mpBm').value.slice(5))+'월분'+(m?' · '+esc(m):''); };
     let e0=null; ['mpCat','mpBm','mpMemo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
 }
 function render(){ renderBase(); }

@@ -53,6 +53,7 @@
   .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
   .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
   .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .ctag{display:inline-block;border:1px solid #cfd4da;border-radius:4px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:#3f454c;background:#fff;font-weight:500;white-space:nowrap}
   .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
   .rs b{color:var(--ink)}
   .red{color:var(--up);font-weight:700}
@@ -118,39 +119,39 @@
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 8</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
-    <tbody><tr class="bmh"><td colspan="8"><b>2026-11분</b> <span class="st ok">결제 완료</span> <span class="wy">수기 결제</span> <span class="bmn">결제 2건</span> · 결제액 49,500원</td></tr><tr data-id="6" class="bmi"><td><span class="bml">└</span>2026-11-05 10:02 <span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+    <tbody><tr data-id="7"><td>2026-11-06 11:20 <span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">49,500</td>
+      <td class="num"></td>
+      <td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영</td>
+      <td class="ctr"><button class="btn sm line" data-cancel="7">결제 취소</button></td></tr><tr data-id="6"><td>2026-11-05 10:02 <span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
       <td class="num"><span class="red">−71,500</span></td>
-      <td>굿팜결제<div class="rs"><b>취소</b> [과다 청구] 파머시 퍼스트 10월 해지 미반영</div></td>
-      <td class="ctr"></td></tr><tr data-id="7" class="bmi"><td><span class="bml">└</span>2026-11-06 11:20 <span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">49,500</td>
+      <td>굿팜결제<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영</div></td>
+      <td class="ctr"></td></tr><tr data-id="5"><td>2026-10-08 14:21 <span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
-      <td>[취소 후 재결제] 11월분 · 파머시 퍼스트 해지 반영</td>
-      <td class="ctr"><button class="btn sm line" data-cancel="7">결제 취소</button></td></tr><tr class="bmh"><td colspan="8"><b>2026-10분</b> <span class="st ok">결제 완료</span> <span class="wy">수기 결제</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="4" class="bmi"><td><span class="bml">└</span>2026-10-05 10:02 <span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>굿팜결제</td>
-      <td class="ctr"></td></tr><tr data-id="5" class="bmi"><td><span class="bml">└</span>2026-10-08 14:21 <span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>[재시도 결제] 10월분 · 카드 한도 초과 후 결제</td>
-      <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td><span class="ctag">재시도 결제</span>10월분 · 카드 한도 초과 후 결제</td>
+      <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="4"><td>2026-10-05 10:02 <span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"></td></tr><tr class="bmh"><td colspan="8"><b>2026-08분</b> <span class="st ok">결제 완료</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="1" class="bmi"><td><span class="bml">└</span>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"></td></tr><tr data-id="3"><td>2026-09-05 10:03 <span class="wy">정기</span></td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"></td></tr><tr data-id="2" class="bmi"><td><span class="bml">└</span>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"></td></tr><tr data-id="2"><td>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
       <td class="num"><span class="red">−71,500</span></td>
-      <td>굿팜결제<div class="rs"><b>취소</b> [중복 결제] 같은 날 두 번 결제</div></td>
-      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
+      <td>굿팜결제<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제</div></td>
+      <td class="ctr"></td></tr><tr data-id="1"><td>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>굿팜결제</td>
+      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03 <span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
       <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl" id="mpMdl"><div class="mh"><h3>수기 결제</h3><button class="x" data-close="">×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">결제 카드</span><div class="ro">신한카드 · 뒤 4자리 ****</div></div>
-    <div class="fr" id="mpBmRow"><span class="fl">청구월</span><div><select class="fi" id="mpBm"><optgroup label="미결제 청구월"><option value="2026-07">2026-07 (미결제)</option></optgroup><optgroup label="전체 (과금 시작 2024-06 ~ 이번 달)"><option value="2026-11" selected="">2026-11</option><option value="2026-10">2026-10</option><option value="2026-09">2026-09</option><option value="2026-08">2026-08</option><option value="2026-06">2026-06</option><option value="2026-05">2026-05</option><option value="2026-04">2026-04</option><option value="2026-03">2026-03</option><option value="2026-02">2026-02</option><option value="2026-01">2026-01</option><option value="2025-12">2025-12</option><option value="2025-11">2025-11</option><option value="2025-10">2025-10</option><option value="2025-09">2025-09</option><option value="2025-08">2025-08</option><option value="2025-07">2025-07</option><option value="2025-06">2025-06</option><option value="2025-05">2025-05</option><option value="2025-04">2025-04</option><option value="2025-03">2025-03</option><option value="2025-02">2025-02</option><option value="2025-01">2025-01</option><option value="2024-12">2024-12</option><option value="2024-11">2024-11</option><option value="2024-10">2024-10</option><option value="2024-09">2024-09</option><option value="2024-08">2024-08</option><option value="2024-07">2024-07</option><option value="2024-06">2024-06</option></optgroup></select><div class="hint">미결제 2026-07 — 가장 오래된 미결제 달이 기본값</div></div></div>
+    <div class="fr" id="mpBmRow"><span class="fl">청구월</span><div><select class="fi" id="mpBm"><optgroup label="미결제 청구월"><option value="2026-07">2026-07 (미결제)</option></optgroup><optgroup label="전체 (과금 시작 2024-06 ~ 이번 달)"><option value="2026-11" selected="">2026-11</option><option value="2026-10">2026-10</option><option value="2026-09">2026-09</option><option value="2026-08">2026-08</option><option value="2026-06">2026-06</option><option value="2026-05">2026-05</option><option value="2026-04">2026-04</option><option value="2026-03">2026-03</option><option value="2026-02">2026-02</option><option value="2026-01">2026-01</option><option value="2025-12">2025-12</option><option value="2025-11">2025-11</option><option value="2025-10">2025-10</option><option value="2025-09">2025-09</option><option value="2025-08">2025-08</option><option value="2025-07">2025-07</option><option value="2025-06">2025-06</option><option value="2025-05">2025-05</option><option value="2025-04">2025-04</option><option value="2025-03">2025-03</option><option value="2025-02">2025-02</option><option value="2025-01">2025-01</option><option value="2024-12">2024-12</option><option value="2024-11">2024-11</option><option value="2024-10">2024-10</option><option value="2024-09">2024-09</option><option value="2024-08">2024-08</option><option value="2024-07">2024-07</option><option value="2024-06">2024-06</option></optgroup></select><div class="hint">기본값은 이번 달(2026-11) · 미결제 2026-07은 목록에서 고름 · 두 달 치는 달마다 한 건씩 결제</div></div></div>
     <div class="fr" id="mpLinkRow"><span class="fl">결제 실패 월</span><div class="ro" id="mpLink"><span class="hint">이 청구월은 미결제 건 없음 — 새 결제로 저장</span></div></div>
     <div class="fr" id="mpCatRow"><span class="fl">결제 사유</span><div><select class="fi" id="mpCat"><option value="재시도 결제">재시도 결제</option><option value="누락분 결제">누락분 결제</option><option value="취소 후 재결제">취소 후 재결제</option><option value="요금제 변경">요금제 변경</option><option value="개국">개국</option><option value="서비스 외 결제" selected="">서비스 외 결제</option><option value="기타">기타</option></select><div class="hint" id="mpHint">장비(PC · 바코드건) · 설치 · 개국 작업비 · 라벨지처럼 서비스 요금이 아닐 때 — 서비스 청구 통계에서 빼고 기타 판매로 집계</div></div></div>
     <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="33,000"></div></div>
     <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="req" id="mpReq">필수</span></span><div><input class="fi" id="mpMemo" value="라벨지 2박스" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"><b>[서비스 외 결제]</b> 11월분 · 라벨지 2박스</span></div>
+    <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"><span class="ctag">서비스 외 결제</span>11월분 · 라벨지 2박스</span></div>
   </div>
   <div class="mf"><button class="btn" data-close="">취소</button><button class="btn pri" data-toast="시안 — 실제 결제는 진행되지 않습니다">결제</button></div></div></div>
   </div>
