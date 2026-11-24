@@ -113,8 +113,7 @@
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
     <div class="opt">옵션: 스마트 OCR · 굿팜 POS · 스마트2D &nbsp;|&nbsp; 서비스 수 3 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
-    <div class="opt dline" id="demoLine">데모 <b>스마트2D</b> · 2026-11 ~ 2026-12 <span class="st ok">적용 중</span> <span class="hint">→ 2027-01 청구분부터 스마트2D 정가 33,000원 · 정기 결제 금액 직접 변경</span></div>
-    <div class="opt dline" id="discLine">금액 할인 <span class="red">−11,000</span> <b>[계약 할인]</b> DRS 파머시 퍼스트 중복 <span class="hint">등록 김운영 · 05-28</span></div></div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
+    </div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 8</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
@@ -134,10 +133,10 @@
       <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"><button class="btn sm line" data-bank="3">계좌 환불 기록</button></td></tr><tr class="bmh"><td colspan="8"><b>2026-08분</b> <span class="st ok">결제 완료</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="1" class="bmi"><td><span class="bml">└</span>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"></td></tr><tr class="bmh"><td colspan="8"><b>2026-08분</b> <span class="st ok">결제 완료</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="1" class="bmi"><td><span class="bml">└</span>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"><button class="btn sm line" data-bank="1">계좌 환불 기록</button></td></tr><tr data-id="2" class="bmi"><td><span class="bml">└</span>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"></td></tr><tr data-id="2" class="bmi"><td><span class="bml">└</span>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
       <td class="num"><span class="red">−71,500</span></td>
       <td>굿팜결제<div class="rs"><b>취소</b> [중복 결제] 같은 날 두 번 결제</div></td>
       <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
