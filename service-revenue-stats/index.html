@@ -1293,7 +1293,9 @@ function renderPay(){
 /* ───────── 화면 이동 ─────────
    약국 결제 관리로 이동할 때 브라우저 기록을 남김 → 뒤로 가기(브라우저 · `‹ 서비스 청구 통계`)로 보던 약국별 청구 위치 · 탭 · 필터 그대로 복귀 */
 function goPay(){ S.backY=window.scrollY; S.payF='unpaid'; S.payW='all'; S.page='pay'; history.pushState({page:'pay'},'','#pay'); render(); window.scrollTo(0,0); }
-history.replaceState({page:'stats'},'',location.pathname+location.search);
+// 주소의 #guide · #inputs 로 바로 열기 (케이스 안내 · 입력 화면 시안 링크용)
+const H0=location.hash.slice(1); if(['guide','inputs'].includes(H0)) S.page=H0;
+history.replaceState({page:S.page||'stats'},'',location.pathname+location.search+(['guide','inputs'].includes(H0)?'#'+H0:''));
 window.addEventListener('popstate',e=>{ S.page=(e.state&&e.state.page)||'stats'; render();
   if(S.page==='stats') requestAnimationFrame(()=>window.scrollTo(0, S.backY!=null ? S.backY : document.getElementById('phPanel').getBoundingClientRect().top+window.scrollY-10)); });
 
