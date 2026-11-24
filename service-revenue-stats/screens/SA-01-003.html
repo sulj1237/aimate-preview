@@ -112,7 +112,7 @@
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt">옵션: 스마트 OCR · 굿팜 POS · 스마트2D &nbsp;|&nbsp; 서비스 수 3 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
+    <div class="opt">옵션: 스마트 OCR · 굿팜 POS &nbsp;|&nbsp; 서비스 수 2 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
     </div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
@@ -145,11 +145,10 @@
       <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl wide" id="svcMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-close="">×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">서비스</span><div class="ro">굿팜 솔루션 (NEW)</div></div>
-    <table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th>데모</th><th class="num">총액</th></tr></thead>
-      <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox"> 데모</label></td><td class="num">45,000</td></tr>
-      <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td><label class="dmck"><input type="checkbox"> 데모</label></td><td class="num">10,000</td></tr>
-      <tr id="demoRow"><td>스마트2D</td><td class="num">30,000</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox" checked=""> 데모</label> <span class="seg" id="demoPer"><select class="fi sm" id="dmFrom"><option>2026-09</option><option selected="">2026-11</option><option>2026-12</option></select><span class="ro">~</span><select class="fi sm" id="dmTo"><option>2026-10</option><option>2026-11</option><option selected="">2026-12</option><option>2027-01</option></select></span></td><td class="num">0</td></tr>
-      <tr class="tot"><td colspan="5">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
+    <table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th class="num">총액</th></tr></thead>
+      <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td class="num">45,000</td></tr>
+      <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td></tr>
+      <tr class="tot"><td colspan="4">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
     <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat"><option value="계약 할인" selected="">계약 할인</option><option value="보상 · 테스트">보상 · 테스트</option><option value="기타">기타</option></select></div></div>
     <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="DRS 파머시 퍼스트 중복" placeholder="기타 사유를 입력하세요"></div></div>
