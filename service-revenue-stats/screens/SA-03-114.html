@@ -1,0 +1,248 @@
+<!-- 정적 화면: 스토리보드용 스냅샷. 동작은 프로토타입에서 확인 -->
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>경영 요약 · VAN 정산 관리 시안</title>
+<!--
+  슈퍼어드민 시안 — 서비스 청구 통계 스토리보드 SA-02-001 ~ 004에서 iframe으로 사용
+  화면(오류 err = 연결 안 되는 행이 있어 반영하지 않음): dash 통계 > 경영 요약(약국별 총수익 포함, stats는 dash로 연결) / kd 통계 > 광동 VIP 정산 / mgmt 약국관리 > VAN 정산 관리(정산 내역 · 업로드 이력) / upload 업로드 결과(정산 내역 위 한 줄) / map 약국 연결 창
+  금액 · 단말기 구성은 2026-11 정산 파일 기준, 약국명 · 사업자번호 · 스토어 ID · TID는 가상값
+-->
+<style>
+  :root{
+    --teal:#1fb6a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e3e6ea; --bg:#f4f5f7;
+    --side:#33383d; --side-line:#454b52; --up:#d6453d; --down:#2f6fd6; --add:#7048e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  button,input,select{font-family:inherit}
+  .wrap{display:flex;min-height:100vh}
+  .side{width:188px;flex:none;background:var(--side);color:#cdd2d7}
+  .side-logo{display:flex;align-items:center;gap:7px;padding:16px;border-bottom:1px solid var(--side-line)}
+  .side-mark{width:18px;height:18px;border-radius:7px 7px 7px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .side-mark::after{content:"";position:absolute;left:-4px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:#f4de3f}
+  .side-word{font-size:16px;font-weight:800;color:#fff}
+  .side-grp{font-size:10.5px;color:#8e959c;padding:14px 16px 6px}
+  .side-item{padding:8px 16px 8px 26px;font-size:12px;color:#aeb4ba}
+  .side-item.on{background:var(--teal);color:#fff;font-weight:700}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+  .topbar{height:46px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px}
+  .crumb{font-size:12px;color:var(--muted)} .crumb b{color:var(--ink)}
+  .demo{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
+  .demo button{height:24px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:11.5px;padding:0 8px;cursor:pointer;color:#4b5158}
+  .demo button.on{background:#4b5158;border-color:#4b5158;color:#fff}
+  .content{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:1240px;position:relative}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+  .ph{display:flex;align-items:center;gap:10px;padding:14px 18px 10px}
+  .ph h3{margin:0;font-size:14px} .ph .sub{font-size:11.5px;color:var(--muted)} .ph .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .btn{height:32px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;color:#4b5158;cursor:pointer}
+  .btn.pri{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  .btn.sm{height:26px;padding:0 10px;font-size:11.5px}
+  .btn.line{border-color:#f0b9b5;color:var(--up)}
+  .btn:disabled{color:#c3c9d0;border-color:var(--line);cursor:default}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:9px 12px;border-bottom:1px solid #eff1f3;white-space:nowrap;vertical-align:top}
+  .tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tbl .ctr{text-align:center}
+  .tbl tr.tot td{background:#f8f9fa;font-weight:800}
+  .addb{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;background:var(--add);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  th .addb{margin-left:3px}
+  .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+  .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
+  .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
+  .rs b{color:var(--ink)}
+  .red{color:var(--up);font-weight:700}
+  .kvg{display:grid;grid-template-columns:120px 1fr 120px 1fr;border-top:1px solid var(--line);margin:0 18px 16px}
+  .kvg>div{padding:9px 12px;border-bottom:1px solid #eff1f3;font-size:12.5px}
+  .kvg .k{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px}
+  .opt{font-size:11.5px;color:var(--muted);padding:0 18px 14px}
+  /* 창 */
+  .dim{position:fixed;inset:0;background:rgba(30,34,38,.45);z-index:20}
+  .mdl{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:21;width:560px;background:#fff;border-radius:10px;box-shadow:0 18px 40px -12px rgba(0,0,0,.45)}
+  .mdl.wide{width:720px}
+  .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .mh h3{margin:0;font-size:15px} .mh .x{margin-left:auto;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer}
+  .mb{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+  .fr{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:start}
+  .fl{font-size:12.5px;font-weight:700;color:#4b5158;padding-top:7px}
+  .fi{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px;color:var(--ink);background:#fff;width:100%}
+  .fi[disabled]{background:#f6f7f9;color:var(--muted)}
+  .ro{padding-top:7px;font-size:12.5px}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .seg{display:flex;gap:6px}
+  .seg label{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;cursor:pointer}
+  .seg label.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d);font-weight:700}
+  .seg input{display:none}
+  .pv{background:#f8f9fa;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px}
+  .pv .mlab{font-size:11px;color:var(--muted)}
+  .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .sum div{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--muted)}
+  .sum b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
+  .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
+  .req{display:none;font-size:9.5px;font-weight:800;color:#fff;background:var(--up);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  .req.on{display:inline-block}
+  .fi.need{border-color:var(--up);background:#fff7f6}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  /* VAN 정산 추가 스타일 */
+  .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:0 18px 14px}
+  .kc{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff}
+  .kc .l{font-size:11.5px;color:var(--muted);font-weight:700}
+  .kc .v{font-size:19px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+  .kc .s{font-size:11px;color:var(--muted);margin-top:3px;white-space:normal}
+  .kc.tot{border-color:var(--teal);background:var(--teal-soft)}
+  .kc .tbu,.tbu{display:inline-block;font-size:10px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px;vertical-align:1px}
+  .basis{margin:0 18px 14px;font-size:11.5px;color:#5b6168;background:#f8f9fa;border:1px solid var(--line);border-radius:6px;padding:8px 12px;line-height:1.7}
+  .basis b{color:var(--ink)}
+  .tools{display:flex;align-items:center;gap:8px;padding:0 18px 10px}
+  .ptabs{display:flex;gap:4px}
+  .ptab{height:30px;border:1px solid var(--line);background:#fff;border-radius:6px;padding:0 12px;font-size:12px;cursor:pointer;color:#4b5158}
+  .ptab.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d);font-weight:700}
+  .ptab b{margin-left:5px;font-weight:800}
+  .q{margin-left:auto;height:30px;width:220px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12px}
+  .tblwrap{overflow:auto;max-height:560px;border-top:1px solid var(--line)}
+  .tbl thead th{position:sticky;top:0;z-index:1}
+  .tg{display:inline-block;font-size:10.5px;font-weight:700;border-radius:3px;padding:0 5px;margin-left:5px;background:#eef0f3;color:#5b6168;vertical-align:1px}
+  .tg.vip{background:#f1ebff;color:var(--add)}
+  .ms{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+  .ms.ok{background:#e6f6f3;color:#0f8a74} .ms.chk{background:#fff3d6;color:#a86b00} .ms.no{background:#fdecea;color:var(--up)}
+  .tog{border:0;background:none;cursor:pointer;color:var(--muted);font-size:11px;padding:0 4px 0 0}
+  tr.tid td{background:#fbfcfd;color:#5b6168;font-size:11.5px}
+  tr.unm td{background:#fff9ec}
+  tr.tot td{background:#f8f9fa;font-weight:800}
+  .sub2{font-size:11px;color:var(--muted)}
+  .steps{display:flex;gap:0;margin:0 0 4px}
+  .steps span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:6px 0;border-bottom:3px solid var(--line)}
+  .steps span.on{color:var(--teal-d);font-weight:800;border-color:var(--teal)}
+  .steps span.done{color:#4b5158;border-color:#9fded6}
+  .sum4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .sum4 div{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--muted)}
+  .sum4 b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .sum4 .ok b{color:#0f8a74} .sum4 .chk b{color:#a86b00} .sum4 .no b{color:var(--up)}
+  .warn{font-size:11.5px;color:#7a5200;background:#fff8e6;border:1px solid #f3dca6;border-radius:6px;padding:9px 12px;line-height:1.6}
+  .cand{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;padding:9px 12px;font-size:12.5px;cursor:pointer}
+  .cand.on{border-color:var(--teal);background:var(--teal-soft)}
+  .cand input{margin:0}
+  .cand .m{color:var(--muted);font-size:11.5px}
+.kc.golink{cursor:pointer;transition:border-color .15s}.kc.golink:hover{border-color:#33c3b4}.kc .more{float:right;font-size:11.5px;font-weight:700;color:#0e9e8c}.persel{display:inline-flex;gap:4px;margin-left:10px}.persel .btn{white-space:nowrap;padding:3px 9px}.persel .btn.on{background:#e6f7f4;border-color:#33c3b4;color:#0e9e8c}
+.sbar{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 16px 6px;background:#fbfcfd}.srow{display:flex;gap:6px;align-items:center}.srch2{height:30px;width:320px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px}
+.fsel{height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-size:12px;background:#fff;min-width:110px}.srow .fsel{height:30px}.btn.pri{background:#16b8a3;border-color:transparent;color:#fff}.sact{margin-left:auto;display:flex;gap:8px;align-items:center}.fcnt{font-size:11.5px;color:#0e9e8c}
+.adv{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:8px}.ag{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12px}.ag>b{width:76px;color:#5b6168;font-size:11.5px}.sf{display:inline-flex;gap:6px;align-items:center}
+.qi{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#e5e7eb;color:#4b5563;font-size:10.5px;font-weight:800;margin-left:4px;cursor:help;position:relative;vertical-align:1px}
+.qi:hover::after{content:attr(data-tip);position:absolute;left:0;top:20px;z-index:20;width:280px;white-space:normal;background:#1f2a37;color:#fff;font-size:12px;font-weight:500;line-height:1.5;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.25);text-align:left}
+.sub2c{color:#6b7280;font-size:12px;white-space:nowrap}
+.tbl th.sort{cursor:pointer;user-select:none}.tbl th.sort .ar{margin-left:3px;font-size:10px;color:#b9bec4}.tbl th.sort.on,.tbl th.sort.on .ar{color:var(--teal-d,#0f766e)}
+.shw{padding:0 18px 14px;display:flex;flex-direction:column;gap:2px}
+.shr{display:grid;grid-template-columns:190px 1fr 56px 56px;gap:8px;align-items:center;font-size:12px;padding:3px 4px;border-radius:6px;cursor:pointer;position:relative}
+.shr:hover{background:#f5f7fa}.shn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shb{background:#f3f5f7;border-radius:4px;height:11px;display:block}.shb>span{display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6}
+.shp{color:#5b6168}.shh{cursor:default;color:#8a9099;font-size:11px;padding-bottom:0}.shh:hover{background:none}.shr:not(.shh):hover::after,.shr.tipon::after{content:attr(data-tip);white-space:pre-line;position:absolute;left:200px;top:22px;z-index:30;min-width:200px;background:#1f2a37;color:#fff;font-size:12px;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.arm{white-space:nowrap}.arm b{color:#1f2328}
+.dfx{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:600}
+.ocb{display:inline-block;margin-left:3px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-size:10.5px;font-weight:600}.ocb.hi{background:#fff7ed;color:#c2410c}
+.pager{display:flex;gap:4px;justify-content:center;padding:12px}.pg{min-width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;cursor:pointer}.pg.on{background:#1f2328;color:#fff;border-color:#1f2328}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side" id="side"><div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">통계</div><div class="side-item">경영 요약<span class="addb">NEW</span></div><div class="side-item">서비스 청구 통계</div><div class="side-item on">광동 VIP 정산<span class="addb">NEW</span></div><div class="side-item">굿팜플러스</div><div class="side-item">굿팜솔루션NEW</div><div class="side-item">모바일약국</div><div class="side-item">AI MATE</div></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb" id="crumb">통계 &gt; <b>광동 VIP 정산</b></div>
+      <div class="demo">시안 화면
+        <button data-go="dash" class="">경영 요약</button>
+        <button data-go="kd" class="on">광동 VIP 정산</button>
+        <button data-go="mgmt">VAN 정산 관리</button>
+        <button data-go="upload">업로드 결과</button>
+        <button data-go="err">업로드 오류</button>
+      </div>
+    </div>
+    <div class="content" id="content"><div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3><span class="qi" data-tip="광동이 준 약정 약국 목록(엑셀)과 굿팜 VIP처를 사업자번호로 대조해, 광동에 청구할 약국과 굿팜 · 광동에서 맞춰야 할 약국을 나눠요. 광동 VIP 지원 금액은 약국별 수익 · 객단가에 넣지 않고 따로 관리하고, 매출은 광동 입금월 기준이에요.">?</span><div class="right"><select class="fi" id="kMonth" style="width:150px;height:32px"><option selected="">2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select></div></div>
+  <div class="cards" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc" id="kFile"><div class="l">광동 약정 약국</div><div class="v">644곳</div><div class="s">승인완료 333 · 듀얼 4 · 실적중지 12 · 해지 295</div></div>
+    <div class="kc" id="kBill"><div class="l">청구 대상</div><div class="v">14,404,500</div><div class="s">291곳 × 49,500 <span class="qi" data-tip="약정 승인완료 · 듀얼이고 굿팜 VIP인 약국. 금월 신규 4곳. 단가는 확인 필요(회의 40,000원 예상, 부가세 포함 여부)">?</span></div></div>
+    <div class="kc" id="kFix"><div class="l">굿팜 조치 필요</div><div class="v" style="color:var(--up)">278곳</div><div class="s">VIP 해제 232 · VIP 설정 15 · 미등록 31</div></div>
+    <div class="kc" id="kAsk"><div class="l">광동 확인 필요</div><div class="v" style="color:#c2410c">24곳</div><div class="s">광동 목록에 없음 15 · 실적중지 9</div></div>
+  </div>
+  <div class="basis" id="kBasis"><b>VIP 해제 필요 232곳</b> · 약정 해지 · 굿팜 VIP(0원) · 청구 제외 <span class="qi" data-tip="광동 약정이 해지돼 광동 청구 대상이 아니에요(청구했다면 11,484,000원). VIP 해제 후 정상 요금 전환 또는 무료 유지 — 운영 기준 확인 필요. 광동 파일 값은 굿팜 약국 데이터를 자동으로 바꾸지 않아요.">?</span></div></div><div class="panel" id="kList"><div class="ph"><h3>광동 약정 약국 대조</h3><span class="qi" data-tip="광동 약정 목록과 굿팜 VIP처를 사업자번호로 대조한 결과. 탭마다 해야 할 일이 달라요">?</span>
+    <div class="right" id="kBtns"><button class="btn" id="kTpl">파일 양식 다운로드</button><button class="btn pri" id="kUp">광동 약정 목록 업로드</button></div></div>
+  <div class="tools"><div class="ptabs"><button class="ptab " data-tab="bill">청구 대상<b>291</b></button><button class="ptab " data-tab="end">VIP 해제 필요<b>232</b></button><button class="ptab " data-tab="set">굿팜 VIP 설정 필요<b>15</b></button><button class="ptab on" data-tab="noreg">굿팜 미등록<b>31</b></button><button class="ptab " data-tab="notkd">광동 목록에 없음<b>15</b></button><button class="ptab " data-tab="stop">광동 확인 필요<b>9</b></button><button class="ptab " data-tab="new">금월 신규<b>4</b></button></div>
+    
+    <input class="q" id="q" placeholder="약국명 · 사업자번호 검색" value=""></div>
+  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>협력도매</th><th>약정 등급</th><th>약정 적용월</th><th class="ctr">약정현황</th><th class="ctr">굿팜</th><th class="num">청구 금액</th><th>할 일</th></tr></thead><tbody>
+  <tr class="unm"><td>우리약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>351-53-67273</td><td>복산나이스</td>
+    <td>L.4 <span class="sub2">3,000만</span></td><td>2026-09</td><td class="ctr">듀얼</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>행복샘약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>254-22-56198</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-07</td><td class="ctr">듀얼</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>샘솔약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>313-39-18907</td><td>지오팜</td>
+    <td>L.3 <span class="sub2">2,000만</span></td><td>2026-10</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>온샘약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>757-52-09566</td><td>지오팜</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-08</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>바른온약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>497-59-65064</td><td>인천약품</td>
+    <td>L.2 <span class="sub2">1,000만</span></td><td>2025-06</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>달온약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>315-67-19094</td><td>인천약품</td>
+    <td>L.4 <span class="sub2">3,000만</span></td><td>2026-02</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>참숲약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>526-35-21747</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-08</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>새봄샘약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>107-29-09028</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-12</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>달샘약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>113-61-67147</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-08</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>늘봄숲약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>347-26-93197</td><td>지오팜</td>
+    <td>L.3 <span class="sub2">2,000만</span></td><td>2026-10</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>담누리약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>823-78-05398</td><td>인천약품</td>
+    <td>L.4 <span class="sub2">3,000만</span></td><td>2025-06</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>꽃정약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>763-67-61188</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2026-09</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>윤숲약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>723-26-58625</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-07</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>달들약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>424-16-03820</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2025-09</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>온봄약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>617-56-17325</td><td>지오팜</td>
+    <td>L.2 <span class="sub2">1,000만</span></td><td>2025-08</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>바른정약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>765-28-48736</td><td>인천약품</td>
+    <td>L.2 <span class="sub2">1,000만</span></td><td>2026-04</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>빛정약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>135-33-45829</td><td>인천약품</td>
+    <td>L.2 <span class="sub2">1,000만</span></td><td>2026-02</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>푸른봄약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>709-57-67752</td><td>인천약품</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2026-02</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>윤봄약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>100-67-49405</td><td>복산나이스</td>
+    <td>L.1 <span class="sub2">500만</span></td><td>2026-04</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr><tr class="unm"><td>참약국<span class="ms chk" style="margin-left:6px">굿팜 미등록</span><div class="sub2">굿팜에 없는 약국 — 광동 파일 값만</div></td><td>867-76-87706</td><td>보덕메디팜</td>
+    <td>L.4 <span class="sub2">3,000만</span></td><td>2025-07</td><td class="ctr">승인완료</td><td class="ctr"><span class="sub2">없음</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td>영업 확인 후 등록 또는 광동에 정정 요청</td></tr>
+  </tbody></table></div>
+  <div class="pager" id="kPager"><button class="pg on" data-kp="1">1</button><button class="pg " data-kp="2">2</button></div></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+
+
+</body></html>

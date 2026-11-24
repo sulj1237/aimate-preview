@@ -143,6 +143,9 @@
 .shr:hover{background:#f5f7fa}.shn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shb{background:#f3f5f7;border-radius:4px;height:11px;display:block}.shb>span{display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6}
 .shp{color:#5b6168}.shh{cursor:default;color:#8a9099;font-size:11px;padding-bottom:0}.shh:hover{background:none}.shr:not(.shh):hover::after,.shr.tipon::after{content:attr(data-tip);white-space:pre-line;position:absolute;left:200px;top:22px;z-index:30;min-width:200px;background:#1f2a37;color:#fff;font-size:12px;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .arm{white-space:nowrap}.arm b{color:#1f2328}
+.dfx{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:600}
+.ocb{display:inline-block;margin-left:3px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-size:10.5px;font-weight:600}.ocb.hi{background:#fff7ed;color:#c2410c}
+.pager{display:flex;gap:4px;justify-content:center;padding:12px}.pg{min-width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;cursor:pointer}.pg.on{background:#1f2328;color:#fff;border-color:#1f2328}
 </style>
 </head>
 <body>
@@ -159,35 +162,67 @@
         <button data-go="err">업로드 오류</button>
       </div>
     </div>
-    <div class="content" id="content"><div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3><span class="qi" data-tip="광동 VIP처는 지원 서비스 금액을 약국 대신 광동에 청구해 받아요. 광동이 준 VIP 목록(엑셀)과 굿팜 VIP처를 비교해요. 광동 VIP 지원 금액은 약국별 수익 · 객단가에 넣지 않고 따로 관리하고, 매출은 광동 입금월 기준이에요.">?</span><div class="right"><select class="fi" id="kMonth" style="width:150px;height:32px"><option selected="">2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select></div></div>
-  <div class="cards">
-    <div class="kc" id="kNew"><div class="l">금월 신규 VIP처</div><div class="v">3곳</div><div class="s">전체 VIP처 88곳</div></div>
-    <div class="kc" id="kMiss"><div class="l">광동 추가 필요</div><div class="v" style="color:var(--up)">4곳</div><div class="s">광동에 추가 · 청구 요청 <span class="qi" data-tip="굿팜 VIP처인데 광동 목록에 없는 약국">?</span></div></div>
-    <div class="kc" id="kBill"><div class="l">총 청구 금액</div><div class="v">4,356,000</div><div class="s">88곳 × 49,500</div></div>
-    <div class="kc" id="kDone"><div class="l">청구 완료 금액</div><div class="v">4,158,000</div><div class="s">일치 84곳</div></div>
-    <div class="kc" id="kUn"><div class="l">미청구 금액</div><div class="v" style="color:var(--up)">198,000</div><div class="s">4곳</div></div>
+    <div class="content" id="content"><div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3><span class="qi" data-tip="광동이 준 약정 약국 목록(엑셀)과 굿팜 VIP처를 사업자번호로 대조해, 광동에 청구할 약국과 굿팜 · 광동에서 맞춰야 할 약국을 나눠요. 광동 VIP 지원 금액은 약국별 수익 · 객단가에 넣지 않고 따로 관리하고, 매출은 광동 입금월 기준이에요.">?</span><div class="right"><select class="fi" id="kMonth" style="width:150px;height:32px"><option selected="">2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select></div></div>
+  <div class="cards" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc" id="kFile"><div class="l">광동 약정 약국</div><div class="v">644곳</div><div class="s">승인완료 333 · 듀얼 4 · 실적중지 12 · 해지 295</div></div>
+    <div class="kc" id="kBill"><div class="l">청구 대상</div><div class="v">14,404,500</div><div class="s">291곳 × 49,500 <span class="qi" data-tip="약정 승인완료 · 듀얼이고 굿팜 VIP인 약국. 금월 신규 4곳. 단가는 확인 필요(회의 40,000원 예상, 부가세 포함 여부)">?</span></div></div>
+    <div class="kc" id="kFix"><div class="l">굿팜 조치 필요</div><div class="v" style="color:var(--up)">278곳</div><div class="s">VIP 해제 232 · VIP 설정 15 · 미등록 31</div></div>
+    <div class="kc" id="kAsk"><div class="l">광동 확인 필요</div><div class="v" style="color:#c2410c">24곳</div><div class="s">광동 목록에 없음 15 · 실적중지 9</div></div>
   </div>
-  <div class="basis" id="kBasis"><b>전월분 입금</b> 4,059,000원 · 미입금 1곳 &nbsp; <b>굿팜 확인 필요</b> 2곳 · 청구 제외 <span class="qi" data-tip="청구했다면 99,000원 — 굿팜 VIP 설정 필요 1곳 · 굿팜 미등록 1곳. 광동 파일 값은 이 목록에만 두고 굿팜 약국 데이터로 만들지 않아요.">?</span></div></div><div class="panel" id="kList"><div class="ph"><h3>VIP처 목록</h3><span class="qi" data-tip="광동 VIP 목록과 다른 약국은 약국명 옆 배지로 표시">?</span>
-    <div class="right" id="kBtns"><button class="btn" id="kTpl">파일 양식 다운로드</button><button class="btn pri" id="kUp">광동 VIP 목록 업로드</button></div></div>
-  <div class="tools"><div class="ptabs">
-    <button class="ptab " data-tab="all">전체<b>90</b></button>
-    <button class="ptab " data-tab="miss">광동 추가 필요<b>4</b></button>
-    <button class="ptab " data-tab="only">굿팜 확인 필요<b>2</b></button>
-    <button class="ptab on" data-tab="new">금월 신규<b>3</b></button></div>
-    
-    <input class="q" id="q" placeholder="약국명 검색" value=""></div>
-  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>VIP 지원 서비스</th><th>VIP 시작월</th><th class="num">청구 금액</th><th class="ctr">청구</th><th class="ctr">전월분 입금</th></tr></thead><tbody>
-  <tr class="unm"><td>온마루약국<span class="tg vip">신규</span><span class="ms no" style="margin-left:6px">광동 추가 필요</span><div class="sub2">서울 성동구 · 40246</div></td><td>405-68-53270</td><td>키오스크</td><td>2026-11</td>
-    <td class="num">49,500</td>
-    <td class="ctr"><b style="color:var(--up)">미청구</b></td>
-    <td class="ctr"><span class="sub2">—</span></td></tr><tr class="unm"><td>꽃봄약국<span class="tg vip">신규</span><span class="ms no" style="margin-left:6px">광동 추가 필요</span><div class="sub2">서울 강남구 · 72855</div></td><td>571-64-63590</td><td>스마트 OCR</td><td>2026-11</td>
-    <td class="num">49,500</td>
-    <td class="ctr"><b style="color:var(--up)">미청구</b></td>
-    <td class="ctr"><span class="sub2">—</span></td></tr><tr class=""><td>한빛길약국<span class="tg vip">신규</span><div class="sub2">서울 송파구 · 46196</div></td><td>653-65-05388</td><td>스마트2D</td><td>2026-11</td>
-    <td class="num">49,500</td>
-    <td class="ctr">청구 완료</td>
-    <td class="ctr"><span class="sub2">—</span></td></tr>
-  </tbody></table></div></div></div>
+  <div class="basis" id="kBasis"><b>VIP 해제 필요 232곳</b> · 약정 해지 · 굿팜 VIP(0원) · 청구 제외 <span class="qi" data-tip="광동 약정이 해지돼 광동 청구 대상이 아니에요(청구했다면 11,484,000원). VIP 해제 후 정상 요금 전환 또는 무료 유지 — 운영 기준 확인 필요. 광동 파일 값은 굿팜 약국 데이터를 자동으로 바꾸지 않아요.">?</span></div></div><div class="panel" id="kList"><div class="ph"><h3>광동 약정 약국 대조</h3><span class="qi" data-tip="광동 약정 목록과 굿팜 VIP처를 사업자번호로 대조한 결과. 탭마다 해야 할 일이 달라요">?</span>
+    <div class="right" id="kBtns"><button class="btn" id="kTpl">파일 양식 다운로드</button><button class="btn pri" id="kUp">광동 약정 목록 업로드</button></div></div>
+  <div class="tools"><div class="ptabs"><button class="ptab " data-tab="bill">청구 대상<b>291</b></button><button class="ptab " data-tab="end">VIP 해제 필요<b>232</b></button><button class="ptab " data-tab="set">굿팜 VIP 설정 필요<b>15</b></button><button class="ptab " data-tab="noreg">굿팜 미등록<b>31</b></button><button class="ptab on" data-tab="notkd">광동 목록에 없음<b>15</b></button><button class="ptab " data-tab="stop">광동 확인 필요<b>9</b></button><button class="ptab " data-tab="new">금월 신규<b>4</b></button></div>
+    <button class="btn sm" id="kReq">청구 요청 목록 다운로드</button>
+    <input class="q" id="q" placeholder="약국명 · 사업자번호 검색" value=""></div>
+  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>협력도매</th><th>약정 등급</th><th>약정 적용월</th><th class="ctr">약정현황</th><th class="ctr">굿팜</th><th class="num">청구 금액</th><th>할 일</th></tr></thead><tbody>
+  <tr class="unm"><td>꽃정약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">부산 해운대구 · 89915</div></td><td>464-54-08909</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>참봄약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">부산 해운대구 · 44038</div></td><td>358-81-95443</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>해약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">서울 강남구 · 88488</div></td><td>353-59-46082</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>길약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">인천 남동구 · 83271</div></td><td>510-58-62657</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>온샘약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">대구 수성구 · 52635</div></td><td>268-87-79671</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>참약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">서울 송파구 · 36244</div></td><td>762-35-56059</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>온봄약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">경기 수원시 · 33716</div></td><td>334-58-81506</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>청솔약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">경기 수원시 · 83220</div></td><td>635-86-20720</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>참길약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">대전 서구 · 48966</div></td><td>474-51-70910</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>빛마루약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">대구 수성구 · 51269</div></td><td>873-75-99693</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>푸른봄약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">부산 해운대구 · 70052</div></td><td>551-86-80851</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>제일마루약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">인천 남동구 · 49194</div></td><td>758-70-84806</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>푸른봄약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">대전 서구 · 70582</div></td><td>832-65-79546</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>큰들약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">부산 해운대구 · 27366</div></td><td>810-16-85065</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr><tr class="unm"><td>별봄약국<span class="ms no" style="margin-left:6px">광동 목록에 없음</span><div class="sub2">인천 남동구 · 48931</div></td><td>587-35-79760</td><td>—</td>
+    <td><span class="sub2">—</span></td><td>—</td><td class="ctr">—</td><td class="ctr"><span class="tg vip">VIP</span></td>
+    <td class="num"><span class="sub2">— (청구 제외)</span></td>
+    <td><a href="#" class="kdgo">광동에 추가 · 청구 요청 ›</a></td></tr>
+  </tbody></table></div>
+  <div class="pager" id="kPager"><button class="pg on" data-kp="1">1</button></div></div></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>

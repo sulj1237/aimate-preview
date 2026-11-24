@@ -145,6 +145,7 @@
 .arm{white-space:nowrap}.arm b{color:#1f2328}
 .dfx{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:600}
 .ocb{display:inline-block;margin-left:3px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-size:10.5px;font-weight:600}.ocb.hi{background:#fff7ed;color:#c2410c}
+.pager{display:flex;gap:4px;justify-content:center;padding:12px}.pg{min-width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;cursor:pointer}.pg.on{background:#1f2328;color:#fff;border-color:#1f2328}
 </style>
 </head>
 <body>
@@ -241,7 +242,7 @@ const EDB_AMT=858000, EDB_PREV=836000;
   SVC.push(['풀패키지',14,rem-1782000-EDB_AMT,remP-1782000-EDB_PREV,1,0,0,1],['ESL',9,1782000,1782000,0,0,0,0],['EDB 연동',39,EDB_AMT,EDB_PREV,0,0,0,0]); })();
 const isEdb=r=>r[0]==='EDB 연동', FEE_NET=FEE_ALL-EDB_AMT;
 const ETC_ALL=1184000, ETC_PREV=1096000, ETC_PH=42;          // 기타 판매(장비 · 설치 · 개국 작업비 · 라벨지) — 수기 결제 '서비스 외 결제'
-const KD_IN=4059000, KD_IN_PREV=4010500, KD_PH=82;                       // 광동 VIP 지원 — 광동이 입금한 금액(입금월 기준)
+const KD_IN=14404500, KD_IN_PREV=14256000, KD_PH=291;                    // 광동 VIP 지원 — 광동 청구 대상(약정 승인완료 · 듀얼 + 굿팜 VIP) 291곳 × 49,500, 광동 입금월 기준. 단가 확인 필요(회의 40,000 예상)
 const ITEMS=[...SVC.map(r=>[r[0],'이용료',...r.slice(1)]),
   ['VAN Fee','VAN',D.length,VAN_FILE,TREND[T2][2],null,null,null,null],
   ['기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)','기타',ETC_PH,ETC_ALL,ETC_PREV,null,null,null,null],
@@ -253,7 +254,7 @@ const dir=v=>v==null?'<span class="sub2">−</span>':v>0?`<span style="color:var
 // 월별 매출 — [월, 이용료(EDB 연동 차감), VAN, 광동 VIP 지원, 기타 판매]. 광동 VIP 지원을 따로 — 광동 몫이 매출에서 얼마인지 보기 위함
 const EDB_M=[770000,778000,786000,794000,802000,810000,818000,820000,828000,832000,EDB_PREV,EDB_AMT];
 const ETC_M=[905000,921000,938000,950000,962000,975000,988000,1001000,1012000,1050000,ETC_PREV,ETC_ALL];
-const KD_M=[3705000,3734000,3764000,3780500,3819000,3851500,3882000,3911500,3938000,3990000,KD_IN_PREV,KD_IN];
+const KD_M=[11583000,11880000,12177000,12474000,12820500,13117500,13365000,13612500,13860000,14058000,KD_IN_PREV,KD_IN];
 const TREND3=TREND.map((r,i)=>[r[0],r[1]-EDB_M[i],r[2],KD_M[i],ETC_M[i]]);
 const kdPct=r=>r[3]/(r[1]+r[2]+r[3]+r[4])*100;
 
@@ -261,9 +262,9 @@ const kdPct=r=>r[3]/(r[1]+r[2]+r[3]+r[4])*100;
    대상 = 전체 약국(이용 중, 스토어 ID 중복 제거), 카테고리로 좁혀 보기. 전월 대비 증감률. 예시값
    [키, 이름, 약국 수, 매출, 전월 평균, 최대, 전월 최대, 최대 약국, 최소, 전월 최소, 최소 약국] */
 const ARPU=[['all','전체',1935,FEE_NET+VAN_ALL+ETC_ALL,35120,368124,352900,'건강온약국',1320,1450,'예시약국 A'],
-  ['pay','유료처',1612,66122000,40510,368124,352900,'건강온약국',22000,22000,'예시약국 B'],
+  ['pay','유료처',1148,66122000,56880,368124,352900,'건강온약국',22000,22000,'예시약국 B'],
   ['free','무료처',240,1620000,6610,58300,61200,'예시약국 C',1320,1450,'예시약국 A'],
-  ['kd','광동 VIP처',83,735816,8960,42350,40100,'예시약국 D',2150,2310,'예시약국 E']];
+  ['kd','광동 VIP처',547,735816,1290,42350,40100,'예시약국 D',0,0,'예시약국 E']];
 function arpuCard(id){
   const a=ARPU.find(x=>x[0]===(S.arpu||'all')), v=Math.round(a[3]/a[2]);
   const mm=(l,cur,prev,nm)=>`<span class="arm"><span class="sub2">${l}</span> <b>${fmt(cur)}</b> ${dir(pct(cur,prev))}${qt(nm+' · 전월 '+fmt(prev))}</span>`;
@@ -297,20 +298,20 @@ function dashTrend(){
 // 협력사 정산: 팜시스 처당 3,300원, 그 외 7곳 처당 7,700원 — 업체가 계좌이체로 입금
 const CSB=[['팜시스',120,3300],['CS 업체 2',64,7700],['CS 업체 3',52,7700],['CS 업체 4',41,7700],['CS 업체 5',33,7700],['CS 업체 6',27,7700],['CS 업체 7',18,7700],['CS 업체 8',12,7700]];
 const GRP_FIX={free:{n:240,a:{'VAN Fee':1180000,'기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)':440000}},
-  vip:{n:83,a:{'광동 VIP 지원':KD_IN,'VAN Fee':520816,'파머시 퍼스트':215000}}};
+  vip:{n:547,a:{'광동 VIP 지원':KD_IN,'VAN Fee':520816,'파머시 퍼스트':215000}}};
 function grpItems(g){
   const all=ITEMS.filter(r=>!isEdb(r)).map(r=>[r[0],r[3]]);
   if(g==='all') return {n:1935,rows:all};
   const sub=k=>(GRP_FIX.free.a[k]||0)+(GRP_FIX.vip.a[k]||0);
   if(g==='free'||g==='vip') return {n:GRP_FIX[g].n,rows:all.map(([k])=>[k,GRP_FIX[g].a[k]||0])};
   const pay=all.map(([k,v])=>[k,v-sub(k)]);
-  if(g==='pay') return {n:1612,rows:pay};
+  if(g==='pay') return {n:1148,rows:pay};
   // 영업 경로 — 약국 유입 경로 기준: 직접 영업 · 광동 · 협력사(CS 업체 8곳 합계). 데이터 연결 방식 확인 필요
-  const csN=CSB.reduce((a,c)=>a+c[1],0), csRows=pay.filter(([k])=>k!=='광동 VIP 지원').map(([k,v])=>[k,Math.round(v*csN/1612/100)*100]);
+  const csN=CSB.reduce((a,c)=>a+c[1],0), csRows=pay.filter(([k])=>k!=='광동 VIP 지원').map(([k,v])=>[k,Math.round(v*csN/1148/100)*100]);
   if(g==='r_cs') return {n:csN,rows:csRows,route:1};
   if(g==='r_kd') return {n:GRP_FIX.vip.n,rows:all.map(([k])=>[k,GRP_FIX.vip.a[k]||0]),route:1};
   if(g==='r_dir'){ const cs=Object.fromEntries(csRows); return {n:1935-csN-GRP_FIX.vip.n,rows:all.map(([k,v])=>[k,v-(GRP_FIX.vip.a[k]||0)-(cs[k]||0)]),route:1}; }
-  const c=CSB.find(x=>x[0]===g), f=c[1]/1612;
+  const c=CSB.find(x=>x[0]===g), f=c[1]/1148;
   return {n:c[1],rows:pay.filter(([k])=>k!=='광동 VIP 지원').map(([k,v])=>[k,Math.round(v*f/100)*100]),cs:c};
 }
 function dashShare(){
@@ -387,54 +388,58 @@ function statList(){
   ${vanNg().length?`<div class="basis" id="ngLine"><b>약국 알 수 없음 VAN ${vanNg().length}곳 · ${fmt(sumV(vanNg()))}원</b> ${qt('받은 돈이라 총매출 · VAN 합계에는 들어가고, 사업자번호를 연결하면 약국별 목록에도 들어가요.')} <a href="#" id="toMgmt2">VAN 정산 관리 ›</a></div>`:''}</div>`;
 }
 
-/* ── 통계 > 광동 VIP 정산 ── 광동 VIP처는 지원 서비스 금액을 약국이 아니라 광동에 청구해 받음. 수치 · 약국은 예시값 */
-const KD_FEE=49500;
-const KD=(()=>{ const pre=['온','봄','늘','숲','빛','솔','별','들','샘','길','해','달','꽃','결','담','윤','다온','하늘','바른','참','새','큰','푸른','고운','미소','행복','우리','건강','열린','중앙','제일','한빛','세움','나눔','새봄','늘봄','소망','은하','청솔'], suf=['','온','길','샘','빛','숲','들','봄','누리','마루'];
-  const rg=['서울 성동구','서울 강남구','서울 송파구','경기 수원시','경기 성남시','경기 고양시','인천 남동구','부산 해운대구','대구 수성구','대전 서구','광주 북구'];
-  const sv=['키오스크','스마트 OCR','스마트2D'], out=[], used=new Set(); let s=7;
-  const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
-  for(let i=0;i<88;i++){ let n; do{ n=pre[Math.floor(rnd()*pre.length)]+suf[Math.floor(rnd()*suf.length)]+'약국'; }while(used.has(n)); used.add(n);
-    const st= i<3 ? '2026-11' : ['2025-03','2025-06','2025-09','2026-01','2026-04','2026-07','2026-09','2026-10'][i%8];
-    const inKd = !(i===0||i===1||i===17||i===41);   // 빠진 처 4곳 (신규 2곳 포함)
-    out.push({n, sid:String(20000+Math.floor(rnd()*70000)), r:rg[i%rg.length], biz:`${300+Math.floor(rnd()*500)}-${10+Math.floor(rnd()*80)}-${String(Math.floor(rnd()*99999)).padStart(5,'0')}`, svc:sv[i%3], st, inKd, admin:true,
-      paid: st==='2026-11'||!inKd ? null : (i===29 ? false : true)}); }
-  [['한결약국','2026-08',true,'경기 성남시','20777'],['새솔약국','2026-05',false,'','—']].forEach(([n,st,reg,r,sid])=>out.push({n, sid, r, reg, biz:`${300+Math.floor(rnd()*500)}-${10+Math.floor(rnd()*80)}-${String(Math.floor(rnd()*99999)).padStart(5,'0')}`, svc:'키오스크', st, inKd:true, admin:false, paid:null}));
+/* ── 통계 > 광동 VIP 정산 ── 광동 약정 약국 목록(엑셀) ↔ 굿팜 VIP처를 사업자번호로 대조해 청구 대상 · 조치 필요를 나눔.
+   기준 = 광동 약정 약국 리스트(실데이터 11-24, 672행 · 사업자번호 644곳) × 굿팜 약국 데이터 대조 결과. 약국명 · 사업자번호는 예시값
+   약정현황: 승인완료 · 듀얼 = 약정 유지(청구 대상), 실적중지 = 광동 확인, 약정해지 = VIP 지원 종료 */
+const KD_FEE=49500;   // VIP처 1곳 청구 단가(이용 금액 45,000 + VAT) — 확인 필요(회의 40,000 예상)
+const KDT={file:644, ok:333, dual:4, stop:12, end:295};   // 광동 파일 약정현황(사업자번호 기준)
+const KD_CAT={bill:['청구 대상','약정 유지 · 굿팜 VIP',''],end:['VIP 해제 필요','약정 해지인데 굿팜 VIP','no'],set:['굿팜 VIP 설정 필요','약정 유지인데 굿팜 VIP 아님','chk'],
+  noreg:['굿팜 미등록','약정 유지인데 굿팜 약국 없음','chk'],notkd:['광동 목록에 없음','굿팜 VIP인데 광동 목록에 없음','no'],stop:['광동 확인 필요','실적중지인데 굿팜 VIP','chk']};
+const KD_ACT={bill:'광동에 청구',end:'VIP 해제 또는 유료 전환',set:'약국 분류 광동 VIP 체크',noreg:'영업 확인 후 등록 또는 광동에 정정 요청',notkd:'광동에 추가 · 청구 요청',stop:'광동에 실적중지 처리 확인'};
+const KD=(()=>{ const pre=['온','봄','늘','숲','빛','솔','별','들','샘','길','해','달','꽃','결','담','윤','다온','하늘','바른','참','새','큰','푸른','고운','미소','행복','우리','건강','열린','중앙','제일','한빛','세움','나눔','새봄','늘봄','소망','은하','청솔'], suf=['','온','길','샘','빛','숲','들','봄','누리','마루','정','솔'];
+  const rg=['서울 성동구','서울 강남구','서울 송파구','경기 수원시','경기 성남시','경기 고양시','인천 남동구','부산 해운대구','대구 수성구','대전 서구','광주 북구','경남 창원시'];
+  const wh=[['인천약품',62],['복산나이스',13],['백제약품',6],['지오팜',13],['보덕메디팜',3],['기타 도매',3]], whOf=x=>{ let t=x*100; for(const [n,w] of wh){ if(t<w) return n; t-=w; } return '인천약품'; };
+  const lv=[['L.1',5000000],['L.2',10000000],['L.3',20000000],['L.4',30000000]], lvOf=x=>x<.47?lv[0]:x<.71?lv[1]:x<.88?lv[2]:lv[3];
+  const ms=['2025-06','2025-07','2025-08','2025-08','2025-09','2025-12','2026-02','2026-04','2026-07','2026-09','2026-10'];
+  const out=[], used=new Set(); let s=11; const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+  const mk=(cat,n,kst,gp)=>{ for(let i=0;i<n;i++){ let nm; do{ nm=pre[Math.floor(rnd()*pre.length)]+suf[Math.floor(rnd()*suf.length)]+'약국'; }while(used.has(nm)&&used.size<400); used.add(nm);
+    const l=lvOf(rnd()), m=cat==='bill'&&i<4?'2026-11':ms[Math.floor(rnd()*ms.length)];
+    out.push({n:nm, cat, kst:typeof kst==='function'?kst(i):kst, gp, sid:gp==='없음'?'—':String(20000+Math.floor(rnd()*70000)), r:rg[Math.floor(rnd()*rg.length)],
+      biz:`${100+Math.floor(rnd()*800)}-${10+Math.floor(rnd()*80)}-${String(Math.floor(rnd()*99999)).padStart(5,'0')}`, wh:cat==='notkd'?'—':whOf(rnd()), lv:cat==='notkd'?null:l, m:cat==='notkd'?'—':m}); } };
+  mk('bill',291,i=>i%146===7?'듀얼':'승인완료','VIP'); mk('end',232,'약정해지','VIP'); mk('set',15,'승인완료','일반'); mk('noreg',31,i=>i<2?'듀얼':'승인완료','없음'); mk('notkd',15,'—','VIP'); mk('stop',9,'실적중지','VIP');
   return out; })();
-const kdAdm=()=>KD.filter(o=>o.admin), kdMiss=()=>KD.filter(o=>o.admin&&!o.inKd), kdOnly=()=>KD.filter(o=>!o.admin), kdNew=()=>KD.filter(o=>o.admin&&o.st==='2026-11');
+const kdOf=c=>KD.filter(o=>o.cat===c), kdNew=()=>KD.filter(o=>o.cat==='bill'&&o.m==='2026-11');
 function kdHead(){
-  const tot=kdAdm().length*KD_FEE, miss=kdMiss().length*KD_FEE, prevPaid=KD.filter(o=>o.admin&&o.paid===true).length*KD_FEE, prevUn=KD.filter(o=>o.admin&&o.paid===false).length;
-  return `<div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3>${qt("광동 VIP처는 지원 서비스 금액을 약국 대신 광동에 청구해 받아요. 광동이 준 VIP 목록(엑셀)과 굿팜 VIP처를 비교해요. 광동 VIP 지원 금액은 약국별 수익 · 객단가에 넣지 않고 따로 관리하고, 매출은 광동 입금월 기준이에요.")}<div class="right">${monthSel('kMonth')}</div></div>
-  <div class="cards">
-    <div class="kc" id="kNew"><div class="l">금월 신규 VIP처</div><div class="v">${kdNew().length}곳</div><div class="s">전체 VIP처 ${kdAdm().length}곳</div></div>
-    <div class="kc" id="kMiss"><div class="l">광동 추가 필요</div><div class="v" style="color:var(--up)">${kdMiss().length}곳</div><div class="s">광동에 추가 · 청구 요청 ${qt("굿팜 VIP처인데 광동 목록에 없는 약국")}</div></div>
-    <div class="kc" id="kBill"><div class="l">총 청구 금액</div><div class="v">${fmt(tot)}</div><div class="s">${kdAdm().length}곳 × ${fmt(KD_FEE)}</div></div>
-    <div class="kc" id="kDone"><div class="l">청구 완료 금액</div><div class="v">${fmt(tot-miss)}</div><div class="s">일치 ${kdAdm().length-kdMiss().length}곳</div></div>
-    <div class="kc" id="kUn"><div class="l">미청구 금액</div><div class="v" style="color:var(--up)">${fmt(miss)}</div><div class="s">${kdMiss().length}곳</div></div>
+  const nb=kdOf('bill').length, tot=nb*KD_FEE, fix=kdOf('end').length+kdOf('set').length+kdOf('noreg').length, ask=kdOf('notkd').length+kdOf('stop').length;
+  return `<div class="panel" id="kSum"><div class="ph"><h3>광동 VIP 정산</h3>${qt("광동이 준 약정 약국 목록(엑셀)과 굿팜 VIP처를 사업자번호로 대조해, 광동에 청구할 약국과 굿팜 · 광동에서 맞춰야 할 약국을 나눠요. 광동 VIP 지원 금액은 약국별 수익 · 객단가에 넣지 않고 따로 관리하고, 매출은 광동 입금월 기준이에요.")}<div class="right">${monthSel('kMonth')}</div></div>
+  <div class="cards" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc" id="kFile"><div class="l">광동 약정 약국</div><div class="v">${fmt(KDT.file)}곳</div><div class="s">승인완료 ${KDT.ok} · 듀얼 ${KDT.dual} · 실적중지 ${KDT.stop} · 해지 ${KDT.end}</div></div>
+    <div class="kc" id="kBill"><div class="l">청구 대상</div><div class="v">${fmt(tot)}</div><div class="s">${nb}곳 × ${fmt(KD_FEE)} ${qt('약정 승인완료 · 듀얼이고 굿팜 VIP인 약국. 금월 신규 '+kdNew().length+'곳. 단가는 확인 필요(회의 40,000원 예상, 부가세 포함 여부)')}</div></div>
+    <div class="kc" id="kFix"><div class="l">굿팜 조치 필요</div><div class="v" style="color:var(--up)">${fix}곳</div><div class="s">VIP 해제 ${kdOf('end').length} · VIP 설정 ${kdOf('set').length} · 미등록 ${kdOf('noreg').length}</div></div>
+    <div class="kc" id="kAsk"><div class="l">광동 확인 필요</div><div class="v" style="color:#c2410c">${ask}곳</div><div class="s">광동 목록에 없음 ${kdOf('notkd').length} · 실적중지 ${kdOf('stop').length}</div></div>
   </div>
-  <div class="basis" id="kBasis"><b>전월분 입금</b> ${fmt(prevPaid)}원 · 미입금 ${prevUn}곳 &nbsp; <b>굿팜 확인 필요</b> ${kdOnly().length}곳 · 청구 제외 ${qt('청구했다면 '+fmt(kdOnly().length*KD_FEE)+'원 — 굿팜 VIP 설정 필요 '+kdOnly().filter(o=>o.reg).length+'곳 · 굿팜 미등록 '+kdOnly().filter(o=>!o.reg).length+'곳. 광동 파일 값은 이 목록에만 두고 굿팜 약국 데이터로 만들지 않아요.')}</div></div>`;
+  <div class="basis" id="kBasis"><b>VIP 해제 필요 ${kdOf('end').length}곳</b> · 약정 해지 · 굿팜 VIP(0원) · 청구 제외 ${qt('광동 약정이 해지돼 광동 청구 대상이 아니에요(청구했다면 '+fmt(kdOf('end').length*KD_FEE)+'원). VIP 해제 후 정상 요금 전환 또는 무료 유지 — 운영 기준 확인 필요. 광동 파일 값은 굿팜 약국 데이터를 자동으로 바꾸지 않아요.')}</div></div>`;
 }
-const KDB=o=>!o.admin?(o.reg?'<span class="ms chk" style="margin-left:6px">굿팜 VIP 설정 필요</span>':'<span class="ms chk" style="margin-left:6px">굿팜 미등록</span>'):!o.inKd?'<span class="ms no" style="margin-left:6px">광동 추가 필요</span>':'';
+const KDB=o=>o.cat==='bill'?(o.m==='2026-11'?'<span class="tg vip">신규</span>':''):`<span class="ms ${KD_CAT[o.cat][2]}" style="margin-left:6px">${KD_CAT[o.cat][0]}</span>`;
+const KDTABS=[['bill','청구 대상'],['end','VIP 해제 필요'],['set','굿팜 VIP 설정 필요'],['noreg','굿팜 미등록'],['notkd','광동 목록에 없음'],['stop','광동 확인 필요'],['new','금월 신규']];
 function kdList(){
-  let a=KD.slice(); if(S.tab==='miss') a=kdMiss(); else if(S.tab==='only') a=kdOnly(); else if(S.tab==='new') a=kdNew();
-  if(S.q) a=a.filter(o=>o.n.includes(S.q));
-  const ord=o=>!o.admin?1:!o.inKd?0:2; a.sort((x,y)=>ord(x)-ord(y) || y.st.localeCompare(x.st));
-  return `<div class="panel" id="kList"><div class="ph"><h3>VIP처 목록</h3>${qt("광동 VIP 목록과 다른 약국은 약국명 옆 배지로 표시")}
-    <div class="right" id="kBtns"><button class="btn" id="kTpl">파일 양식 다운로드</button><button class="btn pri" id="kUp">광동 VIP 목록 업로드</button></div></div>
-  <div class="tools"><div class="ptabs">
-    <button class="ptab ${S.tab==='all'?'on':''}" data-tab="all">전체<b>${KD.length}</b></button>
-    <button class="ptab ${S.tab==='miss'?'on':''}" data-tab="miss">광동 추가 필요<b>${kdMiss().length}</b></button>
-    <button class="ptab ${S.tab==='only'?'on':''}" data-tab="only">굿팜 확인 필요<b>${kdOnly().length}</b></button>
-    <button class="ptab ${S.tab==='new'?'on':''}" data-tab="new">금월 신규<b>${kdNew().length}</b></button></div>
-    ${S.tab==='miss'?'<button class="btn sm" id="kReq">청구 요청 목록 다운로드</button>':''}
-    <input class="q" id="q" placeholder="약국명 검색" value="${esc(S.q)}"></div>
-  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>VIP 지원 서비스</th><th>VIP 시작월</th><th class="num">청구 금액</th><th class="ctr">청구</th><th class="ctr">전월분 입금</th></tr></thead><tbody>
-  ${a.map(o=>`<tr class="${o.admin&&o.inKd?'':'unm'}"><td>${esc(o.n)}${o.st==='2026-11'?'<span class="tg vip">신규</span>':''}${KDB(o)}<div class="sub2">${o.admin?o.r+' · '+o.sid:o.reg?o.r+' · '+o.sid+' · 광동 VIP 미설정 <a href="#" class="kdgo">약국 상세 ›</a>':'굿팜에 없는 약국 — 광동 파일 값만'}</div></td><td>${o.biz}</td><td>${o.svc}</td><td>${o.st}</td>
-    <td class="num">${o.admin?fmt(KD_FEE):'<span class="sub2">— (청구 시 '+fmt(KD_FEE)+')</span>'}</td>
-    <td class="ctr">${!o.admin?'<b style="color:#c2410c">청구 제외 · 확인 필요</b>':o.inKd?'청구 완료':'<b style="color:var(--up)">미청구</b>'}</td>
-    <td class="ctr">${o.paid===true?'입금 완료':o.paid===false?'<b style="color:var(--up)">미입금</b>':'<span class="sub2">—</span>'}</td></tr>`).join('')}
-  </tbody></table></div></div>`;
+  const t=KDTABS.some(x=>x[0]===S.tab)?S.tab:'bill'; let a=t==='new'?kdNew():kdOf(t);
+  if(S.q) a=a.filter(o=>o.n.includes(S.q)||o.biz.replace(/\D/g,'').includes(S.q.replace(/\D/g,'')));
+  const per=20, pages=Math.max(1,Math.ceil(a.length/per)), pg=Math.min(S.kp||1,pages), A=a.slice((pg-1)*per,pg*per);
+  const gp=o=>o.gp==='VIP'?'<span class="tg vip">VIP</span>':o.gp==='일반'?'<span class="tg">일반</span>':'<span class="sub2">없음</span>';
+  return `<div class="panel" id="kList"><div class="ph"><h3>광동 약정 약국 대조</h3>${qt("광동 약정 목록과 굿팜 VIP처를 사업자번호로 대조한 결과. 탭마다 해야 할 일이 달라요")}
+    <div class="right" id="kBtns"><button class="btn" id="kTpl">파일 양식 다운로드</button><button class="btn pri" id="kUp">광동 약정 목록 업로드</button></div></div>
+  <div class="tools"><div class="ptabs">${KDTABS.map(([k,l])=>`<button class="ptab ${t===k?'on':''}" data-tab="${k}">${l}<b>${k==='new'?kdNew().length:kdOf(k).length}</b></button>`).join('')}</div>
+    ${t==='notkd'?'<button class="btn sm" id="kReq">청구 요청 목록 다운로드</button>':t==='end'?'<button class="btn sm" id="kEndDl">VIP 해제 대상 다운로드</button>':''}
+    <input class="q" id="q" placeholder="약국명 · 사업자번호 검색" value="${esc(S.q)}"></div>
+  <div class="tblwrap"><table class="tbl" id="kTbl"><thead><tr><th>약국명</th><th>사업자번호</th><th>협력도매</th><th>약정 등급</th><th>약정 적용월</th><th class="ctr">약정현황</th><th class="ctr">굿팜</th><th class="num">청구 금액</th><th>할 일</th></tr></thead><tbody>
+  ${A.map(o=>`<tr class="${o.cat==='bill'?'':'unm'}"><td>${esc(o.n)}${KDB(o)}<div class="sub2">${o.gp==='없음'?'굿팜에 없는 약국 — 광동 파일 값만':o.r+' · '+o.sid}</div></td><td>${o.biz}</td><td>${o.wh}</td>
+    <td>${o.lv?o.lv[0]+' <span class="sub2">'+fmt(o.lv[1]/10000)+'만</span>':'<span class="sub2">—</span>'}</td><td>${o.m}</td><td class="ctr">${o.kst==='약정해지'?'<b style="color:var(--up)">약정해지</b>':o.kst}</td><td class="ctr">${gp(o)}</td>
+    <td class="num">${o.cat==='bill'?fmt(KD_FEE):'<span class="sub2">— (청구 제외)</span>'}</td>
+    <td>${o.cat==='bill'?'<span class="sub2">'+KD_ACT.bill+'</span>':(o.gp!=='없음'?`<a href="#" class="kdgo">${KD_ACT[o.cat]} ›</a>`:KD_ACT[o.cat])}</td></tr>`).join('')||'<tr><td colspan="9" class="ctr sub2">해당 약국이 없습니다.</td></tr>'}
+  </tbody></table></div>
+  <div class="pager" id="kPager">${Array.from({length:pages},(_,i)=>`<button class="pg ${i+1===pg?'on':''}" data-kp="${i+1}">${i+1}</button>`).join('')}</div></div>`;
 }
-
 /* ── 약국관리 > VAN 정산 관리 ── */
 function mgmtHead(){
   return `<div class="panel" id="mSum"><div class="ph"><h3>VAN 정산 관리</h3>${qt("매달 VAN 정산 파일을 올려 반영해요. 사업자번호로 굿팜 약국에 자동 연결해요.")}
@@ -501,7 +506,7 @@ function render(){
   bind();
 }
 function bind(){
-  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;S.kp=1;render();});
   document.querySelectorAll('[data-ss]').forEach(h=>h.onclick=()=>{ const k=h.dataset.ss; if(S.ss!==k){ S.ss=k; S.sd='desc'; } else if(S.sd==='desc') S.sd='asc'; else { S.ss=null; S.sd=null; } render(); });
   document.querySelectorAll('[data-tog]').forEach(b=>b.onclick=()=>{const k=b.dataset.tog; S.open.has(k)?S.open.delete(k):S.open.add(k); render();});
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>go('mgmt'));
@@ -513,14 +518,16 @@ function bind(){
   document.querySelectorAll('select.fsel[data-f]').forEach(c=>c.onchange=()=>{ S.flt[c.dataset.f]=c.value; render(); });
   const q=$('q'); if(q) q.oninput=()=>{S.q=q.value; const p=q.selectionStart; render(); const n=$('q'); n.focus(); n.setSelectionRange(p,p);};
   document.querySelectorAll('[data-item]').forEach(r=>r.onclick=()=>{ const k=r.dataset.item; if(k==='VAN') go('mgmt'); else if(k==='광동') go('kd'); else if(k==='기타'){ S.ss='etc'; S.sd='desc'; render(); const lp=$('listPanel'); if(lp) lp.scrollIntoView({behavior:'smooth'}); } else toast('시안 — 서비스 청구 통계 · 약국별 청구를 '+r.dataset.nm+'(으)로 걸러 이동'); });
-  if($('kTpl')) $('kTpl').onclick=()=>toast('시안 — 광동 VIP 목록 양식(.xlsx) 다운로드');
+  if($('kTpl')) $('kTpl').onclick=()=>toast('시안 — 광동 약정 목록 양식(.xlsx) 다운로드');
   if($('kUp')) $('kUp').onclick=()=>toast('시안 — 파일 선택 후 바로 대조');
-  if($('kReq')) $('kReq').onclick=()=>toast('시안 — 빠진 처 청구 요청 목록(.xlsx) 다운로드');
+  if($('kReq')) $('kReq').onclick=()=>toast('시안 — 광동 목록에 없는 VIP처 청구 요청 목록(.xlsx) 다운로드');
+  if($('kEndDl')) $('kEndDl').onclick=()=>toast('시안 — VIP 해제 대상(약정 해지 · 굿팜 VIP) 목록(.xlsx) 다운로드');
+  document.querySelectorAll('[data-kp]').forEach(b=>b.onclick=()=>{ S.kp=+b.dataset.kp; render(); });
   document.querySelectorAll('.arpuSel').forEach(s=>s.onchange=()=>{ S.arpu=s.value; render(); });
   if($('sgSel')) $('sgSel').onchange=e=>{ S.sg=e.target.value; render(); };
   if($('toMgmt')) $('toMgmt').onclick=e=>{e.preventDefault(); go('mgmt');};
   if($('toMgmt2')) $('toMgmt2').onclick=e=>{e.preventDefault(); go('mgmt');};
-  document.querySelectorAll('.kdgo').forEach(a=>a.onclick=e=>{e.preventDefault(); toast('시안 — 약국 상세에서 약국 분류 광동 VIP 체크');});
+  document.querySelectorAll('.kdgo').forEach(a=>a.onclick=e=>{e.preventDefault(); toast('시안 — 약국 상세(새 탭)에서 약국 분류 · 서비스를 직접 수정');});
   if($('tvT')) $('tvT').onclick=()=>{ S.tv=!S.tv; render(); };
   if($('dUnpaid')) $('dUnpaid').onclick=()=>{ location.href='index.html?unpaid=1'; };
   document.querySelectorAll('[data-per]').forEach(b=>b.onclick=()=>{ S.per=+b.dataset.per; render(); });
