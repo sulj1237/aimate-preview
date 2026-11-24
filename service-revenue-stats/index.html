@@ -1360,7 +1360,7 @@ function renderGuide(){
    ① 수기 결제 창 = 청구월 + 결제 사유 카테고리 + 메모 / ② 약국 서비스 수정 > 금액 할인 = 금액 + 사유 카테고리 + 메모(필수)
    카테고리는 6개월 결제 실데이터 · 금액 할인 실데이터 기준 */
 const PAY_CAT = [['재시도 결제','정기 결제 실패 후 다시 결제 · 밀린 대금 포함'],['누락분 결제','서비스에는 있는데 정기 결제에서 빠진 금액'],['신규 · 개국 첫 결제','가입한 달 첫 결제 (첫 달 무료 정책 확인 후 유지 여부 결정)'],['요금제 변경','요금제를 바꾸면서 결제'],['서비스 외 결제','라벨 구매 · 검사 수수료 등, 통계에서 제외'],['기타','위에 해당하지 않음 · 메모 필수']];
-const DISC_CAT = [['결합 무료','함께 쓰는 서비스를 무상 제공 (예: POS 무료)'],['계약 할인','제휴처 · 중복 가입 할인 (예: 온비타 · drs)'],['보상 · 테스트','오류 보상 · 테스트 (예: 스캐너 인식 오류, OCR 테스트)'],['기타','위에 해당하지 않음']];
+const DISC_CAT = [['계약 할인','계약 · 제휴 조건으로 약속한 할인 (예: DRS 파머시 퍼스트 중복)'],['보상 · 테스트','오류 보상 · 테스트 (예: 스캐너 인식 오류, OCR 테스트)'],['기타','위에 해당하지 않음']];
 function renderInputs(){
   const opt=(a,v)=>a.map(([t,d])=>`<option value="${t}" ${t===v?'selected':''}>${t}</option>`).join('');
   document.getElementById('content').innerHTML=`<div class="gd inx">
@@ -1386,13 +1386,13 @@ function renderInputs(){
           <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td></tr>
           <tr class="tot"><td colspan="4">총액</td><td class="num">55,000원</td></tr></tbody></table>
         <label class="fl">금액 할인 금액</label><input class="fi" id="idAmt" value="10,000">
-        <label class="fl">할인 사유</label><select class="fi" id="idCat">${opt(DISC_CAT,'결합 무료')}</select>
+        <label class="fl">할인 사유</label><select class="fi" id="idCat">${opt(DISC_CAT,'계약 할인')}</select>
         <div class="hint" id="idHint">${DISC_CAT[0][1]}</div>
         <label class="fl">메모 (필수)</label><input class="fi" id="idMemo" value="풀패키지 포스 비용 할인">
         <div class="pv"><span class="mlab">통계 화면 '금액 할인' 칸에 보이는 내용</span><br><span id="idPv"></span></div>
         <div class="acts"><button class="btn">취소</button><button class="btn pri" data-toast="시안 — 저장되지 않습니다">저장</button></div>
       </div>
-      <div class="foot">금액 할인 실데이터 13곳: 결합 무료 3 · 계약 할인 6 · 보상 · 테스트 2 · 기타(사유 없음) 2 → 메모 필수</div></div>
+      <div class="foot">금액 할인 실데이터 13곳: 계약 할인 6 · 보상 · 테스트 2 · 기타(사유 없음) 2 · POS 무상 3곳은 POS 옵션 0원으로 데이터 정리 → 기타는 메모 필수</div></div>
     </div>
     <div class="panel"><div class="ph"><h3>확인 필요</h3></div><div class="tblwrap"><table class="tbl"><tbody>
       <tr><td class="k">수기 결제</td><td>'신규 · 개국 첫 결제'는 첫 달 무료 정책 확인 후 유지 여부 결정 · 청구월 기본값(결제한 달 / 미결제 청구월)</td></tr>
