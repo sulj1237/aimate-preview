@@ -334,8 +334,6 @@
   .rv pre{background:#f3f4f6;border-radius:6px;padding:10px;font-size:11.5px;line-height:1.5;overflow:auto;margin:8px 0}
   .rv .warn{background:#fff6dd;border:1px solid #f0dc9c;border-radius:6px;padding:10px 12px;font-size:12.5px;margin:12px 20px}
   .rv .lnk{color:var(--teal-d);font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:0;padding:0;font:inherit}
-  .unm{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;background:#f3f4f6;color:#4b5563;vertical-align:1px}
-  .unm.long{background:#fdecec;color:#b42318}
   .sid2{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:1px}
   .sbar{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0 6px;background:#fbfcfd}
   .srow{display:flex;gap:6px;align-items:center}.srow .fsel{height:30px}.srch2{height:30px;width:340px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px;outline:none}
@@ -939,9 +937,8 @@ function phRowHtml(g, c){
   const dl=d=>first?NA:(d===0?'<span class="flat">0</span>':`<span class="${d>0?'upc':'downc'}">${d>0?'+':'−'}${fmt(Math.abs(d))}</span>`);
   const orig=r=>r.fc && !isPre(PH_BY[r.name],c.ym) ? (r.fc.amt||0)+(r.fc.dsc||0) : 0;
   const optCell=r=>(r.svc==='UNALLOC'?'0':fmt(orig(r)))+(isKdFree(r.fc)?'<div class="dsv">광동 VIP 지원 · 이용 금액 '+fmt(KD_FEE)+'</div>':'');
-  const um=c.unp&&c.unp.size?[...c.unp].sort():null;
   const attN=attempts(g.name,c.ym).length, attOn=attN>1&&S.att.has(g.name+'|'+c.ym), attR=attOn?attHtml(g.name,c.ym):'';
-  const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>`+(um?`<span class="unm${um.length>1?' long':''}">미결제 ${um.length}개월 · ${um.map(m=>+m.slice(5)+'월분').join(', ')}</span>`:'');
+  const nm=`<span class="link" data-toast="약국 관리 상세를 새 탭으로 엽니다 (데모)">${g.name}</span>`;
   // 금액 할인 = 금액만. 사유는 결제 예정 금액 칸 계산 아이콘(계산 내역)에서
   const e=g.a.etc;
   const etc=`<td class="num">${e?'<span class="downc">−'+fmt(e)+'</span>':'<span class="flat">0</span>'}</td>`;
@@ -1094,7 +1091,7 @@ function renderMain(){
   const manOn=T!=='unpaid'; if(!manOn) S.man=false;
   const manSet=new Set(PAYS.filter(x=>x.ok && x.bm===S.month && x.date<=TODAY_S && wayOf(x)==='수기').map(x=>x.name));
   const manCnt=new Set(pre0.filter(r=>manSet.has(r.name)).map(r=>r.name)).size;
-  // 미결제 개월 — 약국마다 아직 메우지 못한 청구월(전월 · 기준월). 미결제 목록에서 약국명 옆에 표시하고 오래 밀린 순으로 정렬
+  // 미결제 개월 — 약국마다 아직 메우지 못한 청구월(전월 · 기준월). 미결제 목록을 오래 밀린 순으로 정렬
   const unpM={}; if(T==='unpaid') allRows.forEach(r=>{ const o=unpM[r.name]=unpM[r.name]||new Set(); if(!first&&r.unpaid.prev>0) o.add(M.prev); if(r.unpaid.cur>0) o.add(S.month); });
   const unpN=n=>unpM[n]?unpM[n].size:0;
   const base=pre0.filter(r=>(S.cause==='all'||MEMO_F[S.cause][1](r)) && (!S.man||manSet.has(r.name)));
