@@ -138,6 +138,10 @@
 .qi:hover::after{content:attr(data-tip);position:absolute;left:0;top:20px;z-index:20;width:280px;white-space:normal;background:#1f2a37;color:#fff;font-size:12px;font-weight:500;line-height:1.5;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.25);text-align:left}
 .sub2c{color:#6b7280;font-size:12px;white-space:nowrap}
 .tbl th.sort{cursor:pointer;user-select:none}.tbl th.sort .ar{margin-left:3px;font-size:10px;color:#b9bec4}.tbl th.sort.on,.tbl th.sort.on .ar{color:var(--teal-d,#0f766e)}
+.shw{padding:0 18px 14px;display:flex;flex-direction:column;gap:2px}
+.shr{display:grid;grid-template-columns:190px 1fr 56px 56px;gap:8px;align-items:center;font-size:12px;padding:3px 4px;border-radius:6px;cursor:pointer;position:relative}
+.shr:hover{background:#f5f7fa}.shn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shb{background:#f3f5f7;border-radius:4px;height:11px;display:block}.shb>span{display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6}
+.shp{color:#5b6168}.shh{cursor:default;color:#8a9099;font-size:11px;padding-bottom:0}.shh:hover{background:none}.shr:not(.shh):hover::after,.shr.tipon::after{content:attr(data-tip);white-space:pre-line;position:absolute;left:200px;top:22px;z-index:30;min-width:200px;background:#1f2a37;color:#fff;font-size:12px;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 </style>
 </head>
 <body>
@@ -169,26 +173,92 @@
       <text x="308" y="20.907447786113327" text-anchor="middle" font-size="11" fill="#2b2f33" font-weight="700">72.1백만</text>
       <text x="308" y="192" text-anchor="middle" font-size="11" fill="#8a9099">26.10</text></g><g><title>2026-11 · 이용료 61,600,500 · VAN 5,693,316 · 광동 VIP 4,059,000(5.6%) · 기타 판매 1,184,000 · 합계 72,536,816</title><rect x="494" y="47.38740446707028" width="56" height="126.61259553292972" fill="#2a78d6"></rect><rect x="494" y="35.6854618537935" width="56" height="9.701942613276785" fill="#eb6834"></rect><rect x="494" y="27.34266390137165" width="56" height="6.342797952421847" fill="#8b5cf6"></rect><rect x="494" y="24.90909090909093" width="56" height="0.43357299228071966" rx="3" fill="#1baf7a"></rect>
       <text x="522" y="19.90909090909093" text-anchor="middle" font-size="11" fill="#2b2f33" font-weight="700">72.5백만</text>
-      <text x="522" y="192" text-anchor="middle" font-size="11" fill="#8a9099">26.11</text></g></svg></div><div class="panel" id="dShare" style="flex:1"><div class="ph"><h3>매출 항목 구성비</h3>
+      <text x="522" y="192" text-anchor="middle" font-size="11" fill="#8a9099">26.11</text></g></svg></div><div class="panel" id="dShare" style="flex:1"><div class="ph"><h3>매출 항목 구성비</h3><span class="qi" data-tip="마우스를 올리면 이용 약국 · 매출(전월 대비) · 신규 · 해지, 누르면 그 항목 약국 목록으로 이동. EDB 연동은 EDB에 그대로 넘기는 금액이라 금액만 보여 주고 총매출 · 객단가에서 빼요">?</span>
     <div class="right"><select class="fi" id="sgSel" style="height:28px;font-size:12px;width:auto"><option value="all" selected="">전체</option><option value="pay">유료처</option><option value="free">무료처</option><option value="vip">광동 VIP처</option><optgroup label="협력사 (CS 업체)"><option value="팜시스">팜시스 · 120처</option><option value="CS 업체 2">CS 업체 2 · 64처</option><option value="CS 업체 3">CS 업체 3 · 52처</option><option value="CS 업체 4">CS 업체 4 · 41처</option><option value="CS 업체 5">CS 업체 5 · 33처</option><option value="CS 업체 6">CS 업체 6 · 27처</option><option value="CS 업체 7">CS 업체 7 · 18처</option><option value="CS 업체 8">CS 업체 8 · 12처</option></optgroup></select></div></div>
   <div class="sub2" style="padding:0 18px 6px">1,935처 · 매출 72,536,816원</div>
-  <div style="padding:0 18px 10px;display:flex;flex-direction:column;gap:6px"><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="키오스크 21,450,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">키오스크</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:100.0%"></span></span><span class="num" style="text-align:right">29.6%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="스마트 OCR 14,850,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">스마트 OCR</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:69.2%"></span></span><span class="num" style="text-align:right">20.5%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="파머시 퍼스트 8,536,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">파머시 퍼스트</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:39.8%"></span></span><span class="num" style="text-align:right">11.8%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="스마트2D 6,622,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">스마트2D</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:30.9%"></span></span><span class="num" style="text-align:right">9.1%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="굿팜 POS 4,730,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">굿팜 POS</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:22.1%"></span></span><span class="num" style="text-align:right">6.5%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="모바일 OCR 2,090,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">모바일 OCR</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:9.7%"></span></span><span class="num" style="text-align:right">2.9%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="풀패키지 1,540,500">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">풀패키지</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:7.2%"></span></span><span class="num" style="text-align:right">2.1%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="ESL 1,782,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ESL</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:8.3%"></span></span><span class="num" style="text-align:right">2.5%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="VAN Fee 5,693,316">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">VAN Fee</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:26.5%"></span></span><span class="num" style="text-align:right">7.8%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지) 1,184,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:5.5%"></span></span><span class="num" style="text-align:right">1.6%</span></div><div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="광동 VIP 지원 4,059,000">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">광동 VIP 지원</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:18.9%"></span></span><span class="num" style="text-align:right">5.6%</span></div></div>
-  </div></div><div class="panel" id="dSvc"><div class="ph"><h3>매출 항목</h3><span class="qi" data-tip="행을 누르면 그 항목의 약국 목록으로 이동">?</span></div>
-  <div class="tblwrap"><table class="tbl" id="svcTbl"><thead><tr><th>매출 항목</th><th>구분</th><th class="num">이용 약국</th><th class="num">매출</th><th class="num">전월 대비</th><th class="num">비중</th></tr></thead><tbody>
-  <tr data-item="이용료" data-nm="키오스크" style="cursor:pointer"><td>키오스크 <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">612</td><td class="num">21,450,000</td><td class="num"><span style="color:var(--up)">▲ 1.6%</span></td><td class="num">29.6%</td></tr><tr data-item="이용료" data-nm="스마트 OCR" style="cursor:pointer"><td>스마트 OCR <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">540</td><td class="num">14,850,000</td><td class="num"><span style="color:var(--down)">▼ 0.7%</span></td><td class="num">20.5%</td></tr><tr data-item="이용료" data-nm="파머시 퍼스트" style="cursor:pointer"><td>파머시 퍼스트 <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">388</td><td class="num">8,536,000</td><td class="num"><span style="color:var(--up)">▲ 4.9%</span></td><td class="num">11.8%</td></tr><tr data-item="이용료" data-nm="스마트2D" style="cursor:pointer"><td>스마트2D <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">301</td><td class="num">6,622,000</td><td class="num"><span style="color:var(--up)">▲ 0.3%</span></td><td class="num">9.1%</td></tr><tr data-item="이용료" data-nm="굿팜 POS" style="cursor:pointer"><td>굿팜 POS <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">215</td><td class="num">4,730,000</td><td class="num"><span style="color:var(--down)">▼ 2.3%</span></td><td class="num">6.5%</td></tr><tr data-item="이용료" data-nm="모바일 OCR" style="cursor:pointer"><td>모바일 OCR <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">190</td><td class="num">2,090,000</td><td class="num"><span style="color:var(--up)">▲ 1.1%</span></td><td class="num">2.9%</td></tr><tr data-item="이용료" data-nm="풀패키지" style="cursor:pointer"><td>풀패키지 <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">14</td><td class="num">1,540,500</td><td class="num"><span style="color:var(--down)">▼ 6.1%</span></td><td class="num">2.1%</td></tr><tr data-item="이용료" data-nm="ESL" style="cursor:pointer"><td>ESL <span class="sub2">›</span></td><td><span class="tg">이용료</span></td><td class="num">9</td><td class="num">1,782,000</td><td class="num"><span class="sub2">0.0%</span></td><td class="num">2.5%</td></tr><tr data-item="이용료" data-nm="EDB 연동" style="cursor:pointer" class="edb"><td>EDB 연동 <span class="sub2">›</span> <span class="tg">총매출 차감</span><span class="qi" data-tip="EDB에 그대로 넘기는 금액(수수료 없음)이라 금액만 보여 주고 총매출 · 비중에서 빼요">?</span></td><td><span class="tg">이용료</span></td><td class="num">39</td><td class="num"><span class="sub2">858,000</span></td><td class="num"><span style="color:var(--up)">▲ 2.6%</span></td><td class="num"><span class="sub2">−</span></td></tr><tr data-item="VAN" data-nm="VAN Fee" style="cursor:pointer"><td>VAN Fee <span class="sub2">›</span></td><td><span class="tg">VAN</span></td><td class="num">152</td><td class="num">5,693,316</td><td class="num"><span style="color:var(--down)">▼ 1.7%</span></td><td class="num">7.8%</td></tr><tr data-item="기타" data-nm="기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)" style="cursor:pointer"><td>기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지) <span class="sub2">›</span></td><td><span class="tg">기타</span></td><td class="num">42</td><td class="num">1,184,000</td><td class="num"><span style="color:var(--up)">▲ 8.0%</span></td><td class="num">1.6%</td></tr><tr data-item="광동" data-nm="광동 VIP 지원" style="cursor:pointer"><td>광동 VIP 지원 <span class="sub2">›</span></td><td><span class="tg">광동</span></td><td class="num">82</td><td class="num">4,059,000</td><td class="num"><span style="color:var(--up)">▲ 1.2%</span></td><td class="num">5.6%</td></tr>
-  <tr class="tot"><td>합계</td><td></td><td class="num">—</td><td class="num">72,536,816</td><td class="num"><span style="color:var(--up)">▲ 0.7%</span></td><td class="num">100%</td></tr>
-  </tbody></table></div></div><div class="panel" id="listPanel"><div class="ph"><h3>약국별 총수익</h3><span class="qi" data-tip="이용료 + VAN Fee + 기타 판매(광동 VIP 지원 제외) · 총수익 큰 순 · ▸ 누르면 그 달 결제 내역">?</span></div>
+  <div class="shw" id="shList"><div class="shr shh"><span></span><span></span><span class="num">비중</span><span class="num">이용 약국</span></div><div class="shr" data-item="이용료" data-nm="키오스크" data-tip="키오스크
+이용 약국 612곳
+매출 21,450,000원 (전월 대비 +1.6%)
+신규 11곳 · 해지 4곳">
+    <span class="shn">키오스크 <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:100.0%"></span></span>
+    <span class="num">29.6%</span>
+    <span class="num shp">612곳</span></div><div class="shr" data-item="이용료" data-nm="스마트 OCR" data-tip="스마트 OCR
+이용 약국 540곳
+매출 14,850,000원 (전월 대비 -0.7%)
+신규 10곳 · 해지 8곳">
+    <span class="shn">스마트 OCR <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:69.2%"></span></span>
+    <span class="num">20.5%</span>
+    <span class="num shp">540곳</span></div><div class="shr" data-item="이용료" data-nm="파머시 퍼스트" data-tip="파머시 퍼스트
+이용 약국 388곳
+매출 8,536,000원 (전월 대비 +4.9%)
+신규 12곳 · 해지 3곳">
+    <span class="shn">파머시 퍼스트 <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:39.8%"></span></span>
+    <span class="num">11.8%</span>
+    <span class="num shp">388곳</span></div><div class="shr" data-item="이용료" data-nm="스마트2D" data-tip="스마트2D
+이용 약국 301곳
+매출 6,622,000원 (전월 대비 +0.3%)
+신규 4곳 · 해지 2곳">
+    <span class="shn">스마트2D <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:30.9%"></span></span>
+    <span class="num">9.1%</span>
+    <span class="num shp">301곳</span></div><div class="shr" data-item="이용료" data-nm="굿팜 POS" data-tip="굿팜 POS
+이용 약국 215곳
+매출 4,730,000원 (전월 대비 -2.3%)
+신규 5곳 · 해지 5곳">
+    <span class="shn">굿팜 POS <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:22.1%"></span></span>
+    <span class="num">6.5%</span>
+    <span class="num shp">215곳</span></div><div class="shr" data-item="이용료" data-nm="모바일 OCR" data-tip="모바일 OCR
+이용 약국 190곳
+매출 2,090,000원 (전월 대비 +1.1%)
+신규 6곳 · 해지 1곳">
+    <span class="shn">모바일 OCR <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:9.7%"></span></span>
+    <span class="num">2.9%</span>
+    <span class="num shp">190곳</span></div><div class="shr" data-item="이용료" data-nm="풀패키지" data-tip="풀패키지
+이용 약국 14곳
+매출 1,540,500원 (전월 대비 -6.1%)
+신규 1곳 · 해지 1곳">
+    <span class="shn">풀패키지 <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:7.2%"></span></span>
+    <span class="num">2.1%</span>
+    <span class="num shp">14곳</span></div><div class="shr" data-item="이용료" data-nm="ESL" data-tip="ESL
+이용 약국 9곳
+매출 1,782,000원 (전월 대비 +0.0%)
+신규 0곳 · 해지 0곳">
+    <span class="shn">ESL <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:8.3%"></span></span>
+    <span class="num">2.5%</span>
+    <span class="num shp">9곳</span></div><div class="shr" data-item="VAN" data-nm="VAN Fee" data-tip="VAN Fee
+이용 약국 152곳
+매출 5,693,316원 (전월 대비 -1.7%)">
+    <span class="shn">VAN Fee <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:26.5%"></span></span>
+    <span class="num">7.8%</span>
+    <span class="num shp">152곳</span></div><div class="shr" data-item="기타" data-nm="기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)" data-tip="기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)
+이용 약국 42곳
+매출 1,184,000원 (전월 대비 +8.0%)">
+    <span class="shn">기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지) <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:5.5%"></span></span>
+    <span class="num">1.6%</span>
+    <span class="num shp">42곳</span></div><div class="shr" data-item="광동" data-nm="광동 VIP 지원" data-tip="광동 VIP 지원
+이용 약국 82곳
+매출 4,059,000원 (전월 대비 +1.2%)">
+    <span class="shn">광동 VIP 지원 <span class="sub2">›</span></span>
+    <span class="shb"><span style="width:18.9%"></span></span>
+    <span class="num">5.6%</span>
+    <span class="num shp">82곳</span></div><div class="shr edb" data-item="이용료" data-nm="EDB 연동" data-tip="EDB 연동
+이용 약국 39곳
+매출 858,000원 (전월 대비 +2.6%)
+신규 0곳 · 해지 0곳">
+    <span class="shn">EDB 연동 <span class="sub2">›</span> <span class="tg">총매출 차감</span></span>
+    <span class="shb"></span>
+    <span class="num"><span class="sub2">858,000원</span></span>
+    <span class="num shp">39곳</span></div></div>
+  </div></div><div class="panel" id="listPanel"><div class="ph"><h3>약국별 총수익</h3><span class="qi" data-tip="이용료 + VAN Fee + 기타 판매(광동 VIP 지원 제외) · 총수익 큰 순 · ▸ 누르면 그 달 결제 내역">?</span></div>
   <div class="tools"><span class="sub2">전체 151곳</span></div>
   <div class="sbar"><div class="srow"><select class="fsel" id="qk"><option value="name" selected="">약국명</option><option value="biz">사업자번호</option><option value="tel">전화번호</option><option value="sid">스토어 ID</option></select>
   <input class="srch2" id="qv" type="search" placeholder="약국명 입력 후 Enter 또는 검색" value=""><button class="btn sm pri" id="qGo">검색</button><button class="btn sm" id="qReset">초기화</button>
