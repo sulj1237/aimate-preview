@@ -171,10 +171,14 @@ const mon=m=>m?(+m.slice(0,4))+'-'+m.slice(5):'';
 const nextM=m=>{ let [y,mm]=m.split('-').map(Number); mm++; if(mm>12){mm=1;y++;} return y+'-'+String(mm).padStart(2,'0'); };
 const dState=d=>d.from>NOW?['rq','적용 예정']:(d.to&&d.to<NOW)?['cx','종료']:(d.to===NOW)?['px','종료 예정']:['ok','적용 중'];
 const period=d=>d.from+' ~ '+(d.to||'계속');
-// 데모 — 11-24 추후 고도화(1차 화면에서 뺌). 서비스(옵션)를 데모로 지정하고 데모 기간을 고름. 기간 청구분만 0원, 끝나면 안내만(정기 결제 금액은 담당자가 직접 변경)
-const DEMO={opt:'스마트2D', price:30000, from:'2026-11', to:'2026-12'};
+// 데모 — 1차(11-24). 옵션 하나씩 데모로 지정하고 데모 기간(시작월 ~ 종료월, 필수)을 고름. 기간 청구분만 그 옵션 0원.
+// 끝나면 자동 전환 없음 → 담당자가 결제 카드 등록 · 데모 해제(승인)로 정기 결제 시작. 지정 · 해제 · 카드 등록은 시점 · 처리자를 이력에 남김. 지정 · 해제 권한 = 직원 관리에서 관리자 권한을 받은 직원
+const DEMO={opt:'스마트2D', price:30000, from:'2026-11', to:'2026-12', who:'김운영', at:'2026-11-03'};
 function demoText(d=DEMO){ const [c,t]=dState(d);
-  return `데모 <b>${d.opt}</b> · ${period(d)} <span class="st ${c}">${t}</span>`+(d.to?` <span class="hint">→ ${nextM(d.to)} 청구분부터 ${d.opt} 정가 ${fmt(d.price*1.1)}원 · 정기 결제 금액 직접 변경</span>`:''); }
+  return `데모 <b>${d.opt}</b> · ${period(d)} <span class="st ${c}">${t}</span> <span class="hint">지정 ${d.who} · ${d.at.slice(5)}</span>`+(d.to&&d.to<=NOW?` <span class="hint">→ 결제 카드 등록 · 데모 해제(승인)하면 ${nextM(d.to)} 청구분부터 ${d.opt} 정가 ${fmt(d.price*1.1)}원 정기 결제</span>`:''); }
+// 서비스 변경 이력 — 데모 지정 · 해제, 결제 카드 등록, 금액 할인 등록을 시점 · 처리자와 함께 쌓음 (최신이 위)
+const SVC_LOG=[['2026-11-03 10:12','김운영','데모 지정','스마트2D · 데모 기간 2026-11 ~ 2026-12'],['2026-05-28 15:40','김운영','금액 할인 등록','−11,000 [계약 할인] DRS 파머시 퍼스트 중복'],['2024-06-03 11:20','이영업','결제 카드 등록','신한카드 · 뒤 4자리 ****'],['2024-04-22 09:30','이영업','서비스 등록 · 승인','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS']];
+const svcLog=()=>`<div class="opt" id="svcLog"><b style="color:#1f2328">서비스 변경 이력</b><table class="tbl" style="margin-top:6px"><thead><tr><th>일시</th><th>처리자</th><th>내용</th><th>상세</th></tr></thead><tbody>${SVC_LOG.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td><td><b>${l[2]}</b></td><td>${esc(l[3])}</td></tr>`).join('')}</tbody></table></div>`;
 function discText(d=D){
   return `금액 할인 <span class="red">−${fmt(d.amt*1.1)}</span> <span class="ctag">${d.cat}</span>${esc(d.memo)}${d.who?' <span class="hint">등록 '+d.who+(d.at?' · '+d.at:'')+'</span>':''}`; }
 
@@ -184,7 +188,9 @@ function svcList(){
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt">옵션: 스마트 OCR · 굿팜 POS &nbsp;|&nbsp; 서비스 수 2 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
+    <div class="opt">옵션: 스마트 OCR · 굿팜 POS · 스마트2D &nbsp;|&nbsp; 서비스 수 3 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
+    ${DEMO.off?"":`<div class="opt dline" id="demoLine">${demoText()}</div>`}
+    ${svcLog()}
     </div>`;
 }
 
@@ -220,10 +226,11 @@ function svcModal(){
   return `<div class="dim"></div><div class="mdl wide" id="svcMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-close>×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">서비스</span><div class="ro">굿팜 솔루션 (NEW)</div></div>
-    <table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th class="num">총액</th></tr></thead>
-      <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td class="num">45,000</td></tr>
-      <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td></tr>
-      <tr class="tot"><td colspan="4">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
+    <table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th>데모</th><th class="num">총액</th></tr></thead>
+      <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox"> 데모</label></td><td class="num">45,000</td></tr>
+      <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td><label class="dmck"><input type="checkbox"> 데모</label></td><td class="num">10,000</td></tr>
+      <tr id="demoRow"><td>${DEMO.opt}</td><td class="num">${fmt(DEMO.price)}</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox" checked> 데모</label> <span class="seg" id="demoPer"><select class="fi sm" id="dmFrom">${['2026-11','2026-12'].map(m=>`<option ${m===DEMO.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi sm" id="dmTo">${['2026-11','2026-12','2027-01','2027-02'].map(m=>`<option ${m===DEMO.to?'selected':''}>${m}</option>`).join('')}</select></span> <span class="hint">지정 ${DEMO.who} · ${DEMO.at.slice(5)}</span></td><td class="num">0</td></tr>
+      <tr class="tot"><td colspan="5">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
     <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat">${opt(DISC_CAT,'계약 할인')}</select></div></div>
     <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="DRS 파머시 퍼스트 중복" placeholder="기타 사유를 입력하세요"></div></div>
