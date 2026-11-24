@@ -228,23 +228,31 @@ const monthSel=id=>`<select class="fi" id="${id}" style="width:150px;height:32px
    [항목, 구분, 이용 약국, 당월, 전월, 유료 신규, 무료 신규, 유료 전환, 해지, 이동] */
 const SVC=[['키오스크',612,21450000,21120000,9,2,3,4],['스마트 OCR',540,14850000,14960000,6,4,2,8],['파머시 퍼스트',388,8536000,8140000,12,0,0,3],
   ['스마트2D',301,6622000,6600000,3,1,1,2],['굿팜 POS',215,4730000,4840000,2,3,0,5],['모바일 OCR',190,2090000,2068000,4,2,1,1]];
-(()=>{ const s=SVC.reduce((a,r)=>a+r[2],0), sp=SVC.reduce((a,r)=>a+r[3],0); SVC.push(['그 외 서비스 (EDB · ESL · 풀패키지 등)',164,FEE_ALL-s,TREND[T2][1]-sp,1,0,0,1]); })();
+// 그 외 서비스도 각각 — 풀패키지 · ESL · EDB 연동. EDB 연동은 EDB에 그대로 넘기는 금액(수수료 없음)이라 표시만 하고 총매출에서 차감
+const EDB_AMT=858000, EDB_PREV=836000;
+(()=>{ const s=SVC.reduce((a,r)=>a+r[2],0), sp=SVC.reduce((a,r)=>a+r[3],0), rem=FEE_ALL-s, remP=TREND[T2][1]-sp;
+  SVC.push(['풀패키지',14,rem-1782000-EDB_AMT,remP-1782000-EDB_PREV,1,0,0,1],['ESL',9,1782000,1782000,0,0,0,0],['EDB 연동',39,EDB_AMT,EDB_PREV,0,0,0,0]); })();
+const isEdb=r=>r[0]==='EDB 연동', FEE_NET=FEE_ALL-EDB_AMT;
 const ETC_ALL=1184000, ETC_PREV=1096000, ETC_PH=42;          // 기타 판매(장비 · 설치 · 개국 작업비 · 라벨지) — 수기 결제 '서비스 외 결제'
 const KD_IN=4059000, KD_IN_PREV=4010500, KD_PH=82;                       // 광동 VIP 지원 — 광동이 입금한 금액(입금월 기준)
 const ITEMS=[...SVC.map(r=>[r[0],'이용료',...r.slice(1)]),
   ['VAN Fee','VAN',D.length,VAN_FILE,TREND[T2][2],null,null,null,null],
   ['기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)','기타',ETC_PH,ETC_ALL,ETC_PREV,null,null,null,null],
   ['광동 VIP 지원','광동',KD_PH,KD_IN,KD_IN_PREV,null,null,null,null]];
-const ITEM_TOT=ITEMS.reduce((a,r)=>a+r[3],0), ITEM_PREV=ITEMS.reduce((a,r)=>a+r[4],0);
+const ITEM_TOT=ITEMS.filter(r=>!isEdb(r)).reduce((a,r)=>a+r[3],0), ITEM_PREV=ITEMS.filter(r=>!isEdb(r)).reduce((a,r)=>a+r[4],0);
 const UNPAID={amt:2871500, n:38, longN:2, longAmt:242000};   // 2개월 이상 = 서비스 청구 통계 미결제 탭의 빨간 미결제 개월 표시 약국
 const pct=(c,p)=>p? ((c-p)/p*100) : null;
 const dir=v=>v==null?'<span class="sub2">−</span>':v>0?`<span style="color:var(--up)">▲ ${v.toFixed(1)}%</span>`:v<0?`<span style="color:var(--down)">▼ ${Math.abs(v).toFixed(1)}%</span>`:'<span class="sub2">0.0%</span>';
-// 월별 매출 — [월, 이용료, VAN, 기타(기타 판매 + 광동 VIP 지원)]
-const TREND3=TREND.map((r,i)=>[r[0],r[1],r[2],[4610000,4655000,4702000,4730500,4781000,4826500,4870000,4912500,4950000,5040000,5155000,ETC_ALL+KD_IN][i]]);
+// 월별 매출 — [월, 이용료(EDB 연동 차감), VAN, 광동 VIP 지원, 기타 판매]. 광동 VIP 지원을 따로 — 광동 몫이 매출에서 얼마인지 보기 위함
+const EDB_M=[770000,778000,786000,794000,802000,810000,818000,820000,828000,832000,EDB_PREV,EDB_AMT];
+const ETC_M=[905000,921000,938000,950000,962000,975000,988000,1001000,1012000,1050000,ETC_PREV,ETC_ALL];
+const KD_M=[3705000,3734000,3764000,3780500,3819000,3851500,3882000,3911500,3938000,3990000,KD_IN_PREV,KD_IN];
+const TREND3=TREND.map((r,i)=>[r[0],r[1]-EDB_M[i],r[2],KD_M[i],ETC_M[i]]);
+const kdPct=r=>r[3]/(r[1]+r[2]+r[3]+r[4])*100;
 
 /* 객단가 — 대상 = 전체 약국(이용 중, 스토어 ID 중복 제거), 카테고리로 좁혀 보기. 매출 = 이용료 + VAN + 기타 판매(광동 VIP 지원 금액 제외). 예시값
    [키, 이름, 약국 수, 매출, 12만 원 이상 약국 수] */
-const ARPU=[['all','전체',1935,FEE_ALL+VAN_ALL+ETC_ALL,61],['pay','유료처',1612,66980000,58],['free','무료처',240,1620000,1],['kd','광동 VIP처',83,735816,2]];
+const ARPU=[['all','전체',1935,FEE_NET+VAN_ALL+ETC_ALL,61],['pay','유료처',1612,66122000,58],['free','무료처',240,1620000,1],['kd','광동 VIP처',83,735816,2]];
 function arpuCard(id){
   const a=ARPU.find(x=>x[0]===(S.arpu||'all')), v=Math.round(a[3]/a[2]), rate=v/120000*100;
   return `<div class="kc" id="${id}"><div class="l" style="display:flex;align-items:center;gap:6px">객단가 <select class="arpuSel" style="margin-left:auto;height:22px;font-size:11px;border:1px solid var(--line);border-radius:4px">${ARPU.map(x=>`<option value="${x[0]}" ${x[0]===a[0]?'selected':''}>${x[1]}</option>`).join('')}</select></div>
@@ -253,19 +261,19 @@ function arpuCard(id){
 function dashHead(){
   return `<div class="panel" id="dSum"><div class="ph"><h3>경영 요약</h3>${qt("모든 매출은 입금된 달로 잡아요 — 이용료 · 기타 판매는 페이앱이 헬스포트 계좌에 정산 입금한 달, VAN은 정산 파일 총액(약국 알 수 없음 포함)의 입금월, 광동 VIP 지원은 광동 입금월. 모두 VAT 포함. 정산 후 결제 취소는 반환금을 입금한 달에서 빼요.")}<div class="right">${monthSel('dMonth')}</div></div>
   <div class="cards" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kc tot" id="dTot"><div class="l">총매출</div><div class="v">${fmt(ITEM_TOT)}</div><div class="s">전월 대비 ${dir(pct(ITEM_TOT,ITEM_PREV))} ${qt('약국별 총수익 '+fmt(FEE_ALL+VAN_ALL+ETC_ALL)+'(이용료 '+fmt(FEE_ALL)+' · VAN '+fmt(VAN_ALL)+' · 기타 판매 '+fmt(ETC_ALL)+')'+(VAN_FILE>VAN_ALL?' + 약국 알 수 없음 VAN '+fmt(VAN_FILE-VAN_ALL):'')+' + 광동 VIP '+fmt(KD_IN))}</div></div>
+    <div class="kc tot" id="dTot"><div class="l">총매출</div><div class="v">${fmt(ITEM_TOT)}</div><div class="s">전월 대비 ${dir(pct(ITEM_TOT,ITEM_PREV))} ${qt('약국별 총수익 '+fmt(FEE_NET+VAN_ALL+ETC_ALL)+'(이용료 '+fmt(FEE_NET)+' · EDB 연동 '+fmt(EDB_AMT)+' 차감 · VAN '+fmt(VAN_ALL)+' · 기타 판매 '+fmt(ETC_ALL)+')'+(VAN_FILE>VAN_ALL?' + 약국 알 수 없음 VAN '+fmt(VAN_FILE-VAN_ALL):'')+' + 광동 VIP '+fmt(KD_IN))}</div></div>
     ${arpuCard('dArpu')}
     <div class="kc golink" id="dUnpaid" title="서비스 청구 통계 미결제 탭 · 미결제 개월 많은 순"><div class="l">미수금<span class="more">미결제 약국 보기 ›</span></div><div class="v">${fmt(UNPAID.amt)}</div><div class="s">미결제 ${UNPAID.n}곳 · 2개월 이상 ${UNPAID.longN}곳</div></div>
   </div>
   </div>`;
 }
-const C3=['#2a78d6','#eb6834','#1baf7a'], L3=['이용료','VAN','기타 판매 · 광동 VIP'];
+const C3=['#2a78d6','#eb6834','#8b5cf6','#1baf7a'], L3=['이용료','VAN','광동 VIP','기타 판매'];
 function dashTrend(){
-  const R=perRows(TREND3), n=R.length, W=560,H=200,L=56,B=26,T=10, mx=Math.max(...R.map(r=>r[1]+r[2]+r[3]))*1.1, bw=Math.min(56,(W-L-20)/n*0.62), gap=(W-L-20-bw*n)/(n-1);
+  const R=perRows(TREND3), n=R.length, W=560,H=200,L=56,B=26,T=10, mx=Math.max(...R.map(r=>r[1]+r[2]+r[3]+r[4]))*1.1, bw=Math.min(56,(W-L-20)/n*0.62), gap=(W-L-20-bw*n)/(n-1);
   const y=v=>T+(H-T-B)*(1-v/mx), ticks=[0,20e6,40e6,60e6];
-  const bars=R.map((r,i)=>{ const x=L+10+i*(bw+gap), tot=r[1]+r[2]+r[3]; let base=0;
-    const segs=[1,2,3].map((k,j)=>{ const y0=y(base), y1=y(base+r[k]); base+=r[k]; return `<rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(0,y0-y1-(j?2:0))}" ${j===2?'rx="3"':''} fill="${C3[j]}"/>`; }).join('');
-    return `<g><title>${r[0]} · 이용료 ${fmt(r[1])} · VAN ${fmt(r[2])} · 기타 판매 · 광동 VIP ${fmt(r[3])} · 합계 ${fmt(tot)}</title>${segs}
+  const bars=R.map((r,i)=>{ const x=L+10+i*(bw+gap), tot=r[1]+r[2]+r[3]+r[4]; let base=0;
+    const segs=[1,2,3,4].map((k,j)=>{ const y0=y(base), y1=y(base+r[k]); base+=r[k]; return `<rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(0,y0-y1-(j?2:0))}" ${j===3?'rx="3"':''} fill="${C3[j]}"/>`; }).join('');
+    return `<g><title>${r[0]} · 이용료 ${fmt(r[1])} · VAN ${fmt(r[2])} · 광동 VIP ${fmt(r[3])}(${kdPct(r).toFixed(1)}%) · 기타 판매 ${fmt(r[4])} · 합계 ${fmt(tot)}</title>${segs}
       <text x="${x+bw/2}" y="${y(tot)-5}" text-anchor="middle" font-size="${n>6?9.5:11}" fill="#2b2f33" font-weight="700">${(tot/1e6).toFixed(n>6?0:1)}${n>6?'':'백만'}</text>
       <text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="#8a9099">${r[0].slice(2).replace('-','.')}</text></g>`; }).join('');
   const grid=ticks.map(v=>`<line x1="${L}" x2="${W-6}" y1="${y(v)}" y2="${y(v)}" stroke="#eff1f3"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="10.5" fill="#8a9099">${v/1e6}백만</text>`).join('');
@@ -273,17 +281,36 @@ function dashTrend(){
     <div class="right" style="font-size:11.5px;color:#5b6168;gap:12px;white-space:nowrap">${L3.map((l,i)=>`<span><i style="display:inline-block;width:10px;height:10px;background:${C3[i]};border-radius:2px;vertical-align:-1px"></i> ${l}</span>`).join('')}</div></div>
     <svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;padding:0 12px 12px">${grid}${bars}</svg></div>`;
 }
+// 매출 항목 구성비 — 대상 선택: 전체 · 유료처 · 무료처 · 광동 VIP처 · 협력사(CS 업체)별. 예시값
+// 협력사 정산: 팜시스 처당 3,300원, 그 외 7곳 처당 7,700원 — 업체가 계좌이체로 입금
+const CSB=[['팜시스',120,3300],['CS 업체 2',64,7700],['CS 업체 3',52,7700],['CS 업체 4',41,7700],['CS 업체 5',33,7700],['CS 업체 6',27,7700],['CS 업체 7',18,7700],['CS 업체 8',12,7700]];
+const GRP_FIX={free:{n:240,a:{'VAN Fee':1180000,'기타 판매 (장비 · 설치 · 개국 작업비 · 라벨지)':440000}},
+  vip:{n:83,a:{'광동 VIP 지원':KD_IN,'VAN Fee':520816,'파머시 퍼스트':215000}}};
+function grpItems(g){
+  const all=ITEMS.filter(r=>!isEdb(r)).map(r=>[r[0],r[3]]);
+  if(g==='all') return {n:1935,rows:all};
+  const sub=k=>(GRP_FIX.free.a[k]||0)+(GRP_FIX.vip.a[k]||0);
+  if(g==='free'||g==='vip') return {n:GRP_FIX[g].n,rows:all.map(([k])=>[k,GRP_FIX[g].a[k]||0])};
+  const pay=all.map(([k,v])=>[k,v-sub(k)]);
+  if(g==='pay') return {n:1612,rows:pay};
+  const c=CSB.find(x=>x[0]===g), f=c[1]/1612;
+  return {n:c[1],rows:pay.filter(([k])=>k!=='광동 VIP 지원').map(([k,v])=>[k,Math.round(v*f/100)*100]),cs:c};
+}
 function dashShare(){
-  const mx=Math.max(...ITEMS.map(r=>r[3]));
-  return `<div class="panel" id="dShare" style="flex:1"><div class="ph"><h3>매출 항목 구성비</h3></div>
-  <div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:6px">${ITEMS.map(r=>`<div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="${r[0]} ${fmt(r[3])}">
-    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r[0]}</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:${(r[3]/mx*100).toFixed(1)}%"></span></span><span class="num" style="text-align:right">${(r[3]/ITEM_TOT*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
+  const g=S.sg||'all', G=grpItems(g), rows=G.rows.filter(r=>r[1]>0), tot=rows.reduce((a,r)=>a+r[1],0), mx=Math.max(...rows.map(r=>r[1]));
+  const opt=(v,t)=>`<option value="${v}" ${g===v?'selected':''}>${t}</option>`;
+  return `<div class="panel" id="dShare" style="flex:1"><div class="ph"><h3>매출 항목 구성비</h3>
+    <div class="right"><select class="fi" id="sgSel" style="height:28px;font-size:12px;width:auto">${opt('all','전체')}${opt('pay','유료처')}${opt('free','무료처')}${opt('vip','광동 VIP처')}<optgroup label="협력사 (CS 업체)">${CSB.map(c=>opt(c[0],c[0]+' · '+c[1]+'처')).join('')}</optgroup></select></div></div>
+  <div class="sub2" style="padding:0 18px 6px">${G.n.toLocaleString()}처 · 매출 ${fmt(tot)}원</div>
+  <div style="padding:0 18px 10px;display:flex;flex-direction:column;gap:6px">${rows.map(r=>`<div style="display:grid;grid-template-columns:170px 1fr 52px;gap:8px;align-items:center;font-size:12px" title="${r[0]} ${fmt(r[1])}">
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r[0]}</span><span style="background:#f3f5f7;border-radius:4px;height:11px"><span style="display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6;width:${(r[1]/mx*100).toFixed(1)}%"></span></span><span class="num" style="text-align:right">${(r[1]/tot*100).toFixed(1)}%</span></div>`).join('')}</div>
+  ${G.cs?`<div class="basis" id="csLine" style="margin:0 18px 14px">협력사 정산 ${G.cs[1]}처 × ${fmt(G.cs[2])}원 = <b>${fmt(G.cs[1]*G.cs[2])}원</b> ${qt('업체가 계좌이체로 입금해요. 팜시스 처당 3,300원, 그 외 7곳 처당 7,700원')} <span class="tbu">총매출 포함 확인 필요</span></div>`:''}</div>`;
 }
 const GO_LAB={'이용료':'서비스 청구 통계','VAN':'VAN 정산 관리','기타':'약국별 총수익 · 기타 판매 큰 순','광동':'광동 VIP 정산'};
 function dashSvc(){
   return `<div class="panel" id="dSvc"><div class="ph"><h3>매출 항목</h3>${qt("행을 누르면 그 항목의 약국 목록으로 이동")}</div>
   <div class="tblwrap"><table class="tbl" id="svcTbl"><thead><tr><th>매출 항목</th><th>구분</th><th class="num">이용 약국</th><th class="num">매출</th><th class="num">전월 대비</th><th class="num">비중</th></tr></thead><tbody>
-  ${ITEMS.map(r=>`<tr data-item="${r[1]}" data-nm="${esc(r[0])}" style="cursor:pointer"><td>${r[0]} <span class="sub2">›</span></td><td><span class="tg">${r[1]}</span></td><td class="num">${fmt(r[2])}</td><td class="num">${fmt(r[3])}</td><td class="num">${dir(pct(r[3],r[4]))}</td><td class="num">${(r[3]/ITEM_TOT*100).toFixed(1)}%</td></tr>`).join('')}
+  ${ITEMS.map(r=>`<tr data-item="${r[1]}" data-nm="${esc(r[0])}" style="cursor:pointer"${isEdb(r)?' class="edb"':''}><td>${r[0]} <span class="sub2">›</span>${isEdb(r)?` <span class="tg">총매출 차감</span>${qt('EDB에 그대로 넘기는 금액(수수료 없음)이라 금액만 보여 주고 총매출 · 비중에서 빼요')}`:''}</td><td><span class="tg">${r[1]}</span></td><td class="num">${fmt(r[2])}</td><td class="num">${isEdb(r)?'<span class="sub2">'+fmt(r[3])+'</span>':fmt(r[3])}</td><td class="num">${dir(pct(r[3],r[4]))}</td><td class="num">${isEdb(r)?'<span class="sub2">−</span>':(r[3]/ITEM_TOT*100).toFixed(1)+'%'}</td></tr>`).join('')}
   <tr class="tot"><td>합계</td><td></td><td class="num">—</td><td class="num">${fmt(ITEM_TOT)}</td><td class="num">${dir(pct(ITEM_TOT,ITEM_PREV))}</td><td class="num">100%</td></tr>
   </tbody></table></div></div>`;
 }
@@ -294,11 +321,9 @@ const ETC_ITEM=[['라벨지',55000],['바코드건',176000],['PC 설치',220000]
 D.forEach((o,i)=>{ o.etc = o.st==='ok' && i%5===2 ? ETC_ITEM[i%4] : null; });
 const etcOf=o=>o.etc?o.etc[1]:0, totOf=o=>(o.fee||0)+o.vam+etcOf(o);
 function trend(){
-  const E=[905000,921000,938000,950000,962000,975000,988000,1001000,1012000,1050000,1096000,ETC_ALL];
-  const K=TREND3.map(r=>r[3]);
   return `<div class="panel" id="trendPanel" style="flex:1"><div class="ph"><h3 style="white-space:nowrap">월별 추이</h3>${perSel('tPer')}<button class="btn sm on" id="tvT">그래프로 보기</button></div>
-  <div class="tblwrap" style="max-height:260px;overflow:auto"><table class="tbl" id="tTbl"><thead><tr><th>월</th><th class="num">총매출</th><th class="num">이용료</th><th class="num">VAN</th><th class="num">기타 판매 · 광동 VIP</th></tr></thead><tbody>
-  ${perRows(TREND.map((r,i)=>[...r,K[i]])).reverse().map(r=>`<tr><td>${r[0]}</td><td class="num"><b>${fmt(r[1]+r[2]+r[3])}</b></td><td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2])}</td><td class="num">${fmt(r[3])}</td></tr>`).join('')}
+  <div class="tblwrap" style="max-height:260px;overflow:auto"><table class="tbl" id="tTbl"><thead><tr><th>월</th><th class="num">총매출</th><th class="num">이용료</th><th class="num">VAN</th><th class="num">광동 VIP (비중)</th><th class="num">기타 판매</th></tr></thead><tbody>
+  ${perRows(TREND3).slice().reverse().map(r=>`<tr><td>${r[0]}</td><td class="num"><b>${fmt(r[1]+r[2]+r[3]+r[4])}</b></td><td class="num">${fmt(r[1])}</td><td class="num">${fmt(r[2])}</td><td class="num">${fmt(r[3])} <span class="sub2">${kdPct(r).toFixed(1)}%</span></td><td class="num">${fmt(r[4])}</td></tr>`).join('')}
   </tbody></table></div></div>`;
 }
 function payLines(o){ // 펼침 — 그 달 결제 내역
@@ -445,6 +470,7 @@ function bind(){
   if($('kUp')) $('kUp').onclick=()=>toast('시안 — 파일 선택 후 바로 대조');
   if($('kReq')) $('kReq').onclick=()=>toast('시안 — 빠진 처 청구 요청 목록(.xlsx) 다운로드');
   document.querySelectorAll('.arpuSel').forEach(s=>s.onchange=()=>{ S.arpu=s.value; render(); });
+  if($('sgSel')) $('sgSel').onchange=e=>{ S.sg=e.target.value; render(); };
   if($('toMgmt')) $('toMgmt').onclick=e=>{e.preventDefault(); go('mgmt');};
   if($('toMgmt2')) $('toMgmt2').onclick=e=>{e.preventDefault(); go('mgmt');};
   document.querySelectorAll('.kdgo').forEach(a=>a.onclick=e=>{e.preventDefault(); toast('시안 — 약국 상세에서 약국 분류 광동 VIP 체크');});
