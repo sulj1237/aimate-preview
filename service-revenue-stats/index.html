@@ -347,6 +347,10 @@
   .vbtn{border:1px solid #33c3b4;background:#fff;color:#0e9e8c;border-radius:6px;font-size:11.5px;font-weight:700;padding:3px 9px;cursor:pointer;white-space:nowrap}.vbtn:hover,.vbtn.on{background:#e6f7f4}
   .vanhint{margin-top:8px;font-size:12px;color:#3d444b;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:6px 10px}.vanhint a{color:#c2410c;font-weight:700}
   .mtxt{position:relative}.mtxt[data-tip]:hover::after{content:attr(data-tip);position:absolute;right:0;top:20px;z-index:30;width:240px;white-space:normal;text-align:left;background:#1f2a37;color:#fff;font-size:12px;font-weight:500;line-height:1.5;padding:7px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.18);text-decoration:none}
+  .tbl.pay tr.bmh td{text-align:left;background:#f6f7fb;border-top:1px solid var(--line);font-size:12.5px;padding:7px 10px}.tbl.pay .bmn{color:#6b7280;font-size:11.5px;margin-left:4px}
+  .tbl.pay tr.bmi td:nth-child(4){padding-left:22px}.tbl.pay .bml{color:#9aa1a9;margin-right:4px}.tbl.pay .wy{display:inline-block;font-size:10.5px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
+  .tbl.pay .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px}.tbl.pay .st.ok{background:#e6f6f3;color:#0f8a74}.tbl.pay .st.fail{background:#fdecec;color:#b42318}.tbl.pay .st.cx{background:#eef0f3;color:#5b6168}
+  .tbl.pay .rs{font-size:11.5px;color:#5b6168;margin-top:2px}.tbl.pay .red{color:#d92d20}#pRes .rad{cursor:pointer}#pRes .pc{font-weight:600;color:#8a929a;margin-left:2px}
 </style>
 </head>
 <body>
@@ -911,7 +915,7 @@ const payDT = x => x.date.slice(2)+' '+payTime(x);
 // 결제 이력 — 한 청구월분의 결제 시도(정기 자동결제 실패 → 관리자 수기 결제 성공 등)를 시각순으로. 시도가 2번 이상이면 약국 행에서 펼쳐 봄
 const attempts = (name, ym) => PAYS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S).sort((a,b)=>payDT(a)<payDT(b)?-1:1);
 const attHtml = (name, ym) => { const a=attempts(name,ym);
-  return `<tr class="att-row"><td></td><td colspan="12"><div class="attw"><b class="attt">${+ym.slice(5)}월분 결제 이력</b><table class="attt2"><thead><tr><th>결제 일시</th><th>결제 방식</th><th class="num">시도 금액</th><th>결과</th><th>사유</th></tr></thead><tbody>${a.map(x=>`<tr><td>${payDT(x)}</td><td>${wayOf(x)==='수기'?'관리자 수기 결제':'정기 자동결제'}</td><td class="num">${fmt(x.amt)}</td><td>${x.ok?'<span class="okc">성공</span>':'<span class="upc">실패</span>'}</td><td>${x.ok?esc2(x.reason):esc2(x.fail||'')}</td></tr>`).join('')}</tbody></table></div></td></tr>`; };
+  return `<tr class="att-row"><td></td><td colspan="12"><div class="attw"><b class="attt">${+ym.slice(5)}월분 결제 이력</b><table class="attt2"><thead><tr><th>결제 일시</th><th>결제 방식</th><th class="num">시도 금액</th><th>결과</th><th>사유</th></tr></thead><tbody>${a.map(x=>`<tr><td>${payDT(x)}</td><td>${wayOf(x)==='수기'?'관리자 수기 결제':'정기 자동결제'}</td><td class="num">${fmt(x.amt)}</td><td>${x.ok?'<span class="okc">성공</span>':'<span class="upc">실패</span>'}</td><td>${x.ok?esc(x.reason):esc(x.fail||'')}</td></tr>`).join('')}</tbody></table></div></td></tr>`; };
 const esc2 = t => String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // 결제일시 — 결제 완료: 그 청구월분이 결제된 일시(여러 번이면 모두, 다음 달에 결제해도 그 일시) · 미결제: 마지막 결제 시도(실패) 일시
 const payDates = (name, ym) => [...new Set(PAYS.filter(x=>x.ok && x.name===name && x.bm===ym && x.date<=TODAY_S).map(payDT))].sort();
@@ -1219,7 +1223,7 @@ function bindMain(){
   const qkS=$('qk'); if(qkS) qkS.onchange=e=>{ S.qk=e.target.value; render(); };
   document.querySelectorAll('[data-cls]').forEach(c=>c.onchange=()=>{ c.checked?S.flt.cls.add(c.dataset.cls):S.flt.cls.delete(c.dataset.cls); resetList(); render(); });
   document.querySelectorAll('select.fsel[data-f]').forEach(c=>c.onchange=()=>{ S.flt[c.dataset.f]=c.value; resetList(); render(); });
-  // 미결제 탭 — 약국 결제 관리로 이동(기간 1개월 · 결제 여부 조회 실패)
+  // 미결제 탭 — 약국 결제 관리로 이동(기간 1개월 · 결제 상태 미결제)
   const pg=$('payGo'); if(pg) pg.onclick=goPay;
   // 결제 완료 · 미결제 탭
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ if(S.tab===b.dataset.tab) return; S.tab=b.dataset.tab; S.cf='all'; S.sort=null; resetList(); render(); });
@@ -1237,41 +1241,58 @@ function bindMain(){
 const DEND=[['봄빛약국','123-45-67890','스마트2D','2026-10 ~ 2026-11',82500],
   ['한결약국','234-56-78901','키오스크','2026-09 ~ 2026-11',99000],
   ['소나무약국','345-67-89012','파머시 퍼스트','2026-11 ~ 2026-11',71500]];
+/* 약국 결제 관리 — 정기 결제 내역(SA-01-004)과 같은 구성: 약국 × 청구월 결제 이력 묶음 · 결제 상태 · 정기 / 수기 · 사유. 승인 · 수동 승인 여부는 없앰(수기 결제 '결제 실패 월' 연결로 대신) */
+// 결제 상태 조회: 전체 · 결제 완료 · 미결제(실패만 있고 아직 메우지 못한 청구월) · 취소. 서비스 청구 통계 미결제 탭에서 오면 '미결제'
+const PCX=new Set(); (()=>{ const ok=PAYS.filter(x=>x.ok && x.date>=PAY_FROM && x.date<=PAY_TO && wayOf(x)!=='수기'); if(ok[3]) PCX.add(ok[3]); })();   // 예시: 결제 취소 1건
+const pSt=x=>PCX.has(x)?['cx','취소 완료']:x.ok?['ok','성공']:['fail','실패'];
+function payGroups(){
+  const g={}; PAYS.filter(x=>x.date>=PAY_FROM && x.date<=PAY_TO).forEach(x=>{ (g[x.name+'|'+x.bm]=g[x.name+'|'+x.bm]||[]).push(x); });
+  return Object.values(g).map(rs=>{ rs.sort((a,b)=>payDT(a)<payDT(b)?-1:1); const ok=rs.filter(x=>x.ok&&!PCX.has(x)), last=rs[rs.length-1];
+    return {name:rs[0].name, bm:rs[0].bm, rs, ok, st:ok.length?'paid':rs.some(x=>PCX.has(x))?'cx':'unpaid', last}; })
+    .sort((a,b)=>payDT(b.last)<payDT(a.last)?-1:1);
+}
 function renderPay(){
-  const q=['당일','1주일','1개월','3개월','6개월'];
+  const q=['당일','1주일','1개월','3개월','6개월'], F=S.payF||'unpaid', W=S.payW||'all';
+  const all=payGroups(), list=all.filter(g=>(F==='all'||g.st===F) && (W==='all'||g.rs.some(x=>(wayOf(x)==='수기'?'man':'auto')===W)));
+  const cnt=k=>all.filter(g=>k==='all'||g.st===k).length;
+  const SL={all:'전체',paid:'결제 완료',unpaid:'미결제',cx:'취소'};
+  const row=(g,x,sub)=>{ const pr=person(NAMES.indexOf(g.name)+1000), [c,t]=pSt(x);
+    return `<tr${sub?' class="bmi"':''}><td>${sub?'':g.name}</td><td>${sub?'':pr.biz}</td><td>${sub?'':g.bm}${!sub&&g.st==='unpaid'?' <span class="st fail">미결제</span>':''}</td>
+      <td>${sub?'<span class="bml">└</span>':''}${payDT(x)} <span class="wy">${wayOf(x)==='수기'?'수기':'정기'}</span></td><td><span class="st ${c}">${t}</span></td><td class="num">${fmt(x.amt)}</td><td class="num">${PCX.has(x)?'<span class="red">−'+fmt(x.amt)+'</span>':''}</td>
+      <td>${x.ok?esc(x.reason):esc(x.fail||'')}${PCX.has(x)?'<div class="rs"><b>취소</b> [과다 청구] 해지 미반영</div>':''}</td><td class="ctr">${sub?'':'<button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button>'}</td></tr>`; };
+  const head=g=>{ const [c,t]=g.st==='paid'?['ok','결제 완료']:g.st==='cx'?['cx','취소']:['fail','미결제'], lastOk=g.ok[g.ok.length-1];
+    return `<tr class="bmh"><td colspan="9"><b>${g.name}</b> · ${g.bm}분 <span class="st ${c}">${t}</span>${lastOk&&wayOf(lastOk)==='수기'?' <span class="wy">수기 결제</span>':''} <span class="bmn">결제 ${g.rs.length}건</span>${lastOk?' · 결제액 '+fmt(lastOk.amt)+'원':''}<button class="lnk" style="float:right" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr>`; };
+  const body=list.slice(0,12).map(g=>g.rs.length>1?head(g)+g.rs.map(x=>row(g,x,1)).join(''):row(g,g.rs[0],0)).join('');
   document.getElementById('content').innerHTML=`
     <h2 class="pay-h">약국 결제 관리</h2>
     <div class="panel pay-f">
       <div class="frow">
         <span class="flabel">기간</span><span class="din" id="pFrom">${PAY_FROM}</span>~<span class="din">${PAY_TO}</span>
         ${q.map(x=>`<button class="qbtn ${x==='1개월'?'on':''}" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">${x}</button>`).join('')}
-        <span class="gap"></span><span class="flabel" style="width:auto">수동 승인 여부</span><span class="chk"></span>
-        <span class="gap"></span><span class="flabel" style="width:auto">결제 여부 조회</span>
-        <span id="pRes"><span class="rad"><i></i>전체</span><span class="rad"><i></i>성공</span><span class="rad on"><i></i>실패</span></span>
+        <span class="gap"></span><span class="flabel" style="width:auto">결제 상태</span>
+        <span id="pRes">${Object.keys(SL).map(k=>`<span class="rad ${F===k?'on':''}" data-pf="${k}"><i></i>${SL[k]} <b class="pc">${cnt(k)}</b></span>`).join('')}</span>
       </div>
       <div class="frow">
-        <span class="flabel">검색</span><select class="sel"><option>약국명</option></select><input class="din" style="width:140px">
+        <span class="flabel">검색</span><select class="sel"><option>약국명</option><option>사업자번호</option></select><input class="din" style="width:140px">
+        <span class="gap"></span><span class="flabel" style="width:auto">결제 방식</span><select class="sel" id="pWay">${[['all','전체'],['auto','정기'],['man','수기']].map(([k,t])=>`<option value="${k}" ${W===k?'selected':''}>${t}</option>`).join('')}</select>
         <span class="gap"></span><span class="flabel">업체명</span><select class="sel"><option>전체</option></select>
-        <span class="gap"></span><!-- 데모 종료 예정 — 추후 고도화 -->
       </div>
       <div class="acts"><button class="btn" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">초기화</button><button class="btn pri" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">검색</button></div>
     </div>
-    ${S.dEnd?`<div class="pay-top"><span>데모 종료 예정 <span class="cnt">${DEND.length}곳</span> <span style="color:#8a929a;font-size:12px">— 이번 달로 데모 기간이 끝나 다음 청구분부터 정기 결제 금액을 바꿔야 하는 약국</span></span></div>
-    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 서비스</th><th>데모 기간</th><th>바꿀 정기 결제 금액</th></tr></thead>
-      <tbody>${DEND.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]} <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">종료 예정</span></td><td>${fmt(r[4])}원 (2026-12 청구분부터)</td></tr>`).join('')}</tbody></table></div>`:`
-    <div class="pay-top"><span>전체 <span class="cnt">${PAY_FAILS.length}개</span></span>
+    <div class="pay-top"><span>${SL[F]} <span class="cnt">${list.length}건</span> <span style="color:#8a929a;font-size:12px">약국 × 청구월</span></span>
       <span class="r"><button class="btn pri" data-toast="데모 — 약국 결제 관리 기존 기능">엑셀 내보내기</button><select class="sel"><option>10개 씩</option></select></span></div>
     <div class="panel"><table class="tbl pay" id="pTbl">
-      <thead><tr><th>약국명</th><th>대표자명</th><th>사업자 번호</th><th>결제요청금액</th><th>결제 이유</th><th>결제 성공 여부</th><th>수동 승인 여부</th><th>결제 실패 사유</th><th>결제 일자</th><th>승인</th></tr></thead>
-      <tbody>${PAY_FAILS.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${fmt(r[3])}</td><td>${r[4]}</td><td class="fail">실패</td><td>미승인</td><td>${r[5]}</td><td>${r[6]}</td><td><button class="apv">승인</button></td></tr>`).join('')}</tbody>
+      <thead><tr><th>약국명</th><th>사업자 번호</th><th>청구월</th><th>결제 일시</th><th>결제상태</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 실패 · 취소 사유</th><th class="ctr">약국 상세</th></tr></thead>
+      <tbody>${body||'<tr><td colspan="9" class="empty">조건에 맞는 결제가 없습니다.</td></tr>'}</tbody>
     </table>
-    <div class="pager"><button class="on">1</button></div></div>`}`;
-  const dc=document.getElementById('pDend'); if(dc) dc.onchange=()=>{ S.dEnd=dc.checked; renderPay(); };
+    <div class="pager"><button class="on">1</button></div></div>`;
+  document.querySelectorAll('[data-pf]').forEach(r=>r.onclick=()=>{ S.payF=r.dataset.pf; renderPay(); });
+  const pw=document.getElementById('pWay'); if(pw) pw.onchange=()=>{ S.payW=pw.value; renderPay(); };
 }
 
 /* ───────── 화면 이동 ─────────
    약국 결제 관리로 이동할 때 브라우저 기록을 남김 → 뒤로 가기(브라우저 · `‹ 서비스 청구 통계`)로 보던 약국별 청구 위치 · 탭 · 필터 그대로 복귀 */
-function goPay(){ S.backY=window.scrollY; S.page='pay'; history.pushState({page:'pay'},'','#pay'); render(); window.scrollTo(0,0); }
+function goPay(){ S.backY=window.scrollY; S.payF='unpaid'; S.payW='all'; S.page='pay'; history.pushState({page:'pay'},'','#pay'); render(); window.scrollTo(0,0); }
 history.replaceState({page:'stats'},'',location.pathname+location.search);
 window.addEventListener('popstate',e=>{ S.page=(e.state&&e.state.page)||'stats'; render();
   if(S.page==='stats') requestAnimationFrame(()=>window.scrollTo(0, S.backY!=null ? S.backY : document.getElementById('phPanel').getBoundingClientRect().top+window.scrollY-10)); });
