@@ -223,11 +223,11 @@ function svcModal(){
       <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td></tr>
       <tr class="tot"><td colspan="4">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
-    <div class="fr" id="dCatRow"><span class="fl">할인 사유<span class="addb">추가</span></span><div><select class="fi" id="dCat">${opt(DISC_CAT,'결합 무료')}</select><div class="hint" id="dHint"></div></div></div>
+    <div class="fr" id="dCatRow"><span class="fl">할인 사유<span class="addb">추가</span></span><div><select class="fi" id="dCat">${opt(DISC_CAT,'결합 무료')}</select></div></div>
     <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="POS 무상 제공" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="fr" id="dPerRow"><span class="fl">적용 기간<span class="addb">추가</span></span><div><div class="seg"><select class="fi" id="dFrom" style="width:150px">${['2026-06','2026-11','2026-12'].map(m=>`<option ${m===D.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi" id="dTo" style="width:170px"><option value="">계속 (종료월 없음)</option>${['2026-11','2026-12','2027-01','2027-03','2027-06'].map(m=>`<option ${m===D.to?'selected':''}>${m}</option>`).join('')}</select></div><div class="hint">청구월 기준 — 시작월 청구분부터 종료월 청구분까지 할인</div></div></div>
-    <div class="fr" id="dWhoRow"><span class="fl">등록자<span class="addb">추가</span></span><div class="ro">김운영 <span class="hint">(저장한 관리자로 자동 기록 · 수정하면 수정자로)</span></div></div>
-    <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot"></b> <span class="hint">(옵션 총액 − 금액 할인, VAT 별도)</span></div></div>
+    <div class="fr" id="dPerRow"><span class="fl">적용 기간<span class="addb">추가</span></span><div><div class="seg"><select class="fi" id="dFrom" style="width:150px">${['2026-06','2026-11','2026-12'].map(m=>`<option ${m===D.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi" id="dTo" style="width:170px"><option value="">계속 (종료월 없음)</option>${['2026-11','2026-12','2027-01','2027-03','2027-06'].map(m=>`<option ${m===D.to?'selected':''}>${m}</option>`).join('')}</select></div></div></div>
+    <div class="fr" id="dWhoRow"><span class="fl">등록자<span class="addb">추가</span></span><div class="ro">김운영</div></div>
+    <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot"></b></div></div>
     <div class="pv" id="dPv"><span class="mlab">약국 서비스 목록에 보이는 내용</span><br><span id="dPvT"></span></div>
     <div id="dHist"><div class="fl" style="padding:0 0 6px">지난 금액 할인<span class="addb">추가</span></div>
       <table class="tbl"><thead><tr><th>적용 기간</th><th class="num">금액 (VAT 포함)</th><th>사유</th><th>메모</th><th>등록자</th><th>상태</th></tr></thead>
@@ -308,7 +308,7 @@ function bindAll(){
   if($('pbGo')) $('pbGo').onclick=()=>{ const h=HIST.find(x=>x[0]===S.cid); if(h) h[9]=$('pbDate').value.slice(5).replace('-','-')+' · 김운영'; go('sub'); };
   const r=$('svcRow'); if(r){ r.style.cursor='pointer'; r.onclick=()=>go('svc'); }
   if($('dCat')){ const u=()=>{ const c=$('dCat').value, m=$('dMemo').value.trim(), a=+String($('dAmt').value).replace(/\D/g,'')||0, f=$('dFrom').value, t=$('dTo').value;
-      $('dHint').textContent=hintOf(DISC_CAT,c); $('dTot').textContent=fmt(55000-a)+'원';
+      $('dTot').textContent=fmt(55000-a)+'원';
       $('dPvT').innerHTML=(m||c!=='기타')?discText({amt:a,cat:c,memo:m,from:f,to:t,who:'김운영',at:'저장 시각'}):'<span class="red">사유 기타는 메모를 입력하세요</span>'; };
     ['dCat','dMemo','dAmt','dFrom','dTo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
   if($('cxCat')){ const h=view().find(x=>x[0]===S.cid)||HIST[0], max=h[4]-h[5];
