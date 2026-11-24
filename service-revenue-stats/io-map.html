@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>입력 → 표기 1:1</title>
+<!--
+  입력 화면(약국 서비스 수정 · 수기 결제 · 결제 취소)마다 같은 약국 · 같은 입력값이 어느 화면에 어떻게 표기되는지 1:1로 모은 시안.
+  입력은 payment-admin.html(샘플약국) 그대로, 결과는 같은 값으로 그린 정적 화면. 약국명 · 금액은 예시값
+-->
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  :root{--teal:#1fb6a6;--ink:#2b2f33;--muted:#8a9099;--line:#e3e6ea;--bg:#f4f5f7;--up:#d6453d;--down:#2f6fd6;--org:#FF5A1F}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,sans-serif;color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  .wrap{max-width:1700px;margin:0 auto;padding:18px}
+  h1{font-size:20px;margin:0 0 4px} .lead{color:#4b5560;font-size:12.5px;margin:0 0 12px}
+  .nav{display:flex;gap:6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+  .nav a{font-size:12.5px;font-weight:700;border:1px solid var(--line);background:#fff;color:#4b5560;border-radius:999px;padding:6px 14px;text-decoration:none}
+  .sec{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:10px 0 18px;scroll-margin-top:56px}
+  .sec>h2{margin:0 0 4px;font-size:18px} .sec>.sub{color:#4b5560;font-size:12.5px;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:600px 1fr;gap:18px;align-items:start}
+  .inp{position:sticky;top:56px}
+  .cap{font-size:11.5px;font-weight:800;color:var(--teal);margin-bottom:6px}
+  .shot{width:600px;height:520px;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#dfe2e6}
+  .shot iframe{width:1240px;height:1075px;border:0;transform:scale(.4839);transform-origin:0 0;pointer-events:none;background:#fff}
+  .val{margin-top:8px;background:#f6f8fa;border-radius:8px;padding:8px 10px;font-size:12px}
+  .val div{display:flex;gap:8px}.val span{flex:none;width:76px;color:var(--muted)}
+  .open{display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#08837E}
+  .out{display:flex;flex-direction:column;gap:14px}
+  .card{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .ch{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#fafbfc;border-bottom:1px solid var(--line)}
+  .no{flex:none;width:20px;height:20px;border-radius:50%;background:var(--org);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center}
+  .ch b{font-size:13px}.ch .where{font-size:11.5px;color:var(--muted)}.ch .sc{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:800;color:#08837E;text-decoration:none}
+  .note{padding:8px 12px;font-size:12px;color:#4b5560;border-top:1px dashed var(--line)}
+  .note b{color:var(--ink)}
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:11.5px;text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:7px 9px;border-bottom:1px solid #eff1f3;white-space:nowrap;vertical-align:top}
+  .tbl .num{text-align:right;font-variant-numeric:tabular-nums}.tbl .ctr{text-align:center}
+  .tbl tr.hl td{background:#fff7f2}
+  .tbl tr.dim td{color:#a3a9b0}
+  .tbl tr.sub td{background:#f8f9fa;font-weight:700}.tbl tr.etc td{background:#fff8f8}.tbl tr.tot td{font-weight:800}
+  .st{display:inline-block;font-size:10.5px;font-weight:700;border-radius:4px;padding:0 6px}
+  .st.ok{background:#e6f6f3;color:#0f8a74}.st.fail{background:#fdecea;color:var(--up)}.st.cx{background:#eef0f3;color:#5b6168}
+  .wy{display:inline-block;font-size:10px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
+  .wy.man{background:#fff3d6;color:#a86b00}
+  .ctag{display:inline-block;border:1px solid #cfd4da;border-radius:4px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:#3f454c;background:#fff;font-weight:500;white-space:nowrap}
+  .rs{font-size:11px;color:#5b6168;margin-top:2px}.rs b{color:var(--ink)}
+  .red{color:var(--up);font-weight:700}.blue{color:var(--down);font-weight:700}
+  .drs{font-size:10.5px;color:#5b6168;margin-top:3px;text-align:right;white-space:normal;max-width:150px;margin-left:auto}
+  .mt{font-size:11px;color:#4b5560}
+  .chg{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--org);border-radius:3px;padding:0 4px;margin-left:4px}
+  .step{font-size:11.5px;font-weight:800;color:#5c636b;margin:2px 0 -6px}
+</style>
+</head>
+<body><div class="wrap">
+<h1>입력 → 표기 1:1</h1>
+<p class="lead">입력 화면 3개마다 <b>같은 약국(샘플약국) · 같은 입력값</b>이 어느 화면에 어떻게 보이는지 모았어요. 왼쪽은 실제 입력 시안, 오른쪽은 저장 뒤 화면이고 <span class="chg">바뀜</span>이 입력값이 들어간 자리예요.</p>
+<div class="nav"><a href="#svc">① 약국 서비스 수정 · 금액 할인</a><a href="#manual">② 수기 결제</a><a href="#cancel">③ 결제 취소</a><a href="storyboard.html">스토리보드 ›</a></div>
+
+<!-- ① 약국 서비스 수정 -->
+<section class="sec" id="svc">
+  <h2>① 약국 서비스 수정 — 금액 할인</h2>
+  <div class="sub">약국관리 › 약국 관리 › 상세 › 약국 서비스 수정 (SA-01-003)</div>
+  <div class="grid">
+    <div class="inp">
+      <div class="cap">입력</div>
+      <div class="shot"><iframe src="payment-admin.html?p=svc" loading="lazy"></iframe></div>
+      <div class="val">
+        <div><span>옵션</span>스마트 OCR 45,000 · 굿팜 POS 20,000 (결합 50% → 10,000) = 55,000</div>
+        <div><span>금액 할인</span>10,000 (VAT 별도 → 표시 11,000)</div>
+        <div><span>할인 사유</span>계약 할인</div>
+        <div><span>메모</span>DRS 파머시 퍼스트 중복</div>
+        <div><span>등록자</span>김운영 (로그인 관리자 · 자동)</div>
+      </div>
+      <a class="open" href="payment-admin.html?p=svc" target="_blank">입력 화면 열기 ›</a>
+    </div>
+    <div class="out">
+      <div class="card"><div class="ch"><span class="no">1</span><b>약국 서비스 목록</b><span class="where">약국 상세</span><a class="sc" href="storyboard.html#SA-01-120">SA-01-120 ›</a></div>
+        <table class="tbl"><thead><tr><th>서비스명</th><th>계약일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>등록자</th></tr></thead>
+        <tbody><tr class="hl"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-06-05</td><td class="num">49,500<span class="chg">바뀜</span></td><td>승인</td><td>김운영 · 2026-11-24<span class="chg">바뀜</span></td></tr></tbody></table>
+        <div class="note">과금액 = 총 과금액 45,000 + VAT = <b>49,500</b> · 등록자 = 저장한 관리자 · 날짜</div></div>
+
+      <div class="card"><div class="ch"><span class="no">2</span><b>약국별 청구 — 약국 행</b><span class="where">서비스 청구 통계 · 기준월 2026-12 · 결제 완료</span><a class="sc" href="storyboard.html#SA-01-115">SA-01-115 ›</a></div>
+        <table class="tbl"><thead><tr><th>약국명</th><th>서비스 옵션</th><th class="num">옵션별 금액</th><th class="num">금액 할인</th><th class="num">할인 후 요금</th><th class="num">결제 예정</th><th class="num">실결제</th><th>결제일시</th><th>결제 방식</th><th>비고</th></tr></thead>
+        <tbody><tr class="hl"><td><b>샘플약국</b></td><td>2개 항목</td><td class="num">60,500</td><td class="num"><span class="blue">−11,000</span><span class="chg">바뀜</span><div class="drs"><span class="ctag" style="margin:0">계약 할인</span><div>DRS 파머시 퍼스트 중복</div></div></td><td class="num">49,500</td><td class="num"><b>49,500</b></td><td class="num"><b>49,500</b></td><td>26-12-05 10:02</td><td class="ctr"><span class="wy">자동</span></td><td></td></tr>
+        <tr class="dim"><td>└</td><td>스마트 OCR</td><td class="num">49,500</td><td colspan="7"></td></tr>
+        <tr class="dim"><td>└</td><td>굿팜 POS</td><td class="num">11,000</td><td colspan="7"></td></tr></tbody></table>
+        <div class="note">옵션별 금액 = VAT 포함(49,500 + 11,000) · 금액 할인 칸 = 금액 + <b>사유 태그 + 메모</b> · 할인 후 요금 = 결제 예정 금액이라 계약 확인 필요 없음 · 11-24에 저장하면 <b>다음 정기 결제(12-05)</b>부터 반영</div></div>
+
+      <div class="card"><div class="ch"><span class="no">3</span><b>계산 내역</b><span class="where">약국 행 결제 예정 금액 칸 계산 아이콘</span><a class="sc" href="storyboard.html#SA-01-107">SA-01-107 ›</a></div>
+        <table class="tbl"><thead><tr><th>서비스 옵션</th><th class="num">수량</th><th class="num">정가</th><th class="num">결합 · VIP 할인</th><th class="num">금액</th><th>계산식</th></tr></thead>
+        <tbody><tr><td>스마트 OCR</td><td class="num">1</td><td class="num">49,500</td><td class="num">0</td><td class="num">49,500</td><td>정가</td></tr>
+        <tr><td>굿팜 POS</td><td class="num">1</td><td class="num">22,000</td><td class="num red">−11,000</td><td class="num">11,000</td><td>결합할인 50%</td></tr>
+        <tr class="sub"><td colspan="4">서비스 요금</td><td class="num">60,500</td><td></td></tr>
+        <tr class="etc hl"><td colspan="4">금액 할인 <span class="ctag" style="margin-left:6px">계약 할인</span>DRS 파머시 퍼스트 중복 <span style="color:#8a9099">김운영 · 등록</span><span class="chg">바뀜</span></td><td class="num red">−11,000</td><td style="color:#8a9099">약국 총액에서 차감</td></tr>
+        <tr class="tot"><td colspan="4">할인 후 요금</td><td class="num">49,500원</td><td></td></tr>
+        <tr class="tot"><td colspan="4">결제 예정 금액</td><td class="num">49,500원</td><td style="color:#8a9099;font-weight:400">서비스 요금과 같음</td></tr></tbody></table></div>
+
+      <div class="card"><div class="ch"><span class="no">4</span><b>정기 결제 내역 · 약국 결제 관리</b><span class="where">약국 상세 · 약국관리 › 약국 결제 관리</span></div>
+        <div class="note">금액 할인은 <b>결제 금액(49,500)</b>으로만 반영돼요. 결제 이유 칸은 <q>굿팜결제</q> 그대로예요.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ② 수기 결제 -->
+<section class="sec" id="manual">
+  <h2>② 수기 결제 — 지난 미결제 달(7월분)을 11월에 결제</h2>
+  <div class="sub">약국관리 › 약국 관리 › 상세 › 정기 결제 › [수기 결제] (SA-01-006)</div>
+  <div class="grid">
+    <div class="inp">
+      <div class="cap">입력</div>
+      <div class="shot"><iframe src="payment-admin.html?p=manual" loading="lazy"></iframe></div>
+      <div class="val">
+        <div><span>청구월</span>2026-07 (미결제) — 기본값 이번 달에서 바꿔 고름</div>
+        <div><span>결제 사유</span>재시도 결제</div>
+        <div><span>금액</span>71,500</div>
+        <div><span>메모</span>카드 변경 후 결제</div>
+        <div><span>결제일</span>2026-11-24 14:30 (결제한 시각 · 자동)</div>
+      </div>
+      <a class="open" href="payment-admin.html?p=manual" target="_blank">입력 화면 열기 ›</a>
+    </div>
+    <div class="out">
+      <div class="card"><div class="ch"><span class="no">1</span><b>정기 결제 내역</b><span class="where">약국 상세 · 결제일 최신순</span><a class="sc" href="storyboard.html#SA-01-004">SA-01-004 ›</a></div>
+        <table class="tbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th>결제 이유 · 취소 사유</th></tr></thead>
+        <tbody><tr class="hl"><td>2026-11-24 14:30 <span class="wy">수기</span></td><td>2026-07<span class="chg">바뀜</span></td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td><td><span class="ctag">재시도 결제</span>7월분 · 카드 변경 후 결제<span class="chg">바뀜</span></td></tr>
+        <tr class="dim"><td>2026-11-06 11:20 <span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">49,500</td><td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영</td></tr>
+        <tr class="dim"><td colspan="6">… (11-05 · 10-08 · 10-05 · 09-05 · 08-05 결제)</td></tr>
+        <tr><td>2026-07-05 10:03 <span class="wy">정기</span></td><td>2026-07</td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td><td>굿팜결제</td></tr></tbody></table>
+        <div class="note">맨 위에 새 줄 · 청구월 <b>2026-07</b> · 결제일은 실제 결제한 <b>11-24</b> · 7월 줄 옆 <q>미결제</q> 배지와 제목 옆 <q>미결제 1개월 · 2026-07</q>이 사라짐</div></div>
+
+      <div class="card"><div class="ch"><span class="no">2</span><b>약국별 청구 — 약국 행</b><span class="where">서비스 청구 통계 · 기준월 <b>2026-07</b> · 결제 완료</span><a class="sc" href="storyboard.html#SA-01-112">SA-01-112 ›</a></div>
+        <table class="tbl"><thead><tr><th>약국명</th><th>서비스 옵션</th><th class="num">할인 후 요금</th><th class="num">결제 예정</th><th class="num">실결제</th><th>결제일시</th><th>결제 방식</th><th>비고</th></tr></thead>
+        <tbody><tr class="hl"><td><b>샘플약국</b></td><td>2개 항목</td><td class="num">71,500</td><td class="num"><b>71,500</b></td><td class="num"><b>71,500</b><span class="chg">바뀜</span></td><td>26-11-24 14:30<span class="chg">바뀜</span><div><span class="wy">결제 이력 2회 ▾</span></div></td><td class="ctr"><span class="wy man">수기</span></td><td><span class="mt"><span class="ctag">재시도 결제</span>7월분 · 카드 변경 후 결제</span><span class="chg">바뀜</span></td></tr></tbody></table>
+        <div class="note">7월 통계 <b>미결제 탭에서 빠지고 결제 완료 탭</b>으로 · 결제 이력 2회 = 07-05 정기 실패 → 11-24 수기 성공 · 기준월 2026-11 통계는 그대로</div></div>
+
+      <div class="card"><div class="ch"><span class="no">3</span><b>약국 결제 관리</b><span class="where">약국관리 › 약국 결제 관리 · 기간에 11-24 포함</span><a class="sc" href="storyboard.html#SA-01-002">SA-01-002 ›</a></div>
+        <table class="tbl"><thead><tr><th>약국명</th><th class="num">결제요청금액</th><th>결제 이유</th><th>결제 성공 여부</th><th>결제 실패 사유</th><th>결제 일자</th></tr></thead>
+        <tbody><tr class="hl"><td>샘플약국</td><td class="num">71,500</td><td><span class="ctag">재시도 결제</span>7월분 · 카드 변경 후 결제<span class="chg">바뀜</span></td><td><span class="st ok">성공</span></td><td></td><td>2026-11-24</td></tr></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ③ 결제 취소 -->
+<section class="sec" id="cancel">
+  <h2>③ 결제 취소 — 11-05 결제 과다 청구 취소 (정산 전) → 11-06 재결제</h2>
+  <div class="sub">약국 상세 › 정기 결제 내역 › [결제 취소] (SA-01-005) · 재결제는 ② 수기 결제 창 (SA-01-151)</div>
+  <div class="grid">
+    <div class="inp">
+      <div class="cap">입력</div>
+      <div class="shot"><iframe src="payment-admin.html?p=cancel" loading="lazy"></iframe></div>
+      <div class="val">
+        <div><span>결제 건</span>2026-11-05 · 청구월 2026-11 · 71,500</div>
+        <div><span>취소 금액</span>71,500 (결제액 전액)</div>
+        <div><span>취소 사유</span>과다 청구</div>
+        <div><span>메모</span>파머시 퍼스트 10월 해지 미반영</div>
+        <div><span>이어서</span>수기 결제 — 2026-11 · 취소 후 재결제 · 49,500 · 파머시 퍼스트 해지 반영</div>
+      </div>
+      <a class="open" href="payment-admin.html?p=cancel" target="_blank">입력 화면 열기 ›</a>
+    </div>
+    <div class="out">
+      <div class="card"><div class="ch"><span class="no">1</span><b>정기 결제 내역</b><span class="where">약국 상세 · 결제일 최신순</span><a class="sc" href="storyboard.html#SA-01-141">SA-01-141 ›</a></div>
+        <table class="tbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th></tr></thead>
+        <tbody><tr><td>2026-11-06 11:20 <span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td class="num">49,500</td><td></td><td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영</td></tr>
+        <tr class="hl"><td>2026-11-05 10:02 <span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span><span class="chg">바뀜</span></td><td class="num">71,500</td><td class="num red">−71,500<span class="chg">바뀜</span></td><td>굿팜결제<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영<span class="chg">바뀜</span></div></td></tr></tbody></table>
+        <div class="note">취소한 줄은 그대로 남고 상태 · 취소 금액 · 취소 사유가 붙음 · 재결제는 맨 위 새 줄 · 정산 후 취소면 상태가 <q>취소 요청 중</q> + 반환금 안내 (<a href="storyboard.html#SA-01-142">SA-01-142</a>)</div></div>
+
+      <div class="card"><div class="ch"><span class="no">2</span><b>약국별 청구 — 약국 행</b><span class="where">서비스 청구 통계 · 기준월 2026-11 · 결제 완료</span></div>
+        <div class="step" style="padding:8px 12px 0">취소만 한 상태 (11-05 ~ 11-06 재결제 전)</div>
+        <table class="tbl" style="margin-top:8px"><thead><tr><th>약국명</th><th class="num">결제 예정</th><th class="num">실결제</th><th>결제일시</th><th>결제 방식</th><th>비고</th></tr></thead>
+        <tbody><tr><td><b>샘플약국</b></td><td class="num">71,500</td><td class="num">0</td><td>−</td><td class="ctr">−</td><td><span class="mt">취소 <span class="ctag">과다 청구</span>−71,500</span></td></tr></tbody></table>
+        <div class="note" style="border-top:0">실결제 0원 → <b>미결제 탭</b>으로</div>
+        <div class="step" style="padding:4px 12px 0">재결제 후 (11-06)</div>
+        <table class="tbl" style="margin-top:8px"><thead><tr><th>약국명</th><th class="num">결제 예정</th><th class="num">실결제</th><th>결제일시</th><th>결제 방식</th><th>비고</th></tr></thead>
+        <tbody><tr class="hl"><td><b>샘플약국</b></td><td class="num"><b>49,500</b></td><td class="num"><b>49,500</b><span class="chg">바뀜</span></td><td>26-11-06 11:20<div><span class="wy">결제 이력 2회 ▾</span></div></td><td class="ctr"><span class="wy man">수기</span></td><td><span class="mt">취소 <span class="ctag">과다 청구</span>−71,500<br><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영</span><span class="chg">바뀜</span></td></tr></tbody></table>
+        <div class="note">실결제 = 71,500 − 71,500 + 49,500 = <b>49,500</b> (원래 청구월 2026-11에서 뺌) · 결제 예정 금액은 해지를 반영해 정기 결제 금액을 49,500으로 고친 뒤 값</div></div>
+
+      <div class="card"><div class="ch"><span class="no">3</span><b>약국 결제 관리</b><span class="where">약국관리 › 약국 결제 관리</span><a class="sc" href="storyboard.html#SA-01-002">SA-01-002 ›</a></div>
+        <table class="tbl"><thead><tr><th>약국명</th><th class="num">결제요청금액</th><th>결제 이유</th><th>결제 성공 여부</th><th>결제 일자</th></tr></thead>
+        <tbody><tr><td>샘플약국</td><td class="num">49,500</td><td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영</td><td><span class="st ok">성공</span></td><td>2026-11-06</td></tr>
+        <tr class="hl"><td>샘플약국</td><td class="num">71,500</td><td>굿팜결제<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영</div></td><td><span class="st cx">취소 완료</span><span class="chg">바뀜</span></td><td>2026-11-05</td></tr></tbody></table></div>
+
+      <div class="card"><div class="ch"><span class="no">4</span><b>경영 요약 · 매출</b><span class="where">통계 › 경영 요약</span></div>
+        <div class="note">정산 전 취소 = 취소 완료일(11-05)의 달에서 <b>−71,500</b> · 정산 후 취소 = 페이앱 취소 완료 알림을 받은 날의 달에서 뺌</div></div>
+    </div>
+  </div>
+</section>
+</div></body></html>
