@@ -176,10 +176,10 @@ function discText(d=D){ const [c,t]=dState(d);
 function svcList(){
   return `<div class="panel"><div class="ph"><h3>${PH.name}</h3><span class="sub">스토어 ID ${PH.store}</span></div></div>
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
-    <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자<span class="addb">추가</span></th></tr></thead>
+    <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
     <div class="opt">옵션: 스마트 OCR · 굿팜 POS &nbsp;|&nbsp; 서비스 수 2 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
-    <div class="opt dline" id="discLine">${discText()} <span class="addb">추가</span></div></div>`;
+    <div class="opt dline" id="discLine">${discText()}</div></div>`;
 }
 
 /* 결제 취소 가능 기간 — 결제일로부터 CANCEL_DAYS일 이내만 버튼 표시 (기간은 페이앱 · 카드사 기준 확인 필요, 시안 60일) */
@@ -204,8 +204,8 @@ function subPanel(){
   return `<div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>${PH.method}</div><div class="k">결제카드정보</div><div>${PH.card} &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
-  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span><span class="addb">추가</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
-    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월<span class="addb">추가</span></th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액<span class="addb">추가</span></th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소<span class="addb">추가</span></th></tr></thead>
+  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
+    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody>${groups(HIST).map(([m,rs])=>(rs.length>1?bmHead(m,rs):'')+rs.map(h=>{ const sub=rs.length>1, [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
       return `<tr data-id="${h[0]}"${sub?' class="bmi"':''}><td>${sub?'<span class="bml">└</span>':''}${h[1]}${sub?' <span class="wy">'+(isMan(h)?'수기':'정기')+'</span>':''}</td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
@@ -223,13 +223,13 @@ function svcModal(){
       <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td></tr>
       <tr class="tot"><td colspan="4">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
-    <div class="fr" id="dCatRow"><span class="fl">할인 사유<span class="addb">추가</span></span><div><select class="fi" id="dCat">${opt(DISC_CAT,'결합 무료')}</select></div></div>
+    <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat">${opt(DISC_CAT,'결합 무료')}</select></div></div>
     <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="POS 무상 제공" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="fr" id="dPerRow"><span class="fl">적용 기간<span class="addb">추가</span></span><div><div class="seg"><select class="fi" id="dFrom" style="width:150px">${['2026-06','2026-11','2026-12'].map(m=>`<option ${m===D.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi" id="dTo" style="width:170px"><option value="">계속 (종료월 없음)</option>${['2026-11','2026-12','2027-01','2027-03','2027-06'].map(m=>`<option ${m===D.to?'selected':''}>${m}</option>`).join('')}</select></div></div></div>
-    <div class="fr" id="dWhoRow"><span class="fl">등록자<span class="addb">추가</span></span><div class="ro">김운영</div></div>
+    <div class="fr" id="dPerRow"><span class="fl">적용 기간</span><div><div class="seg"><select class="fi" id="dFrom" style="width:150px">${['2026-06','2026-11','2026-12'].map(m=>`<option ${m===D.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi" id="dTo" style="width:170px"><option value="">계속 (종료월 없음)</option>${['2026-11','2026-12','2027-01','2027-03','2027-06'].map(m=>`<option ${m===D.to?'selected':''}>${m}</option>`).join('')}</select></div></div></div>
+    <div class="fr" id="dWhoRow"><span class="fl">등록자</span><div class="ro">김운영</div></div>
     <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot"></b></div></div>
     <div class="pv" id="dPv"><span class="mlab">약국 서비스 목록에 보이는 내용</span><br><span id="dPvT"></span></div>
-    <div id="dHist"><div class="fl" style="padding:0 0 6px">지난 금액 할인<span class="addb">추가</span></div>
+    <div id="dHist"><div class="fl" style="padding:0 0 6px">지난 금액 할인</div>
       <table class="tbl"><thead><tr><th>적용 기간</th><th class="num">금액 (VAT 포함)</th><th>사유</th><th>메모</th><th>등록자</th><th>상태</th></tr></thead>
       <tbody>${HISTD.map(h=>`<tr><td>${h[0]} ~ ${h[1]}</td><td class="num red">−${fmt(h[2]*1.1)}</td><td>${h[3]}</td><td>${esc(h[4])}</td><td>${h[5]}</td><td><span class="st cx">종료</span></td></tr>`).join('')}</tbody></table></div>
   </div>
@@ -288,11 +288,11 @@ function manualModal(){
   return `<div class="dim"></div><div class="mdl" id="mpMdl"><div class="mh"><h3>수기 결제</h3><button class="x" data-close>×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">결제 카드</span><div class="ro">${PH.card}</div></div>
-    <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm">${bmOpts()}</select><div class="hint">${bmHint()}</div></div></div>
-    <div class="fr" id="mpLinkRow"><span class="fl">결제 실패 월<span class="addb">추가</span></span><div class="ro" id="mpLink"></div></div>
-    <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'재시도 결제')}</select><div class="hint" id="mpHint"></div></div></div>
+    <div class="fr" id="mpBmRow"><span class="fl">청구월</span><div><select class="fi" id="mpBm">${bmOpts()}</select><div class="hint">${bmHint()}</div></div></div>
+    <div class="fr" id="mpLinkRow"><span class="fl">결제 실패 월</span><div class="ro" id="mpLink"></div></div>
+    <div class="fr" id="mpCatRow"><span class="fl">결제 사유</span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'재시도 결제')}</select><div class="hint" id="mpHint"></div></div></div>
     <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="71,500"></div></div>
-    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span><span class="req" id="mpReq">필수</span></span><div><input class="fi" id="mpMemo" value="카드 변경 후 결제" placeholder="기타 사유를 입력하세요"></div></div>
+    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="req" id="mpReq">필수</span></span><div><input class="fi" id="mpMemo" value="카드 변경 후 결제" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"></span></div>
   </div>
   <div class="mf"><button class="btn" data-close>취소</button><button class="btn pri" data-toast="시안 — 실제 결제는 진행되지 않습니다">결제</button></div></div>`;
