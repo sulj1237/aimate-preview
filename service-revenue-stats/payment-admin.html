@@ -212,8 +212,8 @@ function subPanel(){
     <tbody>${groups(HIST).map(([m,rs])=>(rs.length>1?bmHead(m,rs):'')+rs.map(h=>{ const sub=rs.length>1, [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
       return `<tr data-id="${h[0]}"${sub?' class="bmi"':''}><td>${sub?'<span class="bml">└</span>':''}${h[1]}${sub?' <span class="wy">'+(isMan(h)?'수기':'정기')+'</span>':''}</td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
-      <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+(h[9]?'<br><b>반환금 입금</b> '+h[9]+' — 페이앱 카드 취소 결과를 받으면 취소 완료':' — 입금하면 카드 취소 후 취소 완료')+'</div>':''}</td>
-      <td class="ctr">${h[3]==='rq'&&!h[9]?`<button class="btn sm line" data-payback="${h[0]}">반환금 입금 기록</button>`:can||h[3]==='cf'?`<button class="btn sm line" data-cancel="${h[0]}">${h[3]==='cf'?'다시 취소':'결제 취소'}</button>`:''}</td></tr>`; }).join('')).join('')}</tbody></table></div>`;
+      <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+' — 입금하면 페이앱이 카드 취소 후 알려 줘 취소 완료로 바뀜'+'</div>':''}</td>
+      <td class="ctr">${can||h[3]==='cf'?`<button class="btn sm line" data-cancel="${h[0]}">${h[3]==='cf'?'다시 취소':'결제 취소'}</button>`:''}</td></tr>`; }).join('')).join('')}</tbody></table></div>`;
 }
 
 /* ① 약국 서비스 수정 — 금액 할인 사유 */
@@ -251,6 +251,7 @@ function cancelModal(){
 }
 
 /* 정산 후 취소 — 운영팀이 페이앱 계좌로 반환금을 입금한 날 기록 (매출은 입금한 달에서 뺌) */
+// 반환금 입금 기록 — 11-24 삭제(입금 후 페이앱 취소 완료 알림으로 자동 반영). 시안 코드만 남김
 function paybackModal(){
   const h=view().find(x=>x[0]===S.cid)||HIST[0];
   return `<div class="dim"></div><div class="mdl" id="pbMdl"><div class="mh"><h3>반환금 입금 기록</h3><button class="x" data-close>×</button></div>
