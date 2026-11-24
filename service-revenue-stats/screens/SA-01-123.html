@@ -92,6 +92,7 @@
   .toast.show{opacity:1}
   .tbl tr.bmh td{background:#f6f7fb;border-top:1px solid var(--line);font-size:12.5px;padding:7px 10px}.bmn{color:#6b7280;font-size:11.5px;margin-left:4px}
   .tbl tr.bmi td:first-child{padding-left:22px}.bml{color:#9aa1a9;margin-right:4px}.wy{display:inline-block;font-size:10.5px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
+.dmck{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}#demoPer{display:inline-flex;align-items:center;gap:4px;margin-left:6px}#demoPer .fi{width:96px;height:28px;font-size:12px;padding:0 6px}
 </style>
 </head>
 <body>
@@ -101,8 +102,8 @@
     <div class="topbar">
       <div class="crumb">약국관리 &gt; 약국 관리 &gt; <b>상세</b></div>
       <div class="demo">시안 화면
-        <button data-go="svc" class="on">약국 서비스 수정</button>
-        <button data-go="sub" class="">정기 결제 내역</button>
+        <button data-go="svc">약국 서비스 수정</button>
+        <button data-go="sub" class="on">정기 결제 내역</button>
         <button data-go="cancel">결제 취소</button>
         <button data-go="manual">수기 결제</button>
       </div>
@@ -111,8 +112,9 @@
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt">옵션: 스마트 OCR · 굿팜 POS &nbsp;|&nbsp; 서비스 수 2 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
-    </div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
+    <div class="opt">옵션: 스마트 OCR · 굿팜 POS · 스마트2D &nbsp;|&nbsp; 서비스 수 3 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
+    <div class="opt dline" id="demoLine">데모 <b>스마트2D</b> · 2026-09 ~ 2026-10 <span class="st cx">종료</span> <span class="hint">→ 2026-11 청구분부터 스마트2D 정가 33,000원 · 정기 결제 금액 직접 변경</span></div>
+    <div class="opt dline" id="discLine">금액 할인 <span class="red">−11,000</span> <b>[결합 무료]</b> POS 무상 제공 <span class="hint">등록 김운영 · 05-28</span></div></div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 8</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
@@ -141,25 +143,7 @@
       <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>굿팜결제</td>
-      <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl wide" id="svcMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-close="">×</button></div>
-  <div class="mb">
-    <div class="fr"><span class="fl">서비스</span><div class="ro">굿팜 솔루션 (NEW)</div></div>
-    <table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th class="num">총액</th></tr></thead>
-      <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td class="num">45,000</td></tr>
-      <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td></tr>
-      <tr class="tot"><td colspan="4">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
-    <div class="fr" id="dAmtRow"><span class="fl">금액 할인</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
-    <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat"><option value="결합 무료" selected="">결합 무료</option><option value="계약 할인">계약 할인</option><option value="보상 · 테스트">보상 · 테스트</option><option value="기타">기타</option></select></div></div>
-    <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="POS 무상 제공" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="fr" id="dPerRow"><span class="fl">적용 기간</span><div><div class="seg"><select class="fi" id="dFrom" style="width:150px"><option selected="">2026-06</option><option>2026-11</option><option>2026-12</option></select><span class="ro">~</span><select class="fi" id="dTo" style="width:170px"><option value="" selected="">계속 (종료월 없음)</option><option>2026-11</option><option>2026-12</option><option>2027-01</option><option>2027-03</option><option>2027-06</option></select></div></div></div>
-    <div class="fr" id="dWhoRow"><span class="fl">등록자</span><div class="ro">김운영</div></div>
-    <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot">45,000원</b></div></div>
-    <div class="pv" id="dPv"><span class="mlab">약국 서비스 목록에 보이는 내용</span><br><span id="dPvT">금액 할인 <span class="red">−11,000</span> <b>[결합 무료]</b> POS 무상 제공 · 적용 2026-06 ~ 계속 <span class="st ok">적용 중</span> <span class="hint">등록 김운영 · 저장 시각</span></span></div>
-    <div id="dHist"><div class="fl" style="padding:0 0 6px">지난 금액 할인</div>
-      <table class="tbl"><thead><tr><th>적용 기간</th><th class="num">금액 (VAT 포함)</th><th>사유</th><th>메모</th><th>등록자</th><th>상태</th></tr></thead>
-      <tbody><tr><td>2026-06 ~ 2026-10</td><td class="num red">−11,000</td><td>결합 무료</td><td>POS 무상 제공</td><td>undefined</td><td><span class="st cx">종료</span></td></tr><tr><td>2025-03 ~ 2025-05</td><td class="num red">−16,500</td><td>보상 · 테스트</td><td>스캐너 인식 오류 (대표님 승인)</td><td>이영업 · 2025-02-27</td><td><span class="st cx">종료</span></td></tr></tbody></table></div>
-  </div>
-  <div class="mf"><button class="btn" data-close="">취소</button><button class="btn pri" data-toast="시안 — 저장되지 않습니다">저장</button></div></div></div>
+      <td class="ctr"></td></tr></tbody></table></div></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
