@@ -143,6 +143,7 @@
 .shr:hover{background:#f5f7fa}.shn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shb{background:#f3f5f7;border-radius:4px;height:11px;display:block}.shb>span{display:block;height:11px;border-radius:0 4px 4px 0;background:#2a78d6}
 .shp{color:#5b6168}.shh{cursor:default;color:#8a9099;font-size:11px;padding-bottom:0}.shh:hover{background:none}.shr:not(.shh):hover::after,.shr.tipon::after{content:attr(data-tip);white-space:pre-line;position:absolute;left:200px;top:22px;z-index:30;min-width:200px;background:#1f2a37;color:#fff;font-size:12px;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .arm{white-space:nowrap}.arm b{color:#1f2328}
+.dfx{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:600}
 </style>
 </head>
 <body>
@@ -356,7 +357,7 @@ function payLines(o){ // 펼침 — 그 달 결제 내역
   const L=[];
   if(o.fee>0) L.push(['11-05 10:02','이용료','정기 결제 · 11월분 (자동)',o.fee]);
   if(o.tag==='VIP') L.push(['—','이용료','광동 VIP 지원 서비스 — 약국 결제 0원 (광동 VIP 정산에서 관리)',0]);
-  L.push(['2026-11 입금','VAN Fee',`정산 파일 11월 · TID ${o.tids.length}대 · 승인 ${fmt(o.tids.reduce((s,t)=>s+t.c,0))}건`,o.vam]);
+  L.push(['2026-11 입금','VAN Fee',`정산 파일 11월 · TID ${o.tids.length}대(단가 ${[...new Set(o.tids.map(t=>t.u))].sort((x,y)=>x-y).join(' · ')}원) · 승인 ${fmt(o.tids.reduce((s,t)=>s+t.c,0))}건`,o.vam]);
   if(o.etc) L.push(['11-12 14:20','기타 판매',`${o.etc[0]} · 수기 결제(서비스 외 결제)`,o.etc[1]]);
   return L.map(l=>`<tr class="tid"><td style="padding-left:30px">${l[0]}</td><td colspan="4"><span class="tg">${l[1]}</span> ${l[2]}</td><td class="num">${fmt(l[3])}</td><td colspan="4"></td></tr>`).join('');
 }
@@ -434,6 +435,13 @@ function mgmtHead(){
     <div class="kc" id="mFile"><div class="l">반영 파일</div><div class="v" style="font-size:14px">${FILE.name}</div><div class="s">반영 2026-11-10 16:02 · 김운영</div></div>
   </div></div>`;
 }
+// 정산 단가 — TID(단말기)마다 다름(대리점 10 · 15 · 18원, 제휴사 5원 등). 한 약국에 단가가 다른 TID가 여럿이면 함께 표시
+const rateOf=o=>{ const u=[...new Set(o.tids.map(t=>t.u))].sort((a,b)=>a-b); return u.length>1?`<span title="TID마다 단가가 달라요 — ▸ 눌러 TID별 확인">${u.join(' · ')}원</span>`:u[0]+'원'; };
+function rateSum(){ const g={}; D.forEach(o=>o.tids.forEach(t=>{ const k=t.g+'|'+t.u; const x=g[k]=g[k]||{g:t.g,u:t.u,n:0,c:0,m:0,df:0}; x.n++; x.c+=t.c; x.m+=t.m; if(t.s!==t.c*t.u) x.df++; }));
+  const R=Object.values(g).sort((a,b)=>a.g.localeCompare(b.g)||b.u-a.u), tm=R.reduce((s,x)=>s+x.m,0);
+  return `<div class="tblwrap" id="rateSum" style="margin:0 18px 10px"><table class="tbl"><thead><tr><th>구분</th><th class="num">정산단가</th><th class="num">TID</th><th class="num">승인건수</th><th class="num">정산금액</th><th class="num">비중</th><th class="num">건수 × 단가와 다른 TID</th></tr></thead><tbody>
+  ${R.map(x=>`<tr><td>${x.g}</td><td class="num"><b>${x.u}원</b></td><td class="num">${fmt(x.n)}</td><td class="num">${fmt(x.c)}</td><td class="num">${fmt(x.m)}</td><td class="num">${(x.m/tm*100).toFixed(1)}%</td><td class="num">${x.df?fmt(x.df):'<span class="sub2">0</span>'}</td></tr>`).join('')}
+  </tbody></table></div>`; }
 function mgmtList(){
   let a=D.slice();
   if(S.q) a=a.filter(o=>o.n.includes(S.q)||o.b.replace(/\D/g,'').includes(S.q.replace(/\D/g,'')));
@@ -442,17 +450,20 @@ function mgmtList(){
     const op=S.open.has(o.b);
     let h=`<tr><td><button class="tog" data-tog="${o.b}">${op?'▾':'▸'}</button>${esc(o.n)}</td>
       <td>${o.b}</td><td>${o.st==='ok'?`${esc(o.n)}<div class="sub2">${o.r} · ${o.sid}</div>`:'<span class="tbu">약국 알 수 없음</span><span class="qi" data-tip="정산 파일의 사업자번호와 맞는 굿팜 약국이 없어 어느 약국인지 알 수 없어요. 금액은 이미 받은 돈이라 총매출 · VAN 합계에는 들어가요. 약국 관리에서 사업자번호를 고친 뒤 같은 파일을 다시 올리면 약국에 연결돼요.">?</span><div class="sub2">일치하는 약국 없음 · 반영 금액에서 제외</div>'}</td>
-      <td class="num">${o.tids.length}</td><td class="num">${fmt(o.tids.reduce((s,t)=>s+t.c,0))}</td><td class="num">${fmt(o.vam)}</td></tr>`;
-    if(op) h+=o.tids.map(t=>`<tr class="tid"><td style="padding-left:30px">TID ${t.t} <span class="tg">${t.g}</span></td><td></td><td class="num">단가 ${t.u}원 · 승인 ${fmt(t.a)}</td><td></td><td class="num">${fmt(t.c)}</td><td class="num">${fmt(t.m)}</td></tr>`).join('');
+      <td class="num">${o.tids.length}</td><td class="num">${rateOf(o)}</td><td class="num">${fmt(o.tids.reduce((s,t)=>s+t.c,0))}</td><td class="num">${fmt(o.vam)}</td></tr>`;
+    if(op) h+=o.tids.map(t=>{ const exp=t.c*t.u, df=t.s-exp;
+      return `<tr class="tid"><td style="padding-left:30px">TID ${t.t} <span class="tg">${t.g}</span></td><td colspan="2" class="sub2">승인금액 ${fmt(t.a)} · 정산액 ${fmt(t.s)} + 부가세 ${fmt(t.v)}${df?` <span class="dfx" title="정산액이 승인건수 × 단가(${fmt(exp)})와 달라요 — 취소 건 차감 등, 파일 값 그대로 반영">건수 × 단가와 ${df>0?'+':''}${fmt(df)}</span>`:''}</td><td></td><td class="num"><b>${t.u}원</b></td><td class="num">${fmt(t.c)}</td><td class="num">${fmt(t.m)}</td></tr>`; }).join('');
     return h; };
   return `<div class="panel" id="mList"><div class="ph"><h3>정산 내역</h3>${qt("파일 한 행 = 약국 × TID(단말기) → 사업자번호로 약국 단위 합산. 금액은 정산금액(VAT 포함)")}
     <div class="right" id="upBtns"><button class="btn" id="tplBtn">파일 양식 다운로드</button><button class="btn pri" id="upBtn">정산 파일 업로드</button></div></div>
   ${S.page==='upload'||S.page==='err'?`<div class="pv" id="upRes" style="margin:0 18px 10px;line-height:1.7;background:#e6f6f3;border-color:#bfe7df">
     <b>${FILE.name}</b> 반영 완료 · 집계 월 <b>2026-11</b> <a href="#" id="chgMonth" style="font-size:11.5px">변경</a> · 반영 금액 <b>${fmt(VAN_ALL)}원</b> · 약국 ${fmt(vanOk().length)}곳${vanNg().length?` · <b style="color:var(--up)">약국 알 수 없음 ${vanNg().length}곳 ${fmt(sumV(vanNg()))}원</b>`:' 모두 연결'}</div>`:''}
+  <div class="ph" style="padding-top:0;border:0"><h3 style="font-size:13px">정산 단가별 합계</h3>${qt('같은 약국이라도 TID(단말기)마다 정산 단가가 달라요(대리점 10 · 15 · 18원, 제휴사 5원 등). 정산 파일의 TID별 단가 · 정산액을 그대로 저장하고 단가별로 합쳐 봐요. 정산액이 승인건수 × 단가와 다른 TID(취소 건 차감 등)는 파일 값 그대로 반영하고 수만 표시')}</div>
+  ${rateSum()}
   <div class="tools"><span class="sub2">전체 ${fmt(D.length)}곳</span>
     <input class="q" id="q" placeholder="가맹점명 · 사업자번호 검색" value="${esc(S.q)}"></div>
-  <div class="tblwrap"><table class="tbl" id="vTbl"><thead><tr><th>가맹점명 (파일)</th><th>사업자번호</th><th>굿팜 약국</th><th class="num">TID</th><th class="num">승인건수</th><th class="num">정산금액</th></tr></thead>
-  <tbody>${a.map(fr).join('')}<tr class="tot" id="allRow"><td colspan="5">반영 금액 (연결된 행 합계)</td><td class="num">${fmt(sumV(a.filter(o=>o.st==='ok')))}</td></tr>${a.some(o=>o.st!=='ok')?`<tr id="ngRow"><td colspan="5" style="color:var(--up)">약국 알 수 없음 ${a.filter(o=>o.st!=='ok').length}건 — 약국 관리의 사업자번호를 고친 뒤 같은 파일을 다시 올리면 반영(이전 파일은 대체됨)</td><td class="num" style="color:var(--up)">${fmt(sumV(a.filter(o=>o.st!=='ok')))}</td></tr>`:''}</tbody></table></div></div>`;
+  <div class="tblwrap"><table class="tbl" id="vTbl"><thead><tr><th>가맹점명 (파일)</th><th>사업자번호</th><th>굿팜 약국</th><th class="num">TID</th><th class="num">정산단가</th><th class="num">승인건수</th><th class="num">정산금액</th></tr></thead>
+  <tbody>${a.map(fr).join('')}<tr class="tot" id="allRow"><td colspan="6">반영 금액 (연결된 행 합계)</td><td class="num">${fmt(sumV(a.filter(o=>o.st==='ok')))}</td></tr>${a.some(o=>o.st!=='ok')?`<tr id="ngRow"><td colspan="6" style="color:var(--up)">약국 알 수 없음 ${a.filter(o=>o.st!=='ok').length}건 — 약국 관리의 사업자번호를 고친 뒤 같은 파일을 다시 올리면 반영(이전 파일은 대체됨)</td><td class="num" style="color:var(--up)">${fmt(sumV(a.filter(o=>o.st!=='ok')))}</td></tr>`:''}</tbody></table></div></div>`;
 }
 function hist(){
   return `<div class="panel" id="histPanel"><div class="ph"><h3>업로드 이력</h3>${qt("같은 월 파일을 다시 올리면 이전 파일은 대체됨으로 남아요")}</div>
