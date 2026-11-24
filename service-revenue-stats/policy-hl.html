@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><title>정책 문구 하이라이트</title></head><body><script>
+/* 정책서에 숨겨 넣는 도우미: 주소의 #hl=문구 가 들어 있는 정책 항목을 찾아 하이라이트하고 그 위치로 이동 (페이지가 다 그려진 뒤 다시 맞춤) */
+(function(){
+  var p; try{ p=window.parent; p.document; }catch(e){ return; }
+  var d=p.document, done='';
+  if(!d.getElementById('pol-hl-style')){
+    var st=d.createElement('style'); st.id='pol-hl-style';
+    st.textContent='.pol-hl{background:#FFF3B0 !important;box-shadow:0 0 0 2px #FFD43B;border-radius:4px;transition:background .3s}';
+    d.head.appendChild(st);
+  }
+  function norm(t){ return (t||'').replace(/\s+/g,' ').trim(); }
+  function phrase(){
+    var h=p.location.hash||''; var m=h.match(/^#hl=(.+)$/);
+    if(!m) return ''; try{ return norm(decodeURIComponent(m[1])); }catch(e){ return ''; }
+  }
+  function find(q){
+    var els=d.querySelectorAll('main p, main li, main td, main th, main h2, main h3, article p, article li, article td, article th, article h2, article h3');
+    if(!els.length) els=d.querySelectorAll('p, li, td, th, h2, h3');
+    var best=null;
+    for(var i=0;i<els.length;i++){
+      if(norm(els[i].textContent).indexOf(q)<0) continue;
+      if(!best || best.contains(els[i])) best=els[i];
+    }
+    if(best && best.tagName==='TD'){ var tr=best.closest('tr'); if(tr) best=tr; }
+    return best;
+  }
+  function go(){
+    var q=phrase(); if(!q || done===q) return;
+    var el=find(q); if(!el) return;
+    var old=d.querySelectorAll('.pol-hl'); for(var i=0;i<old.length;i++) old[i].classList.remove('pol-hl');
+    el.classList.add('pol-hl'); el.scrollIntoView({block:'center'}); done=q;
+  }
+  [150,500,1000,1800,3000,4500].forEach(function(t){ setTimeout(go,t); });
+  p.addEventListener('hashchange',function(){ done=''; setTimeout(go,30); });
+})();
+</script></body></html>

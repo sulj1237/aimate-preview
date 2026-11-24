@@ -90,6 +90,8 @@
   .fi.need{border-color:var(--up);background:#fff7f6}
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
   .toast.show{opacity:1}
+  .tbl tr.bmh td{background:#f6f7fb;border-top:1px solid var(--line);font-size:12.5px;padding:7px 10px}.bmn{color:#6b7280;font-size:11.5px;margin-left:4px}
+  .tbl tr.bmi td:first-child{padding-left:22px}.bml{color:#9aa1a9;margin-right:4px}.wy{display:inline-block;font-size:10.5px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
 </style>
 </head>
 <body>
@@ -128,7 +130,7 @@ const PAY_CAT=[ // 수기 결제 사유
   ['취소 후 재결제','결제 취소 뒤 받을 금액을 다시 결제할 때 (차액 · 일할 · 반값)'],
   ['요금제 변경','요금제를 바꾸면서 결제할 때'],
   ['개국','개국하면서 결제할 때'],
-  ['서비스 외 결제','라벨 구매 · 검사 수수료처럼 서비스 요금이 아닐 때 — 서비스 청구 통계에서 제외'],
+  ['서비스 외 결제','장비(PC · 바코드건) · 설치 · 개국 작업비 · 라벨지처럼 서비스 요금이 아닐 때 — 서비스 청구 통계에서 빼고 기타 판매로 집계'],
   ['기타','위에 해당하지 않을 때 — 메모에 이유 입력']];
 const CANCEL_CAT=[ // 결제 취소 사유
   ['해지','서비스를 해지해 그 달 결제를 돌려줄 때'],
@@ -152,7 +154,7 @@ const HIST=[
   [2,'2026-08-05 10:04','2026-08','cx',71500,71500,'','굿팜결제','[중복 결제] 같은 날 두 번 결제'],
   [1,'2026-08-05 10:02','2026-08','ok',71500,0,'','굿팜결제',''],
   [0,'2026-07-05 10:03','2026-07','fail',71500,0,'기타오류(8324 : 거래 정지 카드)','굿팜결제','']];
-const ST={ok:['ok','성공'],fail:['fail','실패'],cx:['cx','취소 완료'],rq:['rq','취소 요청 중']};
+const ST={ok:['ok','성공'],fail:['fail','실패'],cx:['cx','취소 완료'],rq:['rq','취소 요청 중'],bank:['cx','계좌 환불'],cf:['fail','취소 실패']};
 
 const S={page:'sub'};
 function side(){ $('side').innerHTML='<div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">약국관리</div>'+
@@ -184,6 +186,12 @@ function svcList(){
 const TODAY='2026-11-17', CANCEL_DAYS=60;
 const canCancel=at=>(new Date(TODAY)-new Date(at.slice(0,10)))/864e5<=CANCEL_DAYS;
 
+/* 청구월 결제 이력 — 같은 청구월의 결제 시도(정기 실패 → 수기 결제 성공, 취소 → 취소 후 재결제 등)를 한 묶음으로. 묶음 안은 시각순 */
+const isMan=h=>h[1].slice(8,10)!=='05'||/^\[/.test(h[7]);
+const groups=H=>{ const o=[]; H.forEach(h=>{ let g=o.find(x=>x[0]===h[2]); if(!g) o.push(g=[h[2],[]]); g[1].push(h); }); o.forEach(g=>g[1].sort((a,b)=>a[1]<b[1]?-1:1)); return o; };
+const bmHead=(m,rs)=>{ const ok=rs.filter(h=>h[3]==='ok'), last=ok[ok.length-1], rq=rs.some(h=>h[3]==='rq');
+  const st=ok.length?'<span class="st ok">결제 완료</span>'+(isMan(last)?' <span class="wy">수기 결제</span>':''):rq?'<span class="st rq">취소 요청 중</span>':'<span class="st fail">미결제</span>';
+  return `<tr class="bmh"><td colspan="8"><b>${m}분</b> ${st} <span class="bmn">결제 ${rs.length}건</span>${ok.length?' · 결제액 '+fmt(last[4])+'원':''}</td></tr>`; };
 /* 실패 건을 재결제한 수기 결제 — 같은 청구월, 실패 뒤 성공 */
 const paidBy=h=>h[3]==='fail'?HIST.find(x=>x[2]===h[2]&&x[3]==='ok'&&x[1]>h[1]):null;
 
@@ -198,11 +206,11 @@ function subPanel(){
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span><span class="addb">추가</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월<span class="addb">추가</span></th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액<span class="addb">추가</span></th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소<span class="addb">추가</span></th></tr></thead>
-    <tbody>${HIST.map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
-      return `<tr data-id="${h[0]}"><td>${h[1]}</td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span>${paidBy(h)?' <span class="st ok">재결제 완료</span>':''}</td><td>${h[6]||''}${paidBy(h)?'<div class="rs">→ '+paidBy(h)[1].slice(0,10)+' 수기 결제로 처리</div>':''}</td><td class="num">${fmt(h[4])}</td>
+    <tbody>${groups(HIST).map(([m,rs])=>(rs.length>1?bmHead(m,rs):'')+rs.map(h=>{ const sub=rs.length>1, [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
+      return `<tr data-id="${h[0]}"${sub?' class="bmi"':''}><td>${sub?'<span class="bml">└</span>':''}${h[1]}${sub?' <span class="wy">'+(isMan(h)?'수기':'정기')+'</span>':''}</td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
-      <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}</td>
-      <td class="ctr">${can?`<button class="btn sm line" data-cancel="${h[0]}">결제 취소</button>`:''}</td></tr>`; }).join('')}</tbody></table></div>`;
+      <td>${esc(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+esc(h[8])+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+(h[9]?'<br><b>반환금 입금</b> '+h[9]+' — 페이앱 카드 취소 결과를 받으면 취소 완료':' — 입금하면 카드 취소 후 취소 완료')+'</div>':''}</td>
+      <td class="ctr">${h[3]==='rq'&&!h[9]?`<button class="btn sm line" data-payback="${h[0]}">반환금 입금 기록</button>`:can||h[3]==='cf'?`<button class="btn sm line" data-cancel="${h[0]}">${h[3]==='cf'?'다시 취소':'결제 취소'}</button>`:h[3]==='ok'?`<button class="btn sm line" data-bank="${h[0]}">계좌 환불 기록</button>`:''}</td></tr>`; }).join('')).join('')}</tbody></table></div>`;
 }
 
 /* ① 약국 서비스 수정 — 금액 할인 사유 */
@@ -230,15 +238,31 @@ function svcModal(){
 /* ② 결제 취소 창 */
 function cancelModal(){
   const h=view().find(x=>x[0]===S.cid)||HIST[0], left=h[4]-h[5];
-  return `<div class="dim"></div><div class="mdl" id="cxMdl"><div class="mh"><h3>결제 취소</h3><button class="x" data-close>×</button></div>
+  const bk=S.page==='bank';
+  return `<div class="dim"></div><div class="mdl" id="cxMdl"><div class="mh"><h3>${bk?'계좌 환불 기록':'결제 취소'}</h3><button class="x" data-close>×</button></div>
   <div class="mb">
     <div class="sum" id="cxSum"><div>과금일<b>${h[1].slice(0,10)}</b></div><div>청구월<b>${h[2]}</b></div><div>결제액<b>${fmt(h[4])}원</b></div></div>
-    <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div class="ro"><b class="red">${fmt(left)}원</b> (결제액 전액)<div class="hint">결제 건 단위 전체 취소 — 일부만 돌려줄 때는 전액 취소 후 받을 금액을 수기 결제</div></div></div>
+    <div class="fr" id="cxAmtRow"><span class="fl">${bk?'환불 금액':'취소 금액'}</span><div class="ro"><b class="red">${fmt(left)}원</b> (결제액 전액)<div class="hint">${bk?'카드 반품 기간이 지나 카드 취소가 안 되는 결제 — 약국 결제 계좌로 직접 입금한 금액':'결제 건 단위 전체 취소 — 일부만 돌려줄 때는 전액 취소 후 받을 금액을 수기 결제'}</div></div></div>${bk?`<div class="fr" id="bkDateRow"><span class="fl">입금일</span><div><input class="fi" id="bkDate" value="2026-11-20" style="width:150px"></div></div>`:''}
     <div class="fr" id="cxCatRow"><span class="fl">취소 사유</span><div><select class="fi" id="cxCat">${opt(CANCEL_CAT,'과다 청구')}</select><div class="hint" id="cxHint"></div></div></div>
     <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">필수</span></span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전(결제 후 영업일 3~5일 이내) → 바로 <b>취소 완료</b><br>· 정산 후 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 운영팀이 수기 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>
+    ${bk?`<div class="note" id="cxNote">약국 계좌로 입금한 뒤 기록을 남기면 결제 건이 <b>계좌 환불</b>로 바뀌고 환불 금액 · 사유가 보여요.<br>· 매출 통계는 <b>입금(환불)한 달</b>에서 뺍니다.</div>`:`<div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청합니다.<br>· 정산 전(결제 후 영업일 3~5일 이내) → 바로 <b>취소 완료</b><br>· 정산 후 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 운영팀이 수기 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>`}
   </div>
-  <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="cxGo">결제 취소</button></div></div>`;
+  <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="cxGo">${bk?'기록 저장':'결제 취소'}</button></div></div>`;
+}
+
+/* 정산 후 취소 — 운영팀이 페이앱 계좌로 반환금을 입금한 날 기록 (매출은 입금한 달에서 뺌) */
+function paybackModal(){
+  const h=view().find(x=>x[0]===S.cid)||HIST[0];
+  return `<div class="dim"></div><div class="mdl" id="pbMdl"><div class="mh"><h3>반환금 입금 기록</h3><button class="x" data-close>×</button></div>
+  <div class="mb">
+    <div class="sum" id="pbSum"><div>과금일<b>${h[1].slice(0,10)}</b></div><div>청구월<b>${h[2]}</b></div><div>반환금<b class="red">${fmt(h[5]||h[4])}원</b></div></div>
+    <div class="fr"><span class="fl">입금 계좌</span><div class="ro">OO은행 ***-****-**** (페이앱이 알려 준 계좌)</div></div>
+    <div class="fr" id="pbDateRow"><span class="fl">입금일</span><div><input class="fi" id="pbDate" type="date" value="2026-11-24"></div></div>
+    <div class="fr"><span class="fl">처리자</span><div class="ro">김운영 (로그인한 관리자 · 자동)</div></div>
+    <div class="fr"><span class="fl">메모</span><div><input class="fi" id="pbMemo" placeholder="선택 입력"></div></div>
+    <div class="note" id="pbNote">반환금을 입금한 뒤 기록을 남기면 결제 건에 <b>반환금 입금 일자 · 처리자</b>가 보여요.<br>· 매출 통계는 <b>반환금을 입금한 달</b>에서 뺍니다. 서비스 청구 통계는 원래 청구월 결제 완료에서 뺍니다.<br>· 페이앱이 입금을 확인하고 카드 취소 결과를 보내면 <b>취소 완료</b>로 바뀝니다.</div>
+  </div>
+  <div class="mf"><button class="btn" data-close>닫기</button><button class="btn pri" id="pbGo">기록 저장</button></div></div>`;
 }
 
 /* 사유 기타 → 메모 필수: 라벨에 필수 표시, 비어 있으면 저장 · 결제 · 취소 막음 */
@@ -264,7 +288,7 @@ function manualModal(){
   <div class="mb">
     <div class="fr"><span class="fl">결제 카드</span><div class="ro">${PH.card}</div></div>
     <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm">${bmOpts()}</select><div class="hint">${bmHint()}</div></div></div>
-    <div class="fr" id="mpLinkRow"><span class="fl">대상 미결제 건<span class="addb">추가</span></span><div class="ro" id="mpLink"></div></div>
+    <div class="fr" id="mpLinkRow"><span class="fl">결제 실패 월<span class="addb">추가</span></span><div class="ro" id="mpLink"></div></div>
     <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat">${opt(PAY_CAT,'재시도 결제')}</select><div class="hint" id="mpHint"></div></div></div>
     <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="71,500"></div></div>
     <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span><span class="req" id="mpReq">필수</span></span><div><input class="fi" id="mpMemo" value="카드 변경 후 결제" placeholder="기타 사유를 입력하세요"></div></div>
@@ -278,6 +302,9 @@ function bindAll(){
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>go('sub'));
   document.querySelectorAll('[data-toast]').forEach(b=>b.onclick=()=>toast(b.dataset.toast));
   document.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.cancel; go('cancel'); });
+  document.querySelectorAll('[data-bank]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.bank; go('bank'); });
+  document.querySelectorAll('[data-payback]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.payback; go('payback'); });
+  if($('pbGo')) $('pbGo').onclick=()=>{ const h=HIST.find(x=>x[0]===S.cid); if(h) h[9]=$('pbDate').value.slice(5).replace('-','-')+' · 김운영'; go('sub'); };
   const r=$('svcRow'); if(r){ r.style.cursor='pointer'; r.onclick=()=>go('svc'); }
   if($('dCat')){ const u=()=>{ const c=$('dCat').value, m=$('dMemo').value.trim(), a=+String($('dAmt').value).replace(/\D/g,'')||0, f=$('dFrom').value, t=$('dTo').value;
       $('dHint').textContent=hintOf(DISC_CAT,c); $('dTot').textContent=fmt(55000-a)+'원';
@@ -285,10 +312,10 @@ function bindAll(){
     ['dCat','dMemo','dAmt','dFrom','dTo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
   if($('cxCat')){ const h=view().find(x=>x[0]===S.cid)||HIST[0], max=h[4]-h[5];
     const u=()=>{ $('cxHint').textContent=hintOf(CANCEL_CAT,$('cxCat').value); };
-    $('cxCat').onchange=u; u(); $('cxGo').onclick=()=>toast('시안 — 페이앱 취소 요청은 진행되지 않습니다'); }
+    $('cxCat').onchange=u; u(); $('cxGo').onclick=()=>toast(S.page==='bank'?'시안 — 계좌 환불 기록은 저장되지 않습니다':'시안 — 페이앱 취소 요청은 진행되지 않습니다'); }
   if($('mpCat')){ const u=()=>{ const c=$('mpCat').value, m=$('mpMemo').value.trim(), bm=$('mpBm').value,
         f=HIST.filter(h=>h[2]===bm&&h[3]==='fail'&&!paidBy(h)).pop();
-      $('mpLink').innerHTML=f?`<b>${f[1].slice(0,10)} · ${fmt(f[4])}원 · ${esc(f[6])}</b><div class="hint">결제되면 이 건은 <b>실패 · 재결제 완료</b>로 표시되고 이 수기 결제와 연결됨</div>`
+      $('mpLink').innerHTML=f?`<b>${f[1].slice(0,10)} · ${fmt(f[4])}원 · ${esc(f[6])}</b><div class="hint">결제되면 이 건은 이 실패 건과 수기 결제가 <b>같은 청구월 결제 이력</b>으로 묶여 보임</div>`
         :'<span class="hint">이 청구월은 미결제 건 없음 — 새 결제로 저장</span>';
       if(f && e0!==bm){ $('mpAmt').value=fmt(f[4]); e0=bm; }
       $('mpHint').textContent=hintOf(PAY_CAT,c); $('mpPvT').innerHTML='<b>['+c+']</b> '+(+$('mpBm').value.slice(5))+'월분'+(m?' · '+esc(m):''); };
@@ -299,7 +326,7 @@ function renderBase(){
   side();
   document.querySelectorAll('.demo button').forEach(b=>b.classList.toggle('on',b.dataset.go===S.page));
   const base = svcList()+subPanel();
-  const mdl = S.page==='svc'?svcModal():S.page==='cancel'?cancelModal():S.page==='manual'?manualModal():'';
+  const mdl = S.page==='svc'?svcModal():S.page==='payback'?paybackModal():S.page==='cancel'||S.page==='bank'?cancelModal():S.page==='manual'?manualModal():'';
   $('content').innerHTML = base + mdl;
   bindAll();
   if($('dCat')) memoReq('dCat','dMemo','dReq',document.querySelector('#svcMdl .btn.pri'));
@@ -308,7 +335,7 @@ function renderBase(){
 }
 function go(p){ S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
 S.cid=6;
-const P0=new URLSearchParams(location.search).get('p'); if(['svc','sub','cancel','manual'].includes(P0)) S.page=P0;
+const P0=new URLSearchParams(location.search).get('p'); if(['svc','sub','cancel','bank','manual','payback'].includes(P0)) S.page=P0;
 render();
 </script>
 </body>

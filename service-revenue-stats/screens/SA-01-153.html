@@ -1,0 +1,162 @@
+<!-- 정적 화면: 스토리보드용 스냅샷. 동작은 프로토타입에서 확인 -->
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>약국 상세 · 결제 · 환불 화면 시안</title>
+<!--
+  약국 상세(약국관리 > 약국 관리 > 상세)의 결제 · 환불 입력 시안 — 서비스 청구 통계 스토리보드 SA-01-003 ~ 006에서 iframe으로 사용
+  화면: svc 약국 서비스 수정(금액 할인 사유) / sub 정기 결제 내역(결제 취소 · 상태) / cancel 결제 취소 창 / manual 수기 결제 창
+  약국 · 카드 정보는 예시값. 카테고리는 실데이터(결제 6개월 · 금액 할인 13곳 · A/S · 메모 환불 사례) 기준
+-->
+<style>
+  :root{
+    --teal:#1fb6a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e3e6ea; --bg:#f4f5f7;
+    --side:#33383d; --side-line:#454b52; --up:#d6453d; --down:#2f6fd6; --add:#7048e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  button,input,select{font-family:inherit}
+  .wrap{display:flex;min-height:100vh}
+  .side{width:188px;flex:none;background:var(--side);color:#cdd2d7}
+  .side-logo{display:flex;align-items:center;gap:7px;padding:16px;border-bottom:1px solid var(--side-line)}
+  .side-mark{width:18px;height:18px;border-radius:7px 7px 7px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .side-mark::after{content:"";position:absolute;left:-4px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:#f4de3f}
+  .side-word{font-size:16px;font-weight:800;color:#fff}
+  .side-grp{font-size:10.5px;color:#8e959c;padding:14px 16px 6px}
+  .side-item{padding:8px 16px 8px 26px;font-size:12px;color:#aeb4ba}
+  .side-item.on{background:var(--teal);color:#fff;font-weight:700}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+  .topbar{height:46px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px}
+  .crumb{font-size:12px;color:var(--muted)} .crumb b{color:var(--ink)}
+  .demo{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
+  .demo button{height:24px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:11.5px;padding:0 8px;cursor:pointer;color:#4b5158}
+  .demo button.on{background:#4b5158;border-color:#4b5158;color:#fff}
+  .content{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:1240px;position:relative}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+  .ph{display:flex;align-items:center;gap:10px;padding:14px 18px 10px}
+  .ph h3{margin:0;font-size:14px} .ph .sub{font-size:11.5px;color:var(--muted)} .ph .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .btn{height:32px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;color:#4b5158;cursor:pointer}
+  .btn.pri{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  .btn.sm{height:26px;padding:0 10px;font-size:11.5px}
+  .btn.line{border-color:#f0b9b5;color:var(--up)}
+  .btn:disabled{color:#c3c9d0;border-color:var(--line);cursor:default}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:9px 12px;border-bottom:1px solid #eff1f3;white-space:nowrap;vertical-align:top}
+  .tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tbl .ctr{text-align:center}
+  .tbl tr.tot td{background:#f8f9fa;font-weight:800}
+  .addb{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;background:var(--add);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  th .addb{margin-left:3px}
+  .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+  .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
+  .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
+  .rs b{color:var(--ink)}
+  .red{color:var(--up);font-weight:700}
+  .kvg{display:grid;grid-template-columns:120px 1fr 120px 1fr;border-top:1px solid var(--line);margin:0 18px 16px}
+  .kvg>div{padding:9px 12px;border-bottom:1px solid #eff1f3;font-size:12.5px}
+  .kvg .k{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px}
+  .opt{font-size:11.5px;color:var(--muted);padding:0 18px 14px}
+  /* 창 */
+  .dim{position:fixed;inset:0;background:rgba(30,34,38,.45);z-index:20}
+  .mdl{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:21;width:560px;background:#fff;border-radius:10px;box-shadow:0 18px 40px -12px rgba(0,0,0,.45)}
+  .mdl.wide{width:720px}
+  .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .mh h3{margin:0;font-size:15px} .mh .x{margin-left:auto;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer}
+  .mb{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+  .fr{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:start}
+  .fl{font-size:12.5px;font-weight:700;color:#4b5158;padding-top:7px}
+  .fi{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px;color:var(--ink);background:#fff;width:100%}
+  .fi[disabled]{background:#f6f7f9;color:var(--muted)}
+  .ro{padding-top:7px;font-size:12.5px}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .seg{display:flex;gap:6px}
+  .seg label{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;cursor:pointer}
+  .seg label.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d);font-weight:700}
+  .seg input{display:none}
+  .pv{background:#f8f9fa;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px}
+  .pv .mlab{font-size:11px;color:var(--muted)}
+  .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .sum div{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--muted)}
+  .sum b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
+  .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
+  .req{display:none;font-size:9.5px;font-weight:800;color:#fff;background:var(--up);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  .req.on{display:inline-block}
+  .fi.need{border-color:var(--up);background:#fff7f6}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  .tbl tr.bmh td{background:#f6f7fb;border-top:1px solid var(--line);font-size:12.5px;padding:7px 10px}.bmn{color:#6b7280;font-size:11.5px;margin-left:4px}
+  .tbl tr.bmi td:first-child{padding-left:22px}.bml{color:#9aa1a9;margin-right:4px}.wy{display:inline-block;font-size:10.5px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side" id="side"><div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">약국관리</div><div class="side-item on">약국 관리</div><div class="side-item">신규 약국 관리</div><div class="side-item">약국 A/S</div><div class="side-item">약국 결제 관리</div><div class="side-item">태블릿 관리</div></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">약국관리 &gt; 약국 관리 &gt; <b>상세</b></div>
+      <div class="demo">시안 화면
+        <button data-go="svc">약국 서비스 수정</button>
+        <button data-go="sub" class="">정기 결제 내역</button>
+        <button data-go="cancel">결제 취소</button>
+        <button data-go="manual" class="on">수기 결제</button>
+      </div>
+    </div>
+    <div class="content" id="content"><div class="panel"><div class="ph"><h3>샘플약국</h3><span class="sub">스토어 ID 2024047xxxx</span></div></div>
+  <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
+    <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th></tr></thead>
+    <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td></tr></tbody></table>
+    <div class="opt">옵션: 스마트 OCR · 굿팜 POS &nbsp;|&nbsp; 서비스 수 2 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
+    <div class="opt dline" id="discLine">금액 할인 <span class="red">−11,000</span> <b>[결합 무료]</b> POS 무상 제공 · 적용 2026-06 ~ 계속 <span class="st ok">적용 중</span> <span class="addb">추가</span></div></div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
+    <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
+      <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
+  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 8</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><span class="addb">추가</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
+    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월<span class="addb">추가</span></th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액<span class="addb">추가</span></th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소<span class="addb">추가</span></th></tr></thead>
+    <tbody><tr class="bmh"><td colspan="8"><b>2026-11분</b> <span class="st ok">결제 완료</span> <span class="wy">수기 결제</span> <span class="bmn">결제 2건</span> · 결제액 49,500원</td></tr><tr data-id="6" class="bmi"><td><span class="bml">└</span>2026-11-05 10:02 <span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="num"><span class="red">−71,500</span></td>
+      <td>굿팜결제<div class="rs"><b>취소</b> [과다 청구] 파머시 퍼스트 10월 해지 미반영</div></td>
+      <td class="ctr"></td></tr><tr data-id="7" class="bmi"><td><span class="bml">└</span>2026-11-06 11:20 <span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">49,500</td>
+      <td class="num"></td>
+      <td>[취소 후 재결제] 11월분 · 파머시 퍼스트 해지 반영</td>
+      <td class="ctr"><button class="btn sm line" data-cancel="7">결제 취소</button></td></tr><tr class="bmh"><td colspan="8"><b>2026-10분</b> <span class="st ok">결제 완료</span> <span class="wy">수기 결제</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="4" class="bmi"><td><span class="bml">└</span>2026-10-05 10:02 <span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>굿팜결제</td>
+      <td class="ctr"></td></tr><tr data-id="5" class="bmi"><td><span class="bml">└</span>2026-10-08 14:21 <span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>[재시도 결제] 10월분 · 카드 한도 초과 후 결제</td>
+      <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>굿팜결제</td>
+      <td class="ctr"><button class="btn sm line" data-bank="3">계좌 환불 기록</button></td></tr><tr class="bmh"><td colspan="8"><b>2026-08분</b> <span class="st ok">결제 완료</span> <span class="bmn">결제 2건</span> · 결제액 71,500원</td></tr><tr data-id="1" class="bmi"><td><span class="bml">└</span>2026-08-05 10:02 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>굿팜결제</td>
+      <td class="ctr"><button class="btn sm line" data-bank="1">계좌 환불 기록</button></td></tr><tr data-id="2" class="bmi"><td><span class="bml">└</span>2026-08-05 10:04 <span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="num"><span class="red">−71,500</span></td>
+      <td>굿팜결제<div class="rs"><b>취소</b> [중복 결제] 같은 날 두 번 결제</div></td>
+      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
+      <td class="num"></td>
+      <td>굿팜결제</td>
+      <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl" id="mpMdl"><div class="mh"><h3>수기 결제</h3><button class="x" data-close="">×</button></div>
+  <div class="mb">
+    <div class="fr"><span class="fl">결제 카드</span><div class="ro">신한카드 · 뒤 4자리 ****</div></div>
+    <div class="fr" id="mpBmRow"><span class="fl">청구월<span class="addb">추가</span></span><div><select class="fi" id="mpBm"><optgroup label="미결제 청구월"><option value="2026-07" selected="">2026-07 (미결제)</option></optgroup><optgroup label="전체 (과금 시작 2024-06 ~ 이번 달)"><option value="2026-11">2026-11</option><option value="2026-10">2026-10</option><option value="2026-09">2026-09</option><option value="2026-08">2026-08</option><option value="2026-06">2026-06</option><option value="2026-05">2026-05</option><option value="2026-04">2026-04</option><option value="2026-03">2026-03</option><option value="2026-02">2026-02</option><option value="2026-01">2026-01</option><option value="2025-12">2025-12</option><option value="2025-11">2025-11</option><option value="2025-10">2025-10</option><option value="2025-09">2025-09</option><option value="2025-08">2025-08</option><option value="2025-07">2025-07</option><option value="2025-06">2025-06</option><option value="2025-05">2025-05</option><option value="2025-04">2025-04</option><option value="2025-03">2025-03</option><option value="2025-02">2025-02</option><option value="2025-01">2025-01</option><option value="2024-12">2024-12</option><option value="2024-11">2024-11</option><option value="2024-10">2024-10</option><option value="2024-09">2024-09</option><option value="2024-08">2024-08</option><option value="2024-07">2024-07</option><option value="2024-06">2024-06</option></optgroup></select><div class="hint">미결제 2026-07 — 가장 오래된 미결제 달이 기본값</div></div></div>
+    <div class="fr" id="mpLinkRow"><span class="fl">결제 실패 월<span class="addb">추가</span></span><div class="ro" id="mpLink"><b>2026-07-05 · 71,500원 · 기타오류(8324 : 거래 정지 카드)</b><div class="hint">결제되면 이 건은 이 실패 건과 수기 결제가 <b>같은 청구월 결제 이력</b>으로 묶여 보임</div></div></div>
+    <div class="fr" id="mpCatRow"><span class="fl">결제 사유<span class="addb">추가</span></span><div><select class="fi" id="mpCat"><option value="재시도 결제">재시도 결제</option><option value="누락분 결제">누락분 결제</option><option value="취소 후 재결제">취소 후 재결제</option><option value="요금제 변경">요금제 변경</option><option value="개국">개국</option><option value="서비스 외 결제">서비스 외 결제</option><option value="기타" selected="">기타</option></select><div class="hint" id="mpHint">위에 해당하지 않을 때 — 메모에 이유 입력</div></div></div>
+    <div class="fr" id="mpAmtRow"><span class="fl">금액</span><div><input class="fi" id="mpAmt" value="71,500"></div></div>
+    <div class="fr" id="mpMemoRow"><span class="fl">메모<span class="addb">추가</span><span class="req on" id="mpReq">필수</span></span><div><input class="fi need" id="mpMemo" value="" placeholder="기타 사유를 입력하세요"></div></div>
+    <div class="pv" id="mpPv"><span class="mlab">정기 결제 내역 · 약국 결제 관리 '결제 이유'에 보이는 내용</span><br><span id="mpPvT"><b>[기타]</b> 7월분</span></div>
+  </div>
+  <div class="mf"><button class="btn" data-close="">취소</button><button class="btn pri" data-toast="시안 — 실제 결제는 진행되지 않습니다">결제</button></div></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+
+
+</body></html>

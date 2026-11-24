@@ -1,0 +1,491 @@
+<!-- 정적 화면: 스토리보드용 스냅샷. 동작은 프로토타입에서 확인 -->
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>경영 요약 · VAN 정산 관리 시안</title>
+<!--
+  슈퍼어드민 시안 — 서비스 청구 통계 스토리보드 SA-02-001 ~ 004에서 iframe으로 사용
+  화면(오류 err = 연결 안 되는 행이 있어 반영하지 않음): dash 통계 > 경영 요약(약국별 총수익 포함, stats는 dash로 연결) / kd 통계 > 광동 VIP 정산 / mgmt 약국관리 > VAN 정산 관리(정산 내역 · 업로드 이력) / upload 업로드 결과(정산 내역 위 한 줄) / map 약국 연결 창
+  금액 · 단말기 구성은 2026-11 정산 파일 기준, 약국명 · 사업자번호 · 스토어 ID · TID는 가상값
+-->
+<style>
+  :root{
+    --teal:#1fb6a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e3e6ea; --bg:#f4f5f7;
+    --side:#33383d; --side-line:#454b52; --up:#d6453d; --down:#2f6fd6; --add:#7048e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  button,input,select{font-family:inherit}
+  .wrap{display:flex;min-height:100vh}
+  .side{width:188px;flex:none;background:var(--side);color:#cdd2d7}
+  .side-logo{display:flex;align-items:center;gap:7px;padding:16px;border-bottom:1px solid var(--side-line)}
+  .side-mark{width:18px;height:18px;border-radius:7px 7px 7px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .side-mark::after{content:"";position:absolute;left:-4px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:#f4de3f}
+  .side-word{font-size:16px;font-weight:800;color:#fff}
+  .side-grp{font-size:10.5px;color:#8e959c;padding:14px 16px 6px}
+  .side-item{padding:8px 16px 8px 26px;font-size:12px;color:#aeb4ba}
+  .side-item.on{background:var(--teal);color:#fff;font-weight:700}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+  .topbar{height:46px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px}
+  .crumb{font-size:12px;color:var(--muted)} .crumb b{color:var(--ink)}
+  .demo{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
+  .demo button{height:24px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:11.5px;padding:0 8px;cursor:pointer;color:#4b5158}
+  .demo button.on{background:#4b5158;border-color:#4b5158;color:#fff}
+  .content{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:1240px;position:relative}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+  .ph{display:flex;align-items:center;gap:10px;padding:14px 18px 10px}
+  .ph h3{margin:0;font-size:14px} .ph .sub{font-size:11.5px;color:var(--muted)} .ph .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .btn{height:32px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;color:#4b5158;cursor:pointer}
+  .btn.pri{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  .btn.sm{height:26px;padding:0 10px;font-size:11.5px}
+  .btn.line{border-color:#f0b9b5;color:var(--up)}
+  .btn:disabled{color:#c3c9d0;border-color:var(--line);cursor:default}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:9px 12px;border-bottom:1px solid #eff1f3;white-space:nowrap;vertical-align:top}
+  .tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tbl .ctr{text-align:center}
+  .tbl tr.tot td{background:#f8f9fa;font-weight:800}
+  .addb{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;background:var(--add);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  th .addb{margin-left:3px}
+  .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+  .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
+  .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
+  .rs b{color:var(--ink)}
+  .red{color:var(--up);font-weight:700}
+  .kvg{display:grid;grid-template-columns:120px 1fr 120px 1fr;border-top:1px solid var(--line);margin:0 18px 16px}
+  .kvg>div{padding:9px 12px;border-bottom:1px solid #eff1f3;font-size:12.5px}
+  .kvg .k{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px}
+  .opt{font-size:11.5px;color:var(--muted);padding:0 18px 14px}
+  /* 창 */
+  .dim{position:fixed;inset:0;background:rgba(30,34,38,.45);z-index:20}
+  .mdl{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:21;width:560px;background:#fff;border-radius:10px;box-shadow:0 18px 40px -12px rgba(0,0,0,.45)}
+  .mdl.wide{width:720px}
+  .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .mh h3{margin:0;font-size:15px} .mh .x{margin-left:auto;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer}
+  .mb{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+  .fr{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:start}
+  .fl{font-size:12.5px;font-weight:700;color:#4b5158;padding-top:7px}
+  .fi{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px;color:var(--ink);background:#fff;width:100%}
+  .fi[disabled]{background:#f6f7f9;color:var(--muted)}
+  .ro{padding-top:7px;font-size:12.5px}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .seg{display:flex;gap:6px}
+  .seg label{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;cursor:pointer}
+  .seg label.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d);font-weight:700}
+  .seg input{display:none}
+  .pv{background:#f8f9fa;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px}
+  .pv .mlab{font-size:11px;color:var(--muted)}
+  .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .sum div{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--muted)}
+  .sum b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
+  .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
+  .req{display:none;font-size:9.5px;font-weight:800;color:#fff;background:var(--up);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  .req.on{display:inline-block}
+  .fi.need{border-color:var(--up);background:#fff7f6}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  /* VAN 정산 추가 스타일 */
+  .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:0 18px 14px}
+  .kc{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff}
+  .kc .l{font-size:11.5px;color:var(--muted);font-weight:700}
+  .kc .v{font-size:19px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+  .kc .s{font-size:11px;color:var(--muted);margin-top:3px;white-space:normal}
+  .kc.tot{border-color:var(--teal);background:var(--teal-soft)}
+  .kc .tbu,.tbu{display:inline-block;font-size:10px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px;vertical-align:1px}
+  .basis{margin:0 18px 14px;font-size:11.5px;color:#5b6168;background:#f8f9fa;border:1px solid var(--line);border-radius:6px;padding:8px 12px;line-height:1.7}
+  .basis b{color:var(--ink)}
+  .tools{display:flex;align-items:center;gap:8px;padding:0 18px 10px}
+  .ptabs{display:flex;gap:4px}
+  .ptab{height:30px;border:1px solid var(--line);background:#fff;border-radius:6px;padding:0 12px;font-size:12px;cursor:pointer;color:#4b5158}
+  .ptab.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d);font-weight:700}
+  .ptab b{margin-left:5px;font-weight:800}
+  .q{margin-left:auto;height:30px;width:220px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12px}
+  .tblwrap{overflow:auto;max-height:560px;border-top:1px solid var(--line)}
+  .tbl thead th{position:sticky;top:0;z-index:1}
+  .tg{display:inline-block;font-size:10.5px;font-weight:700;border-radius:3px;padding:0 5px;margin-left:5px;background:#eef0f3;color:#5b6168;vertical-align:1px}
+  .tg.vip{background:#f1ebff;color:var(--add)}
+  .ms{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+  .ms.ok{background:#e6f6f3;color:#0f8a74} .ms.chk{background:#fff3d6;color:#a86b00} .ms.no{background:#fdecea;color:var(--up)}
+  .tog{border:0;background:none;cursor:pointer;color:var(--muted);font-size:11px;padding:0 4px 0 0}
+  tr.tid td{background:#fbfcfd;color:#5b6168;font-size:11.5px}
+  tr.unm td{background:#fff9ec}
+  tr.tot td{background:#f8f9fa;font-weight:800}
+  .sub2{font-size:11px;color:var(--muted)}
+  .steps{display:flex;gap:0;margin:0 0 4px}
+  .steps span{flex:1;text-align:center;font-size:11px;color:var(--muted);padding:6px 0;border-bottom:3px solid var(--line)}
+  .steps span.on{color:var(--teal-d);font-weight:800;border-color:var(--teal)}
+  .steps span.done{color:#4b5158;border-color:#9fded6}
+  .sum4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .sum4 div{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--muted)}
+  .sum4 b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .sum4 .ok b{color:#0f8a74} .sum4 .chk b{color:#a86b00} .sum4 .no b{color:var(--up)}
+  .warn{font-size:11.5px;color:#7a5200;background:#fff8e6;border:1px solid #f3dca6;border-radius:6px;padding:9px 12px;line-height:1.6}
+  .cand{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;padding:9px 12px;font-size:12.5px;cursor:pointer}
+  .cand.on{border-color:var(--teal);background:var(--teal-soft)}
+  .cand input{margin:0}
+  .cand .m{color:var(--muted);font-size:11.5px}
+.kc.golink{cursor:pointer;transition:border-color .15s}.kc.golink:hover{border-color:#33c3b4}.kc .more{float:right;font-size:11.5px;font-weight:700;color:#0e9e8c}.persel{display:inline-flex;gap:4px;margin-left:10px}.persel .btn{white-space:nowrap;padding:3px 9px}.persel .btn.on{background:#e6f7f4;border-color:#33c3b4;color:#0e9e8c}
+.sbar{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 16px 6px;background:#fbfcfd}.srow{display:flex;gap:6px;align-items:center}.srch2{height:30px;width:320px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px}
+.fsel{height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-size:12px;background:#fff;min-width:110px}.srow .fsel{height:30px}.btn.pri{background:#16b8a3;border-color:transparent;color:#fff}.sact{margin-left:auto;display:flex;gap:8px;align-items:center}.fcnt{font-size:11.5px;color:#0e9e8c}
+.adv{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:8px}.ag{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12px}.ag>b{width:76px;color:#5b6168;font-size:11.5px}.sf{display:inline-flex;gap:6px;align-items:center}
+.qi{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#e5e7eb;color:#4b5563;font-size:10.5px;font-weight:800;margin-left:4px;cursor:help;position:relative;vertical-align:1px}
+.qi:hover::after{content:attr(data-tip);position:absolute;left:0;top:20px;z-index:20;width:280px;white-space:normal;background:#1f2a37;color:#fff;font-size:12px;font-weight:500;line-height:1.5;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.25);text-align:left}
+.sub2c{color:#6b7280;font-size:12px;white-space:nowrap}
+.tbl th.sort{cursor:pointer;user-select:none}.tbl th.sort .ar{margin-left:3px;font-size:10px;color:#b9bec4}.tbl th.sort.on,.tbl th.sort.on .ar{color:var(--teal-d,#0f766e)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side" id="side"><div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">약국관리</div><div class="side-item">약국 관리</div><div class="side-item">신규 약국 관리</div><div class="side-item">약국 A/S</div><div class="side-item">약국 결제 관리</div><div class="side-item on">VAN 정산 관리<span class="addb">NEW</span></div><div class="side-item">태블릿 관리</div></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb" id="crumb">약국관리 &gt; <b>VAN 정산 관리</b></div>
+      <div class="demo">시안 화면
+        <button data-go="dash" class="">경영 요약</button>
+        <button data-go="kd">광동 VIP 정산</button>
+        <button data-go="mgmt">VAN 정산 관리</button>
+        <button data-go="upload">업로드 결과</button>
+        <button data-go="err" class="on">업로드 오류</button>
+      </div>
+    </div>
+    <div class="content" id="content"><div class="panel" id="mSum"><div class="ph"><h3>VAN 정산 관리</h3><span class="qi" data-tip="매달 VAN 정산 파일을 올려 반영해요. 사업자번호로 굿팜 약국에 자동 연결해요.">?</span>
+    <div class="right"><select class="fi" id="mMonth" style="width:150px;height:32px"><option selected="">2026-11</option><option>2026-10</option><option>2026-09</option><option>2026-08</option></select></div></div>
+  <div class="cards" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kc" id="mTot"><div class="l">반영 금액</div><div class="v">5,688,069</div><div class="s">파일 총액 5,693,316 · <b style="color:var(--up)">약국 알 수 없음 1곳 5,247</b></div></div>
+    <div class="kc" id="mOk"><div class="l">약국 · 단말기</div><div class="v">151곳</div><div class="s">TID 258대 · 승인 317,187건</div></div>
+    <div class="kc" id="mFile"><div class="l">반영 파일</div><div class="v" style="font-size:14px">11월 헬스포트.xlsx</div><div class="s">반영 2026-11-10 16:02 · 김운영</div></div>
+  </div></div><div class="panel" id="mList"><div class="ph"><h3>정산 내역</h3><span class="qi" data-tip="파일 한 행 = 약국 × TID(단말기) → 사업자번호로 약국 단위 합산. 금액은 정산금액(VAT 포함)">?</span>
+    <div class="right" id="upBtns"><button class="btn" id="tplBtn">파일 양식 다운로드</button><button class="btn pri" id="upBtn">정산 파일 업로드</button></div></div>
+  <div class="pv" id="upRes" style="margin:0 18px 10px;line-height:1.7;background:#e6f6f3;border-color:#bfe7df">
+    <b>11월 헬스포트.xlsx</b> 반영 완료 · 집계 월 <b>2026-11</b> <a href="#" id="chgMonth" style="font-size:11.5px">변경</a> · 반영 금액 <b>5,688,069원</b> · 약국 151곳 · <b style="color:var(--up)">약국 알 수 없음 1곳 5,247원</b></div>
+  <div class="tools"><span class="sub2">전체 152곳</span>
+    <input class="q" id="q" placeholder="가맹점명 · 사업자번호 검색" value=""></div>
+  <div class="tblwrap"><table class="tbl" id="vTbl"><thead><tr><th>가맹점명 (파일)</th><th>사업자번호</th><th>굿팜 약국</th><th class="num">TID</th><th class="num">승인건수</th><th class="num">정산금액</th></tr></thead>
+  <tbody><tr><td><button class="tog" data-tog="705-82-23237">▸</button>봄약국</td>
+      <td>705-82-23237</td><td><span class="tbu">약국 알 수 없음</span><span class="qi" data-tip="정산 파일의 사업자번호와 맞는 굿팜 약국이 없어 어느 약국인지 알 수 없어요. 금액은 이미 받은 돈이라 총매출 · VAN 합계에는 들어가요. 약국 관리에서 사업자번호를 고친 뒤 같은 파일을 다시 올리면 약국에 연결돼요.">?</span><div class="sub2">일치하는 약국 없음 · 반영 금액에서 제외</div></td>
+      <td class="num">1</td><td class="num">265</td><td class="num">5,247</td></tr><tr><td><button class="tog" data-tog="765-63-74292">▸</button>샘길약국</td>
+      <td>765-63-74292</td><td>샘길약국<div class="sub2">서울 강남구 · 26079</div></td>
+      <td class="num">4</td><td class="num">15,472</td><td class="num">306,029</td></tr><tr><td><button class="tog" data-tog="239-41-62637">▸</button>건강온약국</td>
+      <td>239-41-62637</td><td>건강온약국<div class="sub2">경기 고양시 · 85561</div></td>
+      <td class="num">2</td><td class="num">14,997</td><td class="num">296,624</td></tr><tr><td><button class="tog" data-tog="261-63-20566">▸</button>중앙빛약국</td>
+      <td>261-63-20566</td><td>중앙빛약국<div class="sub2">서울 송파구 · 52179</div></td>
+      <td class="num">3</td><td class="num">9,710</td><td class="num">180,521</td></tr><tr><td><button class="tog" data-tog="763-29-23518">▸</button>윤약국</td>
+      <td>763-29-23518</td><td>윤약국<div class="sub2">인천 남동구 · 18171</div></td>
+      <td class="num">3</td><td class="num">8,781</td><td class="num">173,646</td></tr><tr><td><button class="tog" data-tog="803-27-13861">▸</button>숲봄약국</td>
+      <td>803-27-13861</td><td>숲봄약국<div class="sub2">경기 고양시 · 97511</div></td>
+      <td class="num">4</td><td class="num">9,408</td><td class="num">169,153</td></tr><tr><td><button class="tog" data-tog="254-14-81515">▸</button>길샘약국</td>
+      <td>254-14-81515</td><td>길샘약국<div class="sub2">대구 수성구 · 70507</div></td>
+      <td class="num">2</td><td class="num">7,974</td><td class="num">154,110</td></tr><tr><td><button class="tog" data-tog="661-80-62847">▸</button>청솔샘약국</td>
+      <td>661-80-62847</td><td>청솔샘약국<div class="sub2">인천 남동구 · 44139</div></td>
+      <td class="num">3</td><td class="num">6,758</td><td class="num">131,255</td></tr><tr><td><button class="tog" data-tog="597-69-90476">▸</button>참숲약국</td>
+      <td>597-69-90476</td><td>참숲약국<div class="sub2">경기 고양시 · 63611</div></td>
+      <td class="num">3</td><td class="num">6,464</td><td class="num">127,809</td></tr><tr><td><button class="tog" data-tog="117-84-63055">▸</button>빛빛약국</td>
+      <td>117-84-63055</td><td>빛빛약국<div class="sub2">경기 성남시 · 14767</div></td>
+      <td class="num">2</td><td class="num">5,468</td><td class="num">107,594</td></tr><tr><td><button class="tog" data-tog="640-59-15502">▸</button>고운마루약국</td>
+      <td>640-59-15502</td><td>고운마루약국<div class="sub2">경기 고양시 · 84647</div></td>
+      <td class="num">3</td><td class="num">5,129</td><td class="num">101,475</td></tr><tr><td><button class="tog" data-tog="657-38-76033">▸</button>온빛약국</td>
+      <td>657-38-76033</td><td>온빛약국<div class="sub2">인천 남동구 · 89075</div></td>
+      <td class="num">3</td><td class="num">5,115</td><td class="num">101,199</td></tr><tr><td><button class="tog" data-tog="249-41-97154">▸</button>청솔봄약국</td>
+      <td>249-41-97154</td><td>청솔봄약국<div class="sub2">대전 서구 · 31266</div></td>
+      <td class="num">2</td><td class="num">4,992</td><td class="num">98,762</td></tr><tr><td><button class="tog" data-tog="855-58-80638">▸</button>은하봄약국</td>
+      <td>855-58-80638</td><td>은하봄약국<div class="sub2">대전 서구 · 87581</div></td>
+      <td class="num">2</td><td class="num">4,532</td><td class="num">89,675</td></tr><tr><td><button class="tog" data-tog="239-73-63968">▸</button>미소온약국</td>
+      <td>239-73-63968</td><td>미소온약국<div class="sub2">광주 북구 · 80430</div></td>
+      <td class="num">2</td><td class="num">3,725</td><td class="num">73,735</td></tr><tr><td><button class="tog" data-tog="618-48-02494">▸</button>소망빛약국</td>
+      <td>618-48-02494</td><td>소망빛약국<div class="sub2">경기 고양시 · 34610</div></td>
+      <td class="num">3</td><td class="num">4,453</td><td class="num">73,347</td></tr><tr><td><button class="tog" data-tog="162-50-53822">▸</button>길빛약국</td>
+      <td>162-50-53822</td><td>길빛약국<div class="sub2">경기 성남시 · 71190</div></td>
+      <td class="num">2</td><td class="num">3,588</td><td class="num">69,855</td></tr><tr><td><button class="tog" data-tog="633-78-22796">▸</button>나눔숲약국</td>
+      <td>633-78-22796</td><td>나눔숲약국<div class="sub2">서울 송파구 · 87840</div></td>
+      <td class="num">2</td><td class="num">4,233</td><td class="num">69,746</td></tr><tr><td><button class="tog" data-tog="608-65-66022">▸</button>사랑온약국</td>
+      <td>608-65-66022</td><td>사랑온약국<div class="sub2">광주 북구 · 67890</div></td>
+      <td class="num">2</td><td class="num">3,422</td><td class="num">67,115</td></tr><tr><td><button class="tog" data-tog="328-49-15814">▸</button>꽃샘약국</td>
+      <td>328-49-15814</td><td>꽃샘약국<div class="sub2">경기 수원시 · 35751</div></td>
+      <td class="num">2</td><td class="num">3,749</td><td class="num">61,654</td></tr><tr><td><button class="tog" data-tog="442-20-35867">▸</button>제일약국</td>
+      <td>442-20-35867</td><td>제일약국<div class="sub2">경기 성남시 · 23815</div></td>
+      <td class="num">3</td><td class="num">3,029</td><td class="num">59,974</td></tr><tr><td><button class="tog" data-tog="498-64-69346">▸</button>제일길약국</td>
+      <td>498-64-69346</td><td>제일길약국<div class="sub2">경기 수원시 · 48276</div></td>
+      <td class="num">2</td><td class="num">3,027</td><td class="num">59,915</td></tr><tr><td><button class="tog" data-tog="550-77-09674">▸</button>결마루약국</td>
+      <td>550-77-09674</td><td>결마루약국<div class="sub2">서울 성동구 · 79574</div></td>
+      <td class="num">2</td><td class="num">3,414</td><td class="num">56,200</td></tr><tr><td><button class="tog" data-tog="610-28-61949">▸</button>온들약국</td>
+      <td>610-28-61949</td><td>온들약국<div class="sub2">서울 마포구 · 37067</div></td>
+      <td class="num">2</td><td class="num">2,827</td><td class="num">55,935</td></tr><tr><td><button class="tog" data-tog="680-93-93741">▸</button>우리샘약국</td>
+      <td>680-93-93741</td><td>우리샘약국<div class="sub2">경기 수원시 · 38513</div></td>
+      <td class="num">3</td><td class="num">2,816</td><td class="num">55,638</td></tr><tr><td><button class="tog" data-tog="186-13-83116">▸</button>건강빛약국</td>
+      <td>186-13-83116</td><td>건강빛약국<div class="sub2">서울 송파구 · 95660</div></td>
+      <td class="num">2</td><td class="num">3,263</td><td class="num">54,038</td></tr><tr><td><button class="tog" data-tog="484-97-21974">▸</button>중앙누리약국</td>
+      <td>484-97-21974</td><td>중앙누리약국<div class="sub2">서울 마포구 · 52058</div></td>
+      <td class="num">3</td><td class="num">2,661</td><td class="num">52,550</td></tr><tr><td><button class="tog" data-tog="522-89-02021">▸</button>샘샘약국</td>
+      <td>522-89-02021</td><td>샘샘약국<div class="sub2">대구 수성구 · 62521</div></td>
+      <td class="num">3</td><td class="num">2,625</td><td class="num">51,718</td></tr><tr><td><button class="tog" data-tog="290-86-71808">▸</button>세움온약국</td>
+      <td>290-86-71808</td><td>세움온약국<div class="sub2">인천 남동구 · 19997</div></td>
+      <td class="num">1</td><td class="num">2,545</td><td class="num">50,351</td></tr><tr><td><button class="tog" data-tog="308-61-28108">▸</button>제일마루약국</td>
+      <td>308-61-28108</td><td>제일마루약국<div class="sub2">인천 남동구 · 87841</div></td>
+      <td class="num">2</td><td class="num">2,478</td><td class="num">48,965</td></tr><tr><td><button class="tog" data-tog="827-11-14408">▸</button>빛샘약국</td>
+      <td>827-11-14408</td><td>빛샘약국<div class="sub2">경기 고양시 · 65261</div></td>
+      <td class="num">2</td><td class="num">2,436</td><td class="num">48,193</td></tr><tr><td><button class="tog" data-tog="276-18-57772">▸</button>늘마루약국</td>
+      <td>276-18-57772</td><td>늘마루약국<div class="sub2">부산 해운대구 · 68987</div></td>
+      <td class="num">2</td><td class="num">2,401</td><td class="num">47,362</td></tr><tr><td><button class="tog" data-tog="318-58-49640">▸</button>빛봄약국</td>
+      <td>318-58-49640</td><td>빛봄약국<div class="sub2">서울 마포구 · 16455</div></td>
+      <td class="num">2</td><td class="num">2,394</td><td class="num">47,302</td></tr><tr><td><button class="tog" data-tog="656-62-68900">▸</button>미소들약국</td>
+      <td>656-62-68900</td><td>미소들약국<div class="sub2">서울 송파구 · 74773</div></td>
+      <td class="num">2</td><td class="num">2,314</td><td class="num">45,798</td></tr><tr><td><button class="tog" data-tog="477-79-55234">▸</button>사랑샘약국</td>
+      <td>477-79-55234</td><td>사랑샘약국<div class="sub2">서울 송파구 · 83919</div></td>
+      <td class="num">1</td><td class="num">2,297</td><td class="num">45,461</td></tr><tr><td><button class="tog" data-tog="159-94-31144">▸</button>미소누리약국</td>
+      <td>159-94-31144</td><td>미소누리약국<div class="sub2">인천 남동구 · 11425</div></td>
+      <td class="num">2</td><td class="num">2,287</td><td class="num">45,283</td></tr><tr><td><button class="tog" data-tog="469-17-20122">▸</button>청솔길약국</td>
+      <td>469-17-20122</td><td>청솔길약국<div class="sub2">서울 송파구 · 57151</div></td>
+      <td class="num">3</td><td class="num">2,730</td><td class="num">45,069</td></tr><tr><td><button class="tog" data-tog="481-94-68735">▸</button>담누리약국</td>
+      <td>481-94-68735</td><td>담누리약국<div class="sub2">대구 수성구 · 25172</div></td>
+      <td class="num">1</td><td class="num">2,264</td><td class="num">43,976</td></tr><tr><td><button class="tog" data-tog="828-70-31126">▸</button>제일숲약국</td>
+      <td>828-70-31126</td><td>제일숲약국<div class="sub2">대구 수성구 · 48465</div></td>
+      <td class="num">1</td><td class="num">2,198</td><td class="num">43,501</td></tr><tr><td><button class="tog" data-tog="413-50-35899">▸</button>빛들약국</td>
+      <td>413-50-35899</td><td>빛들약국<div class="sub2">광주 북구 · 65097</div></td>
+      <td class="num">2</td><td class="num">3,917</td><td class="num">43,065</td></tr><tr><td><button class="tog" data-tog="405-80-30659">▸</button>다온숲약국</td>
+      <td>405-80-30659</td><td>다온숲약국<div class="sub2">대구 수성구 · 56210</div></td>
+      <td class="num">3</td><td class="num">2,166</td><td class="num">42,887</td></tr><tr><td><button class="tog" data-tog="736-77-34697">▸</button>숲온약국</td>
+      <td>736-77-34697</td><td>숲온약국<div class="sub2">인천 남동구 · 87161</div></td>
+      <td class="num">2</td><td class="num">2,597</td><td class="num">42,785</td></tr><tr><td><button class="tog" data-tog="284-51-19898">▸</button>늘온약국</td>
+      <td>284-51-19898</td><td>늘온약국<div class="sub2">서울 성동구 · 89731</div></td>
+      <td class="num">1</td><td class="num">2,147</td><td class="num">42,431</td></tr><tr><td><button class="tog" data-tog="248-68-68378">▸</button>청솔마루약국</td>
+      <td>248-68-68378</td><td>청솔마루약국<div class="sub2">서울 성동구 · 15141</div></td>
+      <td class="num">2</td><td class="num">2,553</td><td class="num">42,043</td></tr><tr><td><button class="tog" data-tog="423-49-53144">▸</button>하늘숲약국</td>
+      <td>423-49-53144</td><td>하늘숲약국<div class="sub2">부산 해운대구 · 19964</div></td>
+      <td class="num">2</td><td class="num">2,115</td><td class="num">41,738</td></tr><tr><td><button class="tog" data-tog="297-97-11920">▸</button>온마루약국</td>
+      <td>297-97-11920</td><td>온마루약국<div class="sub2">서울 마포구 · 67696</div></td>
+      <td class="num">1</td><td class="num">2,078</td><td class="num">41,144</td></tr><tr><td><button class="tog" data-tog="772-60-30916">▸</button>봄온약국</td>
+      <td>772-60-30916</td><td>봄온약국<div class="sub2">광주 북구 · 18970</div></td>
+      <td class="num">2</td><td class="num">2,461</td><td class="num">40,897</td></tr><tr><td><button class="tog" data-tog="237-59-69151">▸</button>건강샘약국</td>
+      <td>237-59-69151</td><td>건강샘약국<div class="sub2">경기 수원시 · 77609</div></td>
+      <td class="num">2</td><td class="num">2,435</td><td class="num">40,121</td></tr><tr><td><button class="tog" data-tog="811-23-68972">▸</button>새샘약국</td>
+      <td>811-23-68972</td><td>새샘약국<div class="sub2">부산 해운대구 · 41345</div></td>
+      <td class="num">3</td><td class="num">1,976</td><td class="num">39,085</td></tr><tr><td><button class="tog" data-tog="840-25-02673">▸</button>큰약국</td>
+      <td>840-25-02673</td><td>큰약국<div class="sub2">경기 고양시 · 52216</div></td>
+      <td class="num">1</td><td class="num">2,359</td><td class="num">38,511</td></tr><tr><td><button class="tog" data-tog="842-88-56783">▸</button>결샘약국</td>
+      <td>842-88-56783</td><td>결샘약국<div class="sub2">대구 수성구 · 59346</div></td>
+      <td class="num">2</td><td class="num">1,936</td><td class="num">38,293</td></tr><tr><td><button class="tog" data-tog="834-88-30130">▸</button>참길약국</td>
+      <td>834-88-30130</td><td>참길약국<div class="sub2">경기 수원시 · 48758</div></td>
+      <td class="num">2</td><td class="num">2,350</td><td class="num">37,670</td></tr><tr><td><button class="tog" data-tog="457-10-49542">▸</button>별들약국</td>
+      <td>457-10-49542</td><td>별들약국<div class="sub2">인천 남동구 · 21698</div></td>
+      <td class="num">2</td><td class="num">2,204</td><td class="num">36,334</td></tr><tr><td><button class="tog" data-tog="437-21-47343">▸</button>봄봄약국</td>
+      <td>437-21-47343</td><td>봄봄약국<div class="sub2">인천 남동구 · 44887</div></td>
+      <td class="num">2</td><td class="num">2,138</td><td class="num">35,231</td></tr><tr><td><button class="tog" data-tog="116-32-83280">▸</button>별빛약국</td>
+      <td>116-32-83280</td><td>별빛약국<div class="sub2">서울 마포구 · 83378</div></td>
+      <td class="num">3</td><td class="num">2,499</td><td class="num">34,779</td></tr><tr><td><button class="tog" data-tog="569-11-94270">▸</button>온봄약국</td>
+      <td>569-11-94270</td><td>온봄약국<div class="sub2">대구 수성구 · 37096</div></td>
+      <td class="num">1</td><td class="num">1,743</td><td class="num">34,432</td></tr><tr><td><button class="tog" data-tog="185-58-42631">▸</button>윤샘약국</td>
+      <td>185-58-42631</td><td>윤샘약국<div class="sub2">부산 해운대구 · 43590</div></td>
+      <td class="num">2</td><td class="num">2,049</td><td class="num">33,752</td></tr><tr><td><button class="tog" data-tog="380-82-61580">▸</button>다온샘약국</td>
+      <td>380-82-61580</td><td>다온샘약국<div class="sub2">경기 성남시 · 93928</div></td>
+      <td class="num">1</td><td class="num">1,999</td><td class="num">32,984</td></tr><tr><td><button class="tog" data-tog="674-18-73445">▸</button>달샘약국</td>
+      <td>674-18-73445</td><td>달샘약국<div class="sub2">서울 송파구 · 44651</div></td>
+      <td class="num">2</td><td class="num">1,654</td><td class="num">32,631</td></tr><tr><td><button class="tog" data-tog="877-68-36890">▸</button>결들약국</td>
+      <td>877-68-36890</td><td>결들약국<div class="sub2">서울 마포구 · 12913</div></td>
+      <td class="num">1</td><td class="num">1,962</td><td class="num">32,357</td></tr><tr><td><button class="tog" data-tog="102-73-07892">▸</button>숲약국</td>
+      <td>102-73-07892</td><td>숲약국<div class="sub2">서울 강남구 · 33579</div></td>
+      <td class="num">1</td><td class="num">1,620</td><td class="num">32,056</td></tr><tr><td><button class="tog" data-tog="293-35-49355">▸</button>해들약국</td>
+      <td>293-35-49355</td><td>해들약국<div class="sub2">경기 성남시 · 24363</div></td>
+      <td class="num">2</td><td class="num">2,895</td><td class="num">31,823</td></tr><tr><td><button class="tog" data-tog="160-70-40428">▸</button>한빛마루약국</td>
+      <td>160-70-40428</td><td>한빛마루약국<div class="sub2">경기 수원시 · 25048</div></td>
+      <td class="num">2</td><td class="num">1,921</td><td class="num">31,664</td></tr><tr><td><button class="tog" data-tog="480-67-32316">▸</button>꽃누리약국</td>
+      <td>480-67-32316</td><td>꽃누리약국<div class="sub2">대구 수성구 · 65238</div></td>
+      <td class="num">1</td><td class="num">1,915</td><td class="num">31,466</td></tr><tr><td><button class="tog" data-tog="503-54-44277">▸</button>솔들약국</td>
+      <td>503-54-44277</td><td>솔들약국<div class="sub2">대전 서구 · 53642</div></td>
+      <td class="num">2</td><td class="num">1,889</td><td class="num">31,291</td></tr><tr><td><button class="tog" data-tog="654-91-03191">▸</button>제일샘약국</td>
+      <td>654-91-03191</td><td>제일샘약국<div class="sub2">경기 성남시 · 78662</div></td>
+      <td class="num">1</td><td class="num">1,820</td><td class="num">29,948</td></tr><tr><td><button class="tog" data-tog="625-28-75255">▸</button>바른누리약국</td>
+      <td>625-28-75255</td><td>바른누리약국<div class="sub2">부산 해운대구 · 35974</div></td>
+      <td class="num">2</td><td class="num">2,729</td><td class="num">29,931</td></tr><tr><td><button class="tog" data-tog="680-13-82197">▸</button>꽃들약국</td>
+      <td>680-13-82197</td><td>꽃들약국<div class="sub2">서울 마포구 · 96434</div></td>
+      <td class="num">1</td><td class="num">1,796</td><td class="num">29,585</td></tr><tr><td><button class="tog" data-tog="402-12-85354">▸</button>별봄약국</td>
+      <td>402-12-85354</td><td>별봄약국<div class="sub2">서울 강남구 · 65410</div></td>
+      <td class="num">2</td><td class="num">1,494</td><td class="num">29,542</td></tr><tr><td><button class="tog" data-tog="583-67-64253">▸</button>꽃봄약국</td>
+      <td>583-67-64253</td><td>꽃봄약국<div class="sub2">대전 서구 · 92136</div></td>
+      <td class="num">1</td><td class="num">1,486</td><td class="num">29,304</td></tr><tr><td><button class="tog" data-tog="598-36-70821">▸</button>온숲약국</td>
+      <td>598-36-70821</td><td>온숲약국<div class="sub2">경기 고양시 · 60195</div></td>
+      <td class="num">2</td><td class="num">1,468</td><td class="num">29,027</td></tr><tr><td><button class="tog" data-tog="557-41-65881">▸</button>세움길약국</td>
+      <td>557-41-65881</td><td>세움길약국<div class="sub2">서울 성동구 · 61999</div></td>
+      <td class="num">2</td><td class="num">1,760</td><td class="num">28,975</td></tr><tr><td><button class="tog" data-tog="869-49-77783">▸</button>바른약국</td>
+      <td>869-49-77783</td><td>바른약국<div class="sub2">서울 마포구 · 19148</div></td>
+      <td class="num">2</td><td class="num">1,446</td><td class="num">28,631</td></tr><tr><td><button class="tog" data-tog="174-89-06060">▸</button>다온들약국</td>
+      <td>174-89-06060</td><td>다온들약국<div class="sub2">대전 서구 · 63818</div></td>
+      <td class="num">2</td><td class="num">1,739</td><td class="num">28,453</td></tr><tr><td><button class="tog" data-tog="820-15-16831">▸</button>은하온약국</td>
+      <td>820-15-16831</td><td>은하온약국<div class="sub2">대구 수성구 · 74164</div></td>
+      <td class="num">2</td><td class="num">5,163</td><td class="num">28,375</td></tr><tr><td><button class="tog" data-tog="262-35-54002">▸</button>은하약국</td>
+      <td>262-35-54002</td><td>은하약국<div class="sub2">서울 성동구 · 71344</div></td>
+      <td class="num">1</td><td class="num">1,429</td><td class="num">28,294</td></tr><tr><td><button class="tog" data-tog="155-49-55752">▸</button>은하숲약국</td>
+      <td>155-49-55752</td><td>은하숲약국<div class="sub2">광주 북구 · 15546</div></td>
+      <td class="num">2</td><td class="num">1,701</td><td class="num">28,080</td></tr><tr><td><button class="tog" data-tog="511-14-60707">▸</button>소망길약국</td>
+      <td>511-14-60707</td><td>소망길약국<div class="sub2">광주 북구 · 87691</div></td>
+      <td class="num">1</td><td class="num">1,685</td><td class="num">27,671</td></tr><tr><td><button class="tog" data-tog="563-27-31277">▸</button>은하마루약국</td>
+      <td>563-27-31277</td><td>은하마루약국<div class="sub2">부산 해운대구 · 84622</div></td>
+      <td class="num">1</td><td class="num">1,649</td><td class="num">27,192</td></tr><tr><td><button class="tog" data-tog="119-76-23861">▸</button>별약국</td>
+      <td>119-76-23861</td><td>별약국<div class="sub2">부산 해운대구 · 44384</div></td>
+      <td class="num">1</td><td class="num">1,355</td><td class="num">26,829</td></tr><tr><td><button class="tog" data-tog="729-77-12735">▸</button>새봄마루약국</td>
+      <td>729-77-12735</td><td>새봄마루약국<div class="sub2">광주 북구 · 72927</div></td>
+      <td class="num">2</td><td class="num">1,627</td><td class="num">26,367</td></tr><tr><td><button class="tog" data-tog="234-96-82626">▸</button>봄샘약국</td>
+      <td>234-96-82626</td><td>봄샘약국<div class="sub2">서울 송파구 · 33493</div></td>
+      <td class="num">2</td><td class="num">1,337</td><td class="num">26,294</td></tr><tr><td><button class="tog" data-tog="837-40-65723">▸</button>소망약국</td>
+      <td>837-40-65723</td><td>소망약국<div class="sub2">경기 수원시 · 97109</div></td>
+      <td class="num">1</td><td class="num">1,586</td><td class="num">26,153</td></tr><tr><td><button class="tog" data-tog="413-13-59621">▸</button>푸른빛약국</td>
+      <td>413-13-59621</td><td>푸른빛약국<div class="sub2">경기 수원시 · 51128</div></td>
+      <td class="num">1</td><td class="num">1,293</td><td class="num">25,601</td></tr><tr><td><button class="tog" data-tog="156-48-51638">▸</button>들들약국</td>
+      <td>156-48-51638</td><td>들들약국<div class="sub2">서울 마포구 · 89680</div></td>
+      <td class="num">1</td><td class="num">1,478</td><td class="num">24,222</td></tr><tr><td><button class="tog" data-tog="472-40-99395">▸</button>달들약국</td>
+      <td>472-40-99395</td><td>달들약국<div class="sub2">경기 성남시 · 85180</div></td>
+      <td class="num">2</td><td class="num">1,461</td><td class="num">24,041</td></tr><tr><td><button class="tog" data-tog="365-76-17185">▸</button>다온길약국</td>
+      <td>365-76-17185</td><td>다온길약국<div class="sub2">광주 북구 · 93488</div></td>
+      <td class="num">2</td><td class="num">1,460</td><td class="num">24,024</td></tr><tr><td><button class="tog" data-tog="572-25-85712">▸</button>늘길약국</td>
+      <td>572-25-85712</td><td>늘길약국<div class="sub2">서울 성동구 · 68367</div></td>
+      <td class="num">2</td><td class="num">1,440</td><td class="num">23,777</td></tr><tr><td><button class="tog" data-tog="695-79-40039">▸</button>청솔약국</td>
+      <td>695-79-40039</td><td>청솔약국<div class="sub2">서울 강남구 · 81493</div></td>
+      <td class="num">1</td><td class="num">1,330</td><td class="num">21,896</td></tr><tr><td><button class="tog" data-tog="350-94-79770">▸</button>사랑들약국</td>
+      <td>350-94-79770</td><td>사랑들약국<div class="sub2">서울 성동구 · 79454</div></td>
+      <td class="num">2</td><td class="num">1,312</td><td class="num">21,678</td></tr><tr><td><button class="tog" data-tog="681-98-77418">▸</button>새봄온약국</td>
+      <td>681-98-77418</td><td>새봄온약국<div class="sub2">인천 남동구 · 33236</div></td>
+      <td class="num">2</td><td class="num">1,310</td><td class="num">21,619</td></tr><tr><td><button class="tog" data-tog="100-47-31972">▸</button>솔숲약국</td>
+      <td>100-47-31972</td><td>솔숲약국<div class="sub2">서울 성동구 · 49225</div></td>
+      <td class="num">1</td><td class="num">1,309</td><td class="num">21,582</td></tr><tr><td><button class="tog" data-tog="519-77-18552">▸</button>제일빛약국</td>
+      <td>519-77-18552</td><td>제일빛약국<div class="sub2">경기 고양시 · 21983</div></td>
+      <td class="num">1</td><td class="num">1,259</td><td class="num">20,774</td></tr><tr><td><button class="tog" data-tog="252-26-10803">▸</button>빛온약국</td>
+      <td>252-26-10803</td><td>빛온약국<div class="sub2">경기 수원시 · 56101</div></td>
+      <td class="num">1</td><td class="num">1,049</td><td class="num">20,770</td></tr><tr><td><button class="tog" data-tog="442-99-58347">▸</button>달빛약국</td>
+      <td>442-99-58347</td><td>달빛약국<div class="sub2">서울 강남구 · 64417</div></td>
+      <td class="num">3</td><td class="num">1,048</td><td class="num">20,750</td></tr><tr><td><button class="tog" data-tog="334-48-23666">▸</button>늘빛약국</td>
+      <td>334-48-23666</td><td>늘빛약국<div class="sub2">서울 마포구 · 97429</div></td>
+      <td class="num">1</td><td class="num">1,258</td><td class="num">20,724</td></tr><tr><td><button class="tog" data-tog="208-81-49494">▸</button>해누리약국</td>
+      <td>208-81-49494</td><td>해누리약국<div class="sub2">부산 해운대구 · 36854</div></td>
+      <td class="num">1</td><td class="num">1,043</td><td class="num">20,612</td></tr><tr><td><button class="tog" data-tog="714-85-37295">▸</button>나눔약국</td>
+      <td>714-85-37295</td><td>나눔약국<div class="sub2">경기 수원시 · 80419</div></td>
+      <td class="num">1</td><td class="num">1,248</td><td class="num">20,576</td></tr><tr><td><button class="tog" data-tog="132-36-40931">▸</button>새들약국</td>
+      <td>132-36-40931</td><td>새들약국<div class="sub2">경기 고양시 · 63829</div></td>
+      <td class="num">1</td><td class="num">1,231</td><td class="num">20,279</td></tr><tr><td><button class="tog" data-tog="722-65-30847">▸</button>미소길약국</td>
+      <td>722-65-30847</td><td>미소길약국<div class="sub2">인천 남동구 · 97613</div></td>
+      <td class="num">2</td><td class="num">1,242</td><td class="num">20,272</td></tr><tr><td><button class="tog" data-tog="594-38-52353">▸</button>중앙마루약국</td>
+      <td>594-38-52353</td><td>중앙마루약국<div class="sub2">서울 마포구 · 16515</div></td>
+      <td class="num">3</td><td class="num">1,105</td><td class="num">19,428</td></tr><tr><td><button class="tog" data-tog="491-21-13351">▸</button>샘봄약국</td>
+      <td>491-21-13351</td><td>샘봄약국<div class="sub2">대구 수성구 · 28457</div></td>
+      <td class="num">1</td><td class="num">955</td><td class="num">18,909</td></tr><tr><td><button class="tog" data-tog="235-91-87529">▸</button>빛마루약국</td>
+      <td>235-91-87529</td><td>빛마루약국<div class="sub2">인천 남동구 · 21794</div></td>
+      <td class="num">1</td><td class="num">1,569</td><td class="num">17,171</td></tr><tr><td><button class="tog" data-tog="891-42-93862">▸</button>새온약국</td>
+      <td>891-42-93862</td><td>새온약국<div class="sub2">경기 수원시 · 40924</div></td>
+      <td class="num">1</td><td class="num">1,025</td><td class="num">16,880</td></tr><tr><td><button class="tog" data-tog="513-33-86294">▸</button>솔온약국</td>
+      <td>513-33-86294</td><td>솔온약국<div class="sub2">경기 수원시 · 28120</div></td>
+      <td class="num">3</td><td class="num">852</td><td class="num">16,715</td></tr><tr><td><button class="tog" data-tog="665-40-54832">▸</button>열린봄약국</td>
+      <td>665-40-54832</td><td>열린봄약국<div class="sub2">서울 강남구 · 70497</div></td>
+      <td class="num">1</td><td class="num">837</td><td class="num">16,553</td></tr><tr><td><button class="tog" data-tog="702-40-78646">▸</button>하늘들약국</td>
+      <td>702-40-78646</td><td>하늘들약국<div class="sub2">대구 수성구 · 71854</div></td>
+      <td class="num">2</td><td class="num">981</td><td class="num">16,174</td></tr><tr><td><button class="tog" data-tog="620-38-57927">▸</button>열린샘약국</td>
+      <td>620-38-57927</td><td>열린샘약국<div class="sub2">경기 수원시 · 34246</div></td>
+      <td class="num">1</td><td class="num">918</td><td class="num">15,147</td></tr><tr><td><button class="tog" data-tog="440-16-84109">▸</button>한빛숲약국</td>
+      <td>440-16-84109</td><td>한빛숲약국<div class="sub2">광주 북구 · 14962</div></td>
+      <td class="num">1</td><td class="num">750</td><td class="num">14,850</td></tr><tr><td><button class="tog" data-tog="264-61-76707">▸</button>소망봄약국</td>
+      <td>264-61-76707</td><td>소망봄약국<div class="sub2">서울 성동구 · 95169</div></td>
+      <td class="num">1</td><td class="num">738</td><td class="num">14,612</td></tr><tr><td><button class="tog" data-tog="895-92-47136">▸</button>나눔온약국</td>
+      <td>895-92-47136</td><td>나눔온약국<div class="sub2">대전 서구 · 52048</div></td>
+      <td class="num">1</td><td class="num">820</td><td class="num">13,299</td></tr><tr><td><button class="tog" data-tog="516-19-44781">▸</button>행복봄약국</td>
+      <td>516-19-44781</td><td>행복봄약국<div class="sub2">부산 해운대구 · 65969</div></td>
+      <td class="num">1</td><td class="num">668</td><td class="num">13,226</td></tr><tr><td><button class="tog" data-tog="512-53-86540">▸</button>담빛약국</td>
+      <td>512-53-86540</td><td>담빛약국<div class="sub2">서울 강남구 · 81742</div></td>
+      <td class="num">1</td><td class="num">1,180</td><td class="num">12,936</td></tr><tr><td><button class="tog" data-tog="628-17-71323">▸</button>건강누리약국</td>
+      <td>628-17-71323</td><td>건강누리약국<div class="sub2">대구 수성구 · 30799</div></td>
+      <td class="num">1</td><td class="num">650</td><td class="num">12,870</td></tr><tr><td><button class="tog" data-tog="397-90-49281">▸</button>담마루약국</td>
+      <td>397-90-49281</td><td>담마루약국<div class="sub2">광주 북구 · 80748</div></td>
+      <td class="num">1</td><td class="num">638</td><td class="num">12,613</td></tr><tr><td><button class="tog" data-tog="325-72-68361">▸</button>고운누리약국</td>
+      <td>325-72-68361</td><td>고운누리약국<div class="sub2">인천 남동구 · 54324</div></td>
+      <td class="num">1</td><td class="num">630</td><td class="num">12,474</td></tr><tr><td><button class="tog" data-tog="141-34-19774">▸</button>하늘길약국</td>
+      <td>141-34-19774</td><td>하늘길약국<div class="sub2">대구 수성구 · 77357</div></td>
+      <td class="num">2</td><td class="num">751</td><td class="num">12,392</td></tr><tr><td><button class="tog" data-tog="136-35-78227">▸</button>건강마루약국</td>
+      <td>136-35-78227</td><td>건강마루약국<div class="sub2">대구 수성구 · 16883</div></td>
+      <td class="num">1</td><td class="num">1,114</td><td class="num">12,254</td></tr><tr><td><button class="tog" data-tog="734-44-67624">▸</button>한빛빛약국</td>
+      <td>734-44-67624</td><td>한빛빛약국<div class="sub2">서울 성동구 · 80068</div></td>
+      <td class="num">2</td><td class="num">679</td><td class="num">11,191</td></tr><tr><td><button class="tog" data-tog="445-60-72821">▸</button>들봄약국</td>
+      <td>445-60-72821</td><td>들봄약국<div class="sub2">서울 강남구 · 97384</div></td>
+      <td class="num">1</td><td class="num">679</td><td class="num">11,072</td></tr><tr><td><button class="tog" data-tog="263-73-90527">▸</button>열린길약국</td>
+      <td>263-73-90527</td><td>열린길약국<div class="sub2">대구 수성구 · 96377</div></td>
+      <td class="num">1</td><td class="num">554</td><td class="num">10,930</td></tr><tr><td><button class="tog" data-tog="542-63-03173">▸</button>건강봄약국</td>
+      <td>542-63-03173</td><td>건강봄약국<div class="sub2">서울 성동구 · 52033</div></td>
+      <td class="num">1</td><td class="num">652</td><td class="num">10,758</td></tr><tr><td><button class="tog" data-tog="148-98-36240">▸</button>열린숲약국</td>
+      <td>148-98-36240</td><td>열린숲약국<div class="sub2">경기 수원시 · 57555</div></td>
+      <td class="num">2</td><td class="num">632</td><td class="num">10,342</td></tr><tr><td><button class="tog" data-tog="472-49-44177">▸</button>솔누리약국</td>
+      <td>472-49-44177</td><td>솔누리약국<div class="sub2">서울 마포구 · 90071</div></td>
+      <td class="num">1</td><td class="num">617</td><td class="num">10,181</td></tr><tr><td><button class="tog" data-tog="405-70-55632">▸</button>늘봄약국</td>
+      <td>405-70-55632</td><td>늘봄약국<div class="sub2">서울 성동구 · 20025</div></td>
+      <td class="num">2</td><td class="num">586</td><td class="num">9,719</td></tr><tr><td><button class="tog" data-tog="682-21-21563">▸</button>큰빛약국</td>
+      <td>682-21-21563</td><td>큰빛약국<div class="sub2">서울 마포구 · 47375</div></td>
+      <td class="num">1</td><td class="num">458</td><td class="num">9,068</td></tr><tr><td><button class="tog" data-tog="679-24-68939">▸</button>중앙약국</td>
+      <td>679-24-68939</td><td>중앙약국<div class="sub2">부산 해운대구 · 53301</div></td>
+      <td class="num">1</td><td class="num">449</td><td class="num">8,890</td></tr><tr><td><button class="tog" data-tog="809-17-25625">▸</button>늘봄샘약국</td>
+      <td>809-17-25625</td><td>늘봄샘약국<div class="sub2">경기 성남시 · 51402</div></td>
+      <td class="num">1</td><td class="num">477</td><td class="num">7,871</td></tr><tr><td><button class="tog" data-tog="202-39-04241">▸</button>늘봄길약국</td>
+      <td>202-39-04241</td><td>늘봄길약국<div class="sub2">서울 강남구 · 30589</div></td>
+      <td class="num">1</td><td class="num">375</td><td class="num">7,425</td></tr><tr><td><button class="tog" data-tog="656-84-94661">▸</button>담온약국</td>
+      <td>656-84-94661</td><td>담온약국<div class="sub2">대구 수성구 · 41191</div></td>
+      <td class="num">2</td><td class="num">430</td><td class="num">7,072</td></tr><tr><td><button class="tog" data-tog="131-19-14980">▸</button>미소마루약국</td>
+      <td>131-19-14980</td><td>미소마루약국<div class="sub2">대구 수성구 · 33359</div></td>
+      <td class="num">2</td><td class="num">348</td><td class="num">6,891</td></tr><tr><td><button class="tog" data-tog="579-20-98119">▸</button>늘약국</td>
+      <td>579-20-98119</td><td>늘약국<div class="sub2">부산 해운대구 · 86891</div></td>
+      <td class="num">1</td><td class="num">416</td><td class="num">6,848</td></tr><tr><td><button class="tog" data-tog="632-26-16226">▸</button>나눔누리약국</td>
+      <td>632-26-16226</td><td>나눔누리약국<div class="sub2">대구 수성구 · 80462</div></td>
+      <td class="num">1</td><td class="num">380</td><td class="num">6,270</td></tr><tr><td><button class="tog" data-tog="747-40-25101">▸</button>솔봄약국</td>
+      <td>747-40-25101</td><td>솔봄약국<div class="sub2">대전 서구 · 16553</div></td>
+      <td class="num">2</td><td class="num">1,042</td><td class="num">5,731</td></tr><tr><td><button class="tog" data-tog="455-41-24066">▸</button>청솔들약국</td>
+      <td>455-41-24066</td><td>청솔들약국<div class="sub2">서울 송파구 · 82030</div></td>
+      <td class="num">1</td><td class="num">234</td><td class="num">3,861</td></tr><tr><td><button class="tog" data-tog="715-28-16076">▸</button>하늘마루약국</td>
+      <td>715-28-16076</td><td>하늘마루약국<div class="sub2">경기 수원시 · 10497</div></td>
+      <td class="num">1</td><td class="num">184</td><td class="num">3,643</td></tr><tr><td><button class="tog" data-tog="438-34-44857">▸</button>큰들약국</td>
+      <td>438-34-44857</td><td>큰들약국<div class="sub2">대전 서구 · 50210</div></td>
+      <td class="num">1</td><td class="num">176</td><td class="num">3,485</td></tr><tr><td><button class="tog" data-tog="453-62-81763">▸</button>샘온약국</td>
+      <td>453-62-81763</td><td>샘온약국<div class="sub2">경기 고양시 · 84026</div></td>
+      <td class="num">1</td><td class="num">169</td><td class="num">3,346</td></tr><tr><td><button class="tog" data-tog="248-61-65215">▸</button>봄빛약국</td>
+      <td>248-61-65215</td><td>봄빛약국<div class="sub2">서울 강남구 · 88655</div></td>
+      <td class="num">2</td><td class="num">195</td><td class="num">2,934</td></tr><tr><td><button class="tog" data-tog="512-32-99287">▸</button>달온약국</td>
+      <td>512-32-99287</td><td>달온약국<div class="sub2">대전 서구 · 50859</div></td>
+      <td class="num">1</td><td class="num">108</td><td class="num">2,138</td></tr><tr><td><button class="tog" data-tog="132-76-38200">▸</button>윤들약국</td>
+      <td>132-76-38200</td><td>윤들약국<div class="sub2">대전 서구 · 76273</div></td>
+      <td class="num">1</td><td class="num">97</td><td class="num">1,921</td></tr><tr><td><button class="tog" data-tog="400-23-80142">▸</button>윤길약국</td>
+      <td>400-23-80142</td><td>윤길약국<div class="sub2">경기 수원시 · 30754</div></td>
+      <td class="num">2</td><td class="num">84</td><td class="num">1,666</td></tr><tr><td><button class="tog" data-tog="765-75-22491">▸</button>중앙온약국</td>
+      <td>765-75-22491</td><td>중앙온약국<div class="sub2">경기 수원시 · 59658</div></td>
+      <td class="num">1</td><td class="num">54</td><td class="num">1,069</td></tr><tr><td><button class="tog" data-tog="199-93-55319">▸</button>새봄샘약국</td>
+      <td>199-93-55319</td><td>새봄샘약국<div class="sub2">광주 북구 · 42171</div></td>
+      <td class="num">1</td><td class="num">15</td><td class="num">297</td></tr><tr><td><button class="tog" data-tog="211-35-24188">▸</button>큰숲약국</td>
+      <td>211-35-24188</td><td>큰숲약국<div class="sub2">서울 마포구 · 57096</div></td>
+      <td class="num">1</td><td class="num">15</td><td class="num">297</td></tr><tr><td><button class="tog" data-tog="283-45-96231">▸</button>큰봄약국</td>
+      <td>283-45-96231</td><td>큰봄약국<div class="sub2">서울 성동구 · 81841</div></td>
+      <td class="num">1</td><td class="num">12</td><td class="num">238</td></tr><tr><td><button class="tog" data-tog="254-83-23370">▸</button>한빛봄약국</td>
+      <td>254-83-23370</td><td>한빛봄약국<div class="sub2">서울 마포구 · 10178</div></td>
+      <td class="num">3</td><td class="num">5</td><td class="num">128</td></tr><tr><td><button class="tog" data-tog="762-36-19395">▸</button>솔빛약국</td>
+      <td>762-36-19395</td><td>솔빛약국<div class="sub2">인천 남동구 · 60586</div></td>
+      <td class="num">2</td><td class="num">6</td><td class="num">119</td></tr><tr><td><button class="tog" data-tog="244-55-90738">▸</button>샘들약국</td>
+      <td>244-55-90738</td><td>샘들약국<div class="sub2">서울 마포구 · 86743</div></td>
+      <td class="num">1</td><td class="num">7</td><td class="num">116</td></tr><tr><td><button class="tog" data-tog="444-76-17232">▸</button>큰누리약국</td>
+      <td>444-76-17232</td><td>큰누리약국<div class="sub2">서울 마포구 · 44558</div></td>
+      <td class="num">1</td><td class="num">6</td><td class="num">99</td></tr><tr><td><button class="tog" data-tog="657-98-17826">▸</button>꽃길약국</td>
+      <td>657-98-17826</td><td>꽃길약국<div class="sub2">광주 북구 · 77759</div></td>
+      <td class="num">1</td><td class="num">3</td><td class="num">59</td></tr><tr><td><button class="tog" data-tog="578-95-93735">▸</button>세움누리약국</td>
+      <td>578-95-93735</td><td>세움누리약국<div class="sub2">경기 성남시 · 18787</div></td>
+      <td class="num">1</td><td class="num">2</td><td class="num">40</td></tr><tr class="tot" id="allRow"><td colspan="5">반영 금액 (연결된 행 합계)</td><td class="num">5,688,069</td></tr><tr id="ngRow"><td colspan="5" style="color:var(--up)">약국 알 수 없음 1건 — 약국 관리의 사업자번호를 고친 뒤 같은 파일을 다시 올리면 반영(이전 파일은 대체됨)</td><td class="num" style="color:var(--up)">5,247</td></tr></tbody></table></div></div><div class="panel" id="histPanel"><div class="ph"><h3>업로드 이력</h3><span class="qi" data-tip="같은 월 파일을 다시 올리면 이전 파일은 대체됨으로 남아요">?</span></div>
+  <div class="tblwrap"><table class="tbl" id="hTbl"><thead><tr><th>집계 월</th><th>파일명</th><th>업로드 일시</th><th>확정자</th><th>확정 일시</th><th class="num">행 수</th><th class="num">반영 금액</th><th class="ctr">상태</th></tr></thead><tbody>
+  <tr><td>2026-11</td><td>11월 헬스포트.xlsx</td><td>2026-11-10 15:28</td><td>김운영</td><td>2026-11-10 16:02</td><td class="num">258</td><td class="num">5,688,069</td><td class="ctr"><span class="ms ok" style="">반영 중</span></td></tr><tr><td>2026-10</td><td>10월 헬스포트.xlsx</td><td>2026-10-26 14:09</td><td>김운영</td><td>2026-10-26 14:40</td><td class="num">249</td><td class="num">5,793,588</td><td class="ctr"><span class="ms ok" style="">반영 중</span></td></tr><tr><td>2026-10</td><td>10월 헬스포트(수정 전).xlsx</td><td>2026-10-24 11:12</td><td>김운영</td><td>2026-10-24 11:30</td><td class="num">249</td><td class="num">5,791,210</td><td class="ctr"><span class="ms " style="background:#eef0f3;color:#5b6168">대체됨</span></td></tr><tr><td>2026-09</td><td>9월 헬스포트.xlsx</td><td>2026-10-26 14:09</td><td>김운영</td><td>2026-10-26 14:35</td><td class="num">247</td><td class="num">5,672,394</td><td class="ctr"><span class="ms ok" style="">반영 중</span></td></tr><tr><td>2026-08</td><td>헬스포트_8월.xlsx</td><td>2026-10-26 14:21</td><td>김운영</td><td>2026-10-26 14:33</td><td class="num">246</td><td class="num">5,344,936</td><td class="ctr"><span class="ms ok" style="">반영 중</span></td></tr>
+  </tbody></table></div></div><div class="dim"></div><div class="mdl" id="errMdl"><div class="mh"><h3>연결된 행은 반영했어요 · 연결 안 된 행 1건</h3><button class="x" data-close="">✕</button></div><div class="mb">
+  <div class="warn" id="errMsg">굿팜 약국과 연결된 행은 반영했어요. 아래 <b>1건</b>은 <b>약국 알 수 없음</b>로 남겨 반영 금액에서 뺐어요. 약국 관리의 사업자번호를 고친 뒤 같은 파일을 다시 올리면 남은 행까지 반영돼요(이전 파일은 대체됨).</div>
+  <table class="tbl" id="errTbl"><thead><tr><th>가맹점명</th><th>사업자번호</th><th class="num">TID</th><th class="num">정산금액</th><th>사유</th></tr></thead><tbody>
+  <tr><td>봄약국</td><td>705-82-23237</td><td class="num">1</td><td class="num">5,247</td><td style="color:var(--up);font-weight:700">같은 사업자번호 약국 여러 곳</td></tr>
+  </tbody></table>
+  <div class="hint" id="errHint">사유는 <b>일치하는 약국 없음</b>(사업자번호가 굿팜 약국에 없음) · <b>같은 사업자번호 약국 여러 곳</b>(한 사업자번호에 약국이 2곳 이상) 두 가지예요. 테스트 계정은 대조에서 빼요.</div>
+  </div><div class="mf"><button class="btn pri" data-close="">확인</button></div></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+
+
+</body></html>
