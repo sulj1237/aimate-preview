@@ -144,6 +144,7 @@
 .shp{color:#5b6168}.shh{cursor:default;color:#8a9099;font-size:11px;padding-bottom:0}.shh:hover{background:none}.shr:not(.shh):hover::after,.shr.tipon::after{content:attr(data-tip);white-space:pre-line;position:absolute;left:200px;top:22px;z-index:30;min-width:200px;background:#1f2a37;color:#fff;font-size:12px;line-height:1.6;padding:8px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .arm{white-space:nowrap}.arm b{color:#1f2328}
 .dfx{display:inline-block;margin-left:6px;padding:0 5px;border-radius:4px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:600}
+.ocb{display:inline-block;margin-left:3px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-size:10.5px;font-weight:600}.ocb.hi{background:#fff7ed;color:#c2410c}
 </style>
 </head>
 <body>
@@ -347,6 +348,14 @@ function dashSvc(){
 const ETC_ITEM=[['라벨지',55000],['바코드건',176000],['PC 설치',220000],['라벨지',55000]];
 D.forEach((o,i)=>{ o.etc = o.st==='ok' && i%5===2 ? ETC_ITEM[i%4] : null; });
 const etcOf=o=>o.etc?o.etc[1]:0, totOf=o=>(o.fee||0)+o.vam+etcOf(o);
+// OCR 원가 — 약국 OCR 건수 × 건당 원가. 건당 원가 = 그 달 지킴 비용 ÷ 지킴 전체 건수(매달 실제 단가)
+//   2026-11: 기본 400만 + 3개월 연속 60만 건 초과 추가 200만 = 600만 원 ÷ 약 60.5만 건 ≈ 9.9원 (예시값, 이지다큐 원가는 확인 필요)
+const OCR_FEE=6000000, OCR_CNT=605000, OCR_UNIT=OCR_FEE/OCR_CNT;
+D.forEach((o,i)=>{ const h=[...String(o.b)].reduce((a,c)=>(a*31+c.charCodeAt(0))%100003,7);
+  o.ocr = o.st!=='ok' || i%4===3 ? 0 : Math.round(150+Math.pow((h%1000)/1000,2)*3900); });
+(()=>{ const ok=D.filter(o=>o.ocr>0); [6981,6210,4870,4620].forEach((n,j)=>{ if(ok[j*7+1]) ok[j*7+1].ocr=n; }); })();
+const ocrCost=o=>Math.round((o.ocr||0)*OCR_UNIT), netOf=o=>totOf(o)-ocrCost(o);
+const ocrCell=o=>!o.ocr?'<span class="sub2">−</span>':fmt(o.ocr)+(o.ocr>6000?' <span class="ocb hi" title="월 6,000건 초과 — 추가 과금 대상">추가 과금</span>':o.ocr>4500?' <span class="ocb" title="손익분기 4,500건 초과 — 표시만">손익분기 ↑</span>':'');
 function trend(){
   return `<div class="panel" id="trendPanel" style="flex:1"><div class="ph"><h3 style="white-space:nowrap">월별 추이</h3>${perSel('tPer')}<button class="btn sm on" id="tvT">그래프로 보기</button></div>
   <div class="tblwrap" style="max-height:260px;overflow:auto"><table class="tbl" id="tTbl"><thead><tr><th>월</th><th class="num">총매출</th><th class="num">이용료</th><th class="num">VAN</th><th class="num">광동 VIP (비중)</th><th class="num">기타 판매</th></tr></thead><tbody>
@@ -359,21 +368,22 @@ function payLines(o){ // 펼침 — 그 달 결제 내역
   if(o.tag==='VIP') L.push(['—','이용료','광동 VIP 지원 서비스 — 약국 결제 0원 (광동 VIP 정산에서 관리)',0]);
   L.push(['2026-11 입금','VAN Fee',`정산 파일 11월 · TID ${o.tids.length}대(단가 ${[...new Set(o.tids.map(t=>t.u))].sort((x,y)=>x-y).join(' · ')}원) · 승인 ${fmt(o.tids.reduce((s,t)=>s+t.c,0))}건`,o.vam]);
   if(o.etc) L.push(['11-12 14:20','기타 판매',`${o.etc[0]} · 수기 결제(서비스 외 결제)`,o.etc[1]]);
-  return L.map(l=>`<tr class="tid"><td style="padding-left:30px">${l[0]}</td><td colspan="4"><span class="tg">${l[1]}</span> ${l[2]}</td><td class="num">${fmt(l[3])}</td><td colspan="4"></td></tr>`).join('');
+  if(o.ocr) L.push(['2026-11','OCR 원가',`지킴 ${fmt(o.ocr)}건 × 건당 ${OCR_UNIT.toFixed(1)}원`,-ocrCost(o)]);
+  return L.map(l=>`<tr class="tid"><td style="padding-left:30px">${l[0]}</td><td colspan="4"><span class="tg">${l[1]}</span> ${l[2]}</td><td class="num">${l[3]<0?"<span class=downc>−"+fmt(-l[3])+"</span>":fmt(l[3])}</td><td colspan="7"></td></tr>`).join('');
 }
 function statList(){
   let a=vanOk().filter(o=>vMatch(o)&&vPass(o));
   // 정렬 — 총수익 · 이용료 · VAN Fee · 기타 판매 헤더. 누를 때마다 큰 순(▼) → 작은 순(▲) → 기본(총수익 큰 순)
-  const SK={tot:totOf, fee:o=>o.fee||0, van:o=>o.vam, etc:o=>o.etc?o.etc[1]:0}, k=S.ss||'tot', dir=S.ss&&S.sd==='asc'?-1:1;
+  const SK={tot:totOf, fee:o=>o.fee||0, van:o=>o.vam, etc:o=>o.etc?o.etc[1]:0, ocr:o=>o.ocr||0, net:netOf}, k=S.ss||'tot', dir=S.ss&&S.sd==='asc'?-1:1;
   a.sort((x,y)=>dir*(SK[k](y)-SK[k](x)) || totOf(y)-totOf(x));
   const sh=(key,t)=>`<th class="num sort ${S.ss===key?'on':''}" data-ss="${key}">${t}<span class="ar">${S.ss===key?(S.sd==='asc'?'▲':'▼'):'↕'}</span></th>`;
   const row=o=>`<tr><td><button class="tog" data-tog="${o.b}">${S.open.has(o.b)?'▾':'▸'}</button>${esc(o.n)}${o.tag?`<span class="tg ${o.tag==='VIP'?'vip':''}">${o.tag}</span>`:''}</td><td class="sub2c">${o.r}</td><td class="sub2c">${o.sid}</td><td class="sub2c">${o.b}</td><td class="sub2c">${vinfo(o).tel}</td>
-    <td class="num"><b>${fmt(totOf(o))}</b></td><td class="num">${fmt(o.fee||0)}</td><td class="num">${fmt(o.vam)}</td><td class="num">${o.etc?fmt(o.etc[1]):'0'}</td><td></td></tr>`+(S.open.has(o.b)?payLines(o):'');
-  return `<div class="panel" id="listPanel"><div class="ph"><h3>약국별 총수익</h3>${qt("이용료 + VAN Fee + 기타 판매(광동 VIP 지원 제외) · 총수익 큰 순 · ▸ 누르면 그 달 결제 내역")}</div>
+    <td class="num"><b>${fmt(totOf(o))}</b></td><td class="num">${fmt(o.fee||0)}</td><td class="num">${fmt(o.vam)}</td><td class="num">${o.etc?fmt(o.etc[1]):'0'}</td><td class="num">${ocrCell(o)}</td><td class="num">${o.ocr?'<span class="downc">−'+fmt(ocrCost(o))+'</span>':'0'}</td><td class="num"><b${netOf(o)<0?' style="color:var(--up)"':''}>${fmt(netOf(o))}</b></td><td></td></tr>`+(S.open.has(o.b)?payLines(o):'');
+  return `<div class="panel" id="listPanel"><div class="ph"><h3>약국별 총수익</h3>${qt("총수익 = 이용료 + VAN Fee + 기타 판매(광동 VIP 지원 제외), 순수익 = 총수익 − OCR 원가 · 총수익 큰 순 · ▸ 누르면 그 달 결제 내역")}</div>
   <div class="tools"><span class="sub2">전체 ${fmt(a.length)}곳</span></div>
   ${searchBar()}
-  <div class="tblwrap"><table class="tbl" id="sTbl"><thead><tr><th>약국명</th><th>지역</th><th>스토어 ID</th><th>사업자번호</th><th>전화번호</th>${sh('tot','총수익')}${sh('fee','이용료')}${sh('van','VAN Fee')}${sh('etc','기타 판매')}<th></th></tr></thead>
-  <tbody>${a.map(row).join('')||'<tr><td colspan="10" class="ctr sub2">조회된 약국이 없습니다.</td></tr>'}</tbody></table></div>
+  <div class="tblwrap"><table class="tbl" id="sTbl"><thead><tr><th>약국명</th><th>지역</th><th>스토어 ID</th><th>사업자번호</th><th>전화번호</th>${sh('tot','총수익')}${sh('fee','이용료')}${sh('van','VAN Fee')}${sh('etc','기타 판매')}${sh('ocr','OCR 건수')}<th class="num">OCR 원가${qt('약국 OCR 건수 × 건당 원가. 건당 원가 = 그 달 지킴 비용 ÷ 지킴 전체 건수 — 11월 600만 원(기본 400만 + 3개월 연속 60만 건 초과 200만) ÷ 약 60.5만 건 ≈ '+OCR_UNIT.toFixed(1)+'원. 이지다큐 원가는 확인 필요')}</th>${sh('net','순수익')}<th></th></tr></thead>
+  <tbody>${a.map(row).join('')||'<tr><td colspan="13" class="ctr sub2">조회된 약국이 없습니다.</td></tr>'}</tbody></table></div>
   ${vanNg().length?`<div class="basis" id="ngLine"><b>약국 알 수 없음 VAN ${vanNg().length}곳 · ${fmt(sumV(vanNg()))}원</b> ${qt('받은 돈이라 총매출 · VAN 합계에는 들어가고, 사업자번호를 연결하면 약국별 목록에도 들어가요.')} <a href="#" id="toMgmt2">VAN 정산 관리 ›</a></div>`:''}</div>`;
 }
 
