@@ -1236,10 +1236,10 @@ function bindMain(){
 
 /* ───────── 약국 결제 관리 (이동 화면) ───────── */
 /* 데모 기간 종료 · 종료 예정 — 데모 기간이 이번 달로 끝나거나 이미 끝났는데 정기 결제로 바꾸지 않은 약국(예시). 자동 전환 없음, 담당자가 정기 결제로 변경
-   [약국, 사업자번호, 데모 옵션, 데모 기간, 정기 결제로 바꾸면 결제 금액, 등록자 · 일, 결제 카드 등록 여부, 상태] */
-const DEND=[['봄빛약국','123-45-67890','스마트2D','2026-10 ~ 2026-11',82500,'김운영 · 10-02',1,'종료 예정'],
-  ['한결약국','234-56-78901','키오스크','2026-09 ~ 2026-11',99000,'이영업 · 09-01',0,'종료 예정'],
-  ['소나무약국','345-67-89012','파머시 퍼스트','2026-08 ~ 2026-09',71500,'김운영 · 08-03',0,'데모 기간 종료']];
+   [약국, 사업자번호, 데모 서비스, 데모 기간, 정기 결제로 바꾸면 결제 금액, 등록자 · 일, 결제 카드 등록 여부, 상태] */
+const DEND=[['봄빛약국','123-45-67890','굿팜 솔루션 (NEW)','2026-10 ~ 2026-11',82500,'김운영 · 10-02',1,'종료 예정'],
+  ['한결약국','234-56-78901','모바일 바코드프리','2026-09 ~ 2026-11',99000,'이영업 · 09-01',0,'종료 예정'],
+  ['소나무약국','345-67-89012','굿팜 솔루션 (NEW)','2026-08 ~ 2026-09',71500,'김운영 · 08-03',0,'데모 기간 종료']];
 /* 약국 결제 관리 — 정기 결제 내역(SA-01-004)과 같은 구성: 약국 × 청구월 결제 이력 묶음 · 결제 상태 · 정기 / 수기 · 사유. 승인 · 수동 승인 여부는 없앰(수기 결제 '결제 실패 월' 연결로 대신) */
 // 결제 상태 조회: 전체 · 결제 완료 · 미결제(실패만 있고 아직 메우지 못한 청구월) · 취소. 서비스 청구 통계 미결제 탭에서 오면 '미결제'
 const PCX=new Set(); (()=>{ const ok=PAYS.filter(x=>x.ok && x.date>=PAY_FROM && x.date<=PAY_TO && wayOf(x)!=='수기'); if(ok[3]) PCX.add(ok[3]); })();   // 예시: 결제 취소 1건
@@ -1280,7 +1280,7 @@ function renderPay(){
       <div class="acts"><button class="btn" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">초기화</button><button class="btn pri" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">검색</button></div>
     </div>
     ${S.dEnd?`<div class="pay-top"><span>데모 기간 종료 · 종료 예정 <span class="cnt">${DEND.length}곳</span> <span style="color:#8a929a;font-size:12px">데모 기간이 이번 달로 끝나거나 이미 끝난 약국 — 담당자가 정기 결제로 바꾸기 전까지 그대로</span></span></div>
-    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 옵션</th><th>데모 기간</th><th>등록자</th><th>결제 카드</th><th>정기 결제로 바꾸면</th><th class="ctr">약국 상세</th></tr></thead>
+    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 서비스</th><th>데모 기간</th><th>등록자</th><th>결제 카드</th><th>정기 결제로 바꾸면</th><th class="ctr">약국 상세</th></tr></thead>
       <tbody>${DEND.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]} <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">${r[7]}</span></td><td>${r[5]}</td><td>${r[6]?'등록됨':'<b style="color:#b42318">미등록</b>'}</td><td>${fmt(r[4])}원</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr>`).join('')}</tbody></table></div>`:`
     <div class="pay-top"><span>${SL[F]} <span class="cnt">${list.length}건</span> <span style="color:#8a929a;font-size:12px">약국 × 청구월</span></span>
       <span class="r"><button class="btn pri" data-toast="데모 — 약국 결제 관리 기존 기능">엑셀 내보내기</button><select class="sel"><option>10개 씩</option></select></span></div>
