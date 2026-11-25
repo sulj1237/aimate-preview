@@ -178,12 +178,14 @@ function demoText(d=DEMO){ const [c,t]=dState(d);
   return `데모 <b>${d.opt}</b> · ${period(d)} <span class="st ${c}">${t}</span> <span class="hint">지정 ${d.who} · ${d.at.slice(5)}</span>`+(d.to&&d.to<=NOW?` <span class="hint">→ 결제 카드 등록 · 데모 해제(승인)하면 ${nextM(d.to)} 청구분부터 ${d.opt} 정가 ${fmt(d.price*1.1)}원 정기 결제</span>`:''); }
 // 서비스 변경 이력 — 데모 지정 · 해제, 결제 카드 등록, 금액 할인 등록을 시점 · 처리자와 함께 쌓음 (최신이 위)
 // [일시, 작업자, 내용, 변경 전 → 후, 적용 시작월(청구분)] — 등록과 수정은 각각 한 줄. 작업자 · 변경 전후는 여기서만 보여 주고, 계산 내역에는 적용 시작월만
+// 등록자 선택지 — 직원 관리의 굿팜 담당자(예시). 기본값 = 로그인한 관리자(김운영)
+const STAFF=['김운영','이영업','박운영','최영업'];
 const SVC_LOG=[['2026-11-03 10:12','김운영','데모 지정','스마트2D · 0원 (데모 2026-11 ~ 2026-12)','2026-11'],
   ['2026-09-28 15:40','김운영','금액 할인 수정','−5,500 → −11,000 · [계약 할인] DRS 파머시 퍼스트 중복','2026-10'],
-  ['2026-05-28 15:40','이영업','금액 할인 등록','없음 → −5,500 · [계약 할인] DRS 파머시 퍼스트 중복','2026-06'],
+  ['2026-05-28 15:40','이영업 (입력 김운영)','금액 할인 등록','없음 → −5,500 · [계약 할인] DRS 파머시 퍼스트 중복','2026-06'],
   ['2024-06-03 11:20','이영업','결제 카드 등록','신한카드 · 뒤 4자리 ****',''],
   ['2024-04-22 09:30','이영업','서비스 등록 · 승인','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS','2024-06']];
-const svcLog=()=>`<div class="opt" id="svcLog"><b style="color:#1f2328">서비스 변경 이력</b><table class="tbl" style="margin-top:6px"><thead><tr><th>일시</th><th>작업자</th><th>내용</th><th>변경 전 → 후</th><th>적용 시작월</th></tr></thead><tbody>${SVC_LOG.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td><td><b>${l[2]}</b></td><td>${esc(l[3])}</td><td>${l[4]?(+l[4].slice(0,4))+'년 '+(+l[4].slice(5))+'월 청구분':'<span style="color:#8a9099">−</span>'}</td></tr>`).join('')}</tbody></table></div>`;
+const svcLog=()=>`<div class="opt" id="svcLog"><b style="color:#1f2328">서비스 변경 이력</b><table class="tbl" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전 → 후</th><th>적용 시작월</th></tr></thead><tbody>${SVC_LOG.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td><td><b>${l[2]}</b></td><td>${esc(l[3])}</td><td>${l[4]?(+l[4].slice(0,4))+'년 '+(+l[4].slice(5))+'월 청구분':'<span style="color:#8a9099">−</span>'}</td></tr>`).join('')}</tbody></table></div>`;
 function discText(d=D){
   return `금액 할인 <span class="red">−${fmt(d.amt*1.1)}</span> <span class="ctag">${d.cat}</span>${esc(d.memo)}${d.who?' <span class="hint">등록 '+d.who+(d.at?' · '+d.at:'')+'</span>':''}`; }
 
@@ -234,12 +236,12 @@ function svcModal(){
     <table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th>데모</th><th class="num">총액</th></tr></thead>
       <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox"> 데모</label></td><td class="num">45,000</td></tr>
       <tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td><label class="dmck"><input type="checkbox"> 데모</label></td><td class="num">10,000</td></tr>
-      <tr id="demoRow"><td>${DEMO.opt}</td><td class="num">${fmt(DEMO.price)}</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox" checked> 데모</label> <span class="seg" id="demoPer"><select class="fi sm" id="dmFrom">${['2026-11','2026-12'].map(m=>`<option ${m===DEMO.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi sm" id="dmTo">${['2026-11','2026-12','2027-01','2027-02'].map(m=>`<option ${m===DEMO.to?'selected':''}>${m}</option>`).join('')}</select></span> <span class="hint">지정 ${DEMO.who} · ${DEMO.at.slice(5)}</span></td><td class="num">0</td></tr>
+      <tr id="demoRow"><td>${DEMO.opt}</td><td class="num">${fmt(DEMO.price)}</td><td class="num">1</td><td class="num">0%</td><td><label class="dmck"><input type="checkbox" checked> 데모</label> <span class="seg" id="demoPer"><select class="fi sm" id="dmFrom">${['2026-11','2026-12'].map(m=>`<option ${m===DEMO.from?'selected':''}>${m}</option>`).join('')}</select><span class="ro">~</span><select class="fi sm" id="dmTo">${['2026-11','2026-12','2027-01','2027-02'].map(m=>`<option ${m===DEMO.to?'selected':''}>${m}</option>`).join('')}</select></span></td><td class="num">0</td></tr>
       <tr class="tot"><td colspan="5">옵션 총액</td><td class="num">55,000원</td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
     <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat">${opt(DISC_CAT,'계약 할인')}</select></div></div>
     <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="DRS 파머시 퍼스트 중복" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="fr" id="dWhoRow"><span class="fl">등록자</span><div class="ro">김운영</div></div>
+    <div class="fr" id="dWhoRow"><span class="fl">등록자</span><div><select class="fi" id="dWho" style="width:220px">${STAFF.map(n=>`<option ${n==='김운영'?'selected':''}>${n}</option>`).join('')}</select></div></div>
     <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot"></b></div></div>
   </div>
   <div class="mf"><button class="btn" data-close>취소</button><button class="btn pri" data-toast="시안 — 저장되지 않습니다">저장</button></div></div>`;
