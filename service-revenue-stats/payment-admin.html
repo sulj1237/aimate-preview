@@ -218,9 +218,9 @@ function subPanel(){
     <div class="kvg"><div class="k">결제 방식</div><div>${PH.method}</div><div class="k">결제카드정보</div><div>${PH.card} &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
-    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
+    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody>${[...HIST].sort((a,b)=>b[1].localeCompare(a[1])).map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
-      return `<tr data-id="${h[0]}"><td>${h[1]} <span class="wy">${isMan(h)?'수기':'정기'}</span></td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
+      return `<tr data-id="${h[0]}"><td>${h[1]}</td><td><span class="wy">${isMan(h)?'수기':'정기'}</span></td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span></td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
       <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
       <td>${rsn(h[7])}${h[8]?'<div class="rs"><b>취소</b> '+rsn(h[8])+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+' — 입금하면 페이앱이 카드 취소 후 알려 줘 취소 완료로 바뀜'+'</div>':''}</td>
       <td class="ctr">${can||h[3]==='cf'?`<button class="btn sm line" data-cancel="${h[0]}">${h[3]==='cf'?'다시 취소':'결제 취소'}</button>`:''}</td></tr>`; }).join('')}</tbody></table></div>`;
