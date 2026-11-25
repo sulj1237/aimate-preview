@@ -255,7 +255,7 @@ function mount(sec){
   sec._place=function(){ if(ifr.contentDocument&&ifr.contentDocument.readyState==='complete'){ fit(); place(); } };
   ifr.addEventListener('load',function(){ try{ prep(ifr.contentWindow,ifr.contentDocument,sc); }catch(e){ console.error(sc.id,e); }
     setTimeout(function(){ fit(); place(); },400); setTimeout(function(){ fit(); place(); },1200); });
-  ifr.src=sc.src;
+  ifr.src=sc.src+(sc.src.indexOf('?')<0?'?':'&')+'v='+encodeURIComponent(document.lastModified);   // 배포 후 예전 화면이 캐시로 남지 않게
   sec.querySelectorAll('.desc li[data-n]').forEach(bind);
 }
 document.querySelectorAll('.step').forEach(mount);
