@@ -127,10 +127,7 @@
   .tbl .svc{font-weight:700}
   .tbl .svc .go{color:#b9bec4;margin-left:4px;font-weight:400}
   .tbl.svct tr.svcr{cursor:pointer} .tbl.svct tr.svcr:hover td{background:#f6fbfa} .tbl.svct tr.svcr.on td{background:var(--teal-soft,#e6f7f4)}
-  .share{display:flex;align-items:center;gap:8px}
-  .share .bar{height:8px;background:var(--teal);border-radius:2px}
-  .share .pct{min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
-  .tbl.svct td,.tbl.svct th{padding-left:10px;padding-right:10px}.tbl.svct .share{width:120px}
+  .tbl.svct td,.tbl.svct th{padding-left:10px;padding-right:10px}
   .dc .db{display:inline-block;padding:0 5px;margin-bottom:1px;border-radius:3px;background:#fdeee3;color:#b4480a;font-weight:700}
   .dq{font-size:10.5px;font-weight:600;color:#c2570c;white-space:nowrap;margin-top:3px}
   .dc.dx{color:#5b4bb7}.dc .xb,.dsv .xb,td.memo .xb{display:inline-block;padding:0 4px;margin-right:4px;border-radius:3px;background:#ece9fb;color:#4c3aa8;font-weight:700}
@@ -379,13 +376,13 @@
         <span class="flabel">검색</span><select class="sel"><option selected="">약국명</option><option>사업자번호</option></select><input class="din" style="width:140px" value="">
         <span class="gap"></span><span class="flabel" style="width:auto">결제 방식</span><select class="sel" id="pWay"><option value="all" selected="">전체</option><option value="auto">정기</option><option value="man">수기</option></select>
         <span class="gap"></span><span class="flabel">업체명</span><select class="sel"><option selected="">전체</option></select>
-        <span class="gap"></span><label id="pDendL" style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="pDend" checked=""> 데모 종료 예정 (3)</label>
+        <span class="gap"></span><label id="pDendL" style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="pDend" checked=""> 데모 기간 종료 · 종료 예정 (3)</label>
       </div>
       <div class="acts"><button class="btn" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">초기화</button><button class="btn pri" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">검색</button></div>
     </div>
-    <div class="pay-top"><span>데모 종료 예정 <span class="cnt">3곳</span> <span style="color:#8a929a;font-size:12px">이번 달로 데모 기간이 끝나는 약국 — 결제 카드 등록 · 데모 해제(승인)로 정기 결제 시작</span></span></div>
-    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 옵션</th><th>데모 기간</th><th>지정</th><th>결제 카드</th><th>데모 해제 후 정기 결제</th><th class="ctr">약국 상세</th></tr></thead>
-      <tbody><tr><td>봄빛약국</td><td>123-45-67890</td><td>스마트2D</td><td>2026-10 ~ 2026-11 <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">종료 예정</span></td><td>김운영 · 10-02</td><td>등록됨</td><td>82,500원 (2026-12 청구분부터)</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>한결약국</td><td>234-56-78901</td><td>키오스크</td><td>2026-09 ~ 2026-11 <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">종료 예정</span></td><td>이영업 · 09-01</td><td><b style="color:#b42318">미등록</b></td><td>99,000원 (2026-12 청구분부터)</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>소나무약국</td><td>345-67-89012</td><td>파머시 퍼스트</td><td>2026-11 ~ 2026-11 <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">종료 예정</span></td><td>김운영 · 11-01</td><td><b style="color:#b42318">미등록</b></td><td>71,500원 (2026-12 청구분부터)</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr></tbody></table></div></div>
+    <div class="pay-top"><span>데모 기간 종료 · 종료 예정 <span class="cnt">3곳</span> <span style="color:#8a929a;font-size:12px">데모 기간이 이번 달로 끝나거나 이미 끝난 약국 — 담당자가 정기 결제로 바꾸기 전까지 그대로</span></span></div>
+    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 옵션</th><th>데모 기간</th><th>등록자</th><th>결제 카드</th><th>정기 결제로 바꾸면</th><th class="ctr">약국 상세</th></tr></thead>
+      <tbody><tr><td>봄빛약국</td><td>123-45-67890</td><td>스마트2D</td><td>2026-10 ~ 2026-11 <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">종료 예정</span></td><td>김운영 · 10-02</td><td>등록됨</td><td>82,500원</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>한결약국</td><td>234-56-78901</td><td>키오스크</td><td>2026-09 ~ 2026-11 <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">종료 예정</span></td><td>이영업 · 09-01</td><td><b style="color:#b42318">미등록</b></td><td>99,000원</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>소나무약국</td><td>345-67-89012</td><td>파머시 퍼스트</td><td>2026-08 ~ 2026-09 <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">데모 기간 종료</span></td><td>김운영 · 08-03</td><td><b style="color:#b42318">미등록</b></td><td>71,500원</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr></tbody></table></div></div>
   </div>
 </div>
 <aside class="rv" id="rv" aria-label="설명 · 확인 사항"></aside>
