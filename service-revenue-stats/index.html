@@ -1256,7 +1256,7 @@ function renderPay(){
   const cnt=k=>all.filter(g=>k==='all'||g.st===k).length;
   const SL={all:'전체',paid:'결제 완료',unpaid:'미결제',cx:'취소'};
   const row=(g,x,sub)=>{ const pr=person(NAMES.indexOf(g.name)+1000), [c,t]=pSt(x);
-    return `<tr${sub?' class="bmi"':''}><td>${sub?'':g.name}</td><td>${sub?'':pr.biz}</td><td>${sub?'':g.bm}${!sub&&g.st==='unpaid'?' <span class="st fail">미결제</span>':''}</td>
+    return `<tr${sub?' class="bmi"':''}><td>${sub?'':g.name}</td><td>${sub?'':pr.biz}</td><td>${sub?'':g.bm}</td>
       <td>${sub?'<span class="bml">└</span>':''}${payDT(x)}</td><td><span class="wy">${wayOf(x)==='수기'?'수기':'정기'}</span></td><td><span class="st ${c}">${t}</span></td><td class="num">${fmt(x.amt)}</td><td class="num">${PCX.has(x)?'<span class="red">−'+fmt(x.amt)+'</span>':''}</td>
       <td>${x.ok?esc(x.reason):esc(x.fail||'')}${PCX.has(x)?'<div class="rs"><b>취소</b> [과다 청구] 해지 미반영</div>':''}</td><td class="ctr">${sub?'':'<button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button>'}</td></tr>`; };
   const head=g=>{ const [c,t]=g.st==='paid'?['ok','결제 완료']:g.st==='cx'?['cx','취소']:['fail','미결제'], lastOk=g.ok[g.ok.length-1];
