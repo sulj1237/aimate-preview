@@ -373,7 +373,7 @@
         <span class="flabel">기간</span><span class="din" id="pFrom">2026-10-09</span>~<span class="din">2026-11-23</span>
         <button class="qbtn " data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">당일</button><button class="qbtn " data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">1주일</button><button class="qbtn on" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">1개월</button><button class="qbtn " data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">3개월</button><button class="qbtn " data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">6개월</button>
         <span class="gap"></span><span class="flabel" style="width:auto">결제 상태</span>
-        <span id="pRes"><span class="rad on" data-pf="all"><i></i>전체 <b class="pc">679</b></span><span class="rad " data-pf="paid"><i></i>결제 완료 <b class="pc">670</b></span><span class="rad " data-pf="unpaid"><i></i>미결제 <b class="pc">8</b></span><span class="rad " data-pf="cx"><i></i>취소 <b class="pc">1</b></span></span>
+        <span id="pRes"><span class="rad on" data-pf="all"><i></i>전체 <b class="pc">679</b></span><span class="rad " data-pf="paid"><i></i>결제 완료 <b class="pc">670</b></span><span class="rad " data-pf="unpaid"><i></i>결제 실패 <b class="pc">8</b></span><span class="rad " data-pf="cx"><i></i>취소 <b class="pc">1</b></span></span>
       </div>
       <div class="frow">
         <span class="flabel">검색</span><select class="sel"><option selected="">약국명</option><option>사업자번호</option></select><input class="din" style="width:140px" value="">
@@ -389,30 +389,30 @@
     <div class="panel"><table class="tbl pay" id="pTbl">
       <thead><tr><th>약국명</th><th>사업자 번호</th><th>청구월</th><th>결제 일시</th><th>결제 방식</th><th>결제상태</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 실패 · 취소 사유</th><th class="ctr">약국 상세</th></tr></thead>
       <tbody><tr><td>서면프라자약국</td><td>674-51-43353</td><td>2026-11</td>
-      <td>26-11-20 16:56</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">60,500</td><td class="num"></td>
+      <td>26-11-20 16:56</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">60,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr class="pg-on"><td>성심사랑약국</td><td>861-49-44699</td><td>2026-11</td>
       <td>26-11-20 16:12<div><button class="pgb on" data-pg="성심사랑약국|2026-11">결제 2건 ▴</button></div></td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr class="pg-row"><td colspan="10"><div class="pgbox"><b>성심사랑약국 · 11월분 결제 이력</b> <span class="bmn">결제 2건 · 시각순</span>
-      <table><thead><tr><th>결제 일시</th><th>결제 방식</th><th>결과</th><th class="num">금액</th><th>결제 이유 · 실패 · 취소 사유</th></tr></thead><tbody><tr><td>26-11-05 09:33</td><td><span class="wy">정기</span></td><td><span class="st fail">실패</span></td><td class="num">49,500</td><td>기타오류(8326 : 사용 한도 초과)</td></tr><tr><td>26-11-20 16:12</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">49,500</td><td>11월 굿팜결제</td></tr></tbody></table></div></td></tr><tr><td>서면중앙약국</td><td>734-43-79102</td><td>2026-11</td>
+      <table><thead><tr><th>결제 일시</th><th>결제 방식</th><th>결과</th><th class="num">금액</th><th>결제 이유 · 실패 · 취소 사유</th></tr></thead><tbody><tr><td>26-11-05 09:33</td><td><span class="wy">정기</span></td><td><span class="st fail">결제 실패</span></td><td class="num">49,500</td><td>기타오류(8326 : 사용 한도 초과)</td></tr><tr><td>26-11-20 16:12</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td>11월 굿팜결제</td></tr></tbody></table></div></td></tr><tr><td>서면중앙약국</td><td>734-43-79102</td><td>2026-11</td>
       <td>26-11-20 16:12<div><button class="pgb" data-pg="서면중앙약국|2026-11">결제 2건 ▾</button></div></td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>서면프라자약국</td><td>674-51-43353</td><td>2026-10</td>
-      <td>26-11-20 16:04</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">60,500</td><td class="num"></td>
+      <td>26-11-20 16:04</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">60,500</td><td class="num"></td>
       <td>10월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>소망메디약국</td><td>875-13-20908</td><td>2026-11</td>
       <td>26-11-20 15:22<div><button class="pgb" data-pg="소망메디약국|2026-11">결제 2건 ▾</button></div></td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>동탄중앙약국</td><td>587-18-07281</td><td>2026-10</td>
-      <td>26-11-20 13:18</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">49,500</td><td class="num"></td>
+      <td>26-11-20 13:18</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>10월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>동탄중앙약국</td><td>587-18-07281</td><td>2026-11</td>
-      <td>26-11-20 13:10</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">49,500</td><td class="num"></td>
+      <td>26-11-20 13:10</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>노원중앙약국</td><td>158-52-71851</td><td>2026-11</td>
-      <td>26-11-16 17:55</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">49,500</td><td class="num"></td>
+      <td>26-11-16 17:55</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>노원중앙약국</td><td>158-52-71851</td><td>2026-10</td>
-      <td>26-11-16 17:03</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">49,500</td><td class="num"></td>
+      <td>26-11-16 17:03</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>10월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>중동시장약국</td><td>623-17-14463</td><td>2026-11</td>
       <td>26-11-16 16:17<div><button class="pgb" data-pg="중동시장약국|2026-11">결제 2건 ▾</button></div></td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>안산행복약국</td><td>799-93-39872</td><td>2026-11</td>
       <td>26-11-13 16:57<div><button class="pgb" data-pg="안산행복약국|2026-11">결제 2건 ▾</button></div></td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">49,500</td><td class="num"></td>
       <td>11월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr><tr><td>상동사랑약국</td><td>556-73-39154</td><td>2026-10</td>
-      <td>26-11-13 15:32</td><td><span class="wy">수기</span></td><td><span class="st ok">성공</span></td><td class="num">71,500</td><td class="num"></td>
+      <td>26-11-13 15:32</td><td><span class="wy">수기</span></td><td><span class="st ok">결제 완료</span></td><td class="num">71,500</td><td class="num"></td>
       <td>10월 굿팜결제</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 정기 결제 내역(SA-01-004)을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr></tbody>
     </table>
     <div class="pager"><button class="on">1</button></div></div></div>

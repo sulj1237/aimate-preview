@@ -64,7 +64,7 @@
   /* 창 */
   .dim{position:fixed;inset:0;background:rgba(30,34,38,.45);z-index:20}
   .mdl{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:21;width:560px;background:#fff;border-radius:10px;box-shadow:0 18px 40px -12px rgba(0,0,0,.45)}
-  .mdl.wide{width:720px}
+  .mdl.wide{width:1000px}
   .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
   .mh h3{margin:0;font-size:15px} .mh .x{margin-left:auto;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer}
   .mb{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
@@ -93,7 +93,10 @@
   .toast.show{opacity:1}
   .tbl tr.bmh td{background:#f6f7fb;border-top:1px solid var(--line);font-size:12.5px;padding:7px 10px}.bmn{color:#6b7280;font-size:11.5px;margin-left:4px}
   .tbl tr.bmi td:first-child{padding-left:22px}.bml{color:#9aa1a9;margin-right:4px}.wy{display:inline-block;font-size:10.5px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
-.dmck{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}#demoPer{display:inline-flex;align-items:center;gap:4px;margin-left:6px}#demoPer .fi{width:96px;height:28px;font-size:12px;padding:0 6px}
+.oc{border:1px solid var(--line);border-radius:8px;margin-bottom:10px}.oc .ohd{display:flex;align-items:center;gap:14px;padding:9px 12px;background:#f6f7f9;border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;font-size:12.5px}.oc .ohd b{font-size:13px}.oc .ohd .r{margin-left:auto;font-weight:700}.oc .obd{padding:10px 12px;display:grid;gap:10px}.oc .orw{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:start}.oc .orw>span{font-size:12px;font-weight:700;color:#4b5158;padding-top:6px}.oc .fi{height:30px;font-size:12px;padding:0 8px}.oc .seg .fi.sm{width:100px;flex:none}.oc .seg select[data-k]{flex:none}.oc .dcw .fi.sm{width:100px;flex:none}.oc .hint{font-size:11.5px;color:#8a9099}
+.sck{display:inline-block!important}.schh{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12.5px}.schh .btn{margin-left:auto}.ro4 b{display:block;font-size:12.5px;padding:5px 0}.chg{color:#d9480f!important;font-weight:700}#optTbl th,#optTbl td,.tbl.sch th,.tbl.sch td{font-size:11px;padding:6px 6px;white-space:nowrap}.tbl.sch td:last-child{white-space:normal}.tbl.sch{width:100%}
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}.dgrid label{display:block;font-size:11.5px;color:#5b6168;margin-bottom:3px}.dgrid .fi{height:30px;font-size:12px;padding:0 8px}.dgrid .w2{grid-column:span 2}
+.dmck{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}#demoPer,.demoPer{display:inline-flex;align-items:center;gap:4px;margin-left:6px}#demoPer .fi{width:96px;height:28px;font-size:12px;padding:0 6px}
 .st.ex{background:#fff3d6;color:#a86b00}
 </style>
 </head>
@@ -113,8 +116,8 @@
     <div class="content" id="content"><div class="panel"><div class="ph"><h3>샘플약국</h3><span class="sub">스토어 ID 2024047xxxx</span></div></div>
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
-    <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td id="stCell">승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt">옵션: 스마트 OCR · 굿팜 POS &nbsp;|&nbsp; 서비스 수 2 &nbsp;|&nbsp; 정기 과금액 49,500 &nbsp;|&nbsp; 결제일 5일</div>
+    <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
+    <div class="opt">옵션: 스마트 OCR · 굿팜 POS · 스마트2D <span id="stCell"><span class="st ok">데모</span> <span class="hint">2026-11 ~ 2026-12</span></span> &nbsp;|&nbsp; 옵션 수 3 &nbsp;|&nbsp; 정기 과금액 49,500 <span class="hint">(데모 옵션 제외)</span> &nbsp;|&nbsp; 결제일 5일</div>
     <div class="opt" id="svcLog"><b style="color:#1f2328">서비스 변경 이력</b><table class="tbl" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody><tr><td>2026-09-28 15:40</td><td>김운영</td><td><b>금액 할인 수정</b></td><td style="color:#8a9099">−5,500 [계약 할인]</td><td>−11,000 [계약 할인] DRS 파머시 퍼스트 중복</td><td>2026년 10월 청구분</td></tr><tr><td>2026-05-28 15:40</td><td>이영업 (입력 김운영)</td><td><b>금액 할인 등록</b></td><td style="color:#8a9099">없음</td><td>−5,500 [계약 할인] DRS 파머시 퍼스트 중복</td><td>2026년 6월 청구분</td></tr><tr><td>2024-06-03 11:20</td><td>이영업</td><td><b>결제 카드 등록</b></td><td style="color:#8a9099">없음</td><td>신한카드 · 뒤 4자리 ****</td><td><span style="color:#8a9099">−</span></td></tr><tr><td>2024-04-22 09:30</td><td>이영업</td><td><b>서비스 등록 · 승인</b></td><td style="color:#8a9099">없음</td><td>굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS</td><td>2024년 6월 청구분</td></tr></tbody></table></div>
     </div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
