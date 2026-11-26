@@ -363,7 +363,7 @@
         <button data-sc="cmp" class="on">전월 비교</button>
         <button data-sc="first">첫 달 (전월 없음)</button>
         <button class="gdb" id="gdBtn">케이스별 표기 안내</button>
-        <button class="gdb" id="inBtn">입력 화면 시안</button>
+        <button class="gdb" id="inBtn">약국 상세 시안 ›</button>
       </div><button class="rvBtn" id="rvBtn">설명 · 확인 사항</button></div>
     </div>
     <div class="content" id="content"></div>
@@ -1476,7 +1476,7 @@ function renderInputs(){
   };
   ['ipCat','ipBm','ipMemo','idCat','idMemo','idAmt'].forEach(id=>{ $(id).oninput=upd; $(id).onchange=upd; }); upd();
 }
-function goInputs(){ location.href='payment-admin.html?p=manual'; return; S.backY=window.scrollY; S.page='inputs'; history.pushState({page:'inputs'},'','#inputs'); render(); window.scrollTo(0,0); }
+function goInputs(){ location.href='payment-admin.html?from='+encodeURIComponent('서비스 청구 통계'); return; S.backY=window.scrollY; S.page='inputs'; history.pushState({page:'inputs'},'','#inputs'); render(); window.scrollTo(0,0); }
 document.getElementById('inBtn').onclick=goInputs;
 function goGuide(){ if(S.page==='guide') return; S.backY=window.scrollY; S.page='guide'; history.pushState({page:'guide'},'','#guide'); render(); window.scrollTo(0,0); }
 document.getElementById('gdBtn').onclick=goGuide;
