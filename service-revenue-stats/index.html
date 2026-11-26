@@ -443,6 +443,8 @@ const discCause = (c, why) => c==='POS' ? '4-1' : /온비타|drs|중복|파머�
 // 금액 할인 사유 카테고리 (약국 서비스 수정에서 고른 값) — 계약 할인 · 보상 · 테스트 · 기타
 const discCat = why => ({'4-2':'계약 할인','4-3':'보상 · 테스트'})[discCause('',why)] || '기타';
 const ctag = (cat, memo) => '<span class="ctag">'+cat+'</span>'+esc(memo||'');
+// 결제 이유 표시 — 수기 결제는 '[결제 사유 카테고리] 메모'로 저장 → 카테고리는 작은 네모(태그), 메모는 일반 글자. 정기 결제는 'N월 서비스 이용료' 글자만(11-26)
+const rsnH = t => { const m=/^\[([^\]]+)\]\s*(.*)$/.exec(t||''); return m?ctag(m[1],m[2]):esc(t||''); };
 const LIST = i => i.c==='POS' ? 0 : i.c==='FULL_PACKAGE' ? FIXED.FULL_PACKAGE : i.c==='ESL'||i.c==='EDB' ? FIXED[i.c] : i.kd ? FIXED.SMART2D_KD : (FEE[i.c][0]+FEE[i.c][1])*(i.q||1);
 function billX(p, bm){
   const x=p.x, sub=p.sub[bm], canon=bill(sub), out={}, w=fmt, B=t=>'<b class="xb">'+t+'</b>';
@@ -637,7 +639,7 @@ let fi=0; const nextFail = () => FAIL_RS[fi++ % FAIL_RS.length];
 const pay = (p,bm,amt,reason,ok,date,fail) => PAYS.push({name:p.name,bm,amt,reason,ok,date,fail:fail||''});
 PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
   if(!live(bm)(p)) return;
-  const m=MON[bm], a=amtOf(p,bm), late=()=>MON[bm]+'월 서비스 이용료';
+  const m=MON[bm], a=amtOf(p,bm), late=()=>'[재시도 결제] '+MON[bm]+'월분';   // 수기 결제 = 카테고리 + 메모
   // 서비스 추가 달은 그 서비스 무료(billP), 신규 약국 첫 달은 결제 없음 (데모 기간 무료 · 다음 달부터 청구)
   const base = a;
   const newJoin = bm!=='2026-09' && !p.sub[bm==='2026-10'?'2026-09':'2026-10'].length;
@@ -645,7 +647,7 @@ PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
   const rd=(arr,seed)=>RETRY_D[(arr.indexOf(p)+seed)%RETRY_D.length];
   if(MAN_M.includes(p)){ pay(p,bm,base,late(),true,d2(m,9+MAN_M.indexOf(p)%3)); return; }
   if(PAIR.includes(p) && bm==='2026-10') return;                                                    // 10월분은 11월에 함께
-  if(PAIR.includes(p) && bm==='2026-11'){ const d=PAIR_D[PAIR.indexOf(p)]; pay(p,'2026-10',amtOf(p,'2026-10'),'10월 서비스 이용료',true,d2(11,d)); pay(p,bm,base,late(),true,d2(11,d)); return; }
+  if(PAIR.includes(p) && bm==='2026-11'){ const d=PAIR_D[PAIR.indexOf(p)]; pay(p,'2026-10',amtOf(p,'2026-10'),'[재시도 결제] 10월분',true,d2(11,d)); pay(p,bm,base,late(),true,d2(11,d)); return; }
   if(bm==='2026-09' && SEP_RETRY.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(9,5),nextFail()); pay(p,bm,base,late(),true,d2(9,rd(SEP_RETRY,2))); return; }
   if(bm==='2026-09' && SEP_LATE1.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(9,5),nextFail()); pay(p,bm,base,late(),true,d2(10,5)); return; }
   if(bm==='2026-10' && OCT_RETRY.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(10,5),nextFail()); pay(p,bm,base,late(),true,d2(10,rd(OCT_RETRY,5))); return; }
@@ -654,7 +656,7 @@ PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
   if(bm==='2026-11' && NOV_OPEN.includes(p)){ pay(p,bm,base,reasonOf(p,bm),false,d2(11,5),nextFail()); return; }
   pay(p,bm,base,reasonOf(p,bm),true,d2(m,5));
   // 실데이터 사례 — 정기 결제와 별도로 서비스 추가분을 같은 달에 수기 결제(10월은 수기 재결제라 비고가 두 달 다름)
-  if(bm==='2026-11' && p===OCT_RETRY[0]) pay(p,bm,22000,'11월 파머시퍼스트 가입 (미결제분 결제)',true,d2(11,6));
+  if(bm==='2026-11' && p===OCT_RETRY[0]) pay(p,bm,22000,'[누락분 결제] 11월분 · 파머시퍼스트 가입',true,d2(11,6));
 }));
 UN_PH.forEach(n=>['2026-09','2026-10','2026-11'].forEach(bm=>PAYS.push({name:n,bm,amt:49500,reason:MON[bm]+'월 서비스 이용료',ok:true,date:d2(MON[bm],5),fail:''})));
 // 결제 예시를 만든 뒤 목록에 추가 (다른 약국의 결제 실패 · 재시도 예시는 그대로)
@@ -813,7 +815,7 @@ function payNote(name, ym){
   if(!ok.length && fl.length){ const f=fl[fl.length-1];
     return '<span class="mt">미결제 · '+f.date.slice(5)+' 결제 실패 · '+failTxt(f.fail)+(fl.length>1?' · 실패 '+fl.length+'회':'')+'</span>'; }
   // 수기 결제 = 관리자가 결제할 때 적은 결제 이유(메모)를 그대로
-  return ok.filter(x=>wayOf(x)==='수기').map(x=>'<span class="mt">'+x.reason+'</span>').join('<br>');
+  return ok.filter(x=>wayOf(x)==='수기').map(x=>'<span class="mt">'+rsnH(x.reason)+'</span>').join('<br>');
 }
 // 비고의 결제 상태 — 결제 완료 목록에서는 `미결제` 배지를 빼고 결제 내역만
 const payNoteT = (name, ym) => { const h=payNote(name,ym); return S.tab==='paid' && h.startsWith('<span class="mt">미결제') ? '' : h; };
@@ -924,7 +926,7 @@ const payDT = x => x.date.slice(2)+' '+payTime(x);
 // 결제 이력 — 한 청구월분의 결제 시도(정기 자동결제 실패 → 관리자 수기 결제 성공 등)를 시각순으로. 시도가 2번 이상이면 약국 행에서 펼쳐 봄
 const attempts = (name, ym) => PAYS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S).sort((a,b)=>payDT(a)<payDT(b)?-1:1);
 const attHtml = (name, ym) => { const a=attempts(name,ym);
-  return `<tr class="att-row"><td></td><td colspan="12"><div class="attw"><b class="attt">${+ym.slice(5)}월분 결제 이력</b><table class="attt2"><thead><tr><th>결제 일시</th><th>결제 방식</th><th class="num">시도 금액</th><th>결과</th><th>사유</th></tr></thead><tbody>${a.map(x=>`<tr><td>${payDT(x)}</td><td>${wayOf(x)==='수기'?'관리자 수기 결제':'정기 자동결제'}</td><td class="num">${fmt(x.amt)}</td><td>${x.ok?'<span class="okc">성공</span>':'<span class="upc">실패</span>'}</td><td>${x.ok?esc(x.reason):esc(x.fail||'')}</td></tr>`).join('')}</tbody></table></div></td></tr>`; };
+  return `<tr class="att-row"><td></td><td colspan="12"><div class="attw"><b class="attt">${+ym.slice(5)}월분 결제 이력</b><table class="attt2"><thead><tr><th>결제 일시</th><th>결제 방식</th><th class="num">시도 금액</th><th>결과</th><th>사유</th></tr></thead><tbody>${a.map(x=>`<tr><td>${payDT(x)}</td><td>${wayOf(x)==='수기'?'관리자 수기 결제':'정기 자동결제'}</td><td class="num">${fmt(x.amt)}</td><td>${x.ok?'<span class="okc">성공</span>':'<span class="upc">실패</span>'}</td><td>${x.ok?rsnH(x.reason):esc(x.fail||'')}</td></tr>`).join('')}</tbody></table></div></td></tr>`; };
 const esc2 = t => String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // 결제일시 — 결제 완료: 그 청구월분이 결제된 일시(여러 번이면 모두, 다음 달에 결제해도 그 일시) · 미결제: 마지막 결제 시도(실패) 일시
 const payDates = (name, ym) => [...new Set(PAYS.filter(x=>x.ok && x.name===name && x.bm===ym && x.date<=TODAY_S).map(payDT))].sort();
@@ -1271,10 +1273,10 @@ function renderPay(){
     const lastOk=g.ok[g.ok.length-1], x=lastOk||g.last, [c,t]=multi?(g.st==='paid'?['ok','결제 완료']:g.st==='cx'?['cx','취소 완료']:['fail','결제 실패']):pSt(x);
     const r=`<tr${open?' class="pg-on"':''}><td style="text-align:left"><span class="sid" style="margin:0 0 1px">${sidLine(g.name)}</span><span class="link" data-open="payment-admin.html#histPanel" title="약국 상세 › 정기 결제 내역 열기">${g.name}</span></td><td>${pr.biz}</td><td>${g.bm}</td>
       <td>${payDT(x)}</td><td><span class="wy">${wayOf(x)==='수기'?'수기':'정기'}</span></td><td><span class="st ${c}">${t}</span></td><td class="num">${fmt(x.amt)}</td><td class="num">${PCX.has(x)?'<span class="red">−'+fmt(x.amt)+'</span><div class="hint">'+x.date.slice(5,8)+String(Math.min(28,+x.date.slice(8,10)+1)).padStart(2,'0')+' 11:15</div>':''}</td>
-      <td>${x.ok?esc(x.reason):esc(x.fail||'')}${PCX.has(x)?'<div class="rs"><b>취소</b> [과다 청구] 해지 미반영</div>':''}</td><td class="ctr">${multi?`<button class="pgb${open?' on':''}" data-pg="${key}">결제 ${g.rs.length}건 ${open?'▴':'▾'}</button>`:''}</td></tr>`;
+      <td>${x.ok?rsnH(x.reason):esc(x.fail||'')}${PCX.has(x)?'<div class="rs"><b>취소</b> [과다 청구] 해지 미반영</div>':''}</td><td class="ctr">${multi?`<button class="pgb${open?' on':''}" data-pg="${key}">결제 ${g.rs.length}건 ${open?'▴':'▾'}</button>`:''}</td></tr>`;
     if(!open) return r;
     // 펼친 결제 이력 = 같은 표 같은 열에 하위 줄로(머리글 · 제목 없이) — 왼쪽 색 막대 · 옅은 배경 · '└ 1/2'로 위 약국 행에 딸린 줄임을 표시(11-26)
-    return r+g.rs.map((y,i)=>{ const [cc,tt]=pSt(y); return `<tr class="pg-sub${i===g.rs.length-1?' last':''}"><td class="pg-tree">└ ${i+1}/${g.rs.length}</td><td></td><td></td><td>${payDT(y)}</td><td><span class="wy">${wayOf(y)==='수기'?'수기':'정기'}</span></td><td><span class="st ${cc}">${tt}</span></td><td class="num">${fmt(y.amt)}</td><td class="num">${PCX.has(y)?'<span class="red">−'+fmt(y.amt)+'</span>':''}</td><td>${y.ok?esc(y.reason):esc(y.fail||'')}</td><td></td></tr>`; }).join(''); };
+    return r+g.rs.map((y,i)=>{ const [cc,tt]=pSt(y); return `<tr class="pg-sub${i===g.rs.length-1?' last':''}"><td class="pg-tree">└ ${i+1}/${g.rs.length}</td><td></td><td></td><td>${payDT(y)}</td><td><span class="wy">${wayOf(y)==='수기'?'수기':'정기'}</span></td><td><span class="st ${cc}">${tt}</span></td><td class="num">${fmt(y.amt)}</td><td class="num">${PCX.has(y)?'<span class="red">−'+fmt(y.amt)+'</span>':''}</td><td>${y.ok?rsnH(y.reason):esc(y.fail||'')}</td><td></td></tr>`; }).join(''); };
   const body=list.slice(0,12).map(row).join('');
   document.getElementById('content').innerHTML=`
     <h2 class="pay-h">약국 결제 관리</h2>
