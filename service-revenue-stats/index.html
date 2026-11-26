@@ -504,13 +504,13 @@ function billX(p, bm){
 }
 // 서비스 미지정 — 계약 · 옵션 정보 없이 결제되는 약국 (청구 설정 '미배분' 5곳 · 각 49,500원, Q14)
 const UN_FEE = {amt:49500, t:'un', opt:'서비스 미지정', q:'', x:1, cat:['1-2'], why:CB('1-2')+'서비스 · 옵션 정보 없이 결제 · 결제 이유 `굿팜결제`'};
-// 첫 달 무료 — 달 중간에 서비스를 추가하면 그 달은 요금 없음, 다음 달부터 청구 (기존 서비스 금액은 추가 전 구성 그대로)
+// 데모 기간 무료 — 달 중간에 서비스를 추가하면 그 달은 데모 기간으로 요금 없음, 다음 달부터 청구 (기존 서비스 금액은 추가 전 구성 그대로)
 const PREV_BM = {'2026-10':'2026-09', '2026-11':'2026-10'};
 function billFirstFree(p, bm){ const sub=p.sub[bm], prev=p.sub[PREV_BM[bm]];
   if(!prev || !prev.length) return bill(sub);
   const added=sub.filter(i=>!prev.some(j=>j.c===i.c)); if(!added.length) return bill(sub);
   const full=bill(sub), out=bill(sub.filter(i=>!added.includes(i)));
-  added.forEach(i=>{ out[i.c]={amt:0, gross:0, reg:full[i.c].amt, t:'첫 달 무료', opt:full[i.c].opt, q:full[i.c].q, x:0, why:'<b class="db">첫 달 무료</b><br>이번 달 추가 · 다음 달부터 '+fmt(full[i.c].amt)+'원 청구'}; });
+  added.forEach(i=>{ out[i.c]={amt:0, gross:0, reg:full[i.c].amt, t:'데모 기간 무료', opt:full[i.c].opt, q:full[i.c].q, x:0, why:'<b class="db">데모 기간 무료</b><br>이번 달 추가 · 다음 달부터 '+fmt(full[i.c].amt)+'원 청구'}; });
   return out; }
 const billP = (p, bm) => p.un ? {UNALLOC:UN_FEE} : p.x ? billX(p, bm) : billFirstFree(p, bm);
 
@@ -636,7 +636,7 @@ const pay = (p,bm,amt,reason,ok,date,fail) => PAYS.push({name:p.name,bm,amt,reas
 PH.forEach(p=>['2026-09','2026-10','2026-11'].forEach(bm=>{
   if(!live(bm)(p)) return;
   const m=MON[bm], a=amtOf(p,bm), late=()=>MON[bm]+'월 서비스 이용료';
-  // 서비스 추가 달은 그 서비스 무료(billP), 신규 약국 첫 달은 결제 없음 (첫 달 무료 · 다음 달부터 청구)
+  // 서비스 추가 달은 그 서비스 무료(billP), 신규 약국 첫 달은 결제 없음 (데모 기간 무료 · 다음 달부터 청구)
   const base = a;
   const newJoin = bm!=='2026-09' && !p.sub[bm==='2026-10'?'2026-09':'2026-10'].length;
   if(newJoin && !p.x){ p.pre=p.pre||{bm, d:'', first:(MON[bm]%12+1)+'월'}; return; }
@@ -738,15 +738,15 @@ const discWhy=(rows,side)=>[...new Set(rows.map(r=>{ const f=sideF(r,side); retu
 function calcTable(rows, ym, side){ const name=rows[0]&&rows[0].name, p=PH_BY[name], pre=p&&isPre(p,ym), w=fmt;
   const A=phSum(name, rows, ym, side), svc=rows.filter(r=>!NOSVC_C.includes(r.svc)&&sideF(r,side));
   const red=v=>v?'<span class="red">−'+w(v)+'</span>':'<span class="flat">0</span>';
-  // 계산식 — 결합 할인 계산식(요금표) · 첫 달 무료 · 광동 지원 · 등록 금액이 다른 이유 (금액 할인 사유는 금액 할인 줄에)
+  // 계산식 — 결합 할인 계산식(요금표) · 데모 기간 무료 · 광동 지원 · 등록 금액이 다른 이유 (금액 할인 사유는 금액 할인 줄에)
   const how=(f,comb)=>{ if(pre) return '청구 전'; if(isKdFree(f)) return '<div class="dc">광동 VIP 지원 · 이용 금액 '+w(KD_FEE)+'원 (할인 불가) · 약국 결제 0원</div>';
     const c=(f.x?stripCB(f.why||''):(f.why||'')).split('<br>').filter(l=>!/금액 할인 사유/.test(l)).join('<br>');
     return c?'<div class="dc">'+c+'</div>':comb?'<div class="dc">결합할인 50%</div>':(f.amt+(f.dsc||0)?'정가':'−'); };
   let h='<table><thead><tr><th>서비스 옵션</th><th class="num">수량</th><th class="num">정가</th><th class="num">결합 · VIP 할인</th><th class="num">금액</th><th>계산식</th></tr></thead><tbody>'+
-    svc.map(r=>{ const f=sideF(r,side), v=pre?0:(f.amt||0)+(f.dsc||0), g0=pre?0:Math.max(v, f.gross==null?v:f.gross), gross=f.t==='첫 달 무료'?(f.reg||0):g0;
+    svc.map(r=>{ const f=sideF(r,side), v=pre?0:(f.amt||0)+(f.dsc||0), g0=pre?0:Math.max(v, f.gross==null?v:f.gross), gross=f.t==='데모 기간 무료'?(f.reg||0):g0;
       // 결합 할인 = 정가 − 요금표 결합 할인가. 등록 금액이 요금표와 다르면 금액 칸은 등록 금액, 계산식에 이유
-      const comb=f.t==='첫 달 무료'||isKdFree(f)?0:Math.max(0,gross-(f.ca!=null?Math.max(f.ca,v):v));
-      return '<tr><td>'+r.option+'</td><td class="num">'+(f.q||'')+'</td><td class="num">'+w(gross)+'</td><td class="num">'+red(comb)+'</td><td class="num">'+w(v)+'</td><td>'+(f.t==='첫 달 무료'?'<div class="dc">첫 달 무료 · 다음 달부터 '+w(f.reg||0)+'원 청구</div>':how(f,comb))+'</td></tr>'; }).join('')+
+      const comb=f.t==='데모 기간 무료'||isKdFree(f)?0:Math.max(0,gross-(f.ca!=null?Math.max(f.ca,v):v));
+      return '<tr><td>'+r.option+'</td><td class="num">'+(f.q||'')+'</td><td class="num">'+w(gross)+'</td><td class="num">'+red(comb)+'</td><td class="num">'+w(v)+'</td><td>'+(f.t==='데모 기간 무료'?'<div class="dc">데모 기간 무료 · 다음 달부터 '+w(f.reg||0)+'원 청구</div>':how(f,comb))+'</td></tr>'; }).join('')+
     '<tr class="sub"><td colspan="4">서비스 요금</td><td class="num">'+w(A.opt)+'</td><td></td></tr>';
   // 금액 할인 — 약국 총액에서 차감
   const why=discWhy(rows,side);
@@ -805,7 +805,7 @@ const payWayCell = (name, ym) => { const w=new Set(PAYS.filter(x=>x.ok && x.name
   return '<td class="ctr">'+(t?'<b class="pway'+(t==='수기'?' man':'')+'">'+t+'</b>':'<span class="flat">−</span>')+'</td>'; };
 function payNote(name, ym){
   const p=PH_BY[name];
-  if(p && isPre(p,ym)) return '<span class="mt">청구 전 · '+(p.pre.d?p.pre.d+' 이용 시작':'첫 달 무료')+' · '+p.pre.first+'분부터 청구</span>';
+  if(p && isPre(p,ym)) return '<span class="mt">청구 전 · '+(p.pre.d?p.pre.d+' 이용 시작':'데모 기간 무료')+' · '+p.pre.first+'분부터 청구</span>';
   const ps=PAYS.filter(x=>x.name===name && x.bm===ym && x.date<=TODAY_S).sort((a,b)=>a.date.localeCompare(b.date));
   const fl=ps.filter(x=>!x.ok), ok=ps.filter(x=>x.ok);
   if(!ok.length && fl.length){ const f=fl[fl.length-1];
@@ -1371,7 +1371,7 @@ function renderGuide(){
       <tr><td class="k">비고 내용</td><td>약국 행: 결제 상태(청구 전 · 미결제 · 수기 결제 메모) + 메모. 서비스 행: 전월과 다를 때 <b>금액 할인 변경</b>. '계약 확인 필요' 배지는 결제 예정 금액 칸</td></tr>
       <tr><td class="k">비고 위치</td><td>표의 가장 오른쪽 열. 결제 상태 = 약국 행(항목이 1개인 약국은 서비스 행과 한 칸), 계약 확인 필요 · 서비스 변경 = 서비스 행. 금액 할인 금액은 약국 행 '금액 할인' 칸, 사유는 결제 예정 금액 칸 계산 아이콘</td></tr>
       <tr><td class="k">약국별 금액</td><td>옵션별 금액(등록 옵션 금액, 결합 할인 후) · 약국 행은 옵션 총액 → 금액 할인 → 할인 후 요금 → 결제 예정 금액(등록된 정기 결제 금액) → 실결제 금액(그 청구월분 결제, 미결제 0원). 할인 후 요금과 결제 예정 금액이 다르면 결제 예정 금액을 주황색 + 계약 확인 필요</td></tr>
-      <tr><td class="k">신규 · 해지</td><td>서비스별 청구 기준. 신규 = 처음 요금이 발생한 달(첫 달 무료면 다음 달), 해지 = 해지 후 처음 청구가 중단된 달</td></tr>
+      <tr><td class="k">신규 · 해지</td><td>서비스별 청구 기준. 신규 = 처음 요금이 발생한 달(데모 기간 무료면 끝난 다음 달), 해지 = 해지 후 처음 청구가 중단된 달</td></tr>
       <tr><td class="k">광동 VIP</td><td>키오스크 · 스마트 OCR · 스마트2D 중 1개가 광동 지원 서비스(이용 금액 45,000 + VAT = ${fmt(KD_FEE)}원, 할인 불가). 약국 결제 0원으로 집계하고 옵션별 금액 아래 이용 금액을 함께 표기. 그 외 서비스는 서비스 비용 50% 할인(장비비 별도)</td></tr>
     </tbody></table></div></div>
 
@@ -1405,7 +1405,7 @@ function renderGuide(){
 /* ───────── 입력 화면 시안 (다른 화면에 추가할 입력 항목) ─────────
    ① 수기 결제 창 = 청구월 + 결제 사유 카테고리 + 메모 / ② 약국 서비스 수정 > 금액 할인 = 금액 + 사유 카테고리 + 메모(필수)
    카테고리는 6개월 결제 실데이터 · 금액 할인 실데이터 기준 */
-const PAY_CAT = [['재시도 결제','정기 결제 실패 후 다시 결제 · 밀린 대금 포함'],['누락분 결제','서비스에는 있는데 정기 결제에서 빠진 금액'],['신규 · 개국 첫 결제','가입한 달 첫 결제 (첫 달 무료 정책 확인 후 유지 여부 결정)'],['요금제 변경','요금제를 바꾸면서 결제'],['서비스 외 결제','라벨 구매 · 검사 수수료 등, 통계에서 제외'],['기타','위에 해당하지 않음 · 메모 필수']];
+const PAY_CAT = [['재시도 결제','정기 결제 실패 후 다시 결제 · 밀린 대금 포함'],['누락분 결제','서비스에는 있는데 정기 결제에서 빠진 금액'],['신규 · 개국 첫 결제','가입한 달 첫 결제 (데모 기간 무료 정책 확인 후 유지 여부 결정)'],['요금제 변경','요금제를 바꾸면서 결제'],['서비스 외 결제','라벨 구매 · 검사 수수료 등, 통계에서 제외'],['기타','위에 해당하지 않음 · 메모 필수']];
 const DISC_CAT = [['계약 할인','계약 · 제휴 조건으로 약속한 할인 (예: DRS 파머시 퍼스트 중복)'],['보상 · 테스트','오류 보상 · 테스트 (예: 스캐너 인식 오류, OCR 테스트)'],['기타','위에 해당하지 않음']];
 function renderInputs(){
   const opt=(a,v)=>a.map(([t,d])=>`<option value="${t}" ${t===v?'selected':''}>${t}</option>`).join('');
@@ -1441,7 +1441,7 @@ function renderInputs(){
       <div class="foot">금액 할인 실데이터 13곳: 계약 할인 6 · 보상 · 테스트 2 · 기타(사유 없음) 2 · POS 무상 3곳은 POS 옵션 0원으로 데이터 정리 → 기타는 메모 필수</div></div>
     </div>
     <div class="panel"><div class="ph"><h3>확인 필요</h3></div><div class="tblwrap"><table class="tbl"><tbody>
-      <tr><td class="k">수기 결제</td><td>'신규 · 개국 첫 결제'는 첫 달 무료 정책 확인 후 유지 여부 결정 · 청구월 기본값(결제한 달 / 미결제 청구월)</td></tr>
+      <tr><td class="k">수기 결제</td><td>'신규 · 개국 첫 결제'는 데모 기간 무료 정책 확인 후 유지 여부 결정 · 청구월 기본값(결제한 달 / 미결제 청구월)</td></tr>
       <tr><td class="k">금액 할인</td><td>보상 · 테스트를 '오류 보상' / '테스트 · 체험'으로 나눌지, 끝나는 달 입력 · 대상 서비스(옵션) 선택을 넣을지</td></tr>
       <tr><td class="k">개발 범위</td><td>두 입력 화면 개발 범위 · 일정 (통계 화면과 함께 / 따로)</td></tr>
     </tbody></table></div></div>
@@ -1481,7 +1481,7 @@ const RV_ITEMS = [
   {id:'Q12', own:'박단님', q:'VIP · 무료 · 할인으로 빠진 금액(차감액)을 실제 청구액과 따로 보여 줄까요?', bg:'지금은 청구액만 표시하고, 할인 내용은 금액 아래 계산식으로 보여 줌'},
   {id:'Q13', own:'박단님', q:'[확정] 결제 취소 · 환불 통계 반영 — 결제 완료는 원래 청구월에서 취소 금액을 빼고, 매출은 취소일의 달(수기 취소는 입금일의 달)에서 뺌', bg:'지금은 페이앱에서 취소해도 결제 목록에 성공으로 남음(21,823건 중 취소 표시 0건). 슈퍼어드민 결제 취소(스토리보드 SA-01-004 · 005)로 취소 기록을 남기고, 결제 완료는 원래 청구월에서 취소 금액을 뺌. 취소 후 다시 받은 금액은 수기 결제(취소 후 재결제)로 같은 청구월에 더함'},
   {id:'Q14', own:'박단님', q:'미결제 목록에서 결제 예정일이 아직 안 된 건과 기한이 지났거나 결제에 실패한 건을 나눠 볼까요?', bg:'지금은 조회일까지 결제가 확인되지 않은 건을 모두 미결제로 표시'},
-  {id:'Q15', own:'정산 담당 · 영업팀 · 대표', q:'서비스별 원금과 기본 할인액을 보고 어떤 판단을 하나요? 월 정산은 최종 청구액 · 금액 할인 사유 위주로 보고, 월별 추이는 경영 요약으로 옮길까요?', bg:'11-24 회의. 서비스별 비중은 경영 요약 매출 항목 구성비에서 봄(11-25 확정, 서비스 청구 통계는 금액 · 서비스별 할인 · 서비스 요금 합계까지)'}, {id:'Q16', own:'정산 담당 · 광동 담당', q:'VIP 약국이 일부 서비스는 요금을 내므로, 서비스별 약국 부담액과 광동 지원액을 어떤 기준으로 보여 줄까요? 광동 명단 수령 → 대조 → 입금 절차를 확인한 뒤 별도 정산 화면이 필요한지, 불일치 목록 엑셀로 충분한지 정해 주세요', bg:'11-24 회의. 지금은 광동 VIP 정산 화면(SA-03-002)으로 구성'}, {id:'Q17', own:'개발팀 · 정산 담당', q:'[확정] 페이앱에서 취소할 수 없는 결제 — 담당자가 약국 계좌로 입금한 뒤 정기 결제 내역의 <수기 취소 처리>로 입금일 · 사유 · 메모를 남기고 취소 완료(수기 취소)로 바꿈', bg:'11-26 확정. 매출 통계는 입금일의 달에서, 서비스 청구 통계는 원래 청구월 결제 완료에서 뺌(SA-01-143 · 144)'}, {id:'Q18', own:'경영 · 운영 담당', q:'객단가에 첫 달 무료 · 데모 · VIP 약국을 넣을까요? 금액 조회 권한은 누구까지인가요? 경영 요약에서 OCR처럼 직접 연결되는 비용만 다루고, EDB 연동은 이용 건수로 보여 줄까요?', bg:'11-24 회의'}, {id:'Q19', own:'기획 · 개발 · CS', q:'서비스 변경 이력(옵션별 시작일 · 종료일 · 변경자)을 남겨, 해지 후에도 당시 옵션 · 요금을 조회할 수 있게 할까요? 기존 서비스 개편안과 데이터 정리 순서도 함께 정해 주세요', bg:'11-24 회의. 과거 청구액을 설명하려면 당시 이용 옵션이 필요'}, {id:'Q20', own:'CS · 운영팀', q:'서비스 요금과 정기 결제 금액이 다른 약국을 추출해 확인할까요? 과거 옵션 시작일을 몰라 계약일로 대신 넣는 경우, 실제 시작일과 어떻게 구분할까요?', bg:'11-24 회의. 계약 확인 필요 약국 목록이 추출 대상'} ];
+  {id:'Q15', own:'정산 담당 · 영업팀 · 대표', q:'서비스별 원금과 기본 할인액을 보고 어떤 판단을 하나요? 월 정산은 최종 청구액 · 금액 할인 사유 위주로 보고, 월별 추이는 경영 요약으로 옮길까요?', bg:'11-24 회의. 서비스별 비중은 경영 요약 매출 항목 구성비에서 봄(11-25 확정, 서비스 청구 통계는 금액 · 서비스별 할인 · 서비스 요금 합계까지)'}, {id:'Q16', own:'정산 담당 · 광동 담당', q:'VIP 약국이 일부 서비스는 요금을 내므로, 서비스별 약국 부담액과 광동 지원액을 어떤 기준으로 보여 줄까요? 광동 명단 수령 → 대조 → 입금 절차를 확인한 뒤 별도 정산 화면이 필요한지, 불일치 목록 엑셀로 충분한지 정해 주세요', bg:'11-24 회의. 지금은 광동 VIP 정산 화면(SA-03-002)으로 구성'}, {id:'Q17', own:'개발팀 · 정산 담당', q:'[확정] 페이앱에서 취소할 수 없는 결제 — 담당자가 약국 계좌로 입금한 뒤 정기 결제 내역의 <수기 취소 처리>로 입금일 · 사유 · 메모를 남기고 취소 완료(수기 취소)로 바꿈', bg:'11-26 확정. 매출 통계는 입금일의 달에서, 서비스 청구 통계는 원래 청구월 결제 완료에서 뺌(SA-01-143 · 144)'}, {id:'Q18', own:'경영 · 운영 담당', q:'객단가에 데모 기간 무료 · VIP 약국을 넣을까요? 금액 조회 권한은 누구까지인가요? 경영 요약에서 OCR처럼 직접 연결되는 비용만 다루고, EDB 연동은 이용 건수로 보여 줄까요?', bg:'11-24 회의'}, {id:'Q19', own:'기획 · 개발 · CS', q:'서비스 변경 이력(옵션별 시작일 · 종료일 · 변경자)을 남겨, 해지 후에도 당시 옵션 · 요금을 조회할 수 있게 할까요? 기존 서비스 개편안과 데이터 정리 순서도 함께 정해 주세요', bg:'11-24 회의. 과거 청구액을 설명하려면 당시 이용 옵션이 필요'}, {id:'Q20', own:'CS · 운영팀', q:'서비스 요금과 정기 결제 금액이 다른 약국을 추출해 확인할까요? 과거 옵션 시작일을 몰라 계약일로 대신 넣는 경우, 실제 시작일과 어떻게 구분할까요?', bg:'11-24 회의. 계약 확인 필요 약국 목록이 추출 대상'} ];
 const RV_REPLY = {C:['확정','수정 필요','논의 필요'], Q:['답변 완료','확인 중','논의 필요']};
 const RV = {open:false, data:null, err:''};
 const esc = t => String(t==null?'':t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
