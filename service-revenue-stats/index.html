@@ -482,7 +482,8 @@ function billX(p, bm){
   sub.forEach((i,n)=>{ const c=canon[i.c], L=note[n];
     if(n===vipN){ out[i.c]={amt:0, gross:VIP_FEE, ca:0, dsc:0, t:'vip', vip:1, opt:c.opt, q:c.q, x:0, cat:[],
       why:'<b class="db">광동 VIP 지원</b><br>이용 금액 45,000 + VAT = '+w(VIP_FEE)+'원 (할인 불가) · 광동 청구 · 약국 결제 0원'}; return; }
-    if(x.vip && i.c in FEE){ const [sv,eq]=FEE[i.c], q=i.q||1, va=VAT((sv/2+eq)*q);
+    if(x.vip && x.vnd && i.c in FEE){ L.push(B('광동 VIP 할인 없음')+'굿팜 가입 뒤 VIP로 바뀐 약국 — 지원 서비스만 0원, 그 외 서비스는 정가'); }
+    else if(x.vip && i.c in FEE){ const [sv,eq]=FEE[i.c], q=i.q||1, va=VAT((sv/2+eq)*q);
       out[i.c]={amt:amt[n], gross:VAT((sv+eq)*q), ca:va, dsc:ct0[n]>ct[n]?VAT(ct0[n])-VAT(ct[n]):0, t:'vip50', opt:c.opt, q, cat:cat[n], x:amt[n]!==va?1:0,
         why:'<b class="db">광동 VIP 50% 할인</b><br>서비스 비용 '+w(sv)+' × 50% = '+w(sv/2)+(eq?' + 장비비 '+w(eq)+' (할인 없음)':'')+(q>1?' × '+q+'대':'')+' + VAT = '+w(va)+'원'+(amt[n]!==va?'<br>등록 '+w(amt[n])+'원 (VIP 할인가와 다름)':'')}; return; }
     if(x.k==='term') { cat[n].push('1-3'); L.push(CB('1-3')+'서비스 해지 상태인데 결제 중'); }
@@ -560,7 +561,8 @@ const XMIX = [
   [1,'under',[[K,45000],[O,30000],[EDB,20000]],99000,{reason:'굿팜결제(키오스크+스캐너+EDB연동비)',memo:'비고: 키오스크+스캐너 사용중 / 99,000원 / EDB연동비 O'}],
   // 계약 금액이 요금표와 다름 (계약 그대로 결제)
   // 광동 VIP — 키오스크 · 스마트 OCR · 스마트2D 중 1개 = 광동 지원(이용 금액 45,000 · 할인 불가, 약국 결제 0원), 그 외 서비스 = 서비스 비용 50% 할인(장비비 별도)
-  [4,'contract',[[K,0],[PF,20000]],22000,{vip:1}], [2,'contract',[[O,0],[PF,20000]],22000,{vip:1}], [1,'contract',[[D2K,0],[PF,20000]],22000,{vip:1}], [1,'contract',[[K,0],[EDB,20000]],22000,{vip:1}],
+  [3,'contract',[[K,0],[PF,20000]],22000,{vip:1}], [1,'contract',[[K,0],[PF,40000]],44000,{vip:1,vnd:1}],   // vnd = 광동 VIP 할인 없음(굿팜 가입 뒤 VIP로 바뀐 약국 · 담당자가 고름, 11-26)
+  [2,'contract',[[O,0],[PF,20000]],22000,{vip:1}], [1,'contract',[[D2K,0],[PF,20000]],22000,{vip:1}], [1,'contract',[[K,0],[EDB,20000]],22000,{vip:1}],
   [1,'contract',[[K,0],[O,22500]],24750,{vip:1}], [1,'contract',[[K,0],[O,30000],[PF,20000]],55000,{vip:1}], [4,'contract',[[K,45000],[MO,0]],49500],
   [1,'contract',[[K,45000],[O,22500],[MO,0]],74250], [1,'contract',[[K,45000],[PF,20000],[MO,0]],71500],
   // 계약 금액 할인 — 사유의 옵션에만
@@ -997,7 +999,8 @@ const CASE_GROUPS=[
     ['할인 불가 서비스', 'EDB 연동 · ESL은 결합해도 정가', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='할인 불가') && s.paid>0],
     ['굿팜 POS 무료', 'POS는 함께 쓰는 서비스에만 청구. POS 옵션 0원', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='무료') && s.paid>0],
     ['스마트 OCR 기본 제공', '스마트 OCR을 쓰면 모바일 OCR 0원', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>r.fc&&r.fc.t==='스마트 OCR 기본 제공') && s.paid>0],
-    ['광동 VIP', '광동 지원 서비스 1개는 약국 결제 0원 + 이용 금액 표기, 그 외 서비스는 50% 할인(장비비 별도)', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>isKdFree(r.fc)) && s.paid>0] ]],
+    ['광동 VIP', '광동 지원 서비스 1개는 약국 결제 0원 + 이용 금액 표기, 그 외 서비스는 50% 할인(장비비 별도)', 'paid', '2026-11', (n,by,s)=>by[n].some(r=>isKdFree(r.fc)) && s.paid>0 && !PH.find(p=>p.name===n).x.vnd],
+    ['광동 VIP 할인 없음', '굿팜 가입 뒤 VIP로 바뀐 약국. 지원 서비스는 약국 결제 0원 그대로, 그 외 서비스는 50% 할인 없이 정가', 'paid', '2026-11', (n,by,s)=>!!(PH.find(p=>p.name===n)||{x:{}}).x.vnd && s.paid>0] ]],
   ['전월 대비', [
     ['신규', '이번 달 처음 요금이 발생. 전월 0원 · 증감 +', 'paid', '2026-11', (n,by,s,ym,pm)=>s.paid>0 && by[n].some(r=>feeIn(r.fc,ym,n)>0 && !feeIn(r.fp,pm,n))],
     ['해지', '해지 후 이번 달 처음 청구가 중단. 수량 N → 0 · 증감 −', 'paid', '2026-11', (n,by,s,ym,pm)=>by[n].some(r=>feeIn(r.fp,pm,n)>0 && !r.fc && r.qtyPrev) && by[n].some(r=>r.fc)],
@@ -1316,6 +1319,7 @@ const PLIST=[
  {name:'새봄약국',reg:'서울 강서구',addr:'공항대로 47',biz:'456-78-90123',tel:'02-2661-3020',req:'26-11-20',ins:'',st:'설치 예정',dm:['스마트2D','2026-12 ~ 2027-01','데모']},
  {name:'온누리약국',reg:'인천 남동구',addr:'인주대로 590',biz:'567-89-01234',tel:'032-421-7781',req:'24-03-11',ins:'24-03-18',st:'승인'},
  {name:'푸른숲약국',reg:'대전 서구',addr:'둔산로 100',biz:'678-90-12345',tel:'042-486-1102',req:'26-11-18',ins:'',st:'신청',vip:1},
+ {name:'다솜약국',reg:'충북 청주시',addr:'상당로 77',biz:'901-23-45678',tel:'043-255-3370',req:'24-05-02',ins:'24-05-09',st:'승인',vip:2},
  {name:'해맑은약국',reg:'광주 북구',addr:'설죽로 214',biz:'789-01-23456',tel:'062-511-0937',req:'23-06-02',ins:'23-06-09',st:'해지'},
  {name:'다온약국',reg:'경기 성남시',addr:'분당로 55',biz:'890-12-34567',tel:'031-707-2251',req:'25-01-14',ins:'25-01-20',st:'승인'}];
 const stCell=r=>{ if(!r.dm) return r.st; const [o,p,t]=r.dm, c=t==='데모'?['#f5f8ff','#bcd0fb','#2f5bd6','데모']:t==='종료 예정'?['#fffaf0','#f3d08a','#e5a100','데모 종료 예정']:['#fff6f4','#f0b4a8','#c2410c','데모 기간 종료'];
@@ -1335,14 +1339,14 @@ function renderPharm(){
     <div class="panel" style="padding:10px 16px;color:#5b6168;font-size:12.5px;margin-bottom:12px;background:#f3fbfa">${st==='전체'?'적용된 필터가 없습니다.':'적용된 필터 : 서비스상태 <b>'+st+'</b>'+(st==='데모'?' · 데모 기간 <b>'+dq+'</b>':'')}</div>
     <div class="panel pay-f">
       <div class="frow"><select class="sel"><option>약국명</option><option>사업자번호</option><option>전화번호</option><option>스토어 ID</option></select><input class="din" style="width:320px" placeholder="약국명 입력"><button class="btn pri" data-toast="데모 — 조회 조건만 보여줍니다">검색</button><button class="btn" data-toast="데모 — 조회 조건만 보여줍니다">초기화</button></div>
-      <div class="pgh">약국 분류</div><div>${ck(['카드 등록 약국','심사평가원 비맵핑 약국','광동 VIP','CS 업체','테스트','온비타민(DRS)'])}</div>
+      <div class="pgh">약국 분류</div><div>${ck(['카드 등록 약국','심사평가원 비맵핑 약국','광동 VIP','광동 VIP 할인 없음','CS 업체','테스트','온비타민(DRS)'])}</div>
       <div class="pgh">서비스 필터</div><div class="pgrid" id="pSvcF">${sel('서비스명','전체',['전체','굿팜 솔루션 (NEW)'])}${sel('서비스옵션명','전체',['전체','키오스크','스마트 OCR','스마트2D','파머시 퍼스트','굿팜 POS'])}${sel('서비스상태',st,['전체','신청','설치 예정','설치 완료','데모','승인','해지'],'pSt')}${st==='데모'?`<span class="pfl">데모 기간</span><select class="sel pfs" id="pDem">${['기간 종료','종료 예정','진행 중','전체'].map(o=>`<option ${o===dq?'selected':''}>${o}${o==='전체'?'':' ('+cntOf(o)+')'}</option>`).join('')}</select>`:'<span></span><span></span>'}</div>
       <div class="pgh">조건 필터</div><div class="pgrid">${sel('업체명','전체',['전체'])}${sel('청구프로그램','전체',['전체'])}${sel('설치장비','전체',['전체'])}<span class="pfl">설치일</span><input class="din" placeholder="yyyy-mm-dd">${sel('유입경로','전체',['전체'])}${sel('계약서 상태','전체',['전체'])}${sel('OCR 엔진','전체',['전체'])}${sel('결제 방식','전체',['전체'])}</div>
     </div>
     ${st==='데모'?`<div class="pay-top" id="pDemTabs"><span class="dtabs">${['기간 종료','종료 예정','진행 중','전체'].map(o=>`<span class="dtab ${o===dq?'on':''} ${o==='기간 종료'?'ex':''}" data-dem="${o}">${o==='기간 종료'?'데모 기간 종료 · 전환 필요':o==='종료 예정'?'이번 달 종료 예정':o} <b>${o==='전체'?all.length:cntOf(o)}</b></span>`).join('')}</span><span style="color:#8a929a;font-size:12px">종료월 오래된 순</span></div>`:''}
     <div class="pay-top"><span>전체 <span class="cnt">${fmt(list.length)}개</span></span><span><button class="btn">10개</button> <button class="btn">엑셀 내보내기</button> <button class="btn pri">약국 등록</button></span></div>
     <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th></th><th>약국명</th><th>주소</th><th>사업자번호</th><th>전화번호</th><th>서비스명</th><th>서비스 상태</th><th>신청일</th><th>설치일</th><th>문서 발송</th></tr></thead>
-      <tbody>${list.map(r=>`<tr><td>${r.vip?'<span style="font-size:10px;font-weight:800;color:#fff;background:#1fb6a6;border-radius:3px;padding:1px 5px">VIP</span>':''}</td><td style="text-align:left"><span class="link" data-open="payment-admin.html?f=list" title="약국 상세 열기"><b>${r.name}</b></span></td><td style="text-align:left;font-size:12px"><b>(${r.reg})</b> ${r.addr}</td><td>${r.biz}</td><td>${r.tel}</td><td>굿팜 솔루션 (NEW)</td><td style="text-align:left">${stCell(r)}</td><td>${r.req}</td><td>${r.ins||'-'}</td><td></td></tr>`).join('')}</tbody></table></div>`;
+      <tbody>${list.map(r=>`<tr><td>${r.vip===2?'<span style="font-size:10px;font-weight:800;color:#0f6f65;background:#e6f7f4;border:1px solid #1fb6a6;border-radius:3px;padding:0 4px;white-space:nowrap">VIP 할인 없음</span>':r.vip?'<span style="font-size:10px;font-weight:800;color:#fff;background:#1fb6a6;border-radius:3px;padding:1px 5px">VIP</span>':''}</td><td style="text-align:left"><span class="link" data-open="payment-admin.html?f=list" title="약국 상세 열기"><b>${r.name}</b></span></td><td style="text-align:left;font-size:12px"><b>(${r.reg})</b> ${r.addr}</td><td>${r.biz}</td><td>${r.tel}</td><td>굿팜 솔루션 (NEW)</td><td style="text-align:left">${stCell(r)}</td><td>${r.req}</td><td>${r.ins||'-'}</td><td></td></tr>`).join('')}</tbody></table></div>`;
   const ps=document.getElementById('pSt'); if(ps) ps.onchange=()=>{ S.pSt=ps.value; renderPharm(); };
   const pd=document.getElementById('pDem'); if(pd) pd.onchange=()=>{ S.pDem=pd.value.replace(/ \(\d+\)$/,''); renderPharm(); };
   document.querySelectorAll('[data-dem]').forEach(t=>t.onclick=()=>{ S.pDem=t.dataset.dem; renderPharm(); });
