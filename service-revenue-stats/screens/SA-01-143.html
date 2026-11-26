@@ -139,24 +139,24 @@
       <td class="ctr"></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td><span class="wy">정기</span></td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>9월 서비스 이용료</td>
-      <td class="ctr"></td></tr><tr data-id="2"><td>2026-08-05 10:04</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="ctr"> <button class="btn sm line" data-bank="3">수기 취소 처리</button></td></tr><tr data-id="2"><td>2026-08-05 10:04</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
       <td class="num"><span class="red">−71,500</span></td>
       <td>8월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제</div></td>
       <td class="ctr"></td></tr><tr data-id="1"><td>2026-08-05 10:02</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>8월 서비스 이용료</td>
-      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td><span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
+      <td class="ctr"> <button class="btn sm line" data-bank="1">수기 취소 처리</button></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td><span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>7월 서비스 이용료</td>
-      <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl" id="cxMdl"><div class="mh"><h3>계좌 환불 기록</h3><button class="x" data-close="">×</button></div>
+      <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl" id="cxMdl"><div class="mh"><h3>수기 취소 처리</h3><button class="x" data-close="">×</button></div>
   <div class="mb">
     <div class="sum" id="cxSum"><div>과금일<b>2026-08-05</b></div><div>청구월<b>2026-08</b></div><div>결제액<b>71,500원</b></div></div>
-    <div class="fr" id="cxAmtRow"><span class="fl">환불 금액</span><div class="ro"><b class="red">71,500원</b> (결제액 전액)<div class="hint">카드 반품 기간이 지나 카드 취소가 안 되는 결제 — 약국 결제 계좌로 직접 입금한 금액</div></div></div><div class="fr" id="bkDateRow"><span class="fl">입금일</span><div><input class="fi" id="bkDate" value="2026-11-20" style="width:150px"></div></div>
+    <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div class="ro"><b class="red">71,500원</b> (결제액 전액)<div class="hint">페이앱에서 취소할 수 없는 결제 — 약국 계좌로 직접 입금한 금액</div></div></div><div class="fr" id="bkDateRow"><span class="fl">입금일</span><div><input class="fi" id="bkDate" type="date" value="2026-11-17" style="width:150px"><div class="hint">약국 계좌로 입금한 날 — 매출은 이 날의 달에서 뺌</div></div></div>
     <div class="fr" id="cxCatRow"><span class="fl">취소 사유</span><div><select class="fi" id="cxCat"><option value="해지">해지</option><option value="폐업 · 양도">폐업 · 양도</option><option value="과다 청구" selected="">과다 청구</option><option value="중복 결제">중복 결제</option><option value="카드 변경">카드 변경</option><option value="기타">기타</option></select><div class="hint" id="cxHint">해지 · 할인 · 서비스 변경이 정기 결제 금액에 반영되지 않아 더 결제됐을 때</div></div></div>
-    <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">필수</span></span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="note" id="cxNote">약국 계좌로 입금한 뒤 기록을 남기면 결제 건이 <b>계좌 환불</b>로 바뀌고 환불 금액 · 사유가 보여요.<br>· 매출 통계는 <b>입금(환불)한 달</b>에서 뺍니다.</div>
+    <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">필수</span></span><div><input class="fi" id="cxMemo" value="취소 불가 건으로 인한 취소금 입금" placeholder="예: 취소 불가 건으로 인한 취소금 입금 — 약국 계좌로 송금"></div></div>
+    <div class="note" id="cxNote">약국 계좌로 입금한 뒤 저장하면 결제 건이 <b>취소 완료</b>(수기 취소)로 바뀌고 취소 금액 · 사유 · 메모 · 입금일이 보여요.<br>· 매출 통계는 <b>입금일의 달</b>에서, 서비스 청구 통계는 원래 청구월 결제 완료에서 뺍니다.</div>
   </div>
-  <div class="mf"><button class="btn" data-close="">닫기</button><button class="btn pri" id="cxGo">기록 저장</button></div></div></div>
+  <div class="mf"><button class="btn" data-close="">닫기</button><button class="btn pri" id="cxGo">수기 취소 처리</button></div></div></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
