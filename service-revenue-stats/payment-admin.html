@@ -557,12 +557,13 @@ function renderBase(){
   if($('cxCat')) memoReq('cxCat','cxMemo','cxReq',$('cxGo'),S.page==='bank');   // 수기 취소 처리는 메모 항상 필수
   if($('mpCat')) memoReq('mpCat','mpMemo','mpReq',document.querySelector('#mpMdl .btn.pri'));
 }
-function go(p){ S.f=0; if(p!=='svc') S.sedit=0; S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
+// 약국 서비스 수정은 최신 버전(공통 일정 · 옵션별 상태 · 일정 변경 이력, 새봄약국 예시)으로 연다 — 옛 회차 버전은 쓰지 않음(11-26)
+function go(p){ if(p==='svc'){ fScene('mod'); return; } S.f=0; if(p!=='svc') S.sedit=0; S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
 S.cid=6;
-const P0=new URLSearchParams(location.search).get('p'); if(['svc','sub','cancel','bank','manual','payback'].includes(P0)) S.page=P0;
+const P0=new URLSearchParams(location.search).get('p'); if(['sub','cancel','bank','manual','payback'].includes(P0)) S.page=P0; if(P0==='svc') S.f2='mod';
 // 다른 화면에서 #svcLog · #histPanel 로 열면 그 위치로(11-26)
 setTimeout(()=>{ const h=location.hash&&document.getElementById(location.hash.slice(1)); if(h) h.scrollIntoView({block:'start'}); },60);
-const FS=new URLSearchParams(location.search).get('f'); if(FS) fScene(FS); else render();
+const FS=new URLSearchParams(location.search).get('f')||S.f2; if(FS) fScene(FS); else render();
 </script>
 </body>
 </html>
