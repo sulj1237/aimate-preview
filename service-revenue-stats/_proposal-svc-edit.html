@@ -54,6 +54,10 @@ select.fi,input.fi{height:28px;border:1px solid var(--line);border-radius:6px;fo
 .cell-sm{font-size:12px;color:#4b5158}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2b2f33;color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;z-index:9;display:none}
 .htbl th,.htbl td{font-size:12px;padding:6px 10px}.htbl tr.g0 td{border-top:2px solid #e3e6ea}.htbl td[rowspan]{background:#fafbfc}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{display:inline-flex;align-items:center;gap:6px;height:26px;border:1px solid var(--line);border-radius:6px;padding:0 8px;background:#fff;font-size:12.5px}
+.chip .s{font-size:11px;font-weight:700;border-radius:3px;padding:0 5px;line-height:18px}.chip .p{color:#5b6168;font-size:11.5px}.chip .ind{width:6px;height:6px;border-radius:50%;background:var(--org)}
+.chip.dmo{border-color:#bcd0fb;background:#f5f8ff}.chip.dmo .s{background:#2f5bd6;color:#fff}.chip.px{border-color:#f3d08a;background:#fffaf0}.chip.px .s{background:#e5a100;color:#fff}.chip.ex{border-color:#f0b4a8;background:#fff6f4}.chip.ex .s{background:#c2410c;color:#fff}
+.chip.off{color:#8a9099;background:#f7f8fa}.chip.off .nm{text-decoration:line-through}.chip.off .s{background:#9aa0a6;color:#fff}
 </style></head><body><div class="wrap">
 <h1>약국 서비스 수정 — 공통 일정 · 옵션별 일정 · 일정 변경 이력 <span class="mut" style="font-size:13px;font-weight:500">제안 시안 (추천안 반영)</span></h1>
 <p class="lead">약국관리 › 약국 관리 › 약국 상세. 같은 예시 데이터(샘플약국 · 굿팜 솔루션 (NEW))로 <b>기본 조회 → POS 일정만 수정 → 저장 후 이력</b>을 눌러 볼 수 있어요. 버튼 · 입력도 실제로 움직여요.</p>
@@ -91,11 +95,16 @@ function demoBadge(o){ const [f,t]=o.demo; if(t<NOWM) return `<span class="bd en
 
 function listPanel(){
   const paid=S.opts.filter(o=>!['데모','해지'].includes(o.st)&&!o.pend).reduce((a,o)=>a+o.p*o.q*(100-o.dc)/100,0);
-  const opts=S.opts.map(o=>o.n+(indiv(o).length?' <span class="bd ind">개별 일정</span>':'')+(o.st==='데모'?' '+demoBadge(o):'')+(o.st==='해지'?` <span class="bd" style="background:#f1f3f5;color:#8a9099">해지 ${md(eff(o,'해지일'))}</span>`:'')+(['신청','설치 예정','설치 완료'].includes(o.st)?` <span class="bd" style="background:#f1f3f5;color:#5b6168">${o.st}</span>`:'')).join(' · ');
+  // 옵션 칩 A안(11-26) — 모든 옵션 같은 칩, 상태가 있는 옵션만 꼬리표 · 기간, 개별 일정은 주황 점
+  const opts='<div class="chips">'+S.opts.map(o=>{ const dot=indiv(o).length?'<span class="ind" title="개별 일정"></span>':'';
+    if(o.st==='해지') return `<span class="chip off"><span class="nm">${o.n}</span><span class="s">해지</span><span class="p">${md(eff(o,'해지일'))}</span></span>`;
+    if(o.st==='데모'){ const [f,t]=o.demo, [c,l,pp]=t<NOWM?['ex','데모 기간 종료',`${f} ~ ${t} · 승인 전까지 그대로`]:t===NOWM?['px','데모 종료 예정',t.slice(5)+'월 말까지']:['dmo','데모',`${f} ~ ${t}`]; return `<span class="chip ${c}">${o.n}${dot}<span class="s">${l}</span><span class="p">${pp}</span></span>`; }
+    if(['신청','설치 예정','설치 완료'].includes(o.st)) return `<span class="chip">${o.n}${dot}<span class="s" style="background:#e9ecef;color:#5b6168">${o.st}</span></span>`;
+    return `<span class="chip">${o.n}${dot}</span>`; }).join('')+'</div>';
   return `<div class="panel"><div class="ph"><h3>약국 서비스 목록</h3><div class="r"><button class="btn">서비스등록</button><button class="btn pri" data-open>서비스 수정</button></div></div>
   <table><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead><tbody>
   <tr><td><b>굿팜 솔루션 (NEW)</b></td>${['신청일','계약일','설치일','과금 시작일'].map(k=>`<td>${S.common[k]||'미정'}</td>`).join('')}<td class="num">${fmt(Math.round((paid-10000)*1.1))}</td><td>승인</td><td>서명 완료</td><td>이영업</td></tr></tbody></table>
-  <div class="optline">옵션: ${opts}<div class="hint">옵션 수 ${S.opts.length} · 정기 과금액은 데모 옵션 제외 · 날짜 전체와 지난 변경은 서비스 수정 · 서비스 변경 이력에서</div></div></div>`;
+  <div class="optline">${opts}<div class="hint">옵션 ${S.opts.length}개 · 정기 과금액은 데모 · 해지 옵션 제외 · <span style="color:var(--org)">●</span> 개별 일정 있음 · 날짜 전체와 지난 변경은 서비스 수정 · 서비스 변경 이력에서</div></div></div>`;
 }
 function logPanel(){
   const F=['전체','옵션','금액 할인','데모','결제 카드','일정 변경'];
