@@ -86,7 +86,7 @@
   .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
   .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
   code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
-  .req{display:none;font-size:9.5px;font-weight:800;color:#fff;background:var(--up);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  .req{display:none;font-weight:800;color:var(--up);margin-left:2px}   /* 필수 = 라벨 옆 빨간 * (배지 X) */
   .req.on{display:inline-block}
   .fi.need{border-color:var(--up);background:#fff7f6}
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -123,7 +123,7 @@
     <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 7</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
-    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
+    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액 · 취소일</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody><tr data-id="6"><td>2026-11-05 10:02</td><td><span class="wy">정기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>11월 서비스 이용료</td>
@@ -137,7 +137,7 @@
       <td class="num"></td>
       <td>9월 서비스 이용료</td>
       <td class="ctr"><button class="btn sm line" data-bank="3">수기 취소 처리</button></td></tr><tr data-id="2"><td>2026-08-05 10:04</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
-      <td class="num"><span class="red">−71,500</span></td>
+      <td class="num"><span class="red">−71,500</span><div class="hint cxd">취소 08-05 14:30</div></td>
       <td>8월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제<span class="hint"> · 등록자 김운영</span></div></td>
       <td class="ctr"></td></tr><tr data-id="1"><td>2026-08-05 10:02</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
@@ -150,7 +150,7 @@
     <div class="sum" id="cxSum"><div>과금일<b>2026-11-05</b></div><div>청구월<b>2026-11</b></div><div>결제액<b>71,500원</b></div></div>
     <div class="fr" id="cxAmtRow"><span class="fl">취소 금액</span><div class="ro"><b class="red">71,500원</b> (결제액 전액)<div class="hint">결제 건 단위 전체 취소 — 일부만 돌려줄 때는 전액 취소 후 받을 금액을 수기 결제</div></div></div>
     <div class="fr" id="cxCatRow"><span class="fl">취소 사유</span><div><select class="fi" id="cxCat"><option value="해지">해지</option><option value="폐업 · 양도">폐업 · 양도</option><option value="과다 청구" selected="">과다 청구</option><option value="중복 결제">중복 결제</option><option value="카드 변경">카드 변경</option><option value="기타">기타</option></select><div class="hint" id="cxHint">해지 · 할인 · 서비스 변경이 정기 결제 금액에 반영되지 않아 더 결제됐을 때</div></div></div>
-    <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">필수</span></span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영" placeholder="기타 사유를 입력하세요"></div></div>
+    <div class="fr" id="cxMemoRow"><span class="fl">메모<span class="req" id="cxReq">*</span></span><div><input class="fi" id="cxMemo" value="파머시 퍼스트 10월 해지 미반영" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="fr" id="cxWhoRow"><span class="fl">등록자</span><div class="ro">김운영 <span class="hint">(로그인한 관리자 · 자동 기록)</span></div></div>
     <div class="note" id="cxNote">결제 취소를 누르면 페이앱으로 취소를 요청하고, 페이앱 응답에 따라 나뉩니다.<br>· 정산 전(보통 결제 후 영업일 3~5일 이내) → 바로 <b>취소 완료</b><br>· 정산 후 → <b>취소 요청 중</b> — 페이앱이 알려 준 반환금을 운영팀이 수기 입금하면 카드 취소 후 취소 완료<br>· 다시 받을 금액이 있으면 취소 후 <b>수기 결제</b>(사유 <b>취소 후 재결제</b>) — 예: 71,500 취소 → 49,500 재결제</div>
   </div>

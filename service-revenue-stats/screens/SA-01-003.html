@@ -86,7 +86,7 @@
   .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
   .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
   code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
-  .req{display:none;font-size:9.5px;font-weight:800;color:#fff;background:var(--up);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  .req{display:none;font-weight:800;color:var(--up);margin-left:2px}   /* 필수 = 라벨 옆 빨간 * (배지 X) */
   .req.on{display:inline-block}
   .fi.need{border-color:var(--up);background:#fff7f6}
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -123,29 +123,29 @@
     <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 8</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
-    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
+    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액 · 취소일</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody><tr data-id="7"><td>2026-11-06 11:20</td><td><span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">49,500</td>
       <td class="num"></td>
-      <td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영</td>
+      <td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영<span class="hint"> · 등록자 김운영</span></td>
       <td class="ctr"><button class="btn sm line" data-cancel="7">결제 취소</button></td></tr><tr data-id="6"><td>2026-11-05 10:02</td><td><span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
-      <td class="num"><span class="red">−71,500</span></td>
-      <td>11월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영</div></td>
+      <td class="num"><span class="red">−71,500</span><div class="hint cxd">취소 11-06 11:15</div></td>
+      <td>11월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영<span class="hint"> · 등록자 김운영</span></div></td>
       <td class="ctr"></td></tr><tr data-id="5"><td>2026-10-08 14:21</td><td><span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
-      <td><span class="ctag">재시도 결제</span>10월분 · 카드 한도 초과 후 결제</td>
+      <td><span class="ctag">재시도 결제</span>10월분 · 카드 한도 초과 후 결제<span class="hint"> · 등록자 김운영</span></td>
       <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="4"><td>2026-10-05 10:02</td><td><span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>10월 서비스 이용료</td>
       <td class="ctr"></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td><span class="wy">정기</span></td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>9월 서비스 이용료</td>
-      <td class="ctr"></td></tr><tr data-id="2"><td>2026-08-05 10:04</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
-      <td class="num"><span class="red">−71,500</span></td>
-      <td>8월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제</div></td>
+      <td class="ctr"><button class="btn sm line" data-bank="3">수기 취소 처리</button></td></tr><tr data-id="2"><td>2026-08-05 10:04</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
+      <td class="num"><span class="red">−71,500</span><div class="hint cxd">취소 08-05 14:30</div></td>
+      <td>8월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제<span class="hint"> · 등록자 김운영</span></div></td>
       <td class="ctr"></td></tr><tr data-id="1"><td>2026-08-05 10:02</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
       <td class="num"></td>
       <td>8월 서비스 이용료</td>
-      <td class="ctr"></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td><span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
+      <td class="ctr"><button class="btn sm line" data-bank="1">수기 취소 처리</button></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td><span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
       <td class="num"></td>
       <td>7월 서비스 이용료</td>
       <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl wide" id="svcMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-close="">×</button></div>
@@ -159,7 +159,7 @@
       <tr class="tot"><td colspan="4">옵션 총액 <span class="hint">(데모 옵션 제외)</span></td><td class="num">55,000원</td><td colspan="8"></td></tr></tbody></table>
     <div class="fr" id="dAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
     <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat"><option value="계약 할인" selected="">계약 할인</option><option value="보상 · 테스트">보상 · 테스트</option><option value="기타">기타</option></select></div></div>
-    <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">필수</span></span><div><input class="fi" id="dMemo" value="DRS 파머시 퍼스트 중복" placeholder="기타 사유를 입력하세요"></div></div>
+    <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">*</span></span><div><input class="fi" id="dMemo" value="DRS 파머시 퍼스트 중복" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="fr" id="dWhoRow"><span class="fl">등록자</span><div><select class="fi" id="dWho" style="width:220px"><option selected="">김운영</option><option>이영업</option><option>박운영</option><option>최영업</option></select></div></div>
     <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot">45,000원</b></div></div>
   </div>
