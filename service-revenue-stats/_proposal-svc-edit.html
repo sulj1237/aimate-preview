@@ -193,7 +193,6 @@ function editBox(){
    <div style="margin-bottom:10px">적용 범위 <label class="rad"><input type="radio" name="sc" value="common" ${sc==='common'?'checked':''}>공통 일정 수정</label><label class="rad"><input type="radio" name="sc" value="opt" ${sc==='opt'?'checked':''}>선택한 옵션만 수정</label></div>
    ${body}
    <div style="display:flex;gap:10px;margin-top:10px;align-items:center"><span>메모</span><input class="fi" style="flex:1" id="memo" value="${S.memo}"><span>등록자</span><select class="fi" id="who">${['김운영','이영업','박운영'].map(n=>`<option ${n===S.who?'selected':''}>${n}</option>`).join('')}</select></div>
-   <div class="conf"><b>저장 전 확인</b>${ch.length?ch.map(c=>`<div>${c.o} · ${c.k} ${c.b} → <b class="chg-a">${c.a}</b></div>`).join(''):'<div class="mut">바뀌는 항목이 없어요</div>'}</div>
    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button class="btn" data-cancel>수정 취소</button><button class="btn pri" data-save ${ch.length?'':'disabled'}>저장</button></div></div>`;
 }
 // 저장하면 바뀌는 것 — 비교 기준 = 저장 직전 그 옵션에 실제 적용되던 값(적용 방식 포함)
