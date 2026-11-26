@@ -173,8 +173,7 @@ function optChanges(){
 }
 function optSummary(){
   const ch=optChanges(); if(!ch.length) return '';
-  return `<div class="conf" style="flex-basis:100%;margin:0 0 8px"><b>저장 전 확인</b>${ch.map(c=>`<div>${c.t} — ${c.lines.length>3?c.lines[0]+' 외 '+(c.lines.length-1)+'개 항목':c.lines.join(' · ')}</div>`).join('')}</div>
-   <span class="mut" style="align-self:center">메모</span><input class="fi" id="addMemo" style="width:260px" value="${S.addMemo||''}" placeholder="예: 키오스크 추가 계약"><span class="mut" style="margin-right:auto;align-self:center">저장하면 옵션 변경이 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>`;
+  return `<span class="mut" style="align-self:center">메모</span><input class="fi" id="addMemo" style="width:260px" value="${S.addMemo||''}" placeholder="예: 키오스크 추가 계약"><span class="mut" style="margin-right:auto;align-self:center">저장하면 옵션 변경이 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>`;
 }
 function editBox(){
   const sc=S.scope, sel=S.opts.filter(o=>S.sel.has(o.n));
