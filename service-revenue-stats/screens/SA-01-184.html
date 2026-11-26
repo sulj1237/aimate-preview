@@ -1,0 +1,147 @@
+<!-- 정적 화면: 스토리보드용 스냅샷. 동작은 프로토타입에서 확인 -->
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>약국 상세 · 약국 서비스 · 정기 결제 화면 시안</title>
+<!--
+  약국 상세(약국관리 > 약국 관리 > 상세)의 약국 서비스 · 정기 결제 입력 시안 — 서비스 청구 통계 스토리보드 SA-01-003 ~ 006에서 iframe으로 사용
+  화면: svc 약국 서비스 수정(금액 할인 사유) / sub 정기 결제 내역(결제 취소 · 상태) / cancel 결제 취소 창 / manual 수기 결제 창
+  약국 · 카드 정보는 예시값. 카테고리는 실데이터(결제 6개월 · 금액 할인 13곳 · A/S · 메모 환불 사례) 기준
+-->
+<style>
+  :root{
+    --teal:#1fb6a6; --teal-d:#159b8d; --teal-soft:#e6f7f4;
+    --ink:#2b2f33; --muted:#8a9099; --line:#e3e6ea; --bg:#f4f5f7;
+    --side:#33383d; --side-line:#454b52; --up:#d6453d; --down:#2f6fd6; --add:#7048e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;color:var(--ink);background:var(--bg);font-size:13px;line-height:1.5}
+  button,input,select{font-family:inherit}
+  .wrap{display:flex;min-height:100vh}
+  .side{width:188px;flex:none;background:var(--side);color:#cdd2d7}
+  .side-logo{display:flex;align-items:center;gap:7px;padding:16px;border-bottom:1px solid var(--side-line)}
+  .side-mark{width:18px;height:18px;border-radius:7px 7px 7px 2px;background:var(--teal);transform:rotate(8deg);position:relative}
+  .side-mark::after{content:"";position:absolute;left:-4px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:#f4de3f}
+  .side-word{font-size:16px;font-weight:800;color:#fff}
+  .side-grp{font-size:10.5px;color:#8e959c;padding:14px 16px 6px}
+  .side-item{padding:8px 16px 8px 26px;font-size:12px;color:#aeb4ba}
+  .side-item.on{background:var(--teal);color:#fff;font-weight:700}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+  .topbar{height:46px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:12px}
+  .crumb{font-size:12px;color:var(--muted)} .crumb b{color:var(--ink)}
+  .demo{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px dashed #c7cbd0;border-radius:6px;padding:4px 8px;font-size:11.5px;color:var(--muted)}
+  .demo button{height:24px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:11.5px;padding:0 8px;cursor:pointer;color:#4b5158}
+  .demo button.on{background:#4b5158;border-color:#4b5158;color:#fff}
+  .content{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:1240px;position:relative}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:8px}
+  .ph{display:flex;align-items:center;gap:10px;padding:14px 18px 10px}
+  .ph h3{margin:0;font-size:14px} .ph .sub{font-size:11.5px;color:var(--muted)} .ph .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .btn{height:32px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;color:#4b5158;cursor:pointer}
+  .btn.pri{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+  .btn.sm{height:26px;padding:0 10px;font-size:11.5px}
+  .btn.line{border-color:#f0b9b5;color:var(--up)}
+  .btn:disabled{color:#c3c9d0;border-color:var(--line);cursor:default}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:9px 12px;border-bottom:1px solid #eff1f3;white-space:nowrap;vertical-align:top}
+  .tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tbl .ctr{text-align:center}
+  .tbl tr.tot td{background:#f8f9fa;font-weight:800}
+  .addb{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;background:var(--add);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+  th .addb{margin-left:3px}
+  .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+  /* 옵션 칩 — A안(_proposal-opt-line, 11-26): 옵션마다 같은 모양, 상태 있는 옵션만 꼬리표 · 기간. 색 = 데모 파랑 · 종료 예정 노랑 · 기간 종료 주황 · 해지 회색. 개별 일정은 주황 점 */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{display:inline-flex;align-items:center;gap:6px;height:26px;border:1px solid var(--line);border-radius:6px;padding:0 8px;background:#fff;font-size:12.5px;color:#2b2f33;cursor:pointer}
+  .chip .s{font-size:11px;font-weight:700;border-radius:3px;padding:0 5px;line-height:18px}.chip .p{color:#5b6168;font-size:11.5px}.chip .ind{width:6px;height:6px;border-radius:50%;background:#c2410c}
+  .chip.dmo{border-color:#bcd0fb;background:#f5f8ff}.chip.dmo .s{background:#2f5bd6;color:#fff}.chip.px{border-color:#f3d08a;background:#fffaf0}.chip.px .s{background:#e5a100;color:#fff}.chip.ex{border-color:#f0b4a8;background:#fff6f4}.chip.ex .s{background:#c2410c;color:#fff}
+  .chip.off{color:#8a9099;background:#f7f8fa}.chip.off .nm{text-decoration:line-through}.chip.off .s{background:#9aa0a6;color:#fff}.chips-lg{font-size:11.5px;color:#8a9099;margin-top:5px}
+  .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
+  .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
+  .ctag{display:inline-block;border:1px solid #cfd4da;border-radius:4px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:#3f454c;background:#fff;font-weight:500;white-space:nowrap}
+  .rs{font-size:11px;color:#5b6168;margin-top:2px;white-space:normal;max-width:260px}
+  .rs b{color:var(--ink)}
+  .red{color:var(--up);font-weight:700}
+  .kvg{display:grid;grid-template-columns:120px 1fr 120px 1fr;border-top:1px solid var(--line);margin:0 18px 16px}
+  .kvg>div{padding:9px 12px;border-bottom:1px solid #eff1f3;font-size:12.5px}
+  .kvg .k{background:#f8f9fa;color:#5b6168;font-weight:700;font-size:12px}
+  .opt{font-size:11.5px;color:var(--muted);padding:0 18px 14px}
+  /* 창 */
+  .dim{position:fixed;inset:0;background:rgba(30,34,38,.45);z-index:20}
+  .mdl{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:21;width:560px;background:#fff;border-radius:10px;box-shadow:0 18px 40px -12px rgba(0,0,0,.45)}
+  .mdl.wide{width:1000px}
+  .mh{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .mh h3{margin:0;font-size:15px} .mh .x{margin-left:auto;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer}
+  .mb{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+  .fr{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:start}
+  .fl{font-size:12.5px;font-weight:700;color:#4b5158;padding-top:7px}
+  .fi{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-size:12.5px;color:var(--ink);background:#fff;width:100%}
+  .fi[disabled]{background:#f6f7f9;color:var(--muted)}
+  .ro{padding-top:7px;font-size:12.5px}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .seg{display:flex;gap:6px}
+  .seg label{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;cursor:pointer}
+  .seg label.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-d);font-weight:700}
+  .seg input{display:none}
+  .pv{background:#f8f9fa;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px}
+  .pv .mlab{font-size:11px;color:var(--muted)}
+  .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .sum div{background:#f8f9fa;border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--muted)}
+  .sum b{display:block;font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .note{font-size:11.5px;color:#5b6168;background:#f3f7ff;border:1px solid #d7e3fb;border-radius:6px;padding:9px 12px;line-height:1.6}
+  .mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#eef2f6;border-radius:4px;padding:0 4px}
+  .req{display:none;font-weight:800;color:var(--up);margin-left:2px}   /* 필수 = 라벨 옆 빨간 * (배지 X) */
+  .req.on{display:inline-block}
+  .fi.need{border-color:var(--up);background:#fff7f6}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#2b2f33;color:#fff;padding:9px 16px;border-radius:6px;font-size:12.5px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  .tbl tr.bmh td{background:#f6f7fb;border-top:1px solid var(--line);font-size:12.5px;padding:7px 10px}.bmn{color:#6b7280;font-size:11.5px;margin-left:4px}
+  .tbl tr.bmi td:first-child{padding-left:22px}.bml{color:#9aa1a9;margin-right:4px}.wy{display:inline-block;font-size:10.5px;padding:0 5px;border-radius:4px;background:#eef0f3;color:#4b5563;font-weight:600}
+.oc{border:1px solid var(--line);border-radius:8px;margin-bottom:10px}.oc .ohd{display:flex;align-items:center;gap:14px;padding:9px 12px;background:#f6f7f9;border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;font-size:12.5px}.oc .ohd b{font-size:13px}.oc .ohd .r{margin-left:auto;font-weight:700}.oc .obd{padding:10px 12px;display:grid;gap:10px}.oc .orw{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:start}.oc .orw>span{font-size:12px;font-weight:700;color:#4b5158;padding-top:6px}.oc .fi{height:30px;font-size:12px;padding:0 8px}.oc .seg .fi.sm{width:100px;flex:none}.oc .seg select[data-k]{flex:none}.oc .dcw .fi.sm{width:100px;flex:none}.oc .hint{font-size:11.5px;color:#8a9099}
+.sck{display:inline-block!important}.schh{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12.5px}.schh .btn{margin-left:auto}.ro4 b{display:block;font-size:12.5px;padding:5px 0}.chg{color:#d9480f!important;font-weight:700}#optTbl th,#optTbl td,.tbl.sch th,.tbl.sch td{font-size:11px;padding:6px 6px;white-space:nowrap}.tbl.sch td:last-child{white-space:normal}.tbl.sch{width:100%}
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 10px}.dgrid label{display:block;font-size:11.5px;color:#5b6168;margin-bottom:3px}.dgrid .fi{height:30px;font-size:12px;padding:0 8px}.dgrid .w2{grid-column:span 2}
+.dmck{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}
+/* 옵션 표 서비스 상태 칸 — 데모 기간은 상태 아래 줄로(표가 창 밖으로 넘치지 않게, 11-26) */.dmSeg{display:flex!important;flex-direction:column;align-items:flex-start;gap:4px}.dmSeg .demoPer{margin-left:0}.dmSeg .fi{height:26px!important;font-size:11px!important;padding:0 4px!important;width:84px!important}.dmSeg .demoPer .fi{width:80px!important}#optTbl td{vertical-align:top}.optWrap{overflow-x:auto}#demoPer,.demoPer{display:inline-flex;align-items:center;gap:4px;margin-left:6px}#demoPer .fi{width:96px;height:28px;font-size:12px;padding:0 6px}
+.st.ex{background:#fff3d6;color:#a86b00}
+.fcg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.fcg div{background:#f7f8fa;border-radius:6px;padding:6px 8px}.fcg span{display:block;font-size:11px;color:#8a9099}.fcg b{font-size:12.5px}
+.hbtn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;color:#3d444b}
+.fflt span{display:inline-block;border:1px solid var(--line);border-radius:12px;padding:1px 9px;margin-left:4px;font-size:11.5px;cursor:pointer;color:#4b5158;background:#fff}.fflt span.on{background:#eef0fc;border-color:#c7cdf5;color:#3b4bc8;font-weight:700}
+.lnk{border:0;background:none;color:#159b8d;font-size:11.5px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0}
+.dmr td{background:#f5f8ff}.dmt{display:inline-block;background:#2f5bd6;color:#fff;font-size:11px;font-weight:700;border-radius:3px;padding:0 6px;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side" id="side"><div class="side-logo"><span class="side-mark"></span><span class="side-word">goodpharm</span></div><div class="side-grp">약국관리</div><div class="side-item on">약국 관리</div><div class="side-item">신규 약국 관리</div><div class="side-item">약국 A/S</div><div class="side-item">약국 결제 관리</div><div class="side-item">태블릿 관리</div></aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">약국관리 &gt; 약국 관리 &gt; <b>상세</b></div>
+      <div class="demo">시안 화면
+        <button data-go="svc">약국 서비스 수정</button>
+        <button data-go="sub" class="">정기 결제 내역</button>
+        <button data-go="cancel">결제 취소</button>
+        <button data-go="manual">수기 결제</button>
+      </div>
+    </div>
+    <div class="content" id="content"><div class="panel"><div class="ph"><h3>새봄약국</h3><span class="sub">스토어 ID 2026112xxxx · 흐름도 3번 예시(신규 계약)</span></div></div>
+  <div class="panel" id="fSvcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
+    <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
+    <tbody><tr id="fSvcRow" style="cursor:pointer"><td><b>굿팜 솔루션 (NEW)</b></td><td>2026-11-20</td><td>2026-11-24</td><td>미정</td><td>2026-12-05</td><td class="num">49,500</td><td>설치 예정</td><td>서명 완료</td><td>이영업 · 2026-11-24</td></tr></tbody></table>
+    <div class="opt"><div class="chips" id="fChips"><span class="chip" data-fmod="1">스마트 OCR</span><span class="chip" data-fmod="1">굿팜 POS</span><span class="chip dmo" data-fmod="1">스마트2D<span class="s">데모</span><span class="p">2026.12 ~ 2027.01</span></span></div><div class="chips-lg">옵션 3개 · 12월 청구 예정 <b style="color:#2b2f33">49,500</b> (VAT 포함 · 데모 옵션 0원) · 칩을 누르면 약국 서비스 수정</div></div>
+    <div class="opt" id="fLog"><b style="color:#1f2328">서비스 변경 이력</b> <span class="fflt"><span class="on" data-fflt="전체">전체</span><span class="" data-fflt="옵션">옵션</span><span class="" data-fflt="데모">데모</span><span class="" data-fflt="일정 변경">일정 변경</span></span><table class="tbl" id="fLogTbl" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody><tr><td>2026-11-26 10:40</td><td>김운영</td><td><b>데모 지정 · 스마트2D</b></td><td style="color:#8a9099">설치 예정</td><td style="color:#c2410c;font-weight:700">데모 (2026-12 ~ 2027-01)<div class="hint" style="color:#5b6168">12월 청구 예정 66,000 → 49,500</div></td><td>2026년 12월 청구분</td></tr><tr><td>2026-11-24 10:05</td><td>이영업</td><td><b>서비스 등록</b></td><td style="color:#8a9099">없음</td><td style="color:#c2410c;font-weight:700">굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS · 스마트2D</td><td>2026년 12월 청구분</td></tr></tbody></table><div class="hint">현재 등록 내역은 위 목록, 바뀐 내용은 이 이력에 한 번 기록돼요.</div></div>
+  </div><div class="dim" data-fclose=""></div><div class="mdl wide" id="fCalcMdl" style="width:760px"><div class="mh"><div><div class="hint" style="margin:0">통계 › 서비스 청구 통계 › 청구 예정 (2026-12) · 계산 내역</div><h3>새봄약국</h3></div><button class="x" data-fclose="">×</button></div>
+  <div class="mb"><b style="font-size:13px">청구 예정 · 2026-12</b>
+   <table class="tbl" id="fCalcTbl"><thead><tr><th>서비스 옵션</th><th class="num">수량</th><th class="num">정가</th><th class="num">결합 · VIP 할인</th><th class="num">금액</th><th>계산식</th></tr></thead><tbody><tr><td>스마트 OCR</td><td class="num">1</td><td class="num">49,500</td><td class="num">0</td><td class="num"><b>49,500</b></td><td>정가(가장 높은 서비스)</td></tr><tr><td>굿팜 POS</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num"><b>0</b></td><td>무료 — 함께 쓰는 서비스에만 청구</td></tr><tr class="dmr"><td>스마트2D</td><td class="num">1</td><td class="num">33,000</td><td class="num">−</td><td class="num"><b>0</b></td><td><span class="dmt">데모 적용 · 0원</span> 2026-12 ~ 2027-01 청구분</td></tr>
+   <tr><td colspan="4"><b>서비스 요금</b></td><td class="num"><b>49,500</b></td><td></td></tr>
+   <tr style="background:#fff8f6"><td colspan="4">금액 할인</td><td class="num">0</td><td class="hint">약국 총액에서 차감</td></tr>
+   <tr><td colspan="4"><b>결제 예정 금액</b></td><td class="num"><b>49,500원</b></td><td class="hint">서비스 요금과 같음</td></tr></tbody></table>
+   <div class="hint">데모 옵션은 데모 기간 청구분에서 그 옵션만 0원 · 함께 쓰는 유료 옵션은 기존 요금 그대로 · 데모가 끝난 뒤 자동 전환 없음(담당자가 승인으로 바꾸기 전까지 0원)</div></div></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+
+
+</body></html>

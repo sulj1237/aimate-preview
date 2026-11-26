@@ -104,6 +104,11 @@
 .dmck{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}
 /* 옵션 표 서비스 상태 칸 — 데모 기간은 상태 아래 줄로(표가 창 밖으로 넘치지 않게, 11-26) */.dmSeg{display:flex!important;flex-direction:column;align-items:flex-start;gap:4px}.dmSeg .demoPer{margin-left:0}.dmSeg .fi{height:26px!important;font-size:11px!important;padding:0 4px!important;width:84px!important}.dmSeg .demoPer .fi{width:80px!important}#optTbl td{vertical-align:top}.optWrap{overflow-x:auto}#demoPer,.demoPer{display:inline-flex;align-items:center;gap:4px;margin-left:6px}#demoPer .fi{width:96px;height:28px;font-size:12px;padding:0 6px}
 .st.ex{background:#fff3d6;color:#a86b00}
+.fcg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.fcg div{background:#f7f8fa;border-radius:6px;padding:6px 8px}.fcg span{display:block;font-size:11px;color:#8a9099}.fcg b{font-size:12.5px}
+.hbtn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;color:#3d444b}
+.fflt span{display:inline-block;border:1px solid var(--line);border-radius:12px;padding:1px 9px;margin-left:4px;font-size:11.5px;cursor:pointer;color:#4b5158;background:#fff}.fflt span.on{background:#eef0fc;border-color:#c7cdf5;color:#3b4bc8;font-weight:700}
+.lnk{border:0;background:none;color:#159b8d;font-size:11.5px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0}
+.dmr td{background:#f5f8ff}.dmt{display:inline-block;background:#2f5bd6;color:#fff;font-size:11px;font-weight:700;border-radius:3px;padding:0 6px;margin-right:4px}
 </style>
 </head>
 <body>
@@ -113,63 +118,39 @@
     <div class="topbar">
       <div class="crumb">약국관리 &gt; 약국 관리 &gt; <b>상세</b></div>
       <div class="demo">시안 화면
-        <button data-go="svc" class="on">약국 서비스 수정</button>
+        <button data-go="svc">약국 서비스 수정</button>
         <button data-go="sub" class="">정기 결제 내역</button>
         <button data-go="cancel">결제 취소</button>
         <button data-go="manual">수기 결제</button>
       </div>
     </div>
-    <div class="content" id="content"><div class="panel"><div class="ph"><h3>샘플약국</h3><span class="sub">스토어 ID 2024047xxxx</span></div></div>
-  <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
+    <div class="content" id="content"><div class="panel"><div class="ph"><h3>새봄약국</h3><span class="sub">스토어 ID 2026112xxxx · 흐름도 3번 예시(신규 계약)</span></div></div>
+  <div class="panel" id="fSvcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
-    <tbody><tr id="svcRow" style="cursor: pointer;"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt"><div class="chips" id="optChips"><span class="chip" data-go="svc">스마트 OCR</span><span class="chip" data-go="svc">굿팜 POS<span class="ind" title="개별 일정"></span></span><span class="chip dmo" id="stCell" data-go="svc">스마트2D<span class="s">데모</span><span class="p">2026-11 ~ 2026-12</span></span></div><div class="chips-lg">옵션 3개 · 정기 과금액 <b style="color:#2b2f33">49,500</b> (데모 · 해지 옵션 제외) &nbsp;·&nbsp; <span style="color:#c2410c">●</span> 개별 일정 있음 · 칩을 누르면 약국 서비스 수정</div></div>
-    <div class="opt" id="svcLog"><b style="color:#1f2328">서비스 변경 이력</b><table class="tbl" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody><tr><td>2026-09-28 15:40</td><td>김운영</td><td><b>금액 할인 수정</b></td><td style="color:#8a9099">−5,500 [계약 할인]</td><td>−11,000 [계약 할인] DRS 파머시 퍼스트 중복</td><td>2026년 10월 청구분</td></tr><tr><td>2026-05-28 15:40</td><td>이영업 (입력 김운영)</td><td><b>금액 할인 등록</b></td><td style="color:#8a9099">없음</td><td>−5,500 [계약 할인] DRS 파머시 퍼스트 중복</td><td>2026년 6월 청구분</td></tr><tr><td>2024-06-03 11:20</td><td>이영업</td><td><b>결제 카드 등록</b></td><td style="color:#8a9099">없음</td><td>신한카드 · 뒤 4자리 ****</td><td><span style="color:#8a9099">−</span></td></tr><tr><td>2024-04-22 09:30</td><td>이영업</td><td><b>서비스 등록 · 승인</b></td><td style="color:#8a9099">없음</td><td>굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS</td><td>2024년 6월 청구분</td></tr></tbody></table></div>
-    </div><div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
-    <div class="kvg"><div class="k">결제 방식</div><div>수기 정기결제(레거시)</div><div class="k">결제카드정보</div><div>신한카드 · 뒤 4자리 **** &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
-      <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
-  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 8</span></h3><span class="st fail" id="unpaidSum">미결제 1개월 · 2026-07</span><div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
-    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액 · 취소일</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
-    <tbody><tr data-id="7"><td>2026-11-06 11:20</td><td><span class="wy">수기</span></td><td>2026-11</td><td><span class="st ok">성공</span></td><td></td><td class="num">49,500</td>
-      <td class="num"></td>
-      <td><span class="ctag">취소 후 재결제</span>11월분 · 파머시 퍼스트 해지 반영<span class="hint"> · 등록자 김운영</span></td>
-      <td class="ctr"><button class="btn sm line" data-cancel="7">결제 취소</button></td></tr><tr data-id="6"><td>2026-11-05 10:02</td><td><span class="wy">정기</span></td><td>2026-11</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
-      <td class="num"><span class="red">−71,500</span><div class="hint cxd">11-06 11:15</div></td>
-      <td>11월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">과다 청구</span>파머시 퍼스트 10월 해지 미반영<span class="hint"> · 등록자 김운영</span></div></td>
-      <td class="ctr"></td></tr><tr data-id="5"><td>2026-10-08 14:21</td><td><span class="wy">수기</span></td><td>2026-10</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td><span class="ctag">재시도 결제</span>10월분 · 카드 한도 초과 후 결제<span class="hint"> · 등록자 김운영</span></td>
-      <td class="ctr"><button class="btn sm line" data-cancel="5">결제 취소</button></td></tr><tr data-id="4"><td>2026-10-05 10:02</td><td><span class="wy">정기</span></td><td>2026-10</td><td><span class="st fail">실패</span></td><td>기타오류(8326 : 사용 한도 초과)</td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>10월 서비스 이용료</td>
-      <td class="ctr"></td></tr><tr data-id="3"><td>2026-09-05 10:03</td><td><span class="wy">정기</span></td><td>2026-09</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>9월 서비스 이용료</td>
-      <td class="ctr"><button class="btn sm line" data-bank="3">수기 취소 처리</button></td></tr><tr data-id="2"><td>2026-08-05 10:04</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st cx">취소 완료</span></td><td></td><td class="num">71,500</td>
-      <td class="num"><span class="red">−71,500</span><div class="hint cxd">08-05 14:30</div></td>
-      <td>8월 서비스 이용료<div class="rs"><b>취소</b> <span class="ctag">중복 결제</span>같은 날 두 번 결제<span class="hint"> · 등록자 김운영</span></div></td>
-      <td class="ctr"></td></tr><tr data-id="1"><td>2026-08-05 10:02</td><td><span class="wy">정기</span></td><td>2026-08</td><td><span class="st ok">성공</span></td><td></td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>8월 서비스 이용료</td>
-      <td class="ctr"><button class="btn sm line" data-bank="1">수기 취소 처리</button></td></tr><tr data-id="0"><td>2026-07-05 10:03</td><td><span class="wy">정기</span></td><td>2026-07 <span class="st fail">미결제</span></td><td><span class="st fail">실패</span></td><td>기타오류(8324 : 거래 정지 카드)</td><td class="num">71,500</td>
-      <td class="num"></td>
-      <td>7월 서비스 이용료</td>
-      <td class="ctr"></td></tr></tbody></table></div><div class="dim"></div><div class="mdl wide" id="svcMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-close="">×</button></div>
+    <tbody><tr id="fSvcRow" style="cursor:pointer"><td><b>굿팜 솔루션 (NEW)</b></td><td>2026-11-20</td><td>2026-11-24</td><td>미정</td><td>2026-12-05</td><td class="num">66,000</td><td>설치 예정</td><td>서명 완료</td><td>이영업 · 2026-11-24</td></tr></tbody></table>
+    <div class="opt"><div class="chips" id="fChips"><span class="chip" data-fmod="1">스마트 OCR</span><span class="chip" data-fmod="1">굿팜 POS</span><span class="chip" data-fmod="1">스마트2D</span></div><div class="chips-lg">옵션 3개 · 12월 청구 예정 <b style="color:#2b2f33">66,000</b> (VAT 포함 · 데모 옵션 0원) · 칩을 누르면 약국 서비스 수정</div></div>
+    <div class="opt" id="fLog"><b style="color:#1f2328">서비스 변경 이력</b> <span class="fflt"><span class="on" data-fflt="전체">전체</span><span class="" data-fflt="옵션">옵션</span><span class="" data-fflt="데모">데모</span><span class="" data-fflt="일정 변경">일정 변경</span></span><table class="tbl" id="fLogTbl" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody><tr><td>2026-11-24 10:05</td><td>이영업</td><td><b>서비스 등록</b></td><td style="color:#8a9099">없음</td><td style="color:#c2410c;font-weight:700">굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS · 스마트2D</td><td>2026년 12월 청구분</td></tr></tbody></table><div class="hint">현재 등록 내역은 위 목록, 바뀐 내용은 이 이력에 한 번 기록돼요.</div></div>
+  </div><div class="dim" data-fclose=""></div><div class="mdl wide" id="fMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-fclose="">×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">서비스</span><div class="ro">굿팜 솔루션 (NEW)</div></div>
-    <div class="fr" id="dSchRow"><span class="fl">계약 · 설치 일정</span><div><div class="schh"><b>최근 2회차 · 2026-09-12 김운영</b><button class="btn sm" id="schEdit">수정</button></div><div class="hint">옵션마다 적용된 회차의 일정은 아래 옵션 표에 보여요. 새로 설치 · 재설치 · 옵션 추가 · 해지가 생기면 [수정]으로 새 일정을 등록해요</div></div></div>
-    <div class="fr" id="dSchHist"><span class="fl">일정 이력</span><div style="min-width:0;overflow-x:auto"><table class="tbl sch" id="schHist"><thead><tr><th>회차</th><th>등록</th><th>적용 옵션</th><th>신청일</th><th>설치 예정일</th><th>계약일</th><th>설치일</th><th>과금 시작일</th><th>해지일</th><th>해지 사유</th><th>메모</th></tr></thead><tbody><tr><td>2회차 <span class="st ok">현재</span></td><td>김운영<div class="hint">2026-09-12 14:20</div></td><td>굿팜 POS</td><td>2024-04-22</td><td class="chg">2026-09-15</td><td>2024-04-22</td><td class="chg">2026-09-16</td><td>2024-06-05</td><td>−</td><td>−</td><td>POS 장비 교체 재설치</td></tr><tr><td>1회차</td><td>이영업<div class="hint">2024-04-22 09:30</div></td><td>스마트 OCR · 굿팜 POS</td><td>2024-04-22</td><td>2024-04-30</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td>−</td><td>−</td><td>최초 등록</td></tr></tbody></table><div class="hint">바뀐 값은 주황색 — 바로 앞 회차와 비교</div></div></div>
-    <div class="optWrap"><table class="tbl" id="optTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th class="num">총액</th><th>서비스 상태</th><th>신청일</th><th>설치 예정일</th><th>계약일</th><th>설치일</th><th>과금 시작일</th><th>해지일</th><th>회차</th></tr></thead>
-      <tbody><tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td class="num">45,000</td><td><span class="seg dmSeg"><select class="fi sm stSel" style="width:92px"><option>신청</option><option>설치 예정</option><option>설치 완료</option><option>데모</option><option selected="">승인</option><option>해지</option></select><span class="seg demoPer" style="display:none"><select class="fi sm" style="width:92px"><option selected="">2026-11</option></select><span class="ro">~</span><select class="fi sm" style="width:92px"><option selected="">2026-12</option></select></span></span></td><td class="dt6">2024-04-22</td><td class="dt6">2024-04-30</td><td class="dt6">2024-04-22</td><td class="dt6">2024-05-02</td><td class="dt6">2024-06-05</td><td class="dt6">−</td><td>1회차</td></tr><tr><td>굿팜 POS</td><td class="num">20,000</td><td class="num">1</td><td class="num">50%</td><td class="num">10,000</td><td><span class="seg dmSeg"><select class="fi sm stSel" style="width:92px"><option>신청</option><option>설치 예정</option><option>설치 완료</option><option>데모</option><option selected="">승인</option><option>해지</option></select><span class="seg demoPer" style="display:none"><select class="fi sm" style="width:92px"><option selected="">2026-11</option></select><span class="ro">~</span><select class="fi sm" style="width:92px"><option selected="">2026-12</option></select></span></span></td><td class="dt6">2024-04-22</td><td class="dt6">2026-09-15</td><td class="dt6">2024-04-22</td><td class="dt6">2026-09-16</td><td class="dt6">2024-06-05</td><td class="dt6">−</td><td>2회차</td></tr><tr><td>스마트2D</td><td class="num">30,000</td><td class="num">1</td><td class="num">0%</td><td class="num">30,000</td><td><span class="seg dmSeg"><select class="fi sm stSel" style="width:92px"><option>신청</option><option>설치 예정</option><option>설치 완료</option><option selected="">데모</option><option>승인</option><option>해지</option></select><span class="seg demoPer" style=""><select class="fi sm" style="width:92px"><option selected="">2026-11</option><option>2026-12</option></select><span class="ro">~</span><select class="fi sm" style="width:110px"><option>기간 없음</option><option>2026-11</option><option selected="">2026-12</option><option>2027-01</option><option>2027-06</option><option>2027-10</option></select></span></span></td><td class="dt6">2024-04-22</td><td class="dt6">2024-04-30</td><td class="dt6">2024-04-22</td><td class="dt6">2024-05-02</td><td class="dt6">2024-06-05</td><td class="dt6">−</td><td>1회차</td></tr>
-      
-      <tr class="tot"><td colspan="4">옵션 총액 <span class="hint">(데모 옵션 제외)</span></td><td class="num">55,000원</td><td colspan="8"></td></tr></tbody></table></div>
-    <div class="fr" id="dAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" id="dAmt" value="10,000"></div></div>
-    <div class="fr" id="dCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="dCat"><option value="계약 할인" selected="">계약 할인</option><option value="보상 · 테스트">보상 · 테스트</option><option value="기타">기타</option></select></div></div>
-    <div class="fr" id="dMemoRow"><span class="fl">메모<span class="req" id="dReq">*</span></span><div><input class="fi" id="dMemo" value="DRS 파머시 퍼스트 중복" placeholder="기타 사유를 입력하세요"></div></div>
-    <div class="fr" id="dWhoRow"><span class="fl">등록자</span><div><select class="fi" id="dWho" style="width:220px"><option selected="">김운영</option><option>이영업</option><option>박운영</option><option>최영업</option></select></div></div>
-    <div class="fr" id="dTotRow"><span class="fl">총 과금액</span><div class="ro"><b id="dTot">45,000원</b></div></div>
+    <div class="fr" id="fComRow"><span class="fl">공통 일정</span><div><div class="schh"><b>모든 옵션에 같이 적용되는 일정</b><button class="btn sm" data-fedit="">일정 수정</button></div>
+      <div class="fcg"><div><span>신청일</span><b>2026-11-20</b></div><div><span>설치 예정일</span><b>2026-12-05</b></div><div><span>계약일</span><b>2026-11-24</b></div><div><span>설치일</span><b>미정</b></div><div><span>과금 시작일</span><b>2026-12-05</b></div><div><span>해지일</span><b>미정</b></div></div>
+      <div class="hint">한 옵션만 달라지면 그 옵션에서 직접 지정해요 · 해지할 때는 해지일과 해지 사유를 함께 기록해요</div>
+      <div style="margin-top:6px" id="fHistRow"><button class="hbtn" data-fhist="">일정 변경 이력 0건 ▾</button></div></div></div>
+    
+    <table class="tbl" id="fOptTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th class="num">총액</th><th>서비스 상태</th><th>일정</th></tr></thead><tbody>
+    <tr><td>스마트 OCR</td><td class="num">45,000</td><td class="num">1</td><td class="num">0%</td><td class="num">45,000</td>
+      <td><span class="dmSeg"><select class="fi sm" style="width:110px" data-fst="스마트 OCR"><option>신청</option><option selected="">설치 예정</option><option>설치 완료</option><option>데모</option><option>승인</option><option>해지</option></select></span></td>
+      <td><span class="hint" style="margin:0">공통 일정</span></td></tr><tr><td>굿팜 POS</td><td class="num">무료</td><td class="num">1</td><td class="num">0%</td><td class="num">0</td>
+      <td><span class="dmSeg"><select class="fi sm" style="width:110px" data-fst="굿팜 POS"><option>신청</option><option selected="">설치 예정</option><option>설치 완료</option><option>데모</option><option>승인</option><option>해지</option></select></span></td>
+      <td><span class="hint" style="margin:0">공통 일정</span></td></tr><tr><td>스마트2D</td><td class="num">30,000</td><td class="num">1</td><td class="num">50%</td><td class="num">15,000</td>
+      <td><span class="dmSeg"><select class="fi sm" style="width:110px" data-fst="스마트2D"><option>신청</option><option selected="">설치 예정</option><option>설치 완료</option><option>데모</option><option>승인</option><option>해지</option></select></span></td>
+      <td><span class="hint" style="margin:0">공통 일정</span></td></tr></tbody></table>
+    <div class="fr" id="fAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" placeholder="없음" value=""></div></div>
+    <div class="fr" id="fWhoRow"><span class="fl">등록자</span><div><select class="fi" id="fWho" style="width:220px"><option selected="">김운영</option><option>이영업</option><option>박운영</option><option>최영업</option></select><div class="hint">기본값 = 로그인한 관리자(김운영) · 고른 등록자와 실제로 저장한 관리자를 따로 기록</div></div></div>
+    <div class="fr" id="fTotRow"><span class="fl">12월 청구 예정</span><div class="ro"><b>60,000원</b> (부가세 별도) · <b>66,000원</b> (부가세 포함)</div></div>
   </div>
-  <div class="mf"><button class="btn" data-close="">취소</button><button class="btn pri" data-toast="시안 — 저장되지 않습니다">저장</button></div></div></div>
+  <div class="mf"><button class="btn" data-fclose="">취소</button><button class="btn pri" data-foptsave="">저장</button></div></div></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>

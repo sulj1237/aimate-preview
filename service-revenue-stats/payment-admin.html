@@ -104,6 +104,11 @@
 .dmck{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}
 /* 옵션 표 서비스 상태 칸 — 데모 기간은 상태 아래 줄로(표가 창 밖으로 넘치지 않게, 11-26) */.dmSeg{display:flex!important;flex-direction:column;align-items:flex-start;gap:4px}.dmSeg .demoPer{margin-left:0}.dmSeg .fi{height:26px!important;font-size:11px!important;padding:0 4px!important;width:84px!important}.dmSeg .demoPer .fi{width:80px!important}#optTbl td{vertical-align:top}.optWrap{overflow-x:auto}#demoPer,.demoPer{display:inline-flex;align-items:center;gap:4px;margin-left:6px}#demoPer .fi{width:96px;height:28px;font-size:12px;padding:0 6px}
 .st.ex{background:#fff3d6;color:#a86b00}
+.fcg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.fcg div{background:#f7f8fa;border-radius:6px;padding:6px 8px}.fcg span{display:block;font-size:11px;color:#8a9099}.fcg b{font-size:12.5px}
+.hbtn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;color:#3d444b}
+.fflt span{display:inline-block;border:1px solid var(--line);border-radius:12px;padding:1px 9px;margin-left:4px;font-size:11.5px;cursor:pointer;color:#4b5158;background:#fff}.fflt span.on{background:#eef0fc;border-color:#c7cdf5;color:#3b4bc8;font-weight:700}
+.lnk{border:0;background:none;color:#159b8d;font-size:11.5px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0}
+.dmr td{background:#f5f8ff}.dmt{display:inline-block;background:#2f5bd6;color:#fff;font-size:11px;font-weight:700;border-radius:3px;padding:0 6px;margin-right:4px}
 </style>
 </head>
 <body>
@@ -241,7 +246,7 @@ function subPanel(){
   return `<div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>${PH.method}</div><div class="k">결제카드정보</div><div>${PH.card} &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
-  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
+  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm" onclick="window.open('index.html#pay','_blank')">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액 · 취소일</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody>${[...HIST].sort((a,b)=>b[1].localeCompare(a[1])).map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
       return `<tr data-id="${h[0]}"><td>${h[1]}</td><td><span class="wy">${isMan(h)?'수기':'정기'}</span></td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span>${h[3]==='bank'?' <span class="wy">수기 취소</span>':''}</td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
@@ -369,7 +374,164 @@ function bindAll(){
       if($('mpHint')) $('mpHint').textContent=hintOf(PAY_CAT,c); };
     let e0=null; ['mpCat','mpBm','mpMemo'].forEach(id=>{ $(id).oninput=u; $(id).onchange=u; }); u(); }
 }
-function render(){ renderBase(); }
+
+/* ───────── 흐름 예시(흐름도 3번) — 새봄약국 · 굿팜 솔루션 (NEW) 신규 계약 ─────────
+   11-26 확정: 서비스 = 굿팜 솔루션 (NEW) 하나, 옵션이 운영 단위(금액 · 수량 · 서비스별 할인 · 상태). 공통 일정 한 벌 + 옵션별 '공통 일정 사용 / 직접 지정 / 미정'
+   ① POS 설치 예정일만 12.05 → 12.08 직접 지정 → 이력 한 건(적용 시작월 —)   ② 스마트2D 데모 2026-12 ~ 2027-01 → 12월 계산 내역 스마트2D 데모 적용 · 0원
+   이력은 서비스 변경 이력에 한 번 저장 → 수정 모달에는 같은 기록 중 일정 관련 건만 '일정 변경 이력 N건 ▾'
+   [개발] 지금 서버는 마지막 수정 시각만 남음 → 변경 건별 일시 · 선택한 등록자 · 실제 저장한 관리자 · 적용 옵션 · 항목 · 변경 전 · 변경 후 · 적용 시작월 · 메모 저장 필요 */
+const FK=['신청일','설치 예정일','계약일','설치일','과금 시작일','해지일'];
+let F;
+function fInit(){
+  F={common:{'신청일':'2026-11-20','설치 예정일':'2026-12-05','계약일':'2026-11-24','설치일':null,'과금 시작일':'2026-12-05','해지일':null},
+     opts:[{n:'스마트 OCR',p:45000,q:1,dc:0,st:'설치 예정',s:{}},{n:'굿팜 POS',p:0,q:1,dc:0,st:'설치 예정',s:{},free:1},{n:'스마트2D',p:30000,q:1,dc:50,st:'설치 예정',s:{},demo:['2026-12','2027-01']}],
+     log:[['2026-11-24 10:05','이영업','서비스','서비스 등록','없음','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS · 스마트2D','2026-12']],
+     pg:'list', edit:0, scope:'opt', sel:new Set(['굿팜 POS']), form:{}, cform:{}, memo:'', who:'김운영', hist:0, flt:'전체', dr:{} };
+}
+fInit();
+const fMode=(o,k)=>(o.s[k]||{m:'c'}).m;
+const fEff=(o,k)=>{ const x=o.s[k]; if(!x||x.m==='c') return F.common[k]; return x.m==='u'?null:x.v; };
+const fLab=(o,k)=>{ const m=fMode(o,k),v=fEff(o,k); return m==='c'?`${v||'미정'} (공통)`:m==='u'?'미정':`${v} (직접 지정)`; };
+const fInd=o=>FK.filter(k=>fMode(o,k)!=='c');
+const fmd=d=>d?d.slice(5).replace('-','.'):'';
+// 12월 청구 예정 — 데모 옵션은 그 기간 청구분 0원, 결합 할인은 서비스별 할인 그대로
+const fAmt=(o,ym)=>{ if(o.st==='데모'&&o.demo&&o.demo[0]<=ym&&ym<=o.demo[1]) return 0; return o.p*o.q*(100-o.dc)/100; };
+const fTot=ym=>F.opts.filter(o=>o.st!=='해지').reduce((a,o)=>a+fAmt(o,ym),0);
+function fChips(){
+  return '<div class="chips" id="fChips">'+F.opts.map(o=>{ const ind=fInd(o).length?'<span class="s" style="background:#fff1e6;color:#c2410c">개별 일정</span>':'';
+    if(o.st==='데모'){ const [a,b]=o.demo; return `<span class="chip dmo" data-fmod="1">${o.n}<span class="s">데모</span><span class="p">${a.replace('-','.')} ~ ${b.replace('-','.')}</span>${ind}</span>`; }
+    return `<span class="chip" data-fmod="1">${o.n}${ind}</span>`; }).join('')+'</div>';
+}
+function fLogTbl(rows,id){
+  return `<table class="tbl" id="${id}" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody>${rows.length?rows.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td><td><b>${l[3]}</b>${l[7]?`<div class="hint">메모: ${esc(l[7])}</div>`:''}</td><td style="color:#8a9099">${l[4]}</td><td style="color:#c2410c;font-weight:700">${l[5]}</td><td>${l[6]?(+l[6].slice(0,4))+'년 '+(+l[6].slice(5))+'월 청구분':'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="hint">이 종류의 변경 이력이 없어요</td></tr>'}</tbody></table>`;
+}
+function fList(){
+  const FL=['전체','옵션','데모','일정 변경'], rows=F.log.filter(l=>F.flt==='전체'||l[2]===F.flt);
+  return `<div class="panel"><div class="ph"><h3>새봄약국</h3><span class="sub">스토어 ID 2026112xxxx · 흐름도 3번 예시(신규 계약)</span></div></div>
+  <div class="panel" id="fSvcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
+    <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
+    <tbody><tr id="fSvcRow" style="cursor:pointer"><td><b>굿팜 솔루션 (NEW)</b></td><td>${F.common['신청일']}</td><td>${F.common['계약일']}</td><td>${F.common['설치일']||'미정'}</td><td>${F.common['과금 시작일']||'미정'}</td><td class="num">${fmt(Math.round(fTot('2026-12')*1.1))}</td><td>설치 예정</td><td>서명 완료</td><td>이영업 · 2026-11-24</td></tr></tbody></table>
+    <div class="opt">${fChips()}<div class="chips-lg">옵션 ${F.opts.length}개 · 12월 청구 예정 <b style="color:#2b2f33">${fmt(Math.round(fTot('2026-12')*1.1))}</b> (VAT 포함 · 데모 옵션 0원) · 칩을 누르면 약국 서비스 수정</div></div>
+    <div class="opt" id="fLog"><b style="color:#1f2328">서비스 변경 이력</b> <span class="fflt">${FL.map(f=>`<span class="${F.flt===f?'on':''}" data-fflt="${f}">${f}</span>`).join('')}</span>${fLogTbl(rows,'fLogTbl')}<div class="hint">현재 등록 내역은 위 목록, 바뀐 내용은 이 이력에 한 번 기록돼요.</div></div>
+  </div>`;
+}
+function fSchCell(o){ const d=fInd(o); if(!d.length) return '<span class="hint" style="margin:0">공통 일정</span>'; return d.map(k=>fMode(o,k)==='u'?`${k} <b>미정</b>`:`${k} <b style="color:#c2410c">${fmd(fEff(o,k))}</b>`).join(' · '); }
+function fEdit(){
+  const sel=F.opts.filter(o=>F.sel.has(o.n)); let body='';
+  if(F.scope==='common'){
+    body=`<table class="tbl" id="fEditTbl"><thead><tr><th>항목</th><th>현재 공통 값</th><th>변경</th><th>함께 바뀌는 옵션</th></tr></thead><tbody>${FK.map(k=>{ const fol=F.opts.filter(o=>fMode(o,k)==='c').map(o=>o.n), own=F.opts.filter(o=>fMode(o,k)!=='c').map(o=>o.n);
+      return `<tr><td>${k}</td><td>${F.common[k]||'미정'}</td><td><input class="fi" type="date" style="width:150px;height:30px" data-fc="${k}" value="${F.cform[k]??(F.common[k]||'')}"></td><td>${fol.join(' · ')||'—'}${own.length?`<div class="hint">${own.join(' · ')}는 직접 지정 · 미정 값을 유지</div>`:''}</td></tr>`; }).join('')}</tbody></table>`;
+  } else {
+    body=`<div style="margin-bottom:8px;font-size:12.5px">적용 옵션 ${F.opts.map(o=>`<label style="margin-right:12px"><input type="checkbox" data-fsel="${o.n}" ${F.sel.has(o.n)?'checked':''}> ${o.n}</label>`).join('')}</div>
+    ${sel.length?`<table class="tbl" id="fEditTbl"><thead><tr><th>항목</th><th>현재</th><th>변경</th></tr></thead><tbody>${FK.map(k=>{ const labs=[...new Set(sel.map(o=>fLab(o,k)))], f=F.form[k]||{m:'keep'}, anyD=sel.some(o=>fMode(o,k)!=='c');
+      return `<tr><td>${k}</td><td>${labs.length>1?'<b style="color:#a86b00">값이 서로 다름</b>':labs[0]}${anyD&&f.m==='keep'?` <button class="lnk" data-frev="${k}">공통 일정으로 되돌리기</button>`:''}</td><td><select class="fi" style="width:140px;height:30px" data-fm="${k}">${[['keep','그대로'],['c','공통 일정 사용'],['d','직접 지정'],['u','미정']].map(([v,t])=>`<option value="${v}" ${f.m===v?'selected':''}>${t}</option>`).join('')}</select>${f.m==='d'?` <input class="fi" type="date" style="width:150px;height:30px" data-fv="${k}" value="${f.v||''}">`:''}</td></tr>`; }).join('')}</tbody></table>
+    ${sel.length>1?`<div class="hint" id="fTarget">반영 대상 : <b>${sel.map(o=>o.n).join(' · ')}</b> — 바꾼 항목만 이 옵션들에 반영돼요</div>`:''}`:'<div class="hint">옵션을 하나 이상 고르세요</div>'}`;
+  }
+  return `<div class="fr" id="fEditRow"><span class="fl">일정 수정</span><div style="border:1px solid #1fb6a6;border-radius:8px;padding:10px 12px;background:#f3fbfa">
+   <div style="margin-bottom:8px;font-size:12.5px">적용 대상 <label style="margin:0 12px 0 8px"><input type="radio" name="fsc" value="common" ${F.scope==='common'?'checked':''}> 공통 일정 수정</label><label><input type="radio" name="fsc" value="opt" ${F.scope==='opt'?'checked':''}> 선택한 옵션만 수정</label></div>
+   ${body}
+   <div style="display:flex;gap:8px;align-items:center;margin-top:8px;white-space:nowrap"><span style="font-size:12px;color:#5b6168">메모</span><input class="fi" style="height:30px;flex:1" id="fMemo" value="${esc(F.memo)}" placeholder="예: POS 장비 입고 지연"><button class="btn sm" style="flex:none" data-fcancel>수정 취소</button><button class="btn sm pri" style="flex:none" data-fsave>저장</button></div></div></div>`;
+}
+function fChanges(){
+  const out=[];
+  if(F.scope==='common'){ FK.forEach(k=>{ const nv=F.cform[k]; if(nv===undefined||nv===(F.common[k]||'')) return;
+      F.opts.filter(o=>fMode(o,k)==='c').forEach(o=>out.push({o:o.n,k,b:fLab(o,k),a:`${nv||'미정'} (공통)`}));
+      out.push({common:1,k,ap:()=>{F.common[k]=nv||null;}}); }); }
+  else F.opts.filter(o=>F.sel.has(o.n)).forEach(o=>FK.forEach(k=>{ const f=F.form[k]; if(!f||f.m==='keep'||(f.m==='d'&&!f.v)) return;
+    const b=fLab(o,k), a=f.m==='c'?`${F.common[k]||'미정'} (공통)`:f.m==='u'?'미정':`${f.v} (직접 지정)`; if(a===b) return;
+    out.push({o:o.n,k,b,a,ap:()=>{o.s[k]=f.m==='c'?{m:'c'}:f.m==='u'?{m:'u'}:{m:'d',v:f.v};}}); }));
+  return out;
+}
+function fSave(){
+  const ch=fChanges(); if(!ch.length){ toast('바뀐 항목이 없어요'); return; }
+  const g={}; ch.filter(c=>!c.common).forEach(c=>(g[c.o]=g[c.o]||[]).push(c));
+  Object.entries(g).reverse().forEach(([o,cs])=>F.log.unshift(['2026-11-26 10:30',F.who,'일정 변경','일정 변경 · '+o,cs.map(c=>`${c.k} ${c.b}`).join('<br>'),cs.map(c=>`${c.k} ${c.a}`).join('<br>'),cs.some(c=>c.k==='과금 시작일'||c.k==='해지일')?'2026-12':'',F.memo]));
+  ch.forEach(c=>c.ap&&c.ap()); F.edit=0; F.form={}; F.cform={}; F.pg='list'; F.flt='전체'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요');
+}
+function fModal(){
+  const hl=F.log.filter(l=>l[2]==='일정 변경');
+  return `<div class="dim" data-fclose></div><div class="mdl wide" id="fMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-fclose>×</button></div>
+  <div class="mb">
+    <div class="fr"><span class="fl">서비스</span><div class="ro">굿팜 솔루션 (NEW)</div></div>
+    <div class="fr" id="fComRow"><span class="fl">공통 일정</span><div><div class="schh"><b>모든 옵션에 같이 적용되는 일정</b>${F.edit?'':'<button class="btn sm" data-fedit>일정 수정</button>'}</div>
+      <div class="fcg">${FK.map(k=>`<div><span>${k}</span><b>${F.common[k]||'미정'}</b></div>`).join('')}</div>
+      <div class="hint">한 옵션만 달라지면 그 옵션에서 직접 지정해요 · 해지할 때는 해지일과 해지 사유를 함께 기록해요</div>
+      <div style="margin-top:6px" id="fHistRow"><button class="hbtn" data-fhist>일정 변경 이력 ${hl.length}건 ${F.hist?'▴':'▾'}</button>${F.hist?fLogTbl(hl,'fHistTbl'):''}</div></div></div>
+    ${F.edit?fEdit():''}
+    <table class="tbl" id="fOptTbl"><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">서비스별 할인</th><th class="num">총액</th><th>서비스 상태</th><th>일정</th></tr></thead><tbody>
+    ${F.opts.map(o=>{ const d=F.dr[o.n]||{st:o.st,demo:o.demo?[...o.demo]:null}; return `<tr><td>${o.n}</td><td class="num">${o.free?'무료':fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">${fmt(o.p*o.q*(100-o.dc)/100)}</td>
+      <td><span class="dmSeg"><select class="fi sm" style="width:110px" data-fst="${o.n}">${ST_OPTS.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select>${d.st==='데모'?`<span class="seg demoPer" style="display:inline-flex;gap:4px;align-items:center"><select class="fi sm" style="width:96px" data-fd0="${o.n}">${['2026-12','2027-01'].map(m=>`<option ${m===d.demo[0]?'selected':''}>${m}</option>`).join('')}</select>~<select class="fi sm" style="width:96px" data-fd1="${o.n}">${['2026-12','2027-01','2027-02'].map(m=>`<option ${m===d.demo[1]?'selected':''}>${m}</option>`).join('')}</select></span>`:''}</span></td>
+      <td>${fSchCell(o)}</td></tr>`; }).join('')}</tbody></table>
+    <div class="fr" id="fAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" placeholder="없음"></div></div>
+    <div class="fr" id="fWhoRow"><span class="fl">등록자</span><div><select class="fi" id="fWho" style="width:220px">${STAFF.map(n=>`<option ${n===F.who?'selected':''}>${n}</option>`).join('')}</select><div class="hint">기본값 = 로그인한 관리자(김운영) · 고른 등록자와 실제로 저장한 관리자를 따로 기록</div></div></div>
+    <div class="fr" id="fTotRow"><span class="fl">12월 청구 예정</span><div class="ro"><b>${fmt(fPend())}원</b> (부가세 별도) · <b>${fmt(Math.round(fPend()*1.1))}원</b> (부가세 포함)</div></div>
+  </div>
+  <div class="mf"><button class="btn" data-fclose>취소</button><button class="btn pri" data-foptsave>저장</button></div></div>`;
+}
+function fPend(){ return F.opts.reduce((a,o)=>{ const d=F.dr[o.n]; const x=d?{...o,st:d.st,demo:d.demo}:o; return a+fAmt(x,'2026-12'); },0); }
+function fOptSave(){
+  const ch=[]; F.opts.forEach(o=>{ const d=F.dr[o.n]; if(!d) return; const sb=o.st+(o.st==='데모'?` (${o.demo[0]} ~ ${o.demo[1]})`:''), sa=d.st+(d.st==='데모'?` (${d.demo[0]} ~ ${d.demo[1]})`:'');
+    if(sb!==sa) ch.push({o,d,sb,sa}); });
+  if(!ch.length){ F.pg='list'; render(); return; }
+  const before=Math.round(fTot('2026-12')*1.1);
+  ch.forEach(c=>{ c.o.st=c.d.st; if(c.d.st==='데모') c.o.demo=[...c.d.demo]; });
+  const after=Math.round(fTot('2026-12')*1.1);
+  ch.reverse().forEach(c=>F.log.unshift(['2026-11-26 10:40',F.who,c.d.st==='데모'?'데모':'옵션',(c.d.st==='데모'?'데모 지정 · ':'옵션 상태 변경 · ')+c.o.n,c.sb,c.sa+(before!==after?`<div class="hint" style="color:#5b6168">12월 청구 예정 ${fmt(before)} → ${fmt(after)}</div>`:''),c.d.st==='데모'?c.d.demo[0]:'2026-12','']));
+  F.dr={}; F.pg='list'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요');
+}
+function fCalc(){
+  const rows=F.opts.map(o=>{ const v=Math.round(o.p*o.q*1.1), dc=Math.round(o.p*o.q*o.dc/100*1.1), am=Math.round(fAmt(o,'2026-12')*1.1), demo=o.st==='데모'&&am===0;
+    const why=o.free?'무료 — 함께 쓰는 서비스에만 청구':demo?`<span class="dmt">데모 적용 · 0원</span> ${o.demo[0]} ~ ${o.demo[1]} 청구분`:o.dc?'결합 할인 50%':'정가(가장 높은 서비스)';
+    return `<tr${demo?' class="dmr"':''}><td>${o.n}</td><td class="num">${o.q}</td><td class="num">${o.free?0:fmt(v)}</td><td class="num">${demo?'−':dc?'<span class="red">−'+fmt(dc)+'</span>':0}</td><td class="num"><b>${fmt(am)}</b></td><td>${why}</td></tr>`; }).join('');
+  const t=Math.round(fTot('2026-12')*1.1);
+  return `<div class="dim" data-fclose></div><div class="mdl wide" id="fCalcMdl" style="width:760px"><div class="mh"><div><div class="hint" style="margin:0">통계 › 서비스 청구 통계 › 청구 예정 (2026-12) · 계산 내역</div><h3>새봄약국</h3></div><button class="x" data-fclose>×</button></div>
+  <div class="mb"><b style="font-size:13px">청구 예정 · 2026-12</b>
+   <table class="tbl" id="fCalcTbl"><thead><tr><th>서비스 옵션</th><th class="num">수량</th><th class="num">정가</th><th class="num">결합 · VIP 할인</th><th class="num">금액</th><th>계산식</th></tr></thead><tbody>${rows}
+   <tr><td colspan="4"><b>서비스 요금</b></td><td class="num"><b>${fmt(t)}</b></td><td></td></tr>
+   <tr style="background:#fff8f6"><td colspan="4">금액 할인</td><td class="num">0</td><td class="hint">약국 총액에서 차감</td></tr>
+   <tr><td colspan="4"><b>결제 예정 금액</b></td><td class="num"><b>${fmt(t)}원</b></td><td class="hint">서비스 요금과 같음</td></tr></tbody></table>
+   <div class="hint">데모 옵션은 데모 기간 청구분에서 그 옵션만 0원 · 함께 쓰는 유료 옵션은 기존 요금 그대로 · 데모가 끝난 뒤 자동 전환 없음(담당자가 승인으로 바꾸기 전까지 0원)</div></div></div>`;
+}
+function renderFlow(){
+  side(); document.querySelectorAll('.demo button').forEach(b=>b.classList.remove('on'));
+  $('content').innerHTML=fList()+(F.pg==='mod'?fModal():F.pg==='calc'?fCalc():'');
+  const q=x=>document.querySelectorAll(x);
+  q('[data-fmod]').forEach(b=>b.onclick=()=>{F.pg='mod';render();}); const r=$('fSvcRow'); if(r) r.onclick=()=>{F.pg='mod';render();};
+  q('[data-fclose]').forEach(b=>b.onclick=()=>{F.pg='list';F.edit=0;F.dr={};render();});
+  q('[data-fedit]').forEach(b=>b.onclick=()=>{F.edit=1;render();});
+  q('[data-fcancel]').forEach(b=>b.onclick=()=>{F.edit=0;F.form={};F.cform={};render();});
+  q('[data-fhist]').forEach(b=>b.onclick=()=>{F.hist=!F.hist;render();});
+  q('[data-fflt]').forEach(b=>b.onclick=()=>{F.flt=b.dataset.fflt;render();});
+  q('input[name=fsc]').forEach(x=>x.onchange=()=>{F.scope=x.value;render();});
+  q('[data-fsel]').forEach(x=>x.onchange=()=>{x.checked?F.sel.add(x.dataset.fsel):F.sel.delete(x.dataset.fsel);render();});
+  q('[data-fm]').forEach(x=>x.onchange=()=>{const k=x.dataset.fm;F.form[k]={m:x.value,v:(F.form[k]||{}).v};render();});
+  q('[data-fv]').forEach(x=>x.onchange=()=>{F.form[x.dataset.fv].v=x.value;});
+  q('[data-frev]').forEach(b=>b.onclick=()=>{F.form[b.dataset.frev]={m:'c'};render();});
+  q('[data-fc]').forEach(x=>x.onchange=()=>{F.cform[x.dataset.fc]=x.value;});
+  q('[data-fsave]').forEach(b=>b.onclick=()=>{ const m=$('fMemo'); if(m) F.memo=m.value; fSave(); });
+  q('[data-fst]').forEach(x=>x.onchange=()=>{ const o=F.opts.find(y=>y.n===x.dataset.fst); F.dr[o.n]={st:x.value,demo:o.demo?[...o.demo]:['2026-12','2027-01']}; render(); });
+  q('[data-fd0]').forEach(x=>x.onchange=()=>{F.dr[x.dataset.fd0].demo[0]=x.value;render();});
+  q('[data-fd1]').forEach(x=>x.onchange=()=>{F.dr[x.dataset.fd1].demo[1]=x.value;render();});
+  q('[data-foptsave]').forEach(b=>b.onclick=fOptSave);
+  const w=$('fWho'); if(w) w.onchange=()=>{F.who=w.value;};
+}
+// 스토리보드 장면 — 흐름도 3번 클릭 순서
+function fScene(n){
+  fInit(); S.f=1;
+  const posSave=()=>{ F.scope='opt'; F.sel=new Set(['굿팜 POS']); F.form={'설치 예정일':{m:'d',v:'2026-12-08'}}; F.memo='POS 장비 입고 지연'; fSave(); };
+  if(n==='mod'){ F.pg='mod'; }
+  if(n==='edit'){ F.pg='mod'; F.edit=1; F.scope='opt'; F.sel=new Set(['굿팜 POS']); F.form={'설치 예정일':{m:'d',v:'2026-12-08'}}; F.memo='POS 장비 입고 지연'; }
+  if(n==='posSaved'){ posSave(); }
+  if(n==='posHist'){ posSave(); F.pg='mod'; F.hist=1; }
+  if(n==='common'){ posSave(); F.pg='mod'; F.edit=1; F.scope='common'; F.cform={'설치 예정일':'2026-12-10'}; }
+  if(n==='commonSaved'){ posSave(); F.scope='common'; F.cform={'설치 예정일':'2026-12-10'}; F.memo='설치 일정 조정'; fSave(); F.pg='mod'; F.hist=1; }
+  if(n==='demo'){ F.pg='mod'; F.dr={'스마트2D':{st:'데모',demo:['2026-12','2027-01']}}; }
+  if(n==='demoSaved'){ F.dr={'스마트2D':{st:'데모',demo:['2026-12','2027-01']}}; fOptSave(); }
+  if(n==='calc'){ F.dr={'스마트2D':{st:'데모',demo:['2026-12','2027-01']}}; fOptSave(); F.pg='calc'; }
+  render();
+}
+
+function render(){ if(S.f) return renderFlow(); renderBase(); }
 function renderBase(){
   side();
   document.querySelectorAll('.demo button').forEach(b=>b.classList.toggle('on',b.dataset.go===S.page));
@@ -381,10 +543,12 @@ function renderBase(){
   if($('cxCat')) memoReq('cxCat','cxMemo','cxReq',$('cxGo'),S.page==='bank');   // 수기 취소 처리는 메모 항상 필수
   if($('mpCat')) memoReq('mpCat','mpMemo','mpReq',document.querySelector('#mpMdl .btn.pri'));
 }
-function go(p){ if(p!=='svc') S.sedit=0; S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
+function go(p){ S.f=0; if(p!=='svc') S.sedit=0; S.page=p; if(p==='cancel'&&!S.cid) S.cid=6; render(); }
 S.cid=6;
 const P0=new URLSearchParams(location.search).get('p'); if(['svc','sub','cancel','bank','manual','payback'].includes(P0)) S.page=P0;
-render();
+// 다른 화면에서 #svcLog · #histPanel 로 열면 그 위치로(11-26)
+setTimeout(()=>{ const h=location.hash&&document.getElementById(location.hash.slice(1)); if(h) h.scrollIntoView({block:'start'}); },60);
+const FS=new URLSearchParams(location.search).get('f'); if(FS) fScene(FS); else render();
 </script>
 </body>
 </html>
