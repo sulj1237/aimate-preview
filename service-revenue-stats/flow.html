@@ -4,220 +4,115 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>결제 · 등록 흐름도</title>
-<!-- 결제 · 등록 흐름도: 슈퍼어드민 메뉴(약국관리 · 통계) 기준. 화면 번호를 누르면 스토리보드 해당 화면으로 이동 -->
+<!-- 결제 · 등록 흐름도 (11-26 개편): 업무 선택 → 그 업무 흐름도 하나. 흐름도는 Mermaid(프로젝트와 같은 11.15.0), 위 → 아래, 분기선에만 조건.
+     업무마다 시작 화면 / 운영자가 할 일 / 결과 확인 화면 → 흐름도 → 참고(날짜 · 예외 정책) → 관련 화면(스토리보드 링크). 주소 #svc 등으로 업무 바로 열기 -->
 <style>
-:root{--bg:#f5f6f8;--card:#fff;--ink:#1d2330;--sub:#5b6474;--mute:#8a93a3;--line:#d9dde4;
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1d2330;--sub:#5b6474;--mute:#8a93a3;--line:#d9dde4;--teal:#159b8d;
  --reg:#2a78d6;--regb:#eaf2fc;--pay:#e0701f;--payb:#fdf1e7;--stat:#1b9a6c;--statb:#e7f6f0;--warn:#c43d3d;--warnb:#fdecec}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.55 Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 60px}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 60px}
 h1{font-size:20px;margin:0 0 4px}
-.lead{color:var(--sub);margin:0 0 18px}
-.lg{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 14px;color:var(--sub);font-size:12px}
-.lg span{display:inline-flex;align-items:center;gap:6px}
-.lg i{width:12px;height:12px;border-radius:3px;display:inline-block}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 18px}
-.panel h2{font-size:15px;margin:0 0 4px}
-.panel .ds{color:var(--sub);margin:0 0 14px;font-size:12px}
-.scroll{overflow-x:auto}
-/* 전체 흐름 */
-#ov{position:relative;display:grid;grid-template-columns:repeat(3,300px);column-gap:110px;min-width:1120px;padding:6px 4px}
-#ov svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.col{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
-.ch{font-weight:700;font-size:13px;padding:6px 10px;border-radius:6px;text-align:center}
-.n{border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff}
-.n b{display:block;font-size:13px}
-.n .m{font-size:11px;color:var(--mute);margin:1px 0 3px}
-.n .t{font-size:12px;color:var(--sub)}
-.n a{font-size:11px;color:var(--sub);text-decoration:none;border-bottom:1px dotted var(--mute)}
-.n a:hover{color:var(--ink)}
-.reg{border-color:var(--reg)} .reg b{color:#1b5fae}
-.pay{border-color:var(--pay)} .pay b{color:#b5560f}
-.stat{border-color:var(--stat)} .stat b{color:#137652}
-.ch.reg{background:var(--regb);color:#1b5fae} .ch.pay{background:var(--payb);color:#b5560f} .ch.stat{background:var(--statb);color:#137652}
-.el{font-size:11px;fill:var(--sub)}
-/* 상세 흐름 */
-.fl{display:flex;align-items:flex-start;flex-wrap:nowrap;gap:0;min-width:max-content;padding:4px 2px}
-.st{width:160px;flex:none}
-.ar{flex:none;width:26px;align-self:flex-start;margin-top:26px;text-align:center;color:var(--mute);font-size:16px}
-.br{display:flex;flex-direction:column;gap:10px;flex:none}
-.bw{display:flex;align-items:flex-start}
-.bl{flex:none;font-size:11px;font-weight:600;color:var(--sub);background:#eef0f3;border-radius:10px;padding:2px 8px;margin:28px 6px 0 0;white-space:nowrap}
-.bl.no{background:var(--warnb);color:var(--warn)}
-.bl.ok{background:var(--statb);color:#137652}
-.back{margin-top:10px;font-size:12px;color:var(--sub);border-top:1px dashed var(--line);padding-top:8px}
-.back b{color:var(--ink)}
-.tag{display:inline-block;font-size:10px;font-weight:600;border-radius:4px;padding:0 5px;margin-left:4px;vertical-align:1px}
-.tag.ask{background:#fff4d6;color:#8a6200}
+.lead{color:var(--sub);margin:0 0 16px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 16px}
+.tabs a{display:block;text-decoration:none;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-weight:700;font-size:13.5px}
+.tabs a small{display:block;font-weight:500;color:var(--mute);font-size:11.5px;margin-top:2px}
+.tabs a.on{border-color:var(--teal);background:#effaf8;color:#0f6f65}
+.tabs a .rv{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;background:var(--teal);border-radius:4px;padding:0 5px;margin-left:4px;vertical-align:1px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0;overflow:hidden}
+.panel h2{font-size:17px;margin:0 0 4px}
+.ds{color:var(--sub);margin:0 0 14px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
+.sum div{border-radius:8px;padding:10px 12px;font-size:12.5px}
+.sum b{display:block;font-size:11.5px;margin-bottom:3px}
+.sum .s1{background:var(--regb)}.sum .s1 b{color:#1b5fae}
+.sum .s2{background:var(--payb)}.sum .s2 b{color:#b5560f}
+.sum .s3{background:var(--statb)}.sum .s3 b{color:#137652}
+.sum a,.rel a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--mute)}
+.chart{display:flex;justify-content:center;max-width:100%;min-width:0;padding:8px 0 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:14px}
+.chart svg{max-width:100%;height:auto}
+.lgd{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--sub);margin:0 0 6px}
+.lgd i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+h3{font-size:13px;margin:14px 0 6px}
+.notes{margin:0;padding-left:18px;color:var(--sub)}
+.notes li{margin:3px 0}.notes b{color:var(--ink)}
+.case{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.case div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--sub)}
+.case div b{display:block;color:var(--ink);font-size:13px;margin-bottom:2px}
+.rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 14px;margin:0;padding:0;list-style:none}
+.rel li{font-size:12.5px}.rel code{font:600 12px ui-monospace,Menlo,monospace;color:#0f6f65;margin-right:6px}
+.direct{font-size:12px;color:var(--sub);margin:-8px 0 14px}.direct a{color:var(--teal);font-weight:700}
+@media (max-width:720px){.panel{padding:14px}.tabs{grid-template-columns:1fr 1fr}.sum,.case{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>결제 · 등록 흐름도</h1>
-<p class="lead">슈퍼어드민 메뉴 기준으로, 운영자가 등록한 내용이 결제 · 정산을 거쳐 확인 화면까지 어떻게 이어지는지 정리했어요. 화면 번호를 누르면 스토리보드의 해당 화면이 열려요.</p>
-<div class="lg">
- <span><i style="background:var(--reg)"></i>등록 · 업로드 (운영자가 입력)</span>
- <span><i style="background:var(--pay)"></i>결제 · 정산 (돈이 오가는 단계)</span>
- <span><i style="background:var(--stat)"></i>확인 화면</span>
- <span><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#8a93a3" stroke-width="1.5" stroke-dasharray="4 3"/></svg>조치하러 돌아가는 길</span>
+<p class="lead">내 업무를 고르면 어디서 시작하고, 어떤 조건에서 갈라지고, 어디서 결과를 확인하는지 보여 줘요. 화면 번호를 누르면 스토리보드의 해당 화면이 열려요.</p>
+<nav class="tabs" id="tabs"></nav>
+<p class="direct">이번 리뷰 대상 바로가기 : <a href="#svc">③ 서비스 등록 · 수정</a></p>
+<section class="panel" id="flow"></section>
 </div>
-
-<section class="panel">
- <h2>전체 흐름</h2>
- <p class="ds">왼쪽에서 입력한 내용이 가운데에서 결제 · 정산되고, 오른쪽 확인 화면에 모여요.</p>
- <div class="scroll"><div id="ov"></div></div>
-</section>
-
-<div id="detail"></div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.min.js" integrity="sha384-yQ4mmBBT+vhTAwjFH0toJXNYJ6O4usWnt6EPIdWwrRvx2V/n5lXuDZQwQFeSFydF" crossorigin="anonymous"></script><!-- 프로젝트와 같은 mermaid 11.15.0 -->
 <script>
 var SB='storyboard.html#';
-function L(t){ return t.replace(/SA-\d\d-\d\d\d/g,function(m){ return '<a href="'+SB+m+'" target="_blank">'+m+'</a>'; }); }
-
-/* 전체 흐름 노드: [id, 종류, 제목, 메뉴, 설명, 화면] */
-var COLS=[
- ['reg','① 등록 · 업로드',[
-  ['r1','reg','약국 서비스 등록 · 수정','약국관리 › 약국 관리 › 상세','옵션별 상태 · 일정 · 데모 · 할인 등록','SA-01-003 · SA-01-120'],
-  ['r2','reg','약국 분류','약국관리 › 약국 관리 › 상세','광동 VIP · 영업 경로 · 협력사(CS 업체)',''],
-  ['r3','reg','VAN 정산 파일 업로드','약국관리 › VAN 정산 관리 · 매월','TID별 정산 단가 · 승인 건수 · 정산액','SA-02-003'],
-  ['r4','reg','광동 약정 약국 목록 업로드','통계 › 광동 VIP 정산 · 매월','광동이 보낸 약정 약국 목록(엑셀)','SA-03-002']
- ]],
- ['pay','② 결제 · 정산',[
-  ['p1','pay','청구월 결제 예정 금액','약국 × 청구월 한 건','옵션 총액 − 금액 할인. 광동 VIP는 약국 결제 0원, 데모 기간은 무료',''],
-  ['p2','pay','5일 정기 결제','페이앱 카드 자동 결제','성공 : 결제 완료\n실패 : 미결제로 남음','SA-01-004'],
-  ['p3','pay','수기 결제','약국 상세 › 정기 결제','청구월 · 결제 사유(재결제 · 서비스 외 결제 · 기타)','SA-01-006'],
-  ['p4','pay','결제 취소 · 환불','약국 상세 › 정기 결제','전액 취소 · 취소 사유, 정산 전 · 후','SA-01-005'],
-  ['p5','pay','VAN 정산액','VAN사 → 굿팜 입금','TID 단가 × 승인 건수, 사업자번호로 약국 연결',''],
-  ['p6','pay','광동 청구 · 입금','광동 → 굿팜 입금','청구 대상 약국 × 49,500원','SA-03-002']
- ]],
- ['stat','③ 확인',[
-  ['s1','stat','서비스 청구 통계','통계 › 서비스 청구 통계','결제 완료 · 미결제 탭, 매출 항목별 청구, 약국별 청구','SA-01-001 · SA-01-109'],
-  ['s2','stat','약국 결제 관리','약국관리 › 약국 결제 관리','미결제 약국을 기간 1개월 · 조회 실패로 열어 조치','SA-01-002'],
-  ['s5','stat','VAN 정산 관리','약국관리 › VAN 정산 관리','약국별 VAN 정산액 · 업로드 이력','SA-02-002'],
-  ['s6','stat','광동 VIP 정산','통계 › 광동 VIP 정산','청구 대상 · 조치 필요 약국 탭','SA-03-002']
- ]]
+var lk=function(id){ return '<a href="'+SB+id+'" target="_blank">'+id+'</a>'; };
+var CLS=['classDef reg fill:#eaf2fc,stroke:#2a78d6,color:#1b4f8f','classDef pay fill:#fdf1e7,stroke:#e0701f,color:#8f4410','classDef stat fill:#e7f6f0,stroke:#1b9a6c,color:#0f5e42','classDef warn fill:#fdecec,stroke:#c43d3d,color:#9a2b2b','classDef dec fill:#ffffff,stroke:#8a93a3,color:#1d2330'].join('\n');
+// 업무: 탭 이름 · 한 줄 · 시작 화면 · 할 일 · 결과 확인 · 흐름도 · 참고 · (사례) · 관련 화면
+var W=[
+ {k:'pay',t:'① 정기 · 수기 결제',s:'실패한 결제를 수기로 받기',
+  ds:'매달 5일 정기 결제 결과를 보고, 실패한 청구월을 수기 결제로 받아요.',
+  a:['서비스 청구 통계 미결제 탭','SA-01-109'], b:'실패 건 확인 → 수기 결제', c:['약국 상세 정기 결제 내역','SA-01-004'],
+  m:'flowchart TD\nA[청구 금액 확정]:::pay --> B[5일 정기 결제]:::pay\nB -->|성공| C[결제 완료 확인]:::stat\nB -->|실패| D[미결제 탭 확인]:::stat\nD --> E[약국 결제 관리 열기]:::stat\nE --> F[수기 결제]:::pay\nF --> G[결제 내역 확인]:::stat',
+  n:['<b>수기 결제 반영</b> : 선택한 청구월의 미납 건은 납부 완료로 처리하고(미결제 탭에서 빠짐), 결제 실적은 실제 결제일이 속한 달에 집계해요','<b>약국 결제 관리</b> : 미결제 탭에서 열면 기간 1개월 · 결제 상태 <q>결제 실패</q>로 조회돼요','<b>청구월</b> : 수기 결제 창에서 이번 달이 기본, 밀린 달은 미결제 청구월에서 골라요. 두 달 치는 청구월마다 한 건씩'],
+  r:[['SA-01-001','서비스 청구 통계 · 결제 완료'],['SA-01-109','미결제 탭 · 오래 밀린 순'],['SA-01-002','약국 결제 관리'],['SA-01-125','약국 결제 관리 · 결제 이력'],['SA-01-006','수기 결제 창'],['SA-01-004','정기 결제 내역']]},
+ {k:'cancel',t:'② 결제 취소 · 환불',s:'결제를 취소하고 환불하기',
+  ds:'정기 결제 내역에서 전액 취소를 요청하고, 페이앱 응답에 따라 처리 방법이 나뉘어요.',
+  a:['약국 상세 정기 결제 내역','SA-01-004'], b:'결제 취소 → 응답별 처리', c:['정기 결제 내역 취소 상태','SA-01-144'],
+  m:'flowchart TD\nA[결제 취소 요청]:::pay --> B{페이앱 응답}:::dec\nB -->|정산 전| C[취소 완료 확인]:::stat\nB -->|정산 후| D[반환금 이체]:::reg\nD --> E[취소 완료 확인]:::stat\nB -->|취소 불가| F[약국 계좌로 입금]:::reg\nF --> G[수기 취소 처리]:::pay\nG --> H[취소 완료 확인]:::stat',
+  n:['<b>취소 범위</b> : 결제일로부터 60일 안의 결제만, 전액 취소 · 취소 사유 선택','<b>정산 후</b> : 페이앱이 반환금 · 입금 계좌를 알려 주고, 이체 후 카드 취소가 자동 반영돼요','<b>수기 취소</b> : 매출은 취소금을 입금한 날이 속한 달에서 빼요','<b>다시 받을 금액</b> : 수기 결제의 <q>취소 후 재결제</q>로 받아요'],
+  r:[['SA-01-004','정기 결제 내역'],['SA-01-005','결제 취소 창'],['SA-01-141','정산 전 · 바로 취소 완료'],['SA-01-142','정산 후 · 취소 요청 중'],['SA-01-145','취소 실패'],['SA-01-143','수기 취소 처리 창'],['SA-01-144','취소 완료(수기 취소)'],['SA-01-151','수기 결제 · 취소 후 재결제']]},
+ {k:'svc',t:'③ 서비스 등록 · 수정',s:'옵션 · 일정 · 데모 바꾸기',rv:1,
+  ds:'굿팜 솔루션 (NEW) 하나에 옵션을 두고, 옵션마다 상태 · 일정 · 데모 · 할인을 저장해요. 저장하면 목록과 변경 이력이 함께 바뀌어요.',
+  a:['약국 상세 › 서비스 수정','SA-01-003'], b:'옵션 선택 · 저장', c:['약국 서비스 목록 · 변경 이력','SA-01-120'],
+  m:'flowchart TD\nA[약국 상세 열기]:::reg --> B[서비스 수정]:::reg\nB --> C[옵션 선택 · 저장]:::reg\nC --> D[목록 · 변경 이력 갱신]:::stat\nD -->|일정만 변경| E[개별 일정 확인]:::stat\nD -->|청구액 변경| F[계산 내역 확인]:::stat\nF -->|등록과 결제 같음| G[정상 청구]:::stat\nF -->|실제 금액 불일치| H[계약 확인 필요]:::warn\nH --> I[등록 내용 맞추기]:::reg',
+  cs:[['A. 일정만 변경','굿팜 POS 설치 예정일 12.05 → 12.08. POS에만 <q>개별 일정</q>이 붙고, 다른 옵션의 일정과 청구액은 그대로예요. 이력에 한 건(적용 시작월 —) 남고 여기서 끝나요.'],['B. 청구액 변경','스마트2D를 2026.12 ~ 2027.01 데모로 지정. 그 기간 청구분은 스마트2D만 0원이고, 다른 유료 옵션은 기존 요금으로 계산 내역에 함께 보여요.']],
+  n:['<b>계약 확인 필요</b> : 실제 결제 금액이 등록 내용과 다를 때만 나와요. 일정 변경 · 데모 지정만으로는 나오지 않아요','<b>공통 일정</b> : 공통 날짜를 바꾸면 <q>공통 일정 사용</q> 옵션만 따라가고, 직접 지정한 날짜는 그대로예요','<b>데모 종료</b> : 자동 전환 없이 담당자가 승인으로 바꾸기 전까지 0원이에요','<b>예시 약국</b> : 새봄약국(신규 계약, 공통 설치 예정일 12.05)'],
+  r:[['SA-01-003','서비스 수정 (수정 전)'],['SA-01-129','일정 수정 · POS만'],['SA-01-180','저장 후 · POS 개별 일정'],['SA-01-181','일정 변경 이력 펼침'],['SA-01-182','공통 일정 변경 · POS 유지'],['SA-01-128','스마트2D 데모 지정'],['SA-01-183','저장 후 · 스마트2D 데모'],['SA-01-184','12월 계산 내역 · 데모 0원'],['SA-01-120','약국 서비스 목록 · 변경 이력'],['SA-01-106','계산 내역 창'],['SA-01-116','계약 확인 필요']]},
+ {k:'van',t:'④ VAN 정산',s:'정산 파일 올리기',
+  ds:'매달 VAN 정산 파일을 올리면 TID별 단가로 정산액을 계산하고, 사업자번호로 약국에 연결해요.',
+  a:['VAN 정산 관리 › 정산 파일 업로드','SA-02-003'], b:'양식 다운로드 → 업로드', c:['VAN 정산 관리','SA-02-002'],
+  m:'flowchart TD\nA[정산 파일 받기]:::reg --> B[정산 파일 업로드]:::reg\nB --> C{약국 연결}:::dec\nC -->|모두 연결| D[반영 결과 확인]:::stat\nC -->|일부 안 됨| E[연결 안 된 행 확인]:::warn\nC -->|같은 월 다시| F[이전 파일 대체]:::reg',
+  n:['<b>정산액</b> : TID별 정산 단가 × 승인 건수, 단가가 다른 TID는 따로 표시해요','<b>같은 사업자번호 약국 여러 곳</b> : 오류로 보여 주고 연결할 약국을 확인해요'],
+  r:[['SA-02-003','정산 파일 업로드'],['SA-02-002','VAN 정산 관리'],['SA-02-004','일부 연결 안 됨'],['SA-02-111','같은 월 다시 올림(대체)'],['SA-02-112','같은 사업자번호 여러 곳']]},
+ {k:'kd',t:'⑤ 광동 VIP 정산',s:'약정 약국 목록 대조',
+  ds:'광동이 보낸 약정 약국 목록을 굿팜 VIP처와 사업자번호로 대조해 청구 대상을 정하고, 어긋난 약국은 약국 분류에서 맞춰요.',
+  a:['광동 VIP 정산 › 목록 업로드','SA-03-002'], b:'사업자번호 대조 → 탭별 조치', c:['광동 VIP 정산 탭','SA-03-002'],
+  m:'flowchart TD\nA[약정 약국 목록 받기]:::reg --> B[목록 업로드]:::reg\nB --> C{사업자번호 대조}:::dec\nC -->|청구 대상| D[광동 정산 확인]:::pay\nC -->|VIP 해제 필요| E[VIP 해제]:::reg\nC -->|VIP 설정 필요| F[VIP 설정]:::reg\nC -->|굿팜 미등록| G[약국 등록 확인]:::reg\nC -->|광동 목록에 없음| H[광동에 확인 요청]:::warn',
+  n:['<b>청구 대상</b> : 광동 지원 서비스는 약국 결제 0원, 금액은 광동 정산으로 확인해요','<b>VIP 해제 · 설정</b> : 약국 상세의 약국 분류에서 바꿔요'],
+  r:[['SA-03-002','광동 VIP 정산'],['SA-03-111','VIP 해제 필요 탭'],['SA-03-112','굿팜 VIP 설정 필요 탭'],['SA-03-114','굿팜 미등록 탭'],['SA-03-113','광동 목록에 없음 탭']]}
 ];
-/* 연결선: [출발, 도착, 글자, 점선] */
-var EDGES=[
- ['r1','p1','청구 금액'],['r2','p1','VIP 0원'],
- ['p1','p2',''],['p2','p3','실패 시'],
- ['p2','s1','결제 완료'],['p3','s1','청구월분 완료'],['p4','s1','취소 반영'],['p4','p3','다시 받을 금액',1],
- ['r3','p5',''],['r4','p6','대조'],
- ['p5','s5','약국별 반영'],['p6','s6','청구 · 조치'],
- ['s1','s2','미결제'],['s2','p3','약국 상세로',1],['s6','r2','VIP 해제 · 설정',1]
-];
-var ov=document.getElementById('ov');
-ov.innerHTML='<svg id="ovs"></svg>'+COLS.map(function(c){
- return '<div class="col"><div class="ch '+c[0]+'">'+c[1]+'</div>'+c[2].map(function(n){
-  return '<div class="n '+n[1]+'" id="'+n[0]+'"><b>'+n[2]+'</b><div class="m">'+n[3]+'</div><div class="t">'+n[4].replace(/\n/g,'<br>')+'</div>'+(n[5]?'<div style="margin-top:3px">'+L(n[5])+'</div>':'')+'</div>';
- }).join('')+'</div>';
-}).join('');
-
-function draw(){
- var s=document.getElementById('ovs'), o=ov.getBoundingClientRect(), h='';
- h+='<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a93a3"/></marker></defs>';
- var labels=[];
- EDGES.forEach(function(e){
-  var a=document.getElementById(e[0]).getBoundingClientRect(), b=document.getElementById(e[1]).getBoundingClientRect();
-  var ax,ay,bx,by,c1x,c1y,c2x,c2y;
-  var sameCol=Math.abs(a.left-b.left)<10;
-  if(sameCol){
-   // 같은 열: 위 → 아래는 아래쪽 가운데에서, 점선(되돌아감)은 오른쪽 바깥으로 돌아감
-   if(e[3]){ ax=a.right-o.left; ay=a.top+a.height/2-o.top; bx=b.right-o.left; by=b.top+b.height/2-o.top; c1x=ax+46;c1y=ay;c2x=bx+46;c2y=by; }
-   else { ax=a.left+a.width/2-o.left; ay=a.bottom-o.top; bx=b.left+b.width/2-o.left; by=b.top-o.top; c1x=ax;c1y=ay+8;c2x=bx;c2y=by-8; }
-  } else if(a.left<b.left){
-   ax=a.right-o.left; ay=a.top+a.height/2-o.top; bx=b.left-o.left; by=b.top+b.height/2-o.top;
-   var d=(bx-ax)*0.5; c1x=ax+d;c1y=ay;c2x=bx-d;c2y=by;
-  } else {
-   ax=a.left-o.left; ay=a.top+a.height/2-o.top; bx=b.right-o.left; by=b.top+b.height/2-o.top;
-   var d2=(ax-bx)*0.5; c1x=ax-d2;c1y=ay;c2x=bx+d2;c2y=by;
-  }
-  var col=e[3]?'#8a93a3':'#a9b0bc';
-  h+='<path d="M'+ax+' '+ay+' C'+c1x+' '+c1y+' '+c2x+' '+c2y+' '+bx+' '+by+'" fill="none" stroke="'+col+'" stroke-width="1.5" '+(e[3]?'stroke-dasharray="4 3"':'')+' marker-end="url(#ah)"/>';
-  if(e[2]){
-   var t=0.5, mx=Math.pow(1-t,3)*ax+3*Math.pow(1-t,2)*t*c1x+3*(1-t)*t*t*c2x+t*t*t*bx, my=Math.pow(1-t,3)*ay+3*Math.pow(1-t,2)*t*c1y+3*(1-t)*t*t*c2y+t*t*t*by;
-   labels.push([mx,my,e[2]]);
-  }
- });
- // 글자끼리 겹치면 아래로 밀기
- labels.sort(function(p,q){return p[1]-q[1];});
- labels.forEach(function(l,i){ for(var j=0;j<i;j++){ var k=labels[j]; if(Math.abs(k[0]-l[0])<80 && Math.abs(k[1]-l[1])<16) l[1]=k[1]+16; } });
- labels.forEach(function(l){
-  var w=l[2].length*11+10;
-  h+='<rect x="'+(l[0]-w/2)+'" y="'+(l[1]-9)+'" width="'+w+'" height="17" rx="8" fill="#fff" stroke="#e3e6eb"/><text class="el" x="'+l[0]+'" y="'+(l[1]+3.5)+'" text-anchor="middle">'+l[2]+'</text>';
- });
- s.innerHTML=h;
+mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'base',
+ themeVariables:{fontFamily:'Pretendard,-apple-system,Apple SD Gothic Neo,Malgun Gothic,sans-serif',fontSize:'14px',lineColor:'#8a93a3',edgeLabelBackground:'#ffffff',primaryTextColor:'#1d2330'},
+ flowchart:{curve:'basis',nodeSpacing:36,rankSpacing:46,padding:14,useMaxWidth:true,htmlLabels:true}});
+var seq=0;
+function show(k){
+ var w=W.filter(function(x){return x.k===k;})[0]||W[2];
+ document.getElementById('tabs').innerHTML=W.map(function(x){ return '<a href="#'+x.k+'" class="'+(x.k===w.k?'on':'')+'">'+x.t+(x.rv?'<span class="rv">리뷰</span>':'')+'<small>'+x.s+'</small></a>'; }).join('');
+ var el=document.getElementById('flow');
+ el.innerHTML='<h2>'+w.t+'</h2><p class="ds">'+w.ds+'</p>'+
+  '<div class="sum"><div class="s1"><b>시작 화면</b>'+w.a[0]+' · '+lk(w.a[1])+'</div><div class="s2"><b>운영자가 할 일</b>'+w.b+'</div><div class="s3"><b>결과 확인 화면</b>'+w.c[0]+' · '+lk(w.c[1])+'</div></div>'+
+  '<div class="lgd"><span><i style="background:#eaf2fc;border:1px solid #2a78d6"></i>등록 · 입력</span><span><i style="background:#fdf1e7;border:1px solid #e0701f"></i>결제 · 정산</span><span><i style="background:#e7f6f0;border:1px solid #1b9a6c"></i>확인</span><span><i style="background:#fdecec;border:1px solid #c43d3d"></i>조치 필요</span></div>'+
+  '<div class="chart" id="chart"></div>'+
+  (w.cs?'<h3>두 갈래 예시</h3><div class="case">'+w.cs.map(function(c){return '<div><b>'+c[0]+'</b>'+c[1]+'</div>';}).join('')+'</div>':'')+
+  '<h3>참고</h3><ul class="notes">'+w.n.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>'+
+  '<h3>관련 화면</h3><ul class="rel">'+w.r.map(function(x){return '<li><code>'+lk(x[0])+'</code>'+x[1]+'</li>';}).join('')+'</ul>';
+ mermaid.render('mm'+(seq++), w.m+'\n'+CLS).then(function(o){ var c=document.getElementById('chart'); c.innerHTML=o.svg;
+  // 작은 화면 : 글자를 줄이지 않고 원래 크기로 — 넓은 분기만 차트 안에서 옆으로 밀어 봄
+  var sv=c.querySelector('svg'); if(sv && c.clientWidth<sv.viewBox.baseVal.width){ sv.style.width=sv.viewBox.baseVal.width+'px'; sv.style.maxWidth='none'; sv.style.flex='none'; c.style.overflowX='auto'; c.style.justifyContent='flex-start'; } });
 }
-window.addEventListener('resize',draw); window.addEventListener('load',draw); draw();
-
-/* 상세 흐름: 단계 = [종류, 제목, 메뉴, 설명, 화면] 또는 {br:[[라벨, 라벨종류, 단계...], ...]} */
-var D=[
- {t:'1. 정기 결제 → 미결제 → 수기 결제',d:'매달 5일 정기 결제가 실패하면 미결제로 남고, 운영자가 수기 결제로 그 청구월분을 받아요. 결제 내역은 결제일 최신순이고, 청구월 칸으로 몇 월분인지 보여요.',f:[
-  ['reg','약국 서비스 등록','약국 관리 › 상세','서비스 · 금액 할인 저장','SA-01-003'],
-  ['pay','청구월 결제 예정 금액','약국 × 청구월','옵션 총액 − 금액 할인',''],
-  ['pay','5일 정기 결제','페이앱 카드','',''],
-  {br:[
-   ['성공','ok',['stat','결제 완료','서비스 청구 통계','결제 완료 탭에 그 청구월분으로 집계','SA-01-001']],
-   ['실패','no',['stat','미결제 탭','서비스 청구 통계','오래 밀린 순','SA-01-109'],
-                ['stat','약국 결제 관리','[약국 결제 관리 ›]','기간 1개월 · 조회 실패로 열림','SA-01-002'],
-                ['pay','수기 결제','약국 상세 › 정기 결제','청구월 · 결제 사유 저장','SA-01-006'],
-                ['stat','결제 완료로 바뀜','약국 상세 · 통계','실패 · 수기 성공이 같은 청구월로 남음','SA-01-004']]
-  ]}
- ],back:'<b>반영</b> : 선택한 청구월의 미납 건은 납부 완료로 처리하고(미결제 탭에서 빠짐), 결제 실적은 실제 결제일이 속한 달에 집계해요.'},
- {t:'2. 결제 취소 · 환불',d:'정기 결제 내역에서 전액 취소하고, 결제일로부터 60일 안의 결제를 취소하고, 취소를 요청한 뒤 페이앱 응답(정산 전 · 후)에 따라 처리 방법이 나뉘어요. 다시 받을 금액이 있으면 수기 결제로 이어져요.',f:[
-  ['pay','정기 결제 내역','약국 상세 › 정기 결제','[결제 취소]','SA-01-004'],
-  ['pay','결제 취소 창','전액 취소','취소 사유 선택','SA-01-005'],
-  {br:[
-   ['페이앱 응답 : 정산 전','ok',['pay','바로 취소 완료','','카드 승인 취소','SA-01-141']],
-   ['페이앱 응답 : 정산 후','',['pay','취소 요청 중','','반환금 · 입금 계좌 안내(API)','SA-01-142'],['reg','반환금 이체','운영팀 · 은행','안내받은 계좌로 입금',''],['pay','취소 완료','페이앱 알림(API)','카드 취소 후 자동 반영','']],
-   ['페이앱 응답 : 취소 불가','',['pay','취소 실패','','페이앱 실패 사유 표시 · 수기 취소 처리 버튼','SA-01-145'],['reg','약국 계좌로 입금','운영팀 · 은행','취소금 직접 송금',''],['pay','수기 취소 처리','정기 결제 내역','입금일 · 사유 · 메모 · 등록자(로그인 관리자)','SA-01-143'],['pay','취소 완료(수기 취소)','','매출은 입금일의 달에서 뺌','SA-01-144']]
-  ]},
-  ['pay','수기 결제','취소 후 재결제','다시 받을 금액이 있을 때','SA-01-151']
- ]},
- {t:'3. 약국 서비스 수정 → 변경 이력 및 청구 반영',d:'굿팜 솔루션 (NEW) 하나에 옵션(스마트 OCR · 굿팜 POS · 스마트2D)을 두고, 옵션마다 상태 · 일정 · 데모 · 할인을 저장해요. 저장하면 목록에는 지금 등록 내역이, 서비스 변경 이력에는 바뀐 내용이 한 번 남아요. 일정만 바뀌면 이력 확인에서 끝나고, 금액 · 데모가 바뀌면 그 청구월 결제 예정 금액에 반영돼요. 예시 약국 : 새봄약국(신규 계약, 공통 설치 예정일 12.05).',f:[
-  ['reg','약국 서비스 수정 (수정 전)','약국 관리 › 상세','공통 일정 한 벌 · 옵션별 상태 · 일정 한 칸','SA-01-003'],
-  {br:[
-   ['일정만 변경','',['reg','일정 수정','선택한 옵션만 · 굿팜 POS','설치 예정일 12.05(공통) → 12.08 직접 지정','SA-01-129'],
-              ['stat','저장 후 목록','약국 상세','굿팜 POS [개별 일정]','SA-01-180'],
-              ['stat','변경 이력 확인','서비스 변경 이력 · 수정 모달','굿팜 POS · 설치 예정일 12.05 → 12.08 · 적용 시작월 —\n과금 시작일 · 금액 그대로 → 여기서 끝','SA-01-181']],
-   ['청구에 영향 있음','no',['reg','옵션 상태 데모','스마트2D','데모 기간 2026.12 ~ 2027.01','SA-01-128'],
-              ['stat','저장 후 목록 · 이력','약국 상세','스마트2D [데모 2026.12 ~ 2027.01] · 데모 지정 이력','SA-01-183'],
-              ['pay','12월 결제 예정 금액','청구 예정 · 계산 내역','스마트2D 데모 적용 · 0원\n함께 쓰는 유료 옵션은 기존 요금','SA-01-184'],
-              {br:[
-               ['등록 = 실제 결제','ok',['stat','정상 청구','서비스 청구 통계','계산 내역 창에서 옵션 · 할인 확인','SA-01-106']],
-               ['실제 금액 불일치 확인','no',['stat','계약 확인 필요','약국별 청구','등록 내용과 실제 결제가 다를 때만','SA-01-116'],['reg','약국 서비스 수정','약국 관리 › 상세','등록 내용을 실제에 맞춤','SA-01-003']]
-              ]}]
-  ]}
- ],back:'<b>확인</b> : 공통 설치 예정일을 12.10으로 바꿔도 직접 지정한 굿팜 POS는 12.08 그대로(SA-01-182) · 스마트2D 데모 저장 후에도 스마트 OCR은 기존 요금(SA-01-184) · 데모가 끝나면 자동 전환 없음 — 담당자가 승인으로 바꾸기 전까지 0원(SA-01-126 · 127)'},
- {t:'4. VAN 정산',d:'매달 VAN 정산 파일을 올리면 TID별 단가로 정산액을 계산하고, 사업자번호로 약국에 연결해요.',f:[
-  ['reg','정산 파일 받기','VAN사 · 매월','TID별 승인 건수 · 정산액',''],
-  ['reg','정산 파일 업로드','VAN 정산 관리','양식 다운로드 → 업로드','SA-02-003'],
-  ['pay','약국 연결 · 단가 적용','사업자번호 기준','TID별 정산 단가 적용, 단가가 다른 TID 표시','SA-02-002'],
-  {br:[
-   ['모두 연결','ok',['stat','반영 결과','','약국별 VAN 정산액 반영','SA-02-003']],
-   ['일부 안 됨','no',['stat','오류 창','','연결 안 되는 행 확인','SA-02-004']],
-   ['같은 월 다시','',['stat','대체','','이전 파일을 새 파일로 바꿈','SA-02-111']]
-  ]}
- ]},
- {t:'5. 광동 VIP 정산',d:'광동이 보낸 약정 약국 목록을 굿팜 VIP처와 사업자번호로 대조해 청구 대상을 정하고, 어긋난 약국은 약국 분류에서 맞춰요.',f:[
-  ['reg','광동 약정 약국 목록 받기','광동 · 매월','약정현황 · 협력도매 · 약정 등급',''],
-  ['reg','목록 업로드','광동 VIP 정산','받은 파일과 같은 양식','SA-03-002'],
-  ['pay','사업자번호 대조','굿팜 VIP처 ↔ 광동 목록','',''],
-  {br:[
-   ['청구 대상','ok',['pay','광동 청구 · 입금','','청구 대상 × 49,500원','SA-03-002']],
-   ['VIP 해제 필요','no',['reg','약국 분류 수정','약국 관리 › 상세','VIP 해제 또는 유료 전환','SA-03-111']],
-   ['VIP 설정 필요','',['reg','약국 분류 수정','약국 관리 › 상세','광동 VIP 체크','SA-03-112']],
-   ['굿팜 미등록','',['reg','약국 등록','영업 확인','등록 또는 광동에 정정 요청','SA-03-114']],
-   ['광동 목록에 없음','',['pay','광동에 요청','','목록 추가 · 청구 요청','SA-03-113']]
-  ]}
- ]}
-];
-function node(s){ return '<div class="n st '+s[0]+'"><b>'+s[1]+'</b>'+(s[2]?'<div class="m">'+s[2]+'</div>':'')+(s[3]?'<div class="t">'+s[3].replace(/\n/g,'<br>')+'</div>':'')+(s[4]?'<div style="margin-top:3px">'+L(s[4])+'</div>':'')+'</div>'; }
-function seq(arr){ return arr.map(function(s,i){ return (i?'<div class="ar">→</div>':'')+(s.br?'<div class="br">'+s.br.map(function(b){ return '<div class="bw"><span class="bl '+b[1]+'">'+b[0]+'</span>'+seq(b.slice(2))+'</div>'; }).join('')+'</div>':node(s)); }).join(''); }
-document.getElementById('detail').innerHTML=D.map(function(x){
- return '<section class="panel"><h2>'+x.t+'</h2><p class="ds">'+x.d+'</p><div class="scroll"><div class="fl">'+seq(x.f)+'</div></div>'+(x.back?'<div class="back">'+x.back+'</div>':'')+'</section>';
-}).join('');
+function route(){ show((location.hash||'#svc').slice(1)); }
+window.addEventListener('hashchange',route); route();
 </script>
 </body>
 </html>
