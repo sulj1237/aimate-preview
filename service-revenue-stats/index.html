@@ -349,7 +349,8 @@
   .tbl.pay .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px}.tbl.pay .st.ok{background:#e6f6f3;color:#0f8a74}.tbl.pay .st.fail{background:#fdecec;color:#b42318}.tbl.pay .st.cx{background:#eef0f3;color:#5b6168}
   .tbl.pay .rs{font-size:11.5px;color:#5b6168;margin-top:2px}.tbl.pay .red{color:#d92d20}#pRes .rad{cursor:pointer}#pRes .pc{font-weight:600;color:#8a929a;margin-left:2px}
   .pgb{margin-top:4px;font-size:11px;padding:1px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#3d444b;cursor:pointer;font-weight:600}.pgb.on{background:#eef0fc;border-color:#c7cdf5;color:#3b4bc8}
-  .tbl.pay tr.pg-on td{background:#f7f8fc}.tbl.pay tr.pg-row td{background:#f7f8fc;padding:0 14px 14px;text-align:left}
+  .tbl.pay tr.pg-on td{background:#f4f5fd;border-bottom-color:transparent}.tbl.pay tr.pg-on td:first-child{box-shadow:inset 3px 0 0 #6b7bd8}
+  .tbl.pay tr.pg-sub td{background:#f4f5fd;font-size:12px;color:#4a5158;padding-top:6px;padding-bottom:6px;border-bottom:1px dashed #dde0f3}.tbl.pay tr.pg-sub td:first-child{box-shadow:inset 3px 0 0 #6b7bd8}.tbl.pay tr.pg-sub.last td{border-bottom:1px solid var(--line)}.tbl.pay td.pg-tree{color:#6b7bd8;font-weight:700;text-align:left;padding-left:22px}
   .pgbox{border:1px solid #c7cdf5;border-left:3px solid #6b7bd8;border-radius:8px;background:#fff;padding:10px 12px}.pgbox table{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px}.pgbox th{color:#8a9099;font-weight:600;text-align:left;padding:4px 8px;border-bottom:1px solid var(--line)}.pgbox td{padding:5px 8px;border-bottom:1px solid #f0f1f3;text-align:left}.pgbox .num{text-align:right}
 </style>
 </head>
@@ -1261,7 +1262,7 @@ function renderPay(){
   const all=payGroups(), list=all.filter(g=>(F==='all'||g.st===F) && (W==='all'||g.rs.some(x=>(wayOf(x)==='수기'?'man':'auto')===W)));
   const cnt=k=>all.filter(g=>k==='all'||g.st===k).length;
   const SL={all:'전체',paid:'결제 완료',unpaid:'결제 실패',cx:'취소'};
-  // 한 줄 = 약국 × 청구월 1건. 결제가 2건 이상이면 맨 오른쪽 '결제 이력' 열에 '결제 N건 ▾'(1건이면 빈칸) → 그 행 바로 아래 테두리 상자에 그 약국 · 청구월 결제 이력(시각순) — 다른 약국 줄과 섞여 보이지 않게(11-25)
+  // 한 줄 = 약국 × 청구월 1건. 결제가 2건 이상이면 맨 오른쪽 '결제 이력' 열에 '결제 N건 ▾'(1건이면 빈칸) → 그 행 바로 아래 같은 열에 하위 줄로 그 약국 · 청구월 결제 이력(시각순, 11-26)
   // 약국명 = 위 회색 줄 '(지역 · ID)' + 약국명 링크(약국 상세 › 정기 결제 내역) — 약국 상세 열 대신(11-26)
   const row=g=>{ const pr=person(NAMES.indexOf(g.name)+1000), multi=g.rs.length>1, key=g.name+'|'+g.bm, open=multi&&S.payOpen.has(key);
     const lastOk=g.ok[g.ok.length-1], x=lastOk||g.last, [c,t]=multi?(g.st==='paid'?['ok','결제 완료']:g.st==='cx'?['cx','취소 완료']:['fail','결제 실패']):pSt(x);
@@ -1269,8 +1270,8 @@ function renderPay(){
       <td>${payDT(x)}</td><td><span class="wy">${wayOf(x)==='수기'?'수기':'정기'}</span></td><td><span class="st ${c}">${t}</span></td><td class="num">${fmt(x.amt)}</td><td class="num">${PCX.has(x)?'<span class="red">−'+fmt(x.amt)+'</span><div class="hint">취소 '+x.date.slice(5,8)+String(Math.min(28,+x.date.slice(8,10)+1)).padStart(2,'0')+' 11:15</div>':''}</td>
       <td>${x.ok?esc(x.reason):esc(x.fail||'')}${PCX.has(x)?'<div class="rs"><b>취소</b> [과다 청구] 해지 미반영</div>':''}</td><td class="ctr">${multi?`<button class="pgb${open?' on':''}" data-pg="${key}">결제 ${g.rs.length}건 ${open?'▴':'▾'}</button>`:''}</td></tr>`;
     if(!open) return r;
-    return r+`<tr class="pg-row"><td colspan="10"><div class="pgbox"><b>${g.name} · ${+g.bm.slice(5)}월분 결제 이력</b> <span class="bmn">결제 ${g.rs.length}건 · 시각순</span>
-      <table><thead><tr><th>결제 일시</th><th>결제 방식</th><th>결과</th><th class="num">금액</th><th>결제 이유 · 실패 · 취소 사유</th></tr></thead><tbody>${g.rs.map(y=>{ const [cc,tt]=pSt(y); return `<tr><td>${payDT(y)}</td><td><span class="wy">${wayOf(y)==='수기'?'수기':'정기'}</span></td><td><span class="st ${cc}">${tt}</span></td><td class="num">${fmt(y.amt)}</td><td>${y.ok?esc(y.reason):esc(y.fail||'')}</td></tr>`; }).join('')}</tbody></table></div></td></tr>`; };
+    // 펼친 결제 이력 = 같은 표 같은 열에 하위 줄로(머리글 · 제목 없이) — 왼쪽 색 막대 · 옅은 배경 · '└ 1/2'로 위 약국 행에 딸린 줄임을 표시(11-26)
+    return r+g.rs.map((y,i)=>{ const [cc,tt]=pSt(y); return `<tr class="pg-sub${i===g.rs.length-1?' last':''}"><td class="pg-tree">└ ${i+1}/${g.rs.length}</td><td></td><td></td><td>${payDT(y)}</td><td><span class="wy">${wayOf(y)==='수기'?'수기':'정기'}</span></td><td><span class="st ${cc}">${tt}</span></td><td class="num">${fmt(y.amt)}</td><td class="num">${PCX.has(y)?'<span class="red">−'+fmt(y.amt)+'</span>':''}</td><td>${y.ok?esc(y.reason):esc(y.fail||'')}</td><td></td></tr>`; }).join(''); };
   const body=list.slice(0,12).map(row).join('');
   document.getElementById('content').innerHTML=`
     <h2 class="pay-h">약국 결제 관리</h2>
