@@ -51,7 +51,8 @@
   .addb{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;background:var(--add);border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
   th .addb{margin-left:3px}
   .st{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
-  .optd{display:inline-flex;align-items:center;gap:5px;border:1px solid #bfe3da;background:#f3fbf8;border-radius:12px;padding:1px 4px 1px 9px;color:#1f2328;white-space:nowrap}.optd .st{margin:0}.optd .hint{color:#5b6670}   /* 데모 옵션 = 옵션명 · 데모 · 기간을 한 덩어리 칩으로(11-26) */
+  .optc{display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:1px 9px;color:#1f2328;white-space:nowrap;margin-right:4px}   /* 옵션 = 칩 하나씩(A안, 11-26) */
+  .optd{margin-right:4px;display:inline-flex;align-items:center;gap:5px;border:1px solid #bfe3da;background:#f3fbf8;border-radius:12px;padding:1px 4px 1px 9px;color:#1f2328;white-space:nowrap}.optd .st{margin:0}.optd .hint{color:#5b6670}   /* 데모 옵션 = 옵션명 · 데모 · 기간을 한 덩어리 칩으로(11-26) */
   .st.ok{background:#e6f6f3;color:#0f8a74} .st.fail{background:#fdecea;color:var(--up)}
   .st.cx{background:#eef0f3;color:#5b6168} .st.px{background:#fff3d6;color:#a86b00} .st.rq{background:#e8f0fd;color:var(--down)}
   .ctag{display:inline-block;border:1px solid #cfd4da;border-radius:4px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:#3f454c;background:#fff;font-weight:500;white-space:nowrap}
@@ -214,7 +215,7 @@ function svcList(){
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt">옵션: 스마트 OCR · 굿팜 POS${DEMO.on?` · <span class="optd" id="stCell">${DEMO.opt} ${demoCell()}</span>`:` · ${DEMO.opt}`} &nbsp;|&nbsp; 옵션 수 3 &nbsp;|&nbsp; 정기 과금액 ${DEMO.on?'49,500 <span class="hint">(데모 옵션 제외)</span>':'82,500'}</div>
+    <div class="opt">옵션 <span class="optc">스마트 OCR</span><span class="optc">굿팜 POS</span>${DEMO.on?`<span class="optd" id="stCell">${DEMO.opt} ${demoCell()}</span>`:`<span class="optc">${DEMO.opt}</span>`} &nbsp;|&nbsp; 옵션 수 3 &nbsp;|&nbsp; 정기 과금액 ${DEMO.on?'49,500 <span class="hint">(데모 옵션 제외)</span>':'82,500'}</div>
     ${svcLog()}
     </div>`;
 }
