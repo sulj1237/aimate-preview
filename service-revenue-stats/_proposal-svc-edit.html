@@ -74,26 +74,28 @@ function init(){
           ['2026-09-28 15:40','김운영','금액 할인','금액 할인 수정','−5,500 [계약 할인]','−11,000 [계약 할인] DRS 파머시 퍼스트 중복','2026-10'],
           ['2024-06-03 11:20','이영업','결제 카드','결제 카드 등록','없음','신한카드 · 뒤 4자리 ****',''],
           ['2024-04-22 09:30','이영업','서비스','서비스 등록 · 승인','없음','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS','2024-06']],
-     modal:0, edit:0, scope:'opt', sel:new Set(['굿팜 POS']), form:{}, cform:{}, memo:'POS 장비 교체 재설치', who:'김운영', flt:'전체', hist:0, scn:1};
+     modal:0, edit:0, add:null, scope:'opt', sel:new Set(['굿팜 POS']), form:{}, cform:{}, memo:'POS 장비 교체 재설치', who:'김운영', flt:'전체', hist:0, scn:1};
   // 각 옵션 항목 모드: c=공통 일정 사용, d=직접 지정, u=미정  (없으면 c)
 }
 const mode=(o,k)=>(o.s[k]||{m:k==='해지일'&&!S.common[k]?'c':'c'}).m;
 const eff=(o,k)=>{ const x=o.s[k]; if(!x||x.m==='c') return S.common[k]; if(x.m==='u') return null; return x.v; };
 const lab=(o,k)=>{ const m=mode(o,k), v=eff(o,k); return m==='c'?`${v||'미정'} (공통)`:m==='u'?'미정':`${v} (직접 지정)`; };
 const indiv=o=>K.filter(k=>mode(o,k)!=='c');
-const NOWM='2026-11';
+const NOWM='2026-11', TODAY='2026-11-26';
+// 추가할 수 있는 옵션(예시) — 금액은 요금표 정상가 예시
+const CAT=[['키오스크',45000],['파머시 퍼스트',22000],['EDB 연동',15000],['모바일 바코드프리',15000]];
 function demoBadge(o){ const [f,t]=o.demo; if(t<NOWM) return `<span class="bd end">데모 기간 종료</span>`; if(t===NOWM) return `<span class="bd end">데모 종료 예정</span>`; return `<span class="bd dm">데모 ${f.replace('-','.')}~${t.slice(5)}</span>`; }
 
 function listPanel(){
   const paid=S.opts.filter(o=>o.st!=='데모').reduce((a,o)=>a+o.p*o.q*(100-o.dc)/100,0);
-  const opts=S.opts.map(o=>o.n+(indiv(o).length?' <span class="bd ind">개별 일정</span>':'')+(o.st==='데모'?' '+demoBadge(o):'')).join(' · ');
+  const opts=S.opts.map(o=>o.n+(indiv(o).length?' <span class="bd ind">개별 일정</span>':'')+(o.st==='데모'?' '+demoBadge(o):'')+(['신청','설치 예정','설치 완료'].includes(o.st)?` <span class="bd" style="background:#f1f3f5;color:#5b6168">${o.st}</span>`:'')).join(' · ');
   return `<div class="panel"><div class="ph"><h3>약국 서비스 목록</h3><div class="r"><button class="btn">서비스등록</button><button class="btn pri" data-open>서비스 수정</button></div></div>
   <table><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead><tbody>
   <tr><td><b>굿팜 솔루션 (NEW)</b></td>${['신청일','계약일','설치일','과금 시작일'].map(k=>`<td>${S.common[k]||'미정'}</td>`).join('')}<td class="num">${fmt(Math.round((paid-10000)*1.1))}</td><td>승인</td><td>서명 완료</td><td>이영업</td></tr></tbody></table>
   <div class="optline">옵션: ${opts}<div class="hint">옵션 수 ${S.opts.length} · 정기 과금액은 데모 옵션 제외 · 날짜 전체와 지난 변경은 서비스 수정 · 서비스 변경 이력에서</div></div></div>`;
 }
 function logPanel(){
-  const F=['전체','금액 할인','데모','결제 카드','일정 변경'];
+  const F=['전체','옵션','금액 할인','데모','결제 카드','일정 변경'];
   const rows=S.log.filter(l=>S.flt==='전체'||l[2]===S.flt||(S.flt==='데모'&&l[2]==='데모'));
   return `<div class="panel" id="logPanel"><div class="ph"><h3>서비스 변경 이력</h3><span class="mut">최신순</span></div>
   <div class="flt">${F.map(f=>`<span class="${S.flt===f?'on':''}" data-f="${f}">${f}${f==='일정 변경'?' <b>'+S.log.filter(l=>l[2]==='일정 변경').length+'</b>':''}</span>`).join('')}</div>
@@ -116,10 +118,23 @@ function modal(){
     ${S.hist?`<div class="hbox">${hl.length?hl.map(l=>`<div><b>${l[0]} · ${l[1]} · ${l[3].replace('일정 변경 · ','')}</b>${l[7]?' · '+l[7]:''}<br>${l[8].map(c=>`&nbsp;&nbsp;${c}`).join('<br>')}</div>`).join('<hr style="border:0;border-top:1px solid #eef0f2">'):'<span class="mut">아직 일정 변경이 없어요</span>'}</div>`:''}</div></div>
   ${S.edit?editBox():''}
   <div class="sec"><table><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">할인</th><th class="num">총액</th><th>서비스 상태</th><th>일정</th></tr></thead><tbody>
-  ${S.opts.map(o=>`<tr><td>${o.n}</td><td class="num">${fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">${fmt(o.p*o.q*(100-o.dc)/100)}</td><td>${o.st}${o.st==='데모'?` <span class="mut">${o.demo[0]} ~ ${o.demo[1]}</span>`:''}</td><td class="cell-sm">${schCell(o)}</td></tr>`).join('')}
-  </tbody></table><div class="hint">옵션 총액은 데모 옵션 제외 · 옵션 추가 시 그 옵션의 설치일 · 과금 시작일은 <b>미정</b>에서 시작해 확인 후 입력</div></div>
-  </div><div class="mf"><button class="btn" data-close>닫기</button></div></div>`;
+  ${S.opts.map(o=>`<tr><td>${o.n}${o.pend?' <span class="bd ind" style="background:#e6f7f4;color:#159b8d">추가 · 저장 전</span> <button class="lnk" data-del="'+o.n+'">삭제</button>':''}</td><td class="num">${fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">${fmt(o.p*o.q*(100-o.dc)/100)}</td><td>${o.st}${o.st==='데모'?` <span class="mut">${o.demo[0]} ~ ${o.demo[1]}</span>`:''}</td><td class="cell-sm">${schCell(o)}</td></tr>`).join('')}
+  </tbody></table>${addBox()}<div class="hint">옵션 총액은 데모 옵션 제외</div></div>
+  </div><div class="mf">${S.opts.some(o=>o.pend)?'<span class="mut" style="margin-right:auto;align-self:center">추가한 옵션은 저장하면 서비스 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>':''}<button class="btn" data-close>닫기</button></div></div>`;
 }
+// 옵션 추가 — 기존 서비스(굿팜 솔루션 (NEW))에 행 추가. 일정: 계약일은 공통(같은 계약), 신청일은 추가한 날, 설치 예정일 · 설치일 · 과금 시작일은 미정에서 시작해 확인 후 입력
+function addBox(){
+  if(!S.add) return `<div style="margin-top:8px"><button class="btn" data-addopen>+ 옵션 추가</button></div>`;
+  const a=S.add, used=new Set(S.opts.map(o=>o.n)), list=CAT.filter(c=>!used.has(c[0]));
+  const row=(k,def)=>{ const f=a.s[k]||def; return `<tr><td>${k}</td><td><select class="fi" data-am="${k}">${[['c','공통 일정 사용'],['d','직접 지정'],['u','미정']].map(([v,t])=>`<option value="${v}" ${f.m===v?'selected':''}>${t}</option>`).join('')}</select>${f.m==='d'?` <input class="fi" type="date" data-av="${k}" value="${f.v||''}">`:''}${f.m==='c'?` <span class="mut">${S.common[k]||'미정'}</span>`:''}</td></tr>`; };
+  return `<div class="ebox" style="margin-top:10px"><div class="sec-h"><b>옵션 추가</b><span class="mut">굿팜 솔루션 (NEW)에 추가 — 새 서비스 행은 생기지 않아요</span></div>
+   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">옵션 <select class="fi" data-aopt>${list.map(c=>`<option ${c[0]===a.n?'selected':''}>${c[0]}</option>`).join('')}</select>
+    금액 <b>${fmt((CAT.find(c=>c[0]===a.n)||[0,0])[1])}</b> 수량 <input class="fi" style="width:54px" value="1"> 할인 <input class="fi" style="width:54px" value="0%"> 상태 <select class="fi" data-ast>${['신청','설치 예정','설치 완료','데모','승인'].map(x=>`<option ${x===a.st?'selected':''}>${x}</option>`).join('')}</select></div>
+   <table><thead><tr><th style="width:140px">일정 항목</th><th>값</th></tr></thead><tbody>${K.slice(0,5).map(k=>row(k,DEF_ADD[k])).join('')}</tbody></table>
+   <div class="hint">설치일 · 과금 시작일은 <b>미정</b>에서 시작해요. 공통 날짜가 자동으로 들어가지 않아요. 설치 후 [일정 수정]에서 확인해 입력해요.</div>
+   <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px"><button class="btn" data-addcancel>취소</button><button class="btn pri" data-addok>옵션 표에 추가</button></div></div>`;
+}
+const DEF_ADD={'신청일':{m:'d',v:TODAY},'설치 예정일':{m:'u'},'계약일':{m:'c'},'설치일':{m:'u'},'과금 시작일':{m:'u'}};
 function editBox(){
   const sc=S.scope, sel=S.opts.filter(o=>S.sel.has(o.n));
   let body='';
@@ -172,10 +187,11 @@ function scene(n){
   init();
   if(n===2){ S.modal=1; S.edit=1; S.scope='opt'; S.form={'설치 예정일':{m:'d',v:'2026-12-08'},'계약일':{m:'d',v:'2024-04-22'}}; }
   if(n===3){ S.scope='opt'; S.form={'설치 예정일':{m:'d',v:'2026-12-08'},'계약일':{m:'d',v:'2024-04-22'}}; save(); S.modal=0; S.hist=1; }
+  if(n===4){ S.modal=1; S.add={n:'키오스크',st:'신청',s:{}}; }
   S.scn=n; render();
 }
 function render(){
-  document.getElementById('scn').innerHTML=[[1,'① 기본 조회'],[2,'② POS 일정만 수정'],[3,'③ 저장 후 이력']].map(([n,t])=>`<button class="${S.scn===n?'on':''}" data-scn="${n}">${t}</button>`).join('')+'<button data-reset>처음으로</button>';
+  document.getElementById('scn').innerHTML=[[1,'① 기본 조회'],[2,'② POS 일정만 수정'],[3,'③ 저장 후 이력'],[4,'④ 옵션 추가']].map(([n,t])=>`<button class="${S.scn===n?'on':''}" data-scn="${n}">${t}</button>`).join('')+'<button data-reset>처음으로</button>';
   document.getElementById('app').innerHTML=`<div class="panel" style="padding:12px 16px"><b>샘플약국</b> <span class="mut">스토어 ID 2024047xxxx</span></div>`+listPanel()+logPanel()+(S.modal?modal():'');
   bind();
 }
@@ -198,6 +214,17 @@ function bind(){
   const m=document.getElementById('memo'); if(m) m.oninput=()=>{S.memo=m.value;};
   const w=document.getElementById('who'); if(w) w.onchange=()=>{S.who=w.value;render();};
   q('[data-save]').forEach(b=>b.onclick=save);
+  q('[data-addopen]').forEach(b=>b.onclick=()=>{ const used=new Set(S.opts.map(o=>o.n)); S.add={n:(CAT.find(c=>!used.has(c[0]))||[''])[0],st:'신청',s:{}}; render(); });
+  q('[data-aopt]').forEach(x=>x.onchange=()=>{S.add.n=x.value;render();});
+  q('[data-ast]').forEach(x=>x.onchange=()=>{S.add.st=x.value;});
+  q('[data-am]').forEach(x=>x.onchange=()=>{S.add.s[x.dataset.am]={m:x.value};render();});
+  q('[data-av]').forEach(x=>x.onchange=()=>{S.add.s[x.dataset.av].v=x.value;});
+  q('[data-addcancel]').forEach(b=>b.onclick=()=>{S.add=null;render();});
+  q('[data-addok]').forEach(b=>b.onclick=()=>{ const a=S.add, sch={}; K.slice(0,5).forEach(k=>{ const f=a.s[k]||DEF_ADD[k]; if(f.m!=='c') sch[k]=f.m==='d'?{m:'d',v:f.v}:{m:'u'}; });
+    S.opts.push({n:a.n,p:CAT.find(c=>c[0]===a.n)[1],q:1,dc:0,st:a.st,s:sch,pend:1}); S.add=null; render(); });
+  q('[data-del]').forEach(b=>b.onclick=()=>{ S.opts=S.opts.filter(o=>o.n!==b.dataset.del); toast('저장 전이라 이력 없이 지웠어요'); render(); });
+  q('[data-addsave]').forEach(b=>b.onclick=()=>{ S.opts.filter(o=>o.pend).reverse().forEach(o=>{ S.log.unshift(['2026-11-26 10:40',S.who,'옵션','옵션 추가 · '+o.n,'없음',`${o.n} ${fmt(o.p)} · ${o.st}<br>신청일 ${eff(o,'신청일')||'미정'} · 설치일 ${eff(o,'설치일')||'미정'} · 과금 시작일 ${eff(o,'과금 시작일')||'미정'}`,'','']); delete o.pend; });
+    S.flt='전체'; S.modal=0; S.scn=4; toast('옵션을 추가했어요'); render(); });
 }
 scene(+new URLSearchParams(location.search).get("s")||1);
 </script></body></html>
