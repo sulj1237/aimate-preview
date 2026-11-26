@@ -105,22 +105,22 @@ function logPanel(){
 }
 function schCell(o){
   const d=indiv(o); if(!d.length) return '<span class="mut">공통 일정</span>';
-  return d.map(k=>mode(o,k)==='u'?`${k} <b>미정</b>`:`${k} <b style="color:var(--org)">${md(eff(o,k))}</b>`).join(' · ')+' <span class="mut">(직접 지정)</span>';
+  return d.map(k=>mode(o,k)==='u'?`${k} <b>미정</b>`:`${k} <b style="color:var(--org)">${md(eff(o,k))}</b>`).join(' · ')+(d.some(k=>mode(o,k)==='d')?' <span class="mut">(직접 지정)</span>':'');
 }
 function modal(){
-  const hl=S.log.filter(l=>l[2]==='일정 변경');
+  const hl=S.log.filter(l=>l[2]==='일정 변경'||l[2]==='옵션');
   return `<div class="dim" data-close></div><div class="mdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-close>×</button></div><div class="mb">
   <div class="sec"><div class="sec-h"><b>서비스</b><span>굿팜 솔루션 (NEW)</span></div></div>
   <div class="sec"><div class="sec-h"><b>공통 일정</b><div class="r">${S.edit?'':'<button class="btn" data-edit>일정 수정</button>'}</div></div>
     <div class="cgrid">${K.map(k=>`<div><span>${k}</span><b>${S.common[k]||'미정'}</b></div>`).join('')}</div>
     <div class="hint">모든 옵션에 같이 적용되는 일정이에요. 한 옵션만 달라지면 그 옵션에서 직접 지정해요.</div>
-    <div style="margin-top:8px"><button class="hbtn" data-hist>일정 변경 이력 ${hl.length}건 ${S.hist?'▴':'▾'}</button><span class="ph2">2차</span>
-    ${S.hist?`<div class="hbox">${hl.length?hl.map(l=>`<div><b>${l[0]} · ${l[1]} · ${l[3].replace('일정 변경 · ','')}</b>${l[7]?' · '+l[7]:''}<br>${l[8].map(c=>`&nbsp;&nbsp;${c}`).join('<br>')}</div>`).join('<hr style="border:0;border-top:1px solid #eef0f2">'):'<span class="mut">아직 일정 변경이 없어요</span>'}</div>`:''}</div></div>
+    <div style="margin-top:8px"><button class="hbtn" data-hist>옵션 · 일정 변경 이력 ${hl.length}건 ${S.hist?'▴':'▾'}</button><span class="ph2">2차</span>
+    ${S.hist?`<div class="hbox">${hl.length?hl.map(l=>`<div><b>${l[0]} · ${l[1]} · ${l[3]}</b>${l[7]?' · '+l[7]:''}<br>${l[8].map(c=>`&nbsp;&nbsp;${c}`).join('<br>')}</div>`).join('<hr style="border:0;border-top:1px solid #eef0f2">'):'<span class="mut">아직 옵션 · 일정 변경이 없어요</span>'}</div>`:''}</div></div>
   ${S.edit?editBox():''}
   <div class="sec"><table><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">할인</th><th class="num">총액</th><th>서비스 상태</th><th>일정</th></tr></thead><tbody>
   ${S.opts.map(o=>`<tr><td>${o.n}${o.pend?' <span class="bd ind" style="background:#e6f7f4;color:#159b8d">추가 · 저장 전</span> <button class="lnk" data-del="'+o.n+'">삭제</button>':''}</td><td class="num">${fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">${fmt(o.p*o.q*(100-o.dc)/100)}</td><td>${o.st}${o.st==='데모'?` <span class="mut">${o.demo[0]} ~ ${o.demo[1]}</span>`:''}</td><td class="cell-sm">${schCell(o)}</td></tr>`).join('')}
   </tbody></table>${addBox()}<div class="hint">옵션 총액은 데모 옵션 제외</div></div>
-  </div><div class="mf">${S.opts.some(o=>o.pend)?'<span class="mut" style="margin-right:auto;align-self:center">추가한 옵션은 저장하면 서비스 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>':''}<button class="btn" data-close>닫기</button></div></div>`;
+  </div><div class="mf">${S.opts.some(o=>o.pend)?'<span class="mut" style="align-self:center">메모</span><input class="fi" id="addMemo" style="width:260px" value="'+(S.addMemo||'')+'" placeholder="예: 키오스크 추가 계약"><span class="mut" style="margin-right:auto;align-self:center">저장하면 옵션 추가가 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>':''}<button class="btn" data-close>닫기</button></div></div>`;
 }
 // 옵션 추가 — 기존 서비스(굿팜 솔루션 (NEW))에 행 추가. 일정: 계약일은 공통(같은 계약), 신청일은 추가한 날, 설치 예정일 · 설치일 · 과금 시작일은 미정에서 시작해 확인 후 입력
 function addBox(){
@@ -188,10 +188,11 @@ function scene(n){
   if(n===2){ S.modal=1; S.edit=1; S.scope='opt'; S.form={'설치 예정일':{m:'d',v:'2026-12-08'},'계약일':{m:'d',v:'2024-04-22'}}; }
   if(n===3){ S.scope='opt'; S.form={'설치 예정일':{m:'d',v:'2026-12-08'},'계약일':{m:'d',v:'2024-04-22'}}; save(); S.modal=0; S.hist=1; }
   if(n===4){ S.modal=1; S.add={n:'키오스크',st:'신청',s:{}}; }
+  if(n===5){ S.modal=1; S.addMemo='키오스크 추가 계약'; S.opts.push({n:'키오스크',p:45000,q:1,dc:0,st:'신청',s:{'신청일':{m:'d',v:TODAY},'설치 예정일':{m:'u'},'설치일':{m:'u'},'과금 시작일':{m:'u'}},pend:1}); render(); document.querySelector('[data-addsave]').click(); return; }
   S.scn=n; render();
 }
 function render(){
-  document.getElementById('scn').innerHTML=[[1,'① 기본 조회'],[2,'② POS 일정만 수정'],[3,'③ 저장 후 이력'],[4,'④ 옵션 추가']].map(([n,t])=>`<button class="${S.scn===n?'on':''}" data-scn="${n}">${t}</button>`).join('')+'<button data-reset>처음으로</button>';
+  document.getElementById('scn').innerHTML=[[1,'① 기본 조회'],[2,'② POS 일정만 수정'],[3,'③ 저장 후 이력'],[4,'④ 옵션 추가'],[5,'⑤ 옵션 추가 저장 후']].map(([n,t])=>`<button class="${S.scn===n?'on':''}" data-scn="${n}">${t}</button>`).join('')+'<button data-reset>처음으로</button>';
   document.getElementById('app').innerHTML=`<div class="panel" style="padding:12px 16px"><b>샘플약국</b> <span class="mut">스토어 ID 2024047xxxx</span></div>`+listPanel()+logPanel()+(S.modal?modal():'');
   bind();
 }
@@ -223,8 +224,10 @@ function bind(){
   q('[data-addok]').forEach(b=>b.onclick=()=>{ const a=S.add, sch={}; K.slice(0,5).forEach(k=>{ const f=a.s[k]||DEF_ADD[k]; if(f.m!=='c') sch[k]=f.m==='d'?{m:'d',v:f.v}:{m:'u'}; });
     S.opts.push({n:a.n,p:CAT.find(c=>c[0]===a.n)[1],q:1,dc:0,st:a.st,s:sch,pend:1}); S.add=null; render(); });
   q('[data-del]').forEach(b=>b.onclick=()=>{ S.opts=S.opts.filter(o=>o.n!==b.dataset.del); toast('저장 전이라 이력 없이 지웠어요'); render(); });
-  q('[data-addsave]').forEach(b=>b.onclick=()=>{ S.opts.filter(o=>o.pend).reverse().forEach(o=>{ S.log.unshift(['2026-11-26 10:40',S.who,'옵션','옵션 추가 · '+o.n,'없음',`${o.n} ${fmt(o.p)} · ${o.st}<br>신청일 ${eff(o,'신청일')||'미정'} · 설치일 ${eff(o,'설치일')||'미정'} · 과금 시작일 ${eff(o,'과금 시작일')||'미정'}`,'','']); delete o.pend; });
-    S.flt='전체'; S.modal=0; S.scn=4; toast('옵션을 추가했어요'); render(); });
+  const am=document.getElementById('addMemo'); if(am) am.oninput=()=>{S.addMemo=am.value;};
+  q('[data-addsave]').forEach(b=>b.onclick=()=>{ S.opts.filter(o=>o.pend).reverse().forEach(o=>{ const det=[`금액 ${fmt(o.p)} · 수량 ${o.q} · 할인 ${o.dc}% · 상태 ${o.st}`].concat(K.slice(0,5).map(k=>`${k} ${lab(o,k)}`));
+      S.log.unshift(['2026-11-26 10:40',S.who==='김운영'?'김운영':S.who+' (입력 김운영)','옵션','옵션 추가 · '+o.n,'없음',det.join('<br>'),eff(o,'과금 시작일')?eff(o,'과금 시작일').slice(0,7):'',S.addMemo||'',['없음 → 추가'].concat(det)]); delete o.pend; });
+    S.flt='전체'; S.hist=1; S.scn=5; toast('옵션을 추가했어요 — 변경 이력에 남았어요'); render(); });
 }
 scene(+new URLSearchParams(location.search).get("s")||1);
 </script></body></html>
