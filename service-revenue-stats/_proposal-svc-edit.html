@@ -74,7 +74,7 @@ function init(){
           ['2026-09-28 15:40','김운영','금액 할인','금액 할인 수정','−5,500 [계약 할인]','−11,000 [계약 할인] DRS 파머시 퍼스트 중복','2026-10'],
           ['2024-06-03 11:20','이영업','결제 카드','결제 카드 등록','없음','신한카드 · 뒤 4자리 ****',''],
           ['2024-04-22 09:30','이영업','서비스','서비스 등록 · 승인','없음','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS','2024-06']],
-     modal:0, edit:0, add:null, scope:'opt', sel:new Set(['굿팜 POS']), form:{}, cform:{}, memo:'POS 장비 교체 재설치', who:'김운영', flt:'전체', hist:0, scn:1};
+     modal:0, edit:0, add:null, dr:{}, termOpen:null, scope:'opt', sel:new Set(['굿팜 POS']), form:{}, cform:{}, memo:'POS 장비 교체 재설치', who:'김운영', flt:'전체', hist:0, scn:1};
   // 각 옵션 항목 모드: c=공통 일정 사용, d=직접 지정, u=미정  (없으면 c)
 }
 const mode=(o,k)=>(o.s[k]||{m:k==='해지일'&&!S.common[k]?'c':'c'}).m;
@@ -87,8 +87,8 @@ const CAT=[['키오스크',45000],['파머시 퍼스트',22000],['EDB 연동',15
 function demoBadge(o){ const [f,t]=o.demo; if(t<NOWM) return `<span class="bd end">데모 기간 종료</span>`; if(t===NOWM) return `<span class="bd end">데모 종료 예정</span>`; return `<span class="bd dm">데모 ${f.replace('-','.')}~${t.slice(5)}</span>`; }
 
 function listPanel(){
-  const paid=S.opts.filter(o=>o.st!=='데모').reduce((a,o)=>a+o.p*o.q*(100-o.dc)/100,0);
-  const opts=S.opts.map(o=>o.n+(indiv(o).length?' <span class="bd ind">개별 일정</span>':'')+(o.st==='데모'?' '+demoBadge(o):'')+(['신청','설치 예정','설치 완료'].includes(o.st)?` <span class="bd" style="background:#f1f3f5;color:#5b6168">${o.st}</span>`:'')).join(' · ');
+  const paid=S.opts.filter(o=>!['데모','해지'].includes(o.st)&&!o.pend).reduce((a,o)=>a+o.p*o.q*(100-o.dc)/100,0);
+  const opts=S.opts.map(o=>o.n+(indiv(o).length?' <span class="bd ind">개별 일정</span>':'')+(o.st==='데모'?' '+demoBadge(o):'')+(o.st==='해지'?` <span class="bd" style="background:#f1f3f5;color:#8a9099">해지 ${md(eff(o,'해지일'))}</span>`:'')+(['신청','설치 예정','설치 완료'].includes(o.st)?` <span class="bd" style="background:#f1f3f5;color:#5b6168">${o.st}</span>`:'')).join(' · ');
   return `<div class="panel"><div class="ph"><h3>약국 서비스 목록</h3><div class="r"><button class="btn">서비스등록</button><button class="btn pri" data-open>서비스 수정</button></div></div>
   <table><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead><tbody>
   <tr><td><b>굿팜 솔루션 (NEW)</b></td>${['신청일','계약일','설치일','과금 시작일'].map(k=>`<td>${S.common[k]||'미정'}</td>`).join('')}<td class="num">${fmt(Math.round((paid-10000)*1.1))}</td><td>승인</td><td>서명 완료</td><td>이영업</td></tr></tbody></table>
@@ -118,9 +118,9 @@ function modal(){
     ${S.hist?`<div class="hbox">${hl.length?hl.map(l=>`<div><b>${l[0]} · ${l[1]} · ${l[3]}</b>${l[7]?' · '+l[7]:''}<br>${l[8].map(c=>`&nbsp;&nbsp;${c}`).join('<br>')}</div>`).join('<hr style="border:0;border-top:1px solid #eef0f2">'):'<span class="mut">아직 옵션 · 일정 변경이 없어요</span>'}</div>`:''}</div></div>
   ${S.edit?editBox():''}
   <div class="sec"><table><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">할인</th><th class="num">총액</th><th>서비스 상태</th><th>일정</th></tr></thead><tbody>
-  ${S.opts.map(o=>`<tr><td>${o.n}${o.pend?' <span class="bd ind" style="background:#e6f7f4;color:#159b8d">추가 · 저장 전</span> <button class="lnk" data-del="'+o.n+'">삭제</button>':''}</td><td class="num">${fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">${fmt(o.p*o.q*(100-o.dc)/100)}</td><td>${o.st}${o.st==='데모'?` <span class="mut">${o.demo[0]} ~ ${o.demo[1]}</span>`:''}</td><td class="cell-sm">${schCell(o)}</td></tr>`).join('')}
+  ${S.opts.map(optRow).join('')}
   </tbody></table>${addBox()}<div class="hint">옵션 총액은 데모 옵션 제외</div></div>
-  </div><div class="mf">${S.opts.some(o=>o.pend)?'<span class="mut" style="align-self:center">메모</span><input class="fi" id="addMemo" style="width:260px" value="'+(S.addMemo||'')+'" placeholder="예: 키오스크 추가 계약"><span class="mut" style="margin-right:auto;align-self:center">저장하면 옵션 추가가 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>':''}<button class="btn" data-close>닫기</button></div></div>`;
+  </div><div class="mf" style="flex-wrap:wrap">${optSummary()}<button class="btn" data-close>닫기</button></div></div>`;
 }
 // 옵션 추가 — 기존 서비스(굿팜 솔루션 (NEW))에 행 추가. 일정: 계약일은 공통(같은 계약), 신청일은 추가한 날, 설치 예정일 · 설치일 · 과금 시작일은 미정에서 시작해 확인 후 입력
 function addBox(){
@@ -135,6 +135,43 @@ function addBox(){
    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px"><button class="btn" data-addcancel>취소</button><button class="btn pri" data-addok>옵션 표에 추가</button></div></div>`;
 }
 const DEF_ADD={'신청일':{m:'d',v:TODAY},'설치 예정일':{m:'u'},'계약일':{m:'c'},'설치일':{m:'u'},'과금 시작일':{m:'u'}};
+// 옵션 행 — 수량 · 할인 · 상태를 바로 고치고, 이용 이력이 있는 옵션은 [해지](해지일 · 사유), 저장 전 추가한 옵션은 [삭제]
+const ST=['신청','설치 예정','설치 완료','데모','승인'], WHY=['계약 종료','폐업','타사 이전','기타'];
+const D=o=>S.dr[o.n]||(S.dr[o.n]={q:o.q,dc:o.dc,st:o.st,demo:o.demo?[...o.demo]:['2026-12','2027-01'],term:null});
+const nextYm=d=>{ const [y,m]=d.slice(0,7).split('-').map(Number); return m===12?`${y+1}-01`:`${y}-${String(m+1).padStart(2,'0')}`; };
+function optRow(o){
+  if(o.pend) return `<tr><td>${o.n} <span class="bd ind" style="background:#e6f7f4;color:#159b8d">추가 · 저장 전</span> <button class="lnk" data-del="${o.n}">삭제</button></td><td class="num">${fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">${fmt(o.p*o.q*(100-o.dc)/100)}</td><td>${o.st}</td><td class="cell-sm">${schCell(o)}</td></tr>`;
+  if(o.st==='해지') return `<tr style="color:#8a9099"><td>${o.n}</td><td class="num">${fmt(o.p)}</td><td class="num">${o.q}</td><td class="num">${o.dc}%</td><td class="num">−</td><td>해지 <span class="mut">${eff(o,'해지일')}</span></td><td class="cell-sm">${schCell(o)}</td></tr>`;
+  const d=D(o), t=d.term, ch=(a,b)=>a!==b?' style="border-color:#c2410c;color:#c2410c;font-weight:700"':'';
+  return `<tr><td>${o.n}${t?' <span class="bd end">해지 · 저장 전</span>':''}</td><td class="num">${fmt(o.p)}</td>
+   <td class="num"><input class="fi" type="number" min="1" style="width:52px;text-align:right" data-dq="${o.n}" value="${d.q}"${ch(d.q,o.q)}></td>
+   <td class="num"><input class="fi" type="number" min="0" max="100" style="width:56px;text-align:right" data-ddc="${o.n}" value="${d.dc}"${ch(d.dc,o.dc)}>%</td>
+   <td class="num">${fmt(o.p*d.q*(100-d.dc)/100)}</td>
+   <td><select class="fi" data-dst="${o.n}"${ch(d.st,o.st)}>${ST.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select>${d.st==='데모'?` <select class="fi" data-dd0="${o.n}">${['2026-11','2026-12','2027-01'].map(m=>`<option ${m===d.demo[0]?'selected':''}>${m}</option>`).join('')}</select>~<select class="fi" data-dd1="${o.n}">${['2026-12','2027-01','2027-02'].map(m=>`<option ${m===d.demo[1]?'selected':''}>${m}</option>`).join('')}</select>`:''}
+    <div>${t?`<button class="lnk" data-untern="${o.n}">해지 취소</button>`:`<button class="lnk" style="color:#c2410c" data-term="${o.n}">해지</button>`}</div></td>
+   <td class="cell-sm">${schCell(o)}</td></tr>${S.termOpen===o.n||t?`<tr><td colspan="7" style="background:#fff8f3"><b style="color:#c2410c">${o.n} 해지</b> &nbsp; 해지일 <input class="fi" type="date" data-tat="${o.n}" value="${t?t.at:'2026-12-31'}"> 사유 <select class="fi" data-twhy="${o.n}">${WHY.map(w=>`<option ${t&&t.why===w?'selected':''}>${w}</option>`).join('')}</select> <span class="hint">이 옵션에만 반영 · 해지일 다음 달 청구분부터 빠짐 · 이용 기록은 그대로 남음</span>${t?'':` <button class="btn" data-tok="${o.n}">해지 표시</button>`}</td></tr>`:''}`;
+}
+// 저장하면 남는 옵션 이력 — 한 옵션 × 한 종류 = 한 줄
+function optChanges(){
+  const out=[];
+  S.opts.forEach(o=>{
+    if(o.pend){ const det=[`금액 ${fmt(o.p)} · 수량 ${o.q} · 할인 ${o.dc}% · 상태 ${o.st}`].concat(K.slice(0,5).map(k=>`${k} ${lab(o,k)}`));
+      out.push({o,t:'옵션 추가 · '+o.n,b:'없음',a:det.join('<br>'),ym:eff(o,'과금 시작일')?eff(o,'과금 시작일').slice(0,7):'',lines:['없음 → 추가'].concat(det),ap:()=>{delete o.pend;}}); return; }
+    const d=S.dr[o.n]; if(!d||o.st==='해지') return;
+    const L=[]; if(d.q!==o.q) L.push(['수량',o.q,d.q]); if(d.dc!==o.dc) L.push(['서비스별 할인',o.dc+'%',d.dc+'%']);
+    if(L.length){ const b=fmt(o.p*o.q*(100-o.dc)/100), a=fmt(o.p*d.q*(100-d.dc)/100); L.push(['옵션 금액',b,a]);
+      out.push({o,t:'옵션 변경 · '+o.n,b:L.map(l=>`${l[0]} ${l[1]}`).join('<br>'),a:L.map(l=>`${l[0]} ${l[2]}`).join('<br>'),ym:'2026-12',lines:L.map(l=>`${l[0]} ${l[1]} → ${l[2]}`),ap:()=>{o.q=d.q;o.dc=d.dc;}}); }
+    const sb=o.st+(o.st==='데모'?` (${o.demo[0]} ~ ${o.demo[1]})`:''), sa=d.st+(d.st==='데모'?` (${d.demo[0]} ~ ${d.demo[1]})`:'');
+    if(sb!==sa) out.push({o,t:'옵션 상태 변경 · '+o.n,b:sb,a:sa,ym:(o.st==='데모'||d.st==='데모'||d.st==='승인')?(d.st==='데모'?d.demo[0]:'2026-12'):'',lines:[`상태 ${sb} → ${sa}`],ap:()=>{o.st=d.st; if(d.st==='데모') o.demo=[...d.demo];}});
+    if(d.term) out.push({o,t:'옵션 해지 · '+o.n,b:`${o.st} · 해지일 미정`,a:`해지 · 해지일 ${d.term.at}<br>사유 ${d.term.why}`,ym:nextYm(d.term.at),lines:[`상태 ${o.st} → 해지`,`해지일 미정 → ${d.term.at}`,`사유 ${d.term.why}`],ap:()=>{o.st='해지'; o.s['해지일']={m:'d',v:d.term.at};}});
+  });
+  return out;
+}
+function optSummary(){
+  const ch=optChanges(); if(!ch.length) return '';
+  return `<div class="conf" style="flex-basis:100%;margin:0 0 8px"><b>저장 전 확인</b>${ch.map(c=>`<div>${c.t} — ${c.lines.length>3?c.lines[0]+' 외 '+(c.lines.length-1)+'개 항목':c.lines.join(' · ')}</div>`).join('')}</div>
+   <span class="mut" style="align-self:center">메모</span><input class="fi" id="addMemo" style="width:260px" value="${S.addMemo||''}" placeholder="예: 키오스크 추가 계약"><span class="mut" style="margin-right:auto;align-self:center">저장하면 옵션 변경이 변경 이력에 남아요</span><button class="btn pri" data-addsave>저장</button>`;
+}
 function editBox(){
   const sc=S.scope, sel=S.opts.filter(o=>S.sel.has(o.n));
   let body='';
@@ -188,11 +225,14 @@ function scene(n){
   if(n===2){ S.modal=1; S.edit=1; S.scope='opt'; S.form={'설치 예정일':{m:'d',v:'2026-12-08'},'계약일':{m:'d',v:'2024-04-22'}}; }
   if(n===3){ S.scope='opt'; S.form={'설치 예정일':{m:'d',v:'2026-12-08'},'계약일':{m:'d',v:'2024-04-22'}}; save(); S.modal=0; S.hist=1; }
   if(n===4){ S.modal=1; S.add={n:'키오스크',st:'신청',s:{}}; }
+  if(n===6||n===7){ S.modal=1; S.addMemo='POS 해지 · 2D 정식 전환 · OCR 할인 조정'; S.scn=6;
+    S.dr={'스마트 OCR':{q:1,dc:10,st:'승인',demo:['2026-12','2027-01'],term:null},'굿팜 POS':{q:1,dc:50,st:'승인',demo:['2026-12','2027-01'],term:{at:'2026-12-31',why:'계약 종료'}},'스마트2D':{q:1,dc:0,st:'승인',demo:['2026-11','2026-12'],term:null}};
+    if(n===7){ render(); document.querySelector('[data-addsave]').click(); return; } }
   if(n===5){ S.modal=1; S.addMemo='키오스크 추가 계약'; S.opts.push({n:'키오스크',p:45000,q:1,dc:0,st:'신청',s:{'신청일':{m:'d',v:TODAY},'설치 예정일':{m:'u'},'설치일':{m:'u'},'과금 시작일':{m:'u'}},pend:1}); render(); document.querySelector('[data-addsave]').click(); return; }
-  S.scn=n; render();
+  if(S.scn!==6) S.scn=n; render();
 }
 function render(){
-  document.getElementById('scn').innerHTML=[[1,'① 기본 조회'],[2,'② POS 일정만 수정'],[3,'③ 저장 후 이력'],[4,'④ 옵션 추가'],[5,'⑤ 옵션 추가 저장 후']].map(([n,t])=>`<button class="${S.scn===n?'on':''}" data-scn="${n}">${t}</button>`).join('')+'<button data-reset>처음으로</button>';
+  document.getElementById('scn').innerHTML=[[1,'① 기본 조회'],[2,'② POS 일정만 수정'],[3,'③ 저장 후 이력'],[4,'④ 옵션 추가'],[5,'⑤ 옵션 추가 저장 후'],[6,'⑥ 할인 · 상태 · 해지'],[7,'⑦ 그 저장 후 이력']].map(([n,t])=>`<button class="${S.scn===n?'on':''}" data-scn="${n}">${t}</button>`).join('')+'<button data-reset>처음으로</button>';
   document.getElementById('app').innerHTML=`<div class="panel" style="padding:12px 16px"><b>샘플약국</b> <span class="mut">스토어 ID 2024047xxxx</span></div>`+listPanel()+logPanel()+(S.modal?modal():'');
   bind();
 }
@@ -225,9 +265,20 @@ function bind(){
     S.opts.push({n:a.n,p:CAT.find(c=>c[0]===a.n)[1],q:1,dc:0,st:a.st,s:sch,pend:1}); S.add=null; render(); });
   q('[data-del]').forEach(b=>b.onclick=()=>{ S.opts=S.opts.filter(o=>o.n!==b.dataset.del); toast('저장 전이라 이력 없이 지웠어요'); render(); });
   const am=document.getElementById('addMemo'); if(am) am.oninput=()=>{S.addMemo=am.value;};
-  q('[data-addsave]').forEach(b=>b.onclick=()=>{ S.opts.filter(o=>o.pend).reverse().forEach(o=>{ const det=[`금액 ${fmt(o.p)} · 수량 ${o.q} · 할인 ${o.dc}% · 상태 ${o.st}`].concat(K.slice(0,5).map(k=>`${k} ${lab(o,k)}`));
-      S.log.unshift(['2026-11-26 10:40',S.who==='김운영'?'김운영':S.who+' (입력 김운영)','옵션','옵션 추가 · '+o.n,'없음',det.join('<br>'),eff(o,'과금 시작일')?eff(o,'과금 시작일').slice(0,7):'',S.addMemo||'',['없음 → 추가'].concat(det)]); delete o.pend; });
-    S.flt='전체'; S.hist=1; S.scn=5; toast('옵션을 추가했어요 — 변경 이력에 남았어요'); render(); });
+  q('[data-addsave]').forEach(b=>b.onclick=()=>{ const ch=optChanges(), by=S.who==='김운영'?'김운영':S.who+' (입력 김운영)';
+    ch.slice().reverse().forEach(c=>S.log.unshift(['2026-11-26 10:40',by,'옵션',c.t,c.b,c.a,c.ym,S.addMemo||'',c.lines]));
+    ch.forEach(c=>c.ap()); S.dr={}; S.termOpen=null;
+    S.flt='옵션'; S.hist=1; S.scn=S.scn===6?7:5; toast('저장했어요 — 변경 이력에 남았어요'); render(); });
+  const v=x=>x; q('[data-dq]').forEach(i=>i.onchange=()=>{ D(S.opts.find(o=>o.n===i.dataset.dq)).q=+i.value; render(); });
+  q('[data-ddc]').forEach(i=>i.onchange=()=>{ D(S.opts.find(o=>o.n===i.dataset.ddc)).dc=+i.value; render(); });
+  q('[data-dst]').forEach(i=>i.onchange=()=>{ D(S.opts.find(o=>o.n===i.dataset.dst)).st=i.value; render(); });
+  q('[data-dd0]').forEach(i=>i.onchange=()=>{ D(S.opts.find(o=>o.n===i.dataset.dd0)).demo[0]=i.value; render(); });
+  q('[data-dd1]').forEach(i=>i.onchange=()=>{ D(S.opts.find(o=>o.n===i.dataset.dd1)).demo[1]=i.value; render(); });
+  q('[data-term]').forEach(b=>b.onclick=()=>{ S.termOpen=b.dataset.term; render(); });
+  q('[data-tok]').forEach(b=>b.onclick=()=>{ const n=b.dataset.tok; D(S.opts.find(o=>o.n===n)).term={at:document.querySelector(`[data-tat="${n}"]`).value,why:document.querySelector(`[data-twhy="${n}"]`).value}; S.termOpen=null; render(); });
+  q('[data-tat]').forEach(i=>i.onchange=()=>{ const d=S.dr[i.dataset.tat]; if(d&&d.term){d.term.at=i.value;render();} });
+  q('[data-twhy]').forEach(i=>i.onchange=()=>{ const d=S.dr[i.dataset.twhy]; if(d&&d.term){d.term.why=i.value;render();} });
+  q('[data-untern]').forEach(b=>b.onclick=()=>{ D(S.opts.find(o=>o.n===b.dataset.untern)).term=null; render(); });
 }
 scene(+new URLSearchParams(location.search).get("s")||1);
 </script></body></html>
