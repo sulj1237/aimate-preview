@@ -82,8 +82,10 @@ const eff=(o,k)=>{ const x=o.s[k]; if(!x||x.m==='c') return S.common[k]; if(x.m=
 const lab=(o,k)=>{ const m=mode(o,k), v=eff(o,k); return m==='c'?`${v||'미정'} (공통)`:m==='u'?'미정':`${v} (직접 지정)`; };
 const indiv=o=>K.filter(k=>mode(o,k)!=='c');
 const NOWM='2026-11', TODAY='2026-11-26';
-// 추가할 수 있는 옵션(예시) — 금액은 요금표 정상가 예시
-const CAT=[['키오스크',45000],['파머시 퍼스트',22000],['EDB 연동',15000],['모바일 바코드프리',15000]];
+// 추가할 수 있는 옵션 = 서비스 청구 통계 집계 서비스 전체(미등록 청구 · 금액 할인 · 서비스 미지정 제외). 금액 = 요금표 정상가(VAT 별도), 결합 할인은 서비스별 할인으로
+const CAT=[['키오스크',45000,'서비스 30,000 + 장비임대료 15,000'],['스마트 OCR',45000,'서비스 30,000 + 장비임대료 15,000 · 모바일 OCR 기본 제공'],['파머시 퍼스트',40000,''],['스마트2D',30000,''],
+  ['모바일 OCR',15000,'스마트 OCR을 쓰면 무료'],['풀패키지',100000,'정액 · 할인 불가'],['ESL',180000,'정액 · 할인 불가'],['EDB 연동',20000,'할인 불가'],['굿팜 POS',0,'기본 무료 · 계약 때 유료로 한 약국만 20,000'],['모바일 바코드프리',15000,'']];
+const NODC=new Set(['풀패키지','ESL','EDB 연동']);
 function demoBadge(o){ const [f,t]=o.demo; if(t<NOWM) return `<span class="bd end">데모 기간 종료</span>`; if(t===NOWM) return `<span class="bd end">데모 종료 예정</span>`; return `<span class="bd dm">데모 ${f.replace('-','.')}~${t.slice(5)}</span>`; }
 
 function listPanel(){
@@ -125,11 +127,11 @@ function modal(){
 // 옵션 추가 — 기존 서비스(굿팜 솔루션 (NEW))에 행 추가. 일정: 계약일은 공통(같은 계약), 신청일은 추가한 날, 설치 예정일 · 설치일 · 과금 시작일은 미정에서 시작해 확인 후 입력
 function addBox(){
   if(!S.add) return `<div style="margin-top:8px"><button class="btn" data-addopen>+ 옵션 추가</button></div>`;
-  const a=S.add, used=new Set(S.opts.map(o=>o.n)), list=CAT.filter(c=>!used.has(c[0]));
+  const a=S.add, used=new Set(S.opts.filter(o=>o.st!=='해지').map(o=>o.n)), list=CAT.filter(c=>!used.has(c[0]));
   const row=(k,def)=>{ const f=a.s[k]||def; return `<tr><td>${k}</td><td><select class="fi" data-am="${k}">${[['c','공통 일정 사용'],['d','직접 지정'],['u','미정']].map(([v,t])=>`<option value="${v}" ${f.m===v?'selected':''}>${t}</option>`).join('')}</select>${f.m==='d'?` <input class="fi" type="date" data-av="${k}" value="${f.v||''}">`:''}${f.m==='c'?` <span class="mut">${S.common[k]||'미정'}</span>`:''}</td></tr>`; };
-  return `<div class="ebox" style="margin-top:10px"><div class="sec-h"><b>옵션 추가</b><span class="mut">굿팜 솔루션 (NEW)에 추가 — 새 서비스 행은 생기지 않아요</span></div>
+  return `<div class="ebox" style="margin-top:10px"><div class="sec-h"><b>옵션 추가</b><span class="mut">굿팜 솔루션 (NEW)에 추가 — 새 서비스 행은 생기지 않아요 · 선택지 = 서비스 청구 통계에서 집계하는 서비스 전체</span></div>
    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">옵션 <select class="fi" data-aopt>${list.map(c=>`<option ${c[0]===a.n?'selected':''}>${c[0]}</option>`).join('')}</select>
-    금액 <b>${fmt((CAT.find(c=>c[0]===a.n)||[0,0])[1])}</b> 수량 <input class="fi" style="width:54px" value="1"> 할인 <input class="fi" style="width:54px" value="0%"> 상태 <select class="fi" data-ast>${['신청','설치 예정','설치 완료','데모','승인'].map(x=>`<option ${x===a.st?'selected':''}>${x}</option>`).join('')}</select></div>
+    금액 <b>${fmt((CAT.find(c=>c[0]===a.n)||[0,0])[1])}</b> <span class="mut">${(CAT.find(c=>c[0]===a.n)||[])[2]||''}</span> 수량 <input class="fi" style="width:54px" value="1"> 할인 <input class="fi" style="width:54px" value="0%" ${NODC.has(a.n)?'disabled title="할인 불가"':''}> 상태 <select class="fi" data-ast>${['신청','설치 예정','설치 완료','데모','승인'].map(x=>`<option ${x===a.st?'selected':''}>${x}</option>`).join('')}</select></div>
    <table><thead><tr><th style="width:140px">일정 항목</th><th>값</th></tr></thead><tbody>${K.slice(0,5).map(k=>row(k,DEF_ADD[k])).join('')}</tbody></table>
    <div class="hint">설치일 · 과금 시작일은 <b>미정</b>에서 시작해요. 공통 날짜가 자동으로 들어가지 않아요. 설치 후 [일정 수정]에서 확인해 입력해요.</div>
    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px"><button class="btn" data-addcancel>취소</button><button class="btn pri" data-addok>옵션 표에 추가</button></div></div>`;
@@ -145,7 +147,7 @@ function optRow(o){
   const d=D(o), t=d.term, ch=(a,b)=>a!==b?' style="border-color:#c2410c;color:#c2410c;font-weight:700"':'';
   return `<tr><td>${o.n}${t?' <span class="bd end">해지 · 저장 전</span>':''}</td><td class="num">${fmt(o.p)}</td>
    <td class="num"><input class="fi" type="number" min="1" style="width:52px;text-align:right" data-dq="${o.n}" value="${d.q}"${ch(d.q,o.q)}></td>
-   <td class="num"><input class="fi" type="number" min="0" max="100" style="width:56px;text-align:right" data-ddc="${o.n}" value="${d.dc}"${ch(d.dc,o.dc)}>%</td>
+   <td class="num">${NODC.has(o.n)?'<span class="mut">할인 불가</span>':`<input class="fi" type="number" min="0" max="100" style="width:56px;text-align:right" data-ddc="${o.n}" value="${d.dc}"${ch(d.dc,o.dc)}>%`}</td>
    <td class="num">${fmt(o.p*d.q*(100-d.dc)/100)}</td>
    <td><select class="fi" data-dst="${o.n}"${ch(d.st,o.st)}>${ST.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select>${d.st==='데모'?` <select class="fi" data-dd0="${o.n}">${['2026-11','2026-12','2027-01'].map(m=>`<option ${m===d.demo[0]?'selected':''}>${m}</option>`).join('')}</select>~<select class="fi" data-dd1="${o.n}">${['2026-12','2027-01','2027-02'].map(m=>`<option ${m===d.demo[1]?'selected':''}>${m}</option>`).join('')}</select>`:''}
     <div>${t?`<button class="lnk" data-untern="${o.n}">해지 취소</button>`:`<button class="lnk" style="color:#c2410c" data-term="${o.n}">해지</button>`}</div></td>
@@ -255,7 +257,7 @@ function bind(){
   const m=document.getElementById('memo'); if(m) m.oninput=()=>{S.memo=m.value;};
   const w=document.getElementById('who'); if(w) w.onchange=()=>{S.who=w.value;render();};
   q('[data-save]').forEach(b=>b.onclick=save);
-  q('[data-addopen]').forEach(b=>b.onclick=()=>{ const used=new Set(S.opts.map(o=>o.n)); S.add={n:(CAT.find(c=>!used.has(c[0]))||[''])[0],st:'신청',s:{}}; render(); });
+  q('[data-addopen]').forEach(b=>b.onclick=()=>{ const used=new Set(S.opts.filter(o=>o.st!=='해지').map(o=>o.n)); S.add={n:(CAT.find(c=>!used.has(c[0]))||[''])[0],st:'신청',s:{}}; render(); });
   q('[data-aopt]').forEach(x=>x.onchange=()=>{S.add.n=x.value;render();});
   q('[data-ast]').forEach(x=>x.onchange=()=>{S.add.st=x.value;});
   q('[data-am]').forEach(x=>x.onchange=()=>{S.add.s[x.dataset.am]={m:x.value};render();});
