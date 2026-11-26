@@ -468,6 +468,8 @@ function fModal(){
       <td><span class="dmSeg"><select class="fi sm" style="width:110px" data-fst="${o.n}">${ST_OPTS.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select>${d.st==='데모'?`<span class="seg demoPer" style="display:inline-flex;gap:4px;align-items:center"><select class="fi sm" style="width:96px" data-fd0="${o.n}">${['2026-12','2027-01'].map(m=>`<option ${m===d.demo[0]?'selected':''}>${m}</option>`).join('')}</select>~<select class="fi sm" style="width:96px" data-fd1="${o.n}">${['2026-12','2027-01','2027-02'].map(m=>`<option ${m===d.demo[1]?'selected':''}>${m}</option>`).join('')}</select></span>`:''}</span></td>
       <td>${fSchCell(o)}</td></tr>`; }).join('')}</tbody></table>
     <div class="fr" id="fAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" placeholder="없음"></div></div>
+    <div class="fr" id="fCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="fCat">${opt(DISC_CAT,'계약 할인')}</select><div class="hint" id="fCatHint"></div></div></div>
+    <div class="fr" id="fMemoRow"><span class="fl">메모<span class="req" id="fReq">*</span></span><div><input class="fi" id="fMemo" placeholder="기타 사유를 입력하세요"></div></div>
     <div class="fr" id="fWhoRow"><span class="fl">등록자</span><div><select class="fi" id="fWho" style="width:220px">${STAFF.map(n=>`<option ${n===F.who?'selected':''}>${n}</option>`).join('')}</select><div class="hint">기본값 = 로그인한 관리자(김운영) · 고른 등록자와 실제로 저장한 관리자를 따로 기록</div></div></div>
     <div class="fr" id="fTotRow"><span class="fl">12월 청구 예정</span><div class="ro"><b>${fmt(fPend())}원</b> (부가세 별도) · <b>${fmt(Math.round(fPend()*1.1))}원</b> (부가세 포함)</div></div>
   </div>
@@ -545,6 +547,7 @@ function renderBase(){
   $('content').innerHTML = base + mdl;
   bindAll();
   if($('dCat')) memoReq('dCat','dMemo','dReq',document.querySelector('#svcMdl .btn.pri'));
+  if($('fCat')){ const u=()=>{ $('fCatHint').textContent=hintOf(DISC_CAT,$('fCat').value); }; $('fCat').addEventListener('change',u); u(); memoReq('fCat','fMemo','fReq',document.querySelector('[data-foptsave]')); }   // 새 버전 수정 창 — 할인 사유 · 메모(기타면 필수)
   if($('cxCat')) memoReq('cxCat','cxMemo','cxReq',$('cxGo'),S.page==='bank');   // 수기 취소 처리는 메모 항상 필수
   if($('mpCat')) memoReq('mpCat','mpMemo','mpReq',document.querySelector('#mpMdl .btn.pri'));
 }
