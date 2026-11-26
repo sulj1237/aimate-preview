@@ -148,7 +148,7 @@
       <td><span class="hint" style="margin:0">공통 일정</span></td></tr></tbody></table>
     <div class="fr" id="fAmtRow"><span class="fl">금액 할인 (부가세 별도)</span><div><input class="fi" placeholder="없음" value=""></div></div>
     <div class="fr" id="fCatRow"><span class="fl">할인 사유</span><div><select class="fi" id="fCat"><option value="계약 할인" selected="">계약 할인</option><option value="보상 · 테스트">보상 · 테스트</option><option value="기타">기타</option></select><div class="hint" id="fCatHint"></div></div></div>
-    <div class="fr" id="fMemoRow"><span class="fl">메모<span class="req" id="fReq">*</span></span><div><input class="fi" id="fMemo" placeholder="기타 사유를 입력하세요" value=""></div></div>
+    <div class="fr" id="fMemoRow"><span class="fl">메모<span class="req" id="fReq">*</span></span><div><input class="fi" id="fMemo" maxlength="30" placeholder="기타 사유를 입력하세요" value=""><div class="hint memoN" data-for="fMemo">0/30자</div></div></div>
     <div class="fr" id="fWhoRow"><span class="fl">등록자</span><div><select class="fi" id="fWho" style="width:220px"><option selected="">김운영</option><option>이영업</option><option>박운영</option><option>최영업</option></select><div class="hint">기본값 = 로그인한 관리자(김운영) · 고른 등록자와 실제로 저장한 관리자를 따로 기록</div></div></div>
     <div class="fr" id="fTotRow"><span class="fl">12월 청구 예정</span><div class="ro"><b>45,000원</b> (부가세 별도) · <b>49,500원</b> (부가세 포함)</div></div>
   </div>

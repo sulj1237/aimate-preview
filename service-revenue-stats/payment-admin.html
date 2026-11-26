@@ -220,9 +220,9 @@ function discText(d=D){
 
 /* 약국 상세 — 상단 기본 정보 + 약국 서비스 목록 */
 function svcList(){
-  // 약국 분류 — 광동 VIP는 할인 구분을 함께 고름(11-26): 할인 적용(그 외 서비스 50%) / 할인 없음(굿팜 가입 뒤 VIP로 바뀐 약국, 지원 서비스만 0원). 기존 VIP는 모두 할인 적용으로 두고 담당자가 바꿈
+  // 약국 분류 — '광동 VIP' 옆에 '광동 VIP (할인 없음)'을 하나 더 둠(11-26): late VIP(굿팜 가입 뒤 VIP 전환)는 할인 없음으로 표시만 → 지원 서비스 0원 유지 · 그 외 서비스 정가. 기존 VIP는 모두 광동 VIP로 두고 담당자가 바꿈
   return `<div class="panel"><div class="ph"><h3>${PH.name}</h3><span class="sub">스토어 ID ${PH.store}</span></div>
-    <div class="opt" id="phCls"><b style="color:#1f2328;margin-right:10px">약국 분류</b>${['카드 등록 약국','광동 VIP','CS 업체','테스트','온비타민(DRS)'].map(x=>`<label style="margin-right:14px;font-size:12.5px;color:#2b2f33"><input type="checkbox" ${x==='광동 VIP'&&S.vip||x==='카드 등록 약국'?'checked':''} ${x==='광동 VIP'?'data-vip':''}> ${x}</label>`).join('')}${S.vip?`<span id="vipDc" style="display:inline-flex;gap:10px;align-items:center;border:1px solid #1fb6a6;background:#f3fbfa;border-radius:6px;padding:3px 10px;font-size:12.5px;color:#2b2f33">할인 <label><input type="radio" name="vdc" ${S.vip===1?'checked':''} data-vdc="1"> 할인 적용</label><label><input type="radio" name="vdc" ${S.vip===2?'checked':''} data-vdc="2"> 할인 없음 (가입 뒤 VIP 전환)</label></span><div class="hint" style="margin-top:4px">지원 서비스(키오스크 · 스마트 OCR · 스마트2D 중 1개)는 약국 결제 0원 그대로 · ${S.vip===2?'그 외 서비스는 정가':'그 외 서비스는 서비스 비용 50% 할인'} · 바꾸면 서비스 변경 이력에 남음</div>`:''}</div></div>
+    <div class="opt" id="phCls"><b style="color:#1f2328;margin-right:10px">약국 분류</b>${['카드 등록 약국','광동 VIP','광동 VIP (할인 없음)','CS 업체','테스트','온비타민(DRS)'].map(x=>`<label style="margin-right:14px;font-size:12.5px;color:#2b2f33${x==='광동 VIP (할인 없음)'&&S.vip===2?';background:#f3fbfa;border:1px solid #1fb6a6;border-radius:5px;padding:2px 6px':''}" ${x==='광동 VIP (할인 없음)'?'id="vipDc"':''}><input type="checkbox" ${x==='카드 등록 약국'||(x==='광동 VIP'&&S.vip===1)||(x==='광동 VIP (할인 없음)'&&S.vip===2)?'checked':''} ${x==='광동 VIP'?'data-vipc="1"':x==='광동 VIP (할인 없음)'?'data-vipc="2"':''}> ${x}</label>`).join('')}${S.vip===2?`<div class="hint" style="margin-top:4px">late VIP(굿팜 가입 뒤 VIP 전환) — 지원 서비스 0원은 그대로, 그 외 서비스는 정가 · 바꾸면 서비스 변경 이력에 남고 다음 청구분부터</div>`:''}</div></div>
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
@@ -362,8 +362,7 @@ function bindAll(){
   document.querySelectorAll('[data-bank]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.bank; go('bank'); });
   document.querySelectorAll('[data-payback]').forEach(b=>b.onclick=()=>{ S.cid=+b.dataset.payback; go('payback'); });
   if($('pbGo')) $('pbGo').onclick=()=>{ const h=HIST.find(x=>x[0]===S.cid); if(h) h[9]=$('pbDate').value.slice(5).replace('-','-')+' · 김운영'; go('sub'); };
-  document.querySelectorAll('[data-vip]').forEach(c=>c.onchange=()=>{ S.vip=c.checked?1:0; render(); });
-  document.querySelectorAll('[data-vdc]').forEach(c=>c.onchange=()=>{ S.vip=+c.dataset.vdc; render(); });
+  document.querySelectorAll('[data-vipc]').forEach(c=>c.onchange=()=>{ S.vip=c.checked?+c.dataset.vipc:0; render(); });   // 둘 중 하나만
   const r=$('svcRow'); if(r){ r.style.cursor='pointer'; r.onclick=()=>go('svc'); }
   document.querySelectorAll('.stSel').forEach(x=>x.onchange=()=>{ x.parentNode.querySelector('.demoPer').style.display=x.value==='데모'?'':'none'; });
   if($('schEdit')) $('schEdit').onclick=()=>{ S.sedit=1; render(); };
