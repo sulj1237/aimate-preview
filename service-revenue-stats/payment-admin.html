@@ -116,7 +116,7 @@
   <aside class="side" id="side"></aside>
   <div class="main">
     <div class="topbar">
-      <div class="crumb">약국관리 &gt; 약국 관리 &gt; <b>상세</b></div>
+      <div class="crumb">약국관리 &gt; 약국 관리 &gt; <b>상세</b><script>/* 다른 화면에서 왔으면 이전 페이지로 돌아가는 링크(11-26) */(()=>{const f=new URLSearchParams(location.search).get('from'); if(f) document.write('<a class="back" onclick="history.back()" style="color:#159b8d;cursor:pointer;font-weight:700;margin-left:10px">‹ '+f.replace(/[<>&"]/g,'')+'</a>');})();</script></div>
       <div class="demo">시안 화면
         <button data-go="svc">약국 서비스 수정</button>
         <button data-go="sub">정기 결제 내역</button>
@@ -246,7 +246,7 @@ function subPanel(){
   return `<div class="panel" id="subPanel"><div class="ph"><h3>정기 결제</h3></div>
     <div class="kvg"><div class="k">결제 방식</div><div>${PH.method}</div><div class="k">결제카드정보</div><div>${PH.card} &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
-  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm" onclick="window.open('index.html#pay','_blank')">약국 결제 관리</button></div></div>
+  <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm" onclick="location.href='index.html#pay'">약국 결제 관리</button></div></div>
     <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액 · 취소일</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody>${[...HIST].sort((a,b)=>b[1].localeCompare(a[1])).map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
       return `<tr data-id="${h[0]}"><td>${h[1]}</td><td><span class="wy">${isMan(h)?'수기':'정기'}</span></td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span>${h[3]==='bank'?' <span class="wy">수기 취소</span>':''}</td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
@@ -444,6 +444,11 @@ function fChanges(){
 }
 function fSave(){
   const ch=fChanges(); if(!ch.length){ toast('바뀐 항목이 없어요'); return; }
+  // 공통 일정 변경 = 한 줄로 묶음(11-26) — 바뀐 공통 항목 · 따라간 옵션 · 직접 지정을 유지한 옵션
+  if(F.scope==='common'){ const ks=[...new Set(ch.filter(c=>c.common).map(c=>c.k))];
+    const fol=[...new Set(ch.filter(c=>!c.common).map(c=>c.o))], keep=F.opts.filter(o=>ks.some(k=>fMode(o,k)!=='c')).map(o=>o.n);
+    F.log.unshift(['2026-11-26 10:30',F.who,'일정 변경','공통 일정 변경',ks.map(k=>`${k} ${F.common[k]||'미정'}`).join('<br>'),ks.map(k=>`${k} ${F.cform[k]||'미정'}`).join('<br>')+`<div class="hint" style="color:#5b6168">함께 바뀐 옵션 : ${fol.join(' · ')||'없음'}${keep.length?' · 직접 지정 유지 : '+keep.join(' · '):''}</div>`,ks.some(k=>k==='과금 시작일'||k==='해지일')?'2026-12':'',F.memo]);
+    ch.forEach(c=>c.ap&&c.ap()); F.edit=0; F.form={}; F.cform={}; F.pg='list'; F.flt='전체'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요'); return; }
   const g={}; ch.filter(c=>!c.common).forEach(c=>(g[c.o]=g[c.o]||[]).push(c));
   Object.entries(g).reverse().forEach(([o,cs])=>F.log.unshift(['2026-11-26 10:30',F.who,'일정 변경','일정 변경 · '+o,cs.map(c=>`${c.k} ${c.b}`).join('<br>'),cs.map(c=>`${c.k} ${c.a}`).join('<br>'),cs.some(c=>c.k==='과금 시작일'||c.k==='해지일')?'2026-12':'',F.memo]));
   ch.forEach(c=>c.ap&&c.ap()); F.edit=0; F.form={}; F.cform={}; F.pg='list'; F.flt='전체'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요');
@@ -490,7 +495,7 @@ function fCalc(){
    <tr><td colspan="4"><b>서비스 요금</b></td><td class="num"><b>${fmt(t)}</b></td><td></td></tr>
    <tr style="background:#fff8f6"><td colspan="4">금액 할인</td><td class="num">0</td><td class="hint">약국 총액에서 차감</td></tr>
    <tr><td colspan="4"><b>결제 예정 금액</b></td><td class="num"><b>${fmt(t)}원</b></td><td class="hint">서비스 요금과 같음</td></tr></tbody></table>
-   <div class="hint">데모 옵션은 데모 기간 청구분에서 그 옵션만 0원 · 함께 쓰는 유료 옵션은 기존 요금 그대로 · 데모가 끝난 뒤 자동 전환 없음(담당자가 승인으로 바꾸기 전까지 0원)</div></div></div>`;
+   <div class="hint">데모 옵션은 데모 기간 청구분에서 그 옵션만 0원 · 함께 쓰는 유료 옵션은 기존 요금 그대로 · 데모가 끝난 뒤 자동 전환 없음(상태만 <q>데모 기간 종료</q>로 바뀌고 안내만 보여요 — 승인 전환은 담당자)</div></div></div>`;
 }
 function renderFlow(){
   side(); document.querySelectorAll('.demo button').forEach(b=>b.classList.remove('on'));

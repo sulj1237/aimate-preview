@@ -1598,8 +1598,8 @@ if(/[?&](long|unpaid)=1/.test(location.search)){ Object.assign(S,{tab:'unpaid'})
 
 /* ───────── 공통 ───────── */
 function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>el.classList.remove('show'),1800); }
-// 링크 — 누르면 실제 이동할 화면(약국 상세 프로토타입)을 새 탭으로 연다(11-26)
-document.addEventListener('click',e=>{ const o=e.target.closest('[data-open]'); if(o){ e.preventDefault(); e.stopPropagation(); window.open(o.dataset.open,'_blank'); } },true);
+// 링크 — 누르면 실제 이동할 화면(약국 상세 프로토타입)으로 이동. 같은 탭이라 뒤로가기 · '‹ 이전 페이지'로 돌아옴(11-26)
+document.addEventListener('click',e=>{ const o=e.target.closest('[data-open]'); if(o){ e.preventDefault(); e.stopPropagation(); const u=o.dataset.open, from=S.page==='pay'?'약국 결제 관리':'서비스 청구 통계'; const [path,hash]=u.split('#'); location.href=path+(path.includes('?')?'&':'?')+'from='+encodeURIComponent(from)+(hash?'#'+hash:''); } },true);
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-toast]'); if(t){ e.stopPropagation(); toast(t.dataset.toast); }
   const pg=e.target.closest('[data-paygo]'); if(pg){ e.stopPropagation(); document.querySelectorAll('.mdl-bg').forEach(x=>x.remove()); goPay(); } }, true);
 document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{ S.sc=b.dataset.sc; if(S.sc==='first') S.month='2026-10'; document.querySelectorAll('[data-sc]').forEach(x=>x.classList.toggle('on',x===b)); S.cf='all'; render(); });
