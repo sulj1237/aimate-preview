@@ -351,7 +351,6 @@
   .pgb{margin-top:4px;font-size:11px;padding:1px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#3d444b;cursor:pointer;font-weight:600}.pgb.on{background:#eef0fc;border-color:#c7cdf5;color:#3b4bc8}
   .tbl.pay tr.pg-on td{background:#f4f5fd;border-bottom-color:transparent}.tbl.pay tr.pg-on td:first-child{box-shadow:inset 3px 0 0 #6b7bd8}
   .tbl.pay tr.pg-sub td{background:#f4f5fd;font-size:12px;color:#4a5158;padding-top:6px;padding-bottom:6px;border-bottom:1px dashed #dde0f3}.tbl.pay tr.pg-sub td:first-child{box-shadow:inset 3px 0 0 #6b7bd8}.tbl.pay tr.pg-sub.last td{border-bottom:1px solid var(--line)}.tbl.pay td.pg-tree{color:#6b7bd8;font-weight:700;text-align:left;padding-left:22px}
-  .pgbox{border:1px solid #c7cdf5;border-left:3px solid #6b7bd8;border-radius:8px;background:#fff;padding:10px 12px}.pgbox table{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px}.pgbox th{color:#8a9099;font-weight:600;text-align:left;padding:4px 8px;border-bottom:1px solid var(--line)}.pgbox td{padding:5px 8px;border-bottom:1px solid #f0f1f3;text-align:left}.pgbox .num{text-align:right}
 </style>
 </head>
 <body>
@@ -536,7 +535,7 @@ function person(seed){ const r=rng(seed), g=()=>GIVN[Math.floor(r()*GIVN.length)
 const K={c:'KIOSK'}, O={c:'SMART_OCR'}, PF={c:'PHARMACY_FIRST'}, D2={c:'SMART2D'}, D2K={c:'SMART2D',kd:1}, MO={c:'MOBILE_OCR'}, EDB={c:'EDB'}, ESL={c:'ESL'};
 const POS={c:'POS'}, FPK={c:'FULL_PACKAGE',v:'키오스크'}, FPO={c:'FULL_PACKAGE',v:'스마트 OCR'}, K2={c:'KIOSK',q:2}, O2={c:'SMART_OCR',q:2};
 const MIX = [
-  [68,[K]], [231,[O]], [43,[K,PF]], [41,[O,PF]], [14,[K,EDB]], [2,[O,EDB]], [19,[PF]], [38,[MO]], [17,[O,MO]], [15,[D2]],
+  [66,[K]], [2,[K,POS]], [231,[O]], [43,[K,PF]], [41,[O,PF]], [14,[K,EDB]], [2,[O,EDB]], [19,[PF]], [38,[MO]], [17,[O,MO]], [15,[D2]],
   [14,[D2,EDB]], [10,[D2,PF,EDB]], [7,[D2,PF]], [6,[FPK]], [1,[FPO]], [6,[K,O]], [5,[K,PF,MO]], [4,[K,PF,EDB]], [3,[K,MO]],
   [3,[O,PF,MO]], [3,[K,D2]], [3,[K,D2,PF]], [3,[PF,MO]], [2,[O2]], [1,[K2,PF]], [1,[EDB]], [1,[K,D2,EDB]],
   [1,[O,PF,EDB]], [1,[D2,MO]], [1,[O,D2,MO]], [1,[K,MO,EDB]], [1,[K,D2,PF,EDB]], [1,[D2,PF,MO,EDB]], [1,[K,PF,MO,EDB]],
@@ -1291,8 +1290,8 @@ function renderPay(){
       <div class="acts"><button class="btn" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">초기화</button><button class="btn pri" data-toast="데모 — 이동 직후 조회 조건만 보여줍니다">검색</button></div>
     </div>
     ${S.dEnd?`<div class="pay-top"><span>데모 기간 종료 · 종료 예정 <span class="cnt">${DEND.length}곳</span> <span style="color:#8a929a;font-size:12px">데모 기간이 이번 달로 끝나거나 이미 끝난 약국 — 담당자가 정기 결제로 바꾸기 전까지 그대로</span></span></div>
-    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 옵션</th><th>데모 기간</th><th>등록자</th><th>결제 카드</th><th>정기 결제로 바꾸면</th><th class="ctr">약국 상세</th></tr></thead>
-      <tbody>${DEND.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]} <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">${r[7]}</span></td><td>${r[5]}</td><td>${r[6]?'등록됨':'<b style="color:#b42318">미등록</b>'}</td><td>${fmt(r[4])}원</td><td class="ctr"><button class="lnk" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">약국 상세 ›</button></td></tr>`).join('')}</tbody></table></div>`:`
+    <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th>약국명</th><th>사업자 번호</th><th>데모 옵션</th><th>데모 기간</th><th>등록자</th><th>결제 카드</th><th>정기 결제로 바꾸면</th></tr></thead>
+      <tbody>${DEND.map(r=>`<tr><td style="text-align:left"><span class="sid" style="margin:0 0 1px">${sidLine(r[0])}</span><span class="link" data-toast="약국 상세 › 약국 서비스 목록을 새 탭으로 엽니다 (데모)">${r[0]}</span></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]} <span style="font-size:11px;font-weight:800;color:#a86b00;background:#fff3d6;border-radius:3px;padding:0 5px">${r[7]}</span></td><td>${r[5]}</td><td>${r[6]?'등록됨':'<b style="color:#b42318">미등록</b>'}</td><td>${fmt(r[4])}원</td></tr>`).join('')}</tbody></table></div>`:`
     <div class="pay-top"><span>${SL[F]} <span class="cnt">${list.length}건</span> <span style="color:#8a929a;font-size:12px">약국 × 청구월</span></span>
       <span class="r"><button class="btn pri" data-toast="데모 — 약국 결제 관리 기존 기능">엑셀 내보내기</button><select class="sel"><option>10개 씩</option></select></span></div>
     <div class="panel"><table class="tbl pay" id="pTbl">
