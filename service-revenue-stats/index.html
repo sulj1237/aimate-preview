@@ -1326,32 +1326,31 @@ const stCell=r=>{ if(!r.dm) return r.st; const [o,p,t]=r.dm, c=t==='데모'?['#f
   return `${r.st}<div style="margin-top:3px"><span style="display:inline-flex;align-items:center;gap:5px;border:1px solid ${c[1]};background:${c[0]};border-radius:6px;padding:1px 7px;font-size:12px;white-space:nowrap">${o}<span style="font-size:10.5px;font-weight:700;color:#fff;background:${c[2]};border-radius:3px;padding:0 4px">${c[3]}</span><span style="color:#5b6168;font-size:11px">${p}</span></span></div>`; };
 function renderPharm(){
   // 서비스상태 데모 → '데모 기간' 조건 추가(11-26) — 기본은 손봐야 할 '데모 기간 종료', 종료월 오래된 순
-  const st=S.pSt||'데모', DK={'기간 종료':'데모 기간 종료','진행 중':'데모'}, all=PLIST.filter(r=>r.dm);
+  const st=S.pSt||'전체', DK={'기간 종료':'데모 기간 종료','진행 중':'데모'}, all=PLIST.filter(r=>r.dm);
   const dq=S.pDem||'기간 종료', cntOf=k=>all.filter(r=>r.dm[2]===DK[k]).length;
   // 서비스상태 데모 = 데모 옵션이 있는 행 → 데모 기간으로 한 번 더 거름 · 종료월 오래된 순 / 그 밖의 상태 = 그 상태 행 / 전체 = 모두
-  const list=st==='데모'?(dq==='전체'?all:all.filter(r=>r.dm[2]===DK[dq])).slice().sort((a,b)=>a.dm[1].slice(-7)<b.dm[1].slice(-7)?-1:1):st==='전체'?PLIST:PLIST.filter(r=>r.st===st&&!r.dm);
+  const list0=st==='데모'?all.slice().sort((a,b)=>a.dm[1].slice(-7)<b.dm[1].slice(-7)?-1:1):st==='전체'?PLIST:PLIST.filter(r=>r.st===st&&!r.dm);
+  // 약국 분류 광동 VIP 체크 → 전체 · 일반 · 할인 없음으로 한 번 더(11-26)
+  const vs=S.pVipS||'전체', list=S.pVip?list0.filter(r=>r.vip&&(vs==='전체'||(vs==='일반'?r.vip===1:r.vip===2))):list0;
   const ck=a=>a.map(x=>`<label class="pck"><input type="checkbox"> ${x}</label>`).join('');
   const sel=(lab,v,opts,id)=>`<span class="pfl">${lab}</span><select class="sel pfs"${id?` id="${id}"`:''}>${opts.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
   const badge=t=>t==='데모'?'<span style="font-size:11px;font-weight:800;color:#fff;background:#2f5bd6;border-radius:3px;padding:0 5px">데모</span>':`<span style="font-size:11px;font-weight:800;color:${t==='데모 기간 종료'?'#c2410c':'#a86b00'};background:${t==='데모 기간 종료'?'#fff1e6':'#fff3d6'};border-radius:3px;padding:0 5px">${t}</span>`;
   document.getElementById('content').innerHTML=`
     <style>.dtabs{display:inline-flex;gap:6px;margin-right:10px}.dtab{border:1px solid #e3e6ea;border-radius:14px;padding:3px 11px;font-size:12.5px;cursor:pointer;background:#fff;color:#4b5158}.dtab b{margin-left:3px}.dtab.on{background:#2b2f33;border-color:#2b2f33;color:#fff}.dtab.ex:not(.on){border-color:#f0b4a8;color:#c2410c}.pck{display:inline-flex;align-items:center;gap:5px;margin-right:22px;font-size:12.5px;font-weight:600}.pgh{font-size:11.5px;color:#5b6168;margin:10px 0 6px}.pgrid{display:grid;grid-template-columns:repeat(4,auto 1fr);gap:8px 12px;align-items:center}.pfl{font-size:12.5px;font-weight:700}.pfs{width:100%}</style>
     <h2 class="pay-h">약국 관리</h2>
-    <div class="panel" style="padding:10px 16px;color:#5b6168;font-size:12.5px;margin-bottom:12px;background:#f3fbfa">${st==='전체'?'적용된 필터가 없습니다.':'적용된 필터 : 서비스상태 <b>'+st+'</b>'+(st==='데모'?' · 데모 기간 <b>'+dq+'</b>':'')}</div>
+    <div class="panel" style="padding:10px 16px;color:#5b6168;font-size:12.5px;margin-bottom:12px;background:#f3fbfa">${st==='전체'?'적용된 필터가 없습니다.':'적용된 필터 : 서비스상태 <b>'+st+'</b>'}</div>
     <div class="panel pay-f">
       <div class="frow"><select class="sel"><option>약국명</option><option>사업자번호</option><option>전화번호</option><option>스토어 ID</option></select><input class="din" style="width:320px" placeholder="약국명 입력"><button class="btn pri" data-toast="데모 — 조회 조건만 보여줍니다">검색</button><button class="btn" data-toast="데모 — 조회 조건만 보여줍니다">초기화</button></div>
       <div class="pgh">약국 분류</div><div id="pCls">${['카드 등록 약국','심사평가원 비맵핑 약국','광동 VIP','CS 업체','테스트','온비타민(DRS)'].map(x=>`<label class="pck"><input type="checkbox" ${x==='광동 VIP'?'data-pvip '+(S.pVip?'checked':''):''}> ${x}</label>${x==='광동 VIP'&&S.pVip?`<span id="pVipSub" style="display:inline-flex;gap:10px;margin:0 22px 0 -12px;font-size:12px;border:1px solid #1fb6a6;background:#f3fbfa;border-radius:5px;padding:2px 8px">${['전체','일반','할인 없음(late VIP)'].map(o=>`<label><input type="radio" name="pvs" data-pvs="${o}" ${(S.pVipS||'전체')===o?'checked':''}> ${o}</label>`).join('')}</span>`:''}`).join('')}</div>
-      <div class="pgh">서비스 필터</div><div class="pgrid" id="pSvcF">${sel('서비스명','전체',['전체','굿팜 솔루션 (NEW)'])}${sel('서비스옵션명','전체',['전체','키오스크','스마트 OCR','스마트2D','파머시 퍼스트','굿팜 POS'])}${sel('서비스상태',st,['전체','신청','설치 예정','설치 완료','데모','승인','해지'],'pSt')}${st==='데모'?`<span class="pfl">데모 기간</span><select class="sel pfs" id="pDem">${['기간 종료','진행 중','전체'].map(o=>`<option ${o===dq?'selected':''}>${o}${o==='전체'?'':' ('+cntOf(o)+')'}</option>`).join('')}</select>`:'<span></span><span></span>'}</div>
+      <div class="pgh">서비스 필터</div><div class="pgrid" id="pSvcF">${sel('서비스명','전체',['전체','굿팜 솔루션 (NEW)'])}${sel('서비스옵션명','전체',['전체','키오스크','스마트 OCR','스마트2D','파머시 퍼스트','굿팜 POS'])}${sel('서비스상태',st,['전체','신청','설치 예정','설치 완료','데모','승인','해지'],'pSt')}<span></span><span></span></div>
       <div class="pgh">조건 필터</div><div class="pgrid">${sel('업체명','전체',['전체'])}${sel('청구프로그램','전체',['전체'])}${sel('설치장비','전체',['전체'])}<span class="pfl">설치일</span><input class="din" placeholder="yyyy-mm-dd">${sel('유입경로','전체',['전체'])}${sel('계약서 상태','전체',['전체'])}${sel('OCR 엔진','전체',['전체'])}${sel('결제 방식','전체',['전체'])}</div>
     </div>
-    ${st==='데모'?`<div class="pay-top" id="pDemTabs"><span class="dtabs">${['기간 종료','진행 중','전체'].map(o=>`<span class="dtab ${o===dq?'on':''} ${o==='기간 종료'?'ex':''}" data-dem="${o}">${o==='기간 종료'?'데모 기간 종료 · 전환 필요':o} <b>${o==='전체'?all.length:cntOf(o)}</b></span>`).join('')}</span><span style="color:#8a929a;font-size:12px">종료월 오래된 순</span></div>`:''}
     <div class="pay-top"><span>전체 <span class="cnt">${fmt(list.length)}개</span></span><span><button class="btn">10개</button> <button class="btn">엑셀 내보내기</button> <button class="btn pri">약국 등록</button></span></div>
     <div class="panel"><table class="tbl pay" id="pDTbl"><thead><tr><th></th><th>약국명</th><th>주소</th><th>사업자번호</th><th>전화번호</th><th>서비스명</th><th>서비스 상태</th><th>신청일</th><th>설치일</th><th>문서 발송</th></tr></thead>
       <tbody>${list.map(r=>`<tr><td>${r.vip===2?'<span style="font-size:10px;font-weight:800;color:#0f6f65;background:#e6f7f4;border:1px solid #1fb6a6;border-radius:3px;padding:0 4px;white-space:nowrap">VIP 할인 없음</span>':r.vip?'<span style="font-size:10px;font-weight:800;color:#fff;background:#1fb6a6;border-radius:3px;padding:1px 5px">VIP</span>':''}</td><td style="text-align:left"><span class="link" data-open="payment-admin.html?f=list" title="약국 상세 열기"><b>${r.name}</b></span></td><td style="text-align:left;font-size:12px"><b>(${r.reg})</b> ${r.addr}</td><td>${r.biz}</td><td>${r.tel}</td><td>굿팜 솔루션 (NEW)</td><td style="text-align:left">${stCell(r)}</td><td>${r.req}</td><td>${r.ins||'-'}</td><td></td></tr>`).join('')}</tbody></table></div>`;
   const ps=document.getElementById('pSt'); if(ps) ps.onchange=()=>{ S.pSt=ps.value; renderPharm(); };
   document.querySelectorAll('[data-pvip]').forEach(c=>c.onchange=()=>{ S.pVip=c.checked; renderPharm(); });
   document.querySelectorAll('[data-pvs]').forEach(c=>c.onchange=()=>{ S.pVipS=c.dataset.pvs; renderPharm(); });
-  const pd=document.getElementById('pDem'); if(pd) pd.onchange=()=>{ S.pDem=pd.value.replace(/ \(\d+\)$/,''); renderPharm(); };
-  document.querySelectorAll('[data-dem]').forEach(t=>t.onclick=()=>{ S.pDem=t.dataset.dem; renderPharm(); });
 }
 function goPay(){ S.backY=window.scrollY; S.dEnd=false; S.payF='unpaid'; S.payW='all'; S.page='pay'; history.pushState({page:'pay'},'','#pay'); render(); window.scrollTo(0,0); }
 // 주소의 #guide · #inputs · #pay 로 바로 열기 (케이스 안내 · 입력 화면 시안 링크용)
