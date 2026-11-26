@@ -212,7 +212,7 @@ function svcList(){
   <div class="panel" id="svcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
     <tbody><tr id="svcRow"><td><b>굿팜 솔루션 (NEW)</b></td><td>2024-04-22</td><td>2024-04-22</td><td>2024-05-02</td><td>2024-06-05</td><td class="num">49,500</td><td>승인</td><td>서명 완료</td><td>이영업 · 2024-04-22</td></tr></tbody></table>
-    <div class="opt">옵션: 스마트 OCR · 굿팜 POS${DEMO.on?` · ${DEMO.opt} <span id="stCell">${demoCell()}</span>`:` · ${DEMO.opt}`} &nbsp;|&nbsp; 옵션 수 3 &nbsp;|&nbsp; 정기 과금액 ${DEMO.on?'49,500 <span class="hint">(데모 옵션 제외)</span>':'82,500'} &nbsp;|&nbsp; 결제일 5일</div>
+    <div class="opt">옵션: 스마트 OCR · 굿팜 POS${DEMO.on?` · ${DEMO.opt} <span id="stCell">${demoCell()}</span>`:` · ${DEMO.opt}`} &nbsp;|&nbsp; 옵션 수 3 &nbsp;|&nbsp; 정기 과금액 ${DEMO.on?'49,500 <span class="hint">(데모 옵션 제외)</span>':'82,500'}</div>
     ${svcLog()}
     </div>`;
 }
