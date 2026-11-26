@@ -151,7 +151,11 @@ const hintOf=(a,v)=>(a.find(x=>x[0]===v)||a[0])[1];
 
 /* 예시 약국 — 스마트 OCR 단독(49,500) · 10월 말 파머시 퍼스트 해지 */
 const PH={name:'샘플약국', store:'2024047xxxx', card:'신한카드 · 뒤 4자리 ****', method:'수기 정기결제(레거시)'};
-// 정기 결제 내역: [id, 과금일, 청구월, 결제상태, 결제액, 취소 금액, 실패 사유, 결제 이유, 취소 사유 · 메모]
+// 정기 결제 내역: [id, 과금일, 청구월, 결제상태, 결제액, 취소 금액, 실패 사유, 결제 이유, 취소 사유 · 메모] (+ [9] 취소 등록자 · [10] 결제 등록자 · [11] 취소일시 — CXAT)
+// 취소일시 — 한 줄에 결제와 취소를 같이 보여 주므로 취소 금액 칸 아래에 취소일(수기 취소는 입금일)을 따로 표시
+const CXAT={6:'2026-11-06 11:15',2:'2026-08-05 14:30'};
+const cxAt=h=>h[11]||CXAT[h[0]]||'2026-11-06 11:15';
+const CXLB={cx:'취소',rq:'요청',cf:'요청',bank:'입금'};
 const HIST=[
   [7,'2026-11-06 11:20','2026-11','ok',49500,0,'','[취소 후 재결제] 11월분 · 파머시 퍼스트 해지 반영',''],
   [6,'2026-11-05 10:02','2026-11','cx',71500,71500,'','11월 서비스 이용료','[과다 청구] 파머시 퍼스트 10월 해지 미반영'],
@@ -232,10 +236,10 @@ function subPanel(){
     <div class="kvg"><div class="k">결제 방식</div><div>${PH.method}</div><div class="k">결제카드정보</div><div>${PH.card} &nbsp;<button class="btn sm" id="manualBtn" data-go="manual">수기 결제</button></div>
       <div class="k">정기 결제 금액</div><div>49,500원</div><div class="k">정기 결제일</div><div>5일</div></div></div>
   <div class="panel" id="histPanel"><div class="ph"><h3>정기 결제 내역 <span class="sub">전체 ${HIST.length}</span></h3>${unpaid().length?`<span class="st fail" id="unpaidSum">미결제 ${unpaid().length}개월 · ${unpaid().join(' · ')}</span>`:''}<div class="right"><button class="btn sm">약국 결제 관리</button></div></div>
-    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
+    <table class="tbl" id="hTbl"><thead><tr><th>과금일</th><th>결제 방식</th><th>청구월</th><th>결제상태</th><th>실패사유</th><th class="num">결제액</th><th class="num">취소 금액 · 취소일</th><th>결제 이유 · 취소 사유</th><th class="ctr">결제 취소</th></tr></thead>
     <tbody>${[...HIST].sort((a,b)=>b[1].localeCompare(a[1])).map(h=>{ const [c,t]=ST[h[3]], can=h[3]==='ok'&&canCancel(h[1]);
       return `<tr data-id="${h[0]}"><td>${h[1]}</td><td><span class="wy">${isMan(h)?'수기':'정기'}</span></td><td>${h[2]}${h[3]==='fail'&&unpaid().includes(h[2])?' <span class="st fail">미결제</span>':''}</td><td><span class="st ${c}">${t}</span>${h[3]==='bank'?' <span class="wy">수기 취소</span>':''}</td><td>${h[6]||''}</td><td class="num">${fmt(h[4])}</td>
-      <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}</td>
+      <td class="num">${h[5]?'<span class="red">−'+fmt(h[5])+'</span>':''}${CXLB[h[3]]?'<div class="hint cxd">'+CXLB[h[3]]+' '+(h[3]==='bank'?cxAt(h).slice(5,10):cxAt(h).slice(5))+'</div>':''}</td>
       <td>${rsn(h[7])}${isMan(h)&&h[3]!=='fail'?'<span class="hint"> · 등록자 '+(h[10]||'김운영')+'</span>':''}${h[8]?'<div class="rs"><b>'+(h[3]==='bank'?'수기 취소':'취소')+'</b> '+rsn(h[8])+(/^(cx|bank|rq|cf)$/.test(h[3])?'<span class="hint"> · 등록자 '+(h[9]||'김운영')+'</span>':'')+'</div>':''}${h[3]==='rq'?'<div class="rs"><b>반환금</b> '+fmt(h[5])+'원 · 페이앱 입금 계좌 OO은행 ***-****-****'+' — 입금하면 페이앱이 카드 취소 후 알려 줘 취소 완료로 바뀜'+'</div>':''}</td>
       <td class="ctr">${can?`<button class="btn sm line" data-cancel="${h[0]}">결제 취소</button>`:''}${h[3]==='cf'||(h[3]==='ok'&&!can)?`<button class="btn sm line" data-bank="${h[0]}">수기 취소 처리</button>`:''}</td></tr>`; }).join('')}</tbody></table></div>`;
 }
