@@ -53,6 +53,7 @@ select.fi,input.fi{height:28px;border:1px solid var(--line);border-radius:6px;fo
 .conf{background:#fff;border:1px dashed #c7cbd0;border-radius:8px;padding:8px 12px;margin-top:10px;font-size:12px;line-height:1.8}
 .cell-sm{font-size:12px;color:#4b5158}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2b2f33;color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;z-index:9;display:none}
+.htbl th,.htbl td{font-size:12px;padding:6px 10px}.htbl tr.g0 td{border-top:2px solid #e3e6ea}.htbl td[rowspan]{background:#fafbfc}
 </style></head><body><div class="wrap">
 <h1>약국 서비스 수정 — 공통 일정 · 옵션별 일정 · 일정 변경 이력 <span class="mut" style="font-size:13px;font-weight:500">제안 시안 (추천안 반영)</span></h1>
 <p class="lead">약국관리 › 약국 관리 › 약국 상세. 같은 예시 데이터(샘플약국 · 굿팜 솔루션 (NEW))로 <b>기본 조회 → POS 일정만 수정 → 저장 후 이력</b>을 눌러 볼 수 있어요. 버튼 · 입력도 실제로 움직여요.</p>
@@ -117,7 +118,8 @@ function modal(){
     <div class="cgrid">${K.map(k=>`<div><span>${k}</span><b>${S.common[k]||'미정'}</b></div>`).join('')}</div>
     <div class="hint">모든 옵션에 같이 적용되는 일정이에요. 한 옵션만 달라지면 그 옵션에서 직접 지정해요.</div>
     <div style="margin-top:8px"><button class="hbtn" data-hist>옵션 · 일정 변경 이력 ${hl.length}건 ${S.hist?'▴':'▾'}</button><span class="ph2">2차</span>
-    ${S.hist?`<div class="hbox">${hl.length?hl.map(l=>`<div><b>${l[0]} · ${l[1]} · ${l[3]}</b>${l[7]?' · '+l[7]:''}<br>${l[8].map(c=>`&nbsp;&nbsp;${c}`).join('<br>')}</div>`).join('<hr style="border:0;border-top:1px solid #eef0f2">'):'<span class="mut">아직 옵션 · 일정 변경이 없어요</span>'}</div>`:''}</div></div>
+    ${S.hist?(hl.length?`<div style="overflow-x:auto;margin-top:8px"><table class="htbl"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>항목</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th><th>메모</th></tr></thead><tbody>${hl.map(l=>{ const R=l[9]||[], n=R.length||1, sp=`rowspan="${n}"`;
+      return R.map((r,i)=>`<tr class="${i===0?'g0':''}">${i===0?`<td ${sp}>${l[0]}</td><td ${sp}>${l[1]}</td><td ${sp}><b>${l[3]}</b></td>`:''}<td>${r[0]}</td><td class="chg-b">${r[1]===''?'<span class="mut">−</span>':r[1]}</td><td class="chg-a">${r[2]}</td>${i===0?`<td ${sp}>${l[6]?(+l[6].slice(5))+'월 청구분':'<span class="mut">−</span>'}</td><td ${sp} class="cell-sm">${l[7]||''}</td>`:''}</tr>`).join(''); }).join('')}</tbody></table></div>`:'<div class="hint">아직 옵션 · 일정 변경이 없어요</div>'):''}</div></div>
   ${S.edit?editBox():''}
   <div class="sec"><table><thead><tr><th>옵션명</th><th class="num">금액</th><th class="num">수량</th><th class="num">할인</th><th class="num">총액</th><th>서비스 상태</th><th>일정</th></tr></thead><tbody>
   ${S.opts.map(optRow).join('')}
@@ -158,14 +160,14 @@ function optChanges(){
   const out=[];
   S.opts.forEach(o=>{
     if(o.pend){ const det=[`금액 ${fmt(o.p)} · 수량 ${o.q} · 할인 ${o.dc}% · 상태 ${o.st}`].concat(K.slice(0,5).map(k=>`${k} ${lab(o,k)}`));
-      out.push({o,t:'옵션 추가 · '+o.n,b:'없음',a:det.join('<br>'),ym:eff(o,'과금 시작일')?eff(o,'과금 시작일').slice(0,7):'',lines:['없음 → 추가'].concat(det),ap:()=>{delete o.pend;}}); return; }
+      out.push({o,t:'옵션 추가 · '+o.n,b:'없음',a:det.join('<br>'),ym:eff(o,'과금 시작일')?eff(o,'과금 시작일').slice(0,7):'',lines:['없음 → 추가'].concat(det),rows:[['금액','',fmt(o.p)],['수량','',o.q],['서비스별 할인','',o.dc+'%'],['상태','',o.st]].concat(K.slice(0,5).map(k=>[k,'',lab(o,k)])),ap:()=>{delete o.pend;}}); return; }
     const d=S.dr[o.n]; if(!d||o.st==='해지') return;
     const L=[]; if(d.q!==o.q) L.push(['수량',o.q,d.q]); if(d.dc!==o.dc) L.push(['서비스별 할인',o.dc+'%',d.dc+'%']);
     if(L.length){ const b=fmt(o.p*o.q*(100-o.dc)/100), a=fmt(o.p*d.q*(100-d.dc)/100); L.push(['옵션 금액',b,a]);
-      out.push({o,t:'옵션 변경 · '+o.n,b:L.map(l=>`${l[0]} ${l[1]}`).join('<br>'),a:L.map(l=>`${l[0]} ${l[2]}`).join('<br>'),ym:'2026-12',lines:L.map(l=>`${l[0]} ${l[1]} → ${l[2]}`),ap:()=>{o.q=d.q;o.dc=d.dc;}}); }
+      out.push({o,t:'옵션 변경 · '+o.n,b:L.map(l=>`${l[0]} ${l[1]}`).join('<br>'),a:L.map(l=>`${l[0]} ${l[2]}`).join('<br>'),ym:'2026-12',lines:L.map(l=>`${l[0]} ${l[1]} → ${l[2]}`),rows:L,ap:()=>{o.q=d.q;o.dc=d.dc;}}); }
     const sb=o.st+(o.st==='데모'?` (${o.demo[0]} ~ ${o.demo[1]})`:''), sa=d.st+(d.st==='데모'?` (${d.demo[0]} ~ ${d.demo[1]})`:'');
-    if(sb!==sa) out.push({o,t:'옵션 상태 변경 · '+o.n,b:sb,a:sa,ym:(o.st==='데모'||d.st==='데모'||d.st==='승인')?(d.st==='데모'?d.demo[0]:'2026-12'):'',lines:[`상태 ${sb} → ${sa}`],ap:()=>{o.st=d.st; if(d.st==='데모') o.demo=[...d.demo];}});
-    if(d.term) out.push({o,t:'옵션 해지 · '+o.n,b:`${o.st} · 해지일 미정`,a:`해지 · 해지일 ${d.term.at}<br>사유 ${d.term.why}`,ym:nextYm(d.term.at),lines:[`상태 ${o.st} → 해지`,`해지일 미정 → ${d.term.at}`,`사유 ${d.term.why}`],ap:()=>{o.st='해지'; o.s['해지일']={m:'d',v:d.term.at};}});
+    if(sb!==sa) out.push({o,t:'옵션 상태 변경 · '+o.n,b:sb,a:sa,ym:(o.st==='데모'||d.st==='데모'||d.st==='승인')?(d.st==='데모'?d.demo[0]:'2026-12'):'',lines:[`상태 ${sb} → ${sa}`],rows:[['상태',sb,sa]],ap:()=>{o.st=d.st; if(d.st==='데모') o.demo=[...d.demo];}});
+    if(d.term) out.push({o,t:'옵션 해지 · '+o.n,b:`${o.st} · 해지일 미정`,a:`해지 · 해지일 ${d.term.at}<br>사유 ${d.term.why}`,ym:nextYm(d.term.at),lines:[`상태 ${o.st} → 해지`,`해지일 미정 → ${d.term.at}`,`사유 ${d.term.why}`],rows:[['상태',o.st,'해지'],['해지일','미정',d.term.at],['해지 사유','',d.term.why]],ap:()=>{o.st='해지'; o.s['해지일']={m:'d',v:d.term.at};}});
   });
   return out;
 }
@@ -215,7 +217,7 @@ function save(){
   const groups={}; ch.filter(c=>!c.common).forEach(c=>(groups[c.o]=groups[c.o]||[]).push(c));
   Object.entries(groups).reverse().forEach(([o,cs])=>{
     const bill=cs.some(c=>BILL.has(c.k));
-    S.log.unshift([at,by,'일정 변경','일정 변경 · '+o,cs.map(c=>`${c.k} ${c.b}`).join('<br>'),cs.map(c=>`${c.k} ${c.a}`).join('<br>'),bill?'2026-12':'',S.memo,cs.map(c=>`${c.k} ${c.b} → ${c.a}`)]);
+    S.log.unshift([at,by,'일정 변경','일정 변경 · '+o,cs.map(c=>`${c.k} ${c.b}`).join('<br>'),cs.map(c=>`${c.k} ${c.a}`).join('<br>'),bill?'2026-12':'',S.memo,cs.map(c=>`${c.k} ${c.b} → ${c.a}`),cs.map(c=>[c.k,c.b,c.a])]);
   });
   ch.forEach(c=>c.apply());
   S.edit=0; S.form={}; S.cform={}; S.flt='일정 변경'; S.hist=1; S.scn=3; toast('저장했어요 — 서비스 변경 이력에 남았어요');
@@ -268,7 +270,7 @@ function bind(){
   q('[data-del]').forEach(b=>b.onclick=()=>{ S.opts=S.opts.filter(o=>o.n!==b.dataset.del); toast('저장 전이라 이력 없이 지웠어요'); render(); });
   const am=document.getElementById('addMemo'); if(am) am.oninput=()=>{S.addMemo=am.value;};
   q('[data-addsave]').forEach(b=>b.onclick=()=>{ const ch=optChanges(), by=S.who==='김운영'?'김운영':S.who+' (입력 김운영)';
-    ch.slice().reverse().forEach(c=>S.log.unshift(['2026-11-26 10:40',by,'옵션',c.t,c.b,c.a,c.ym,S.addMemo||'',c.lines]));
+    ch.slice().reverse().forEach(c=>S.log.unshift(['2026-11-26 10:40',by,'옵션',c.t,c.b,c.a,c.ym,S.addMemo||'',c.lines,c.rows]));
     ch.forEach(c=>c.ap()); S.dr={}; S.termOpen=null;
     S.flt='옵션'; S.hist=1; S.scn=S.scn===6?7:5; toast('저장했어요 — 변경 이력에 남았어요'); render(); });
   const v=x=>x; q('[data-dq]').forEach(i=>i.onchange=()=>{ D(S.opts.find(o=>o.n===i.dataset.dq)).q=+i.value; render(); });
