@@ -205,14 +205,15 @@ const SCH=[{no:1,at:'2024-04-22 09:30',who:'이영업',opt:'스마트 OCR · 굿
 const ST_OPTS=['신청','설치 예정','설치 완료','데모','승인','해지'];
 function demoCell(d=DEMO){ const ex=d.to&&d.to<NOW, [c,t]=ex?['ex','데모 기간 종료']:d.to===NOW?['px','데모 종료 예정']:['dmo','데모'];
   return `<span class="chip ${c}" id="stCell" data-go="svc">${d.opt}<span class="s">${t}</span><span class="p">${period(d)}${ex?' · 승인 전까지 그대로':''}</span></span>`; }
-// 서비스 변경 이력 — 데모 지정 · 해제, 결제 카드 등록, 금액 할인 등록을 시점 · 처리자와 함께 쌓음 (최신이 위)
+// 서비스 변경 이력 — 서비스 등록, 옵션 추가 · 변경 · 상태 변경 · 해지, 일정 변경, 금액 할인, 결제 카드를 시점 · 등록자와 함께 쌓음 (최신이 위)
 // [일시, 작업자, 내용, 변경 전 → 후, 적용 시작월(청구분)] — 등록과 수정은 각각 한 줄. 작업자 · 변경 전후는 여기서만 보여 주고, 계산 내역에는 적용 시작월만
 // 등록자 선택지 — 직원 관리의 굿팜 담당자(예시). 기본값 = 로그인한 관리자(김운영)
 const STAFF=['김운영','이영업','박운영','최영업'];
-const SVC_LOG=[['2026-09-28 15:40','김운영','금액 할인 수정','−5,500 [계약 할인]','−11,000 [계약 할인] DRS 파머시 퍼스트 중복','2026-10'],
-  ['2026-05-28 15:40','이영업 (입력 김운영)','금액 할인 등록','없음','−5,500 [계약 할인] DRS 파머시 퍼스트 중복','2026-06'],
-  ['2024-06-03 11:20','이영업','결제 카드 등록','없음','신한카드 · 뒤 4자리 ****',''],
-  ['2024-04-22 09:30','이영업','서비스 등록 · 승인','없음','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS','2024-06']];
+// 이력 표기 규칙(11-26) — 내용 = '종류 · 대상', 변경 전 · 후 = 같은 항목 이름 + 값(한 줄에 한 항목), 월 청구액이 바뀌면 마지막 줄에 '월 청구액'
+const SVC_LOG=[['2026-09-28 15:40','김운영','금액 할인 수정 · 굿팜 솔루션 (NEW)','금액 할인 −5,500 [계약 할인]<br>월 청구액 55,000','금액 할인 −11,000 [계약 할인] DRS 파머시 퍼스트 중복<br>월 청구액 49,500','2026-10'],
+  ['2026-05-28 15:40','이영업 (입력 김운영)','금액 할인 등록 · 굿팜 솔루션 (NEW)','금액 할인 없음<br>월 청구액 60,500','금액 할인 −5,500 [계약 할인] DRS 파머시 퍼스트 중복<br>월 청구액 55,000','2026-06'],
+  ['2024-06-03 11:20','이영업','결제 카드 등록 · 굿팜 솔루션 (NEW)','결제 카드 없음','결제 카드 신한카드 · 뒤 4자리 ****',''],
+  ['2024-04-22 09:30','이영업','서비스 등록 · 굿팜 솔루션 (NEW)','없음','옵션 스마트 OCR · 굿팜 POS<br>월 청구액 60,500','2024-06']];
 const svcLog=()=>`<div class="opt" id="svcLog"><b style="color:#1f2328">서비스 변경 이력</b><table class="tbl" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody>${SVC_LOG.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td><td><b>${l[2]}</b></td><td style="color:#8a9099">${esc(l[3])}</td><td>${esc(l[4])}</td><td>${l[5]?(+l[5].slice(0,4))+'년 '+(+l[5].slice(5))+'월 청구분':'<span style="color:#8a9099">−</span>'}</td></tr>`).join('')}</tbody></table></div>`;
 function discText(d=D){
   return `금액 할인 <span class="red">−${fmt(d.amt*1.1)}</span> <span class="ctag">${d.cat}</span>${esc(d.memo)}${d.who?' <span class="hint">등록 '+d.who+(d.at?' · '+d.at:'')+'</span>':''}`; }
@@ -385,7 +386,7 @@ let F;
 function fInit(){
   F={common:{'신청일':'2026-11-20','설치 예정일':'2026-12-05','계약일':'2026-11-24','설치일':null,'과금 시작일':'2026-12-05','해지일':null},
      opts:[{n:'스마트 OCR',p:45000,q:1,dc:0,st:'설치 예정',s:{}},{n:'굿팜 POS',p:0,q:1,dc:0,st:'설치 예정',s:{},free:1},{n:'스마트2D',p:30000,q:1,dc:50,st:'설치 예정',s:{},demo:['2026-12','2027-01']}],
-     log:[['2026-11-24 10:05','이영업','서비스','서비스 등록','없음','굿팜 솔루션 (NEW) · 스마트 OCR · 굿팜 POS · 스마트2D','2026-12']],
+     log:[['2026-11-24 10:05','이영업','서비스','서비스 등록 · 굿팜 솔루션 (NEW)','없음','옵션 스마트 OCR · 굿팜 POS · 스마트2D<br>월 청구액 66,000','2026-12']],
      pg:'list', edit:0, scope:'opt', sel:new Set(['굿팜 POS']), form:{}, cform:{}, memo:'', who:'김운영', hist:0, flt:'전체', dr:{} };
 }
 fInit();
@@ -406,7 +407,7 @@ function fLogTbl(rows,id){
   return `<table class="tbl" id="${id}" style="margin-top:6px"><thead><tr><th>일시</th><th>등록자</th><th>내용</th><th>변경 전</th><th>변경 후</th><th>적용 시작월</th></tr></thead><tbody>${rows.length?rows.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td><td><b>${l[3]}</b>${l[7]?`<div class="hint">메모: ${esc(l[7])}</div>`:''}</td><td style="color:#8a9099">${l[4]}</td><td style="color:#c2410c;font-weight:700">${l[5]}</td><td>${l[6]?(+l[6].slice(0,4))+'년 '+(+l[6].slice(5))+'월 청구분':'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="hint">이 종류의 변경 이력이 없어요</td></tr>'}</tbody></table>`;
 }
 function fList(){
-  const FL=['전체','옵션','데모','일정 변경'], rows=F.log.filter(l=>F.flt==='전체'||l[2]===F.flt);
+  const FL=['전체','서비스','옵션','일정'], rows=F.log.filter(l=>F.flt==='전체'||l[2]===F.flt);
   return `<div class="panel"><div class="ph"><h3>새봄약국</h3><span class="sub">스토어 ID 2026112xxxx · 흐름도 3번 예시(신규 계약)</span></div></div>
   <div class="panel" id="fSvcPanel"><div class="ph"><h3>약국 서비스 목록</h3><div class="right"><button class="btn sm">서비스등록</button></div></div>
     <table class="tbl"><thead><tr><th>서비스명</th><th>신청일</th><th>계약일</th><th>설치일</th><th>과금시작일</th><th class="num">과금액</th><th>서비스상태</th><th>계약서상태</th><th>등록자</th></tr></thead>
@@ -447,14 +448,14 @@ function fSave(){
   // 공통 일정 변경 = 한 줄로 묶음(11-26) — 바뀐 공통 항목 · 따라간 옵션 · 직접 지정을 유지한 옵션
   if(F.scope==='common'){ const ks=[...new Set(ch.filter(c=>c.common).map(c=>c.k))];
     const fol=[...new Set(ch.filter(c=>!c.common).map(c=>c.o))], keep=F.opts.filter(o=>ks.some(k=>fMode(o,k)!=='c')).map(o=>o.n);
-    F.log.unshift(['2026-11-26 10:30',F.who,'일정 변경','공통 일정 변경',ks.map(k=>`${k} ${F.common[k]||'미정'}`).join('<br>'),ks.map(k=>`${k} ${F.cform[k]||'미정'}`).join('<br>')+`<div class="hint" style="color:#5b6168">함께 바뀐 옵션 : ${fol.join(' · ')||'없음'}${keep.length?' · 직접 지정 유지 : '+keep.join(' · '):''}</div>`,ks.some(k=>k==='과금 시작일'||k==='해지일')?'2026-12':'',F.memo]);
+    F.log.unshift(['2026-11-26 10:30',F.who,'일정','일정 변경 · 공통 일정',ks.map(k=>`${k} ${F.common[k]||'미정'}`).join('<br>'),ks.map(k=>`${k} ${F.cform[k]||'미정'}`).join('<br>')+`<div class="hint" style="color:#5b6168">함께 바뀐 옵션 : ${fol.join(' · ')||'없음'}${keep.length?' · 직접 지정 유지 : '+keep.join(' · '):''}</div>`,ks.some(k=>k==='과금 시작일'||k==='해지일')?'2026-12':'',F.memo]);
     ch.forEach(c=>c.ap&&c.ap()); F.edit=0; F.form={}; F.cform={}; F.pg='list'; F.flt='전체'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요'); return; }
   const g={}; ch.filter(c=>!c.common).forEach(c=>(g[c.o]=g[c.o]||[]).push(c));
-  Object.entries(g).reverse().forEach(([o,cs])=>F.log.unshift(['2026-11-26 10:30',F.who,'일정 변경','일정 변경 · '+o,cs.map(c=>`${c.k} ${c.b}`).join('<br>'),cs.map(c=>`${c.k} ${c.a}`).join('<br>'),cs.some(c=>c.k==='과금 시작일'||c.k==='해지일')?'2026-12':'',F.memo]));
+  Object.entries(g).reverse().forEach(([o,cs])=>F.log.unshift(['2026-11-26 10:30',F.who,'일정','일정 변경 · '+o,cs.map(c=>`${c.k} ${c.b}`).join('<br>'),cs.map(c=>`${c.k} ${c.a}`).join('<br>'),cs.some(c=>c.k==='과금 시작일'||c.k==='해지일')?'2026-12':'',F.memo]));
   ch.forEach(c=>c.ap&&c.ap()); F.edit=0; F.form={}; F.cform={}; F.pg='list'; F.flt='전체'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요');
 }
 function fModal(){
-  const hl=F.log.filter(l=>l[2]==='일정 변경');
+  const hl=F.log.filter(l=>l[2]==='일정');
   return `<div class="dim" data-fclose></div><div class="mdl wide" id="fMdl"><div class="mh"><h3>약국 서비스 수정</h3><button class="x" data-fclose>×</button></div>
   <div class="mb">
     <div class="fr"><span class="fl">서비스</span><div class="ro">굿팜 솔루션 (NEW)</div></div>
@@ -483,7 +484,7 @@ function fOptSave(){
   const before=Math.round(fTot('2026-12')*1.1);
   ch.forEach(c=>{ c.o.st=c.d.st; if(c.d.st==='데모') c.o.demo=[...c.d.demo]; });
   const after=Math.round(fTot('2026-12')*1.1);
-  ch.reverse().forEach(c=>F.log.unshift(['2026-11-26 10:40',F.who,c.d.st==='데모'?'데모':'옵션',(c.d.st==='데모'?'데모 지정 · ':'옵션 상태 변경 · ')+c.o.n,c.sb,c.sa+(before!==after?`<div class="hint" style="color:#5b6168">12월 청구 예정 ${fmt(before)} → ${fmt(after)}</div>`:''),c.d.st==='데모'?c.d.demo[0]:'2026-12','']));
+  ch.reverse().forEach(c=>F.log.unshift(['2026-11-26 10:40',F.who,'옵션','상태 변경 · '+c.o.n,`상태 ${c.sb}`+(before!==after?`<br>월 청구액 ${fmt(before)}`:''),`상태 ${c.sa}`+(before!==after?`<br>월 청구액 ${fmt(after)}`:''),c.d.st==='데모'?c.d.demo[0]:'2026-12','']));
   F.dr={}; F.pg='list'; render(); toast('저장했어요 — 서비스 변경 이력에 남았어요');
 }
 function fCalc(){
